@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="uchat"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/snikolayen/uchat/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/snikolayen/uchat/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/snikolayen/uchat/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="uchat">
+				<Option output="/Users/snikolayen/uchat/cmake-build-debug/uchat" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/snikolayen/uchat/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/snikolayen/uchat/."/>
+					<Add directory="/Users/snikolayen/uchat/inc"/>
+					<Add directory="/Users/snikolayen/uchat/libmx"/>
+					<Add directory="/Users/snikolayen/uchat/libmx/inc"/>
+					<Add directory="/Users/snikolayen/uchat/libmx/src"/>
+					<Add directory="/Users/snikolayen/uchat/src"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 uchat"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="uchat/fast">
+				<Option output="/Users/snikolayen/uchat/cmake-build-debug/uchat" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/snikolayen/uchat/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/snikolayen/uchat/."/>
+					<Add directory="/Users/snikolayen/uchat/inc"/>
+					<Add directory="/Users/snikolayen/uchat/libmx"/>
+					<Add directory="/Users/snikolayen/uchat/libmx/inc"/>
+					<Add directory="/Users/snikolayen/uchat/libmx/src"/>
+					<Add directory="/Users/snikolayen/uchat/src"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 uchat/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/snikolayen/uchat/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/snikolayen/uchat/Makefile">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/inc/uchat.h">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/Makefile">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/inc/libmx.h">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/libmx.a">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_atoi.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_bubble_sort.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_clear_list.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_count_substr.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_count_words.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_create_node.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_del_strarr.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_file_to_str.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_foreach.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_get_char_index.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_get_sub_index.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_isalpha.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_isdigit.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_isspace.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_itoa.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_list_size.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_memcpy.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_pop_back.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_pop_front.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_pow.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_printchar.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_printerr.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_printint.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_printstr.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_printstr_color.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_push_back.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_push_front.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_realloc.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_replace_substr.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_str_reverse.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strcat.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strcmp.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strcpy.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strdel.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strdup.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strjoin.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strlen.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strncmp.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strncpy.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strndup.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strnew.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strsplit.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strstr.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_strtrim.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/libmx/src/mx_swap_char.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/src/client/client.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/src/server/server.c">
+			<Option target="uchat"/>
+		</Unit>
+		<Unit filename="/Users/snikolayen/uchat/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

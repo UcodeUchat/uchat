@@ -1,0 +1,3 @@
+/Users/snikolayen/uchat/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/snikolayen/uchat/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/snikolayen/uchat/cmake-build-debug/CMakeFiles/uchat.dir
