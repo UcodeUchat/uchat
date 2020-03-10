@@ -4,13 +4,15 @@ NAME_C = uchat
 
 INC = uchat.h
 
-SRC_SERVER = server.c
+SRC_SERVER = main_server.c \
+             mx_server_worker.c
 
-SRC_CLIENT = client.c
+SRC_CLIENT = main_client.c
 
-OBJ_SERVER = server.o
+OBJ_SERVER = main_server.o \
+             mx_server_worker.o
 
-OBJ_CLIENT = client.o
+OBJ_CLIENT = main_client.o
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic
 

@@ -43,10 +43,10 @@
 #define MX_BOLD_RED "\x1B[[1;31m"
 #define MX_BOLD_BLUE "\x1B[1;34m"
 
-int mx_interact(int client_sock);
-void mx_remove_client(struct pollfd **fds, int *fd_count, int i);
+//int mx_interact(int client_sock);
+//void mx_remove_client(struct pollfd **fds, int *fd_count, int i);
 int mx_daemonize(const char *log_file);
-
+void *mx_worker(void *arg);
 
 
 #endif
