@@ -15,6 +15,8 @@
 #include <arpa/inet.h>
 #include <poll.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <signal.h>
 
 
 #include "libmx/inc/libmx.h"

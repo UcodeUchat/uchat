@@ -1,0 +1,32 @@
+server new client socket 2
+client_sock = 2
+New client created
+pid 7375, tid 252936192: new thread, client socket = 2
+Wed Mar 11 18:18:46 2020	Received 456
+Sent 457
+
+Closed connection
+server new client socket 2
+client_sock = 2
+New client created
+pid 7375, tid 253472768: new thread, client socket = 2
+Wed Mar 11 18:20:20 2020	Received 23456
+Sent 23457
+
+Closed connection
+server new client socket 2
+client_sock = 2
+New client created
+pid 7375, tid 254009344: new thread, client socket = 2
+Wed Mar 11 18:47:43 2020	Received 55
+Sent 56
+
+server new client socket 3
+client_sock = 3
+New client created
+pid 7375, tid 254545920: new thread, client socket = 3
+Wed Mar 11 18:53:35 2020	Received 1000
+Sent 1001
+
+Closed connection
+Closed connection
