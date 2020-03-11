@@ -1,4 +1,4 @@
-NAME_S = chat_server
+NAME_S = uchat_server
 NAME_C = uchat
 
 
