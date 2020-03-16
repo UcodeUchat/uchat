@@ -17,6 +17,13 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <errno.h>
 
 
 #include "libmx/inc/libmx.h"
@@ -48,6 +55,6 @@
 
 int mx_set_demon(const char *log_file);
 void *mx_worker(void *arg);
-
+int main2(int argc, char *argv[]);
 
 #endif

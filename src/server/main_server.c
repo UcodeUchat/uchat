@@ -1,5 +1,6 @@
 #include "uchat.h"
 
+
 int mx_set_demon(const char *log_file) {
     int fd;
     pid_t pid;
@@ -46,8 +47,14 @@ int mx_set_demon(const char *log_file) {
     return setsid();
 }
 
-int main(int argc, const char **argv) {
-    uint16_t port = atoi(argv[1]);
+int main(int argc, char **argv) {
+
+
+
+main2(argc, argv);
+
+
+   uint16_t port = atoi(argv[1]);
     int server;
 
     if (argc < 2) {
@@ -58,20 +65,49 @@ int main(int argc, const char **argv) {
         printf("error = %s\n", strerror(errno));
         return -1;
     }
-    server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+    printf("Configuring local address...\n");
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+
+    struct addrinfo *bind_address;
+    getaddrinfo(0, argv[1], &hints, &bind_address);
+
+
+char abuf[INET_ADDRSTRLEN];
+const char *addr;
+struct sockaddr_in *sinp;
+
+sinp = (struct sockaddr_in *)bind_address->ai_addr;
+addr = inet_ntop(AF_INET, &sinp->sin_addr, abuf, INET_ADDRSTRLEN);
+
+    printf("bind_adress %s\n", addr);
+
+    printf("Creating socket...\n");
+    server = socket(bind_address->ai_family,
+            bind_address->ai_socktype, bind_address->ai_protocol);
     if (server == -1) {
         printf("socket error = %s\n", strerror(errno));
         return -1;
     }
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    inet_aton("10.112.13.9", &addr.sin_addr);
-
-    if (bind(server, (struct sockaddr *) &addr, sizeof(addr)) != 0) {
+    struct sockaddr_in serv_addr;
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(port);
+    inet_aton("192.168.174.128", &serv_addr.sin_addr);
+    if (bind(server, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
         printf("bind error = %s\n", strerror(errno));
         return -1;
     }
+
+    // if (bind(server, bind_address->ai_addr, bind_address->ai_addrlen)) {
+        // printf("bind error = %s\n", strerror(errno));
+        // return -1;
+    // }
+    freeaddrinfo(bind_address);
+
     if (listen(server, SOMAXCONN) == -1) {
         printf("listen error = %s\n", strerror(errno));
         return -1;
@@ -99,3 +135,28 @@ int main(int argc, const char **argv) {
     return 0;
 }
 
+/*
+        // Конвертирует имя хоста в IP адрес
+    server = gethostbyname(argv[0]);
+    if (server == NULL) {
+        fprintf(stderr,"ERROR, no such host\n");
+        exit(-1);
+    }
+    // Указаваем адрес IP сокета
+    bcopy((char *)server->h_addr,
+          (char *)&_addr.sin_addr.s_addr,
+          server->h_length);
+    */
+
+    /*
+    struct hostent *server;
+     int n;
+//     char *host;
+     if ((n = sysconf(_SC_HOST_NAME_MAX)) < 0)
+        n = HOST_NAME_MAX; // лучшее, что можно сделать
+    if ((host = malloc(n)) == NULL)
+        err_sys("ошибка вызова функции malloc");
+    if (gethostname(host, n) < 0)
+        err_sys("ошибка вызова функции gethostname");
+
+*/

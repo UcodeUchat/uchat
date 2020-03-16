@@ -5,12 +5,14 @@ NAME_C = uchat
 INC = uchat.h
 
 SRC_SERVER = main_server.c \
-             mx_server_worker.c
+             mx_server_worker.c \
+	     functions.c
 
 SRC_CLIENT = main_client.c
 
 OBJ_SERVER = main_server.o \
-             mx_server_worker.o
+             mx_server_worker.o \
+	     functions.o
 
 OBJ_CLIENT = main_client.o
 
