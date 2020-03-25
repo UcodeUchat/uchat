@@ -6,6 +6,16 @@ int main(int argc, const char **argv) {
     int enable = 1;
     int err;
 
+    SSL_library_init();
+    OpenSSL_add_all_algorithms();
+    SSL_load_error_strings();
+
+    SSL_CTX *ctx = SSL_CTX_new(TLS_client_method());
+    if (!ctx) {
+        fprintf(stderr, "SSL_CTX_new() failed.\n");
+        return 1;
+    }
+
     if (argc < 3) {
         mx_printerr("usage: uchat [ip_adress] [port]\n");
         return -1;
@@ -32,7 +42,6 @@ int main(int argc, const char **argv) {
 
 
     // sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
 
     sock = socket(peer_address->ai_family,
                   peer_address->ai_socktype, peer_address->ai_protocol);
@@ -61,16 +70,57 @@ int main(int argc, const char **argv) {
     }
     freeaddrinfo(peer_address);
 
+    //SSL
+    SSL *ssl = SSL_new(ctx);
+    if (!ctx) {
+        fprintf(stderr, "SSL_new() failed.\n");
+        return 1;
+    }
+
+    if (!SSL_set_tlsext_host_name(ssl, argv[1])) {
+        fprintf(stderr, "SSL_set_tlsext_host_name() failed.\n");
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    SSL_set_fd(ssl, sock);
+    if (SSL_connect(ssl) == -1) {
+        fprintf(stderr, "SSL_connect() failed.\n");
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    printf ("SSL/TLS using %s\n", SSL_get_cipher(ssl));
+
+    mx_show_certs(ssl);
 
     int number;
     while (scanf("%d", &number) > 0) {
-        if (write(sock, &number, sizeof(number)) == -1) {
+
+        if (SSL_write(ssl, &number, sizeof(number)) == -1) {
             printf("error write= %s\n", strerror(errno));
             continue;
         }
         printf("Sent %d\n", number);
         number = 0;
-        int rc = read(sock, &number, sizeof(number));
+/*
+        int bytes_received = SSL_read(ssl, buffer, sizeof(buffer));
+        if (bytes_received < 1) {
+            printf("\nConnection closed by peer.\n");
+            break;
+        }
+
+        int bytes_sent = SSL_write(ssl, read, strlen(read));
+        printf("Sent %d bytes.\n", bytes_sent);
+
+
+        printf("Received (%d bytes): '%.*s'\n",
+               bytes_received, bytes_received, buffer);
+
+
+*/
+        ////
+        int rc = SSL_read(ssl, &number, sizeof(number));
         if (rc == 0) {
             printf("Closed connection\n");
             break;
@@ -80,11 +130,40 @@ int main(int argc, const char **argv) {
         else
             printf("Received %d\n", number);
     }
+    printf("Closing socket...\n");
+    SSL_shutdown(ssl);
+    SSL_free(ssl);
+    SSL_CTX_free(ctx);
     close(sock);
     return 0;
 }
 
+void mx_show_certs(SSL* ssl) {
+    X509 *cert;
+//    char *line;
+    char *tmp;
 
+    cert = SSL_get_peer_certificate(ssl);
+    if (!cert) {
+        fprintf(stderr, "SSL_get_peer_certificate() failed.\n");
+//        return 1;
+        exit(1);
+    }
+
+    printf("Server certificates:\n");
+    if ((tmp = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0))) {
+        printf("subject: %s\n", tmp);
+        OPENSSL_free(tmp);
+    }
+
+    if ((tmp = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0))) {
+        printf("issuer: %s\n", tmp);
+        OPENSSL_free(tmp);
+    }
+
+    X509_free(cert);
+    OPENSSL_free(tmp);
+}
 
 /*
 struct addrinfo *addr;

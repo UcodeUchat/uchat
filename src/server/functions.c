@@ -119,4 +119,32 @@ int main2(int argc, char *argv[]) {
 	// exit(0);
 }
 
+void mx_show_certs(SSL* ssl) {
+    X509 *cert;
+//    char *line;
+    char *tmp;
+
+    cert = SSL_get_peer_certificate(ssl);
+    if (!cert) {
+        fprintf(stderr, "SSL_get_peer_certificate() failed.\n");
+//        return 1;
+        exit(1);
+    }
+
+    printf("Server certificates:\n");
+    if ((tmp = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0))) {
+        printf("subject: %s\n", tmp);
+        OPENSSL_free(tmp);
+    }
+
+    if ((tmp = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0))) {
+        printf("issuer: %s\n", tmp);
+        OPENSSL_free(tmp);
+    }
+
+    X509_free(cert);
+    OPENSSL_free(tmp);
+}
+
+
 

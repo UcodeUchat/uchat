@@ -1,7 +1,6 @@
 #ifndef UCHAT_H
 #define UCHAT_H
 
-#include <sys/socket.h>
 #include <sys/un.h>
 #include <stdio.h>
 #include <string.h>
@@ -17,13 +16,25 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <signal.h>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <unistd.h>
 #include <errno.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <openssl/crypto.h>
+#include <openssl/x509.h>
+#include <openssl/pem.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+
+
+#include <string.h>
+#include <sys/socket.h>
+#include <resolv.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 
 #include "libmx/inc/libmx.h"
@@ -56,5 +67,8 @@
 int mx_set_demon(const char *log_file);
 void *mx_worker(void *arg);
 int main2(int argc, char *argv[]);
+void mx_show_certs(SSL* ssl);
+void mx_load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
+SSL_CTX* mx_init_server_ctx(void);
 
 #endif

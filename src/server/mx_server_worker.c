@@ -5,7 +5,7 @@ void *mx_worker(void *arg) {
     ssize_t size;
     time_t now;
 
-
+    printf("run worker\n");
     printf("client_sock = %d\n", client_sock);
     printf("New client created\n");
 
