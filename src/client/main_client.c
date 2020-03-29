@@ -16,6 +16,8 @@ int main(int argc, const char **argv) {
         return 1;
     }
 
+    printf("SSL_CTX_new() failed.\n");
+
     if (argc < 3) {
         mx_printerr("usage: uchat [ip_adress] [port]\n");
         return -1;

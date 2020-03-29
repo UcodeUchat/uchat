@@ -49,10 +49,11 @@ int mx_set_demon(const char *log_file) {
 
 int main(int argc, char **argv) {
     main2(argc, argv);  // test info
-    SSL_CTX *ctx;
 
-   uint16_t port = atoi(argv[1]);
+    SSL_CTX *ctx;
+    uint16_t port = atoi(argv[1]);
     int server;
+
     if (argc < 2) {
         mx_printerr("usage: chat_server [port]\n");
         _exit(1);
@@ -63,6 +64,8 @@ int main(int argc, char **argv) {
     }
 
     ctx = mx_init_server_ctx();  // initialize SSL
+    printf("1--------++++\n");
+
     mx_load_certificates(ctx, "newreq.pem", "newreq.pem"); // load cert
 
     printf("Configuring local address...\n");
@@ -96,7 +99,7 @@ addr = inet_ntop(AF_INET, &sinp->sin_addr, abuf, INET_ADDRSTRLEN);
     struct sockaddr_in serv_addr;
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
-    inet_aton("193.168.1.124", &serv_addr.sin_addr);
+    inet_aton("192.168.1.124", &serv_addr.sin_addr);
     if (bind(server, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
         printf("bind error = %s\n", strerror(errno));
         return -1;
@@ -140,7 +143,7 @@ addr = inet_ntop(AF_INET, &sinp->sin_addr, abuf, INET_ADDRSTRLEN);
             fprintf(stderr, "SSL_new() failed.\n");
             return 1;
         }
-        if (!SSL_set_tlsext_host_name(ssl, "193.168.1.124")) {
+        if (!SSL_set_tlsext_host_name(ssl, "192.168.1.124")) {
             fprintf(stderr, "SSL_set_tlsext_host_name() failed.\n");
             ERR_print_errors_fp(stderr);
             return 1;
@@ -192,6 +195,8 @@ SSL_CTX* mx_init_server_ctx(void) {
 
 void mx_load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file) {
     // set the local certificate from CertFile
+    printf("load_cer----1\n");
+
     if (SSL_CTX_use_certificate_file(ctx, cert_file, SSL_FILETYPE_PEM) <= 0) {
         ERR_print_errors_fp(stderr);
         abort();
@@ -201,11 +206,14 @@ void mx_load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file) {
         ERR_print_errors_fp(stderr);
         abort();
     }
+    printf("load_cer----2\n");
     // verify private key
     if (!SSL_CTX_check_private_key(ctx)) {
         fprintf(stderr, "Private key does not match the public certificate\n");
         abort();
     }
+
+    printf("load_cer----3\n");
 }
 
 /*
