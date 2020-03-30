@@ -7,6 +7,8 @@ int mx_daemonize(t_info *info) {
     struct sigaction sa;
     (void)info;
 
+
+    printf("demon 1 .\n");
     if((pid = fork()) < 0) {
         perror("error fork");
         exit(1);
@@ -19,6 +21,8 @@ int mx_daemonize(t_info *info) {
     sa.sa_handler = SIG_IGN;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
+
+    printf("demon 2 .\n");
     if (sigaction(SIGHUP, &sa, NULL) < 0)
         mx_printerr("невозможно игнорировать сигнал SIGHUP");
     // Закрыть все открытые файловые дескрипторы.
@@ -28,10 +32,10 @@ int mx_daemonize(t_info *info) {
         close(i);
 //    if (chdir("/") < 0)
 //        mx_printerr("%s: невозможно сделать текущим рабочим каталогом /\n");
-
-    if ((fd = open(REPORT_FILENAME, O_CREAT | O_WRONLY | O_TRUNC | O_APPEND, S_IRWXU)) == -1)
+    printf("demon 3.\n");
+    if ((fd = open("server_log", O_CREAT | O_WRONLY | O_TRUNC | O_APPEND, S_IRWXU)) == -1)
         mx_err_exit("open error\n");
-//    printf("log_file fd  %d\n", fd);
+    printf("log_file fd  %d\n", fd);
     if (dup2(fd, STDOUT_FILENO) == -1
         || dup2(fd, STDERR_FILENO) == -1) {
         mx_err_exit("dup error\n");

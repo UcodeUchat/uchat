@@ -55,7 +55,7 @@
 #define MX_BOLD_RED "\x1B[[1;31m"
 #define MX_BOLD_BLUE "\x1B[1;34m"
 
-#define REPORT_FILENAME "uchat_log.txt"
+#define REPORT_FILENAME "server_log.txt"
 
 #define BUFLEN 128
 #define QLEN 10
@@ -104,10 +104,10 @@ void mx_err_exit(char *err_msg); // вивести помилку і тоді в
 void mx_sigio_handler(int sigio);
 int mx_init_info_server(t_info **info, int argc, char **argv); // initialization of main structure (info)
 int mx_daemonize(t_info *info); // перейти в режим демона
-void mx_start_server(t_info *info); // створення сокетів та потоків для клієнтів
+int mx_start_server(t_info *info); // створення сокетів та потоків для клієнтів
 
 // client_step ################################################################
-void *mx_start_client(void *argument); // коли клієнт запускає програму, то попадає сюди
+void *mx_worker(void *argument); // коли клієнт запускає програму, то попадає сюди
 
 // work_with_clients.c
 char *mx_read_client_input(int fd); // функція для зчитування повідомлення від клієнта

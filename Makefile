@@ -7,7 +7,7 @@ SRC_SERVER = main_server.c \
 	init_info_server.c \
 	daemonize.c \
 	start_server.c \
-	start_client_server.c \
+	worker_thread.c\
 	work_with_clients_list.c \
 	read_client_input.c \
 	check_client_requests.c \
@@ -29,7 +29,7 @@ OBJ_SERVER = main_server.o \
 	init_info_server.o \
 	daemonize.o \
 	start_server.o \
-	start_client_server.o \
+	worker_thread.o \
 	work_with_clients_list.o \
 	read_client_input.o \
 	check_client_requests.o \

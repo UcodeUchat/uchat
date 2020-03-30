@@ -1,33 +1,43 @@
 #include "inc/uchat.h"
 
-static int initserver(const struct sockaddr *addr, socklen_t alen) {
-    int fd;
-//    int err = 0;
-
-    if ((fd = socket(addr->sa_family, SOCK_STREAM, IPPROTO_IP)) < 0)
-        mx_err_exit("socket error\n");
-    if (bind(fd, addr, alen) < 0)
-        mx_err_exit("bind error\n");
-    if (listen(fd, SOMAXCONN) < 0)
-        mx_err_exit("listen error\n");
-    return fd;
-}
-
-void mx_start_server(t_info *info) {
+int mx_start_server(t_info *info) {
     int listen_fd;
+//    struct sockaddr_in sa;
+    struct addrinfo hints;
+    struct addrinfo *bind_address;
 
-    struct sockaddr_in sa;
-    inet_aton("192.168.1.124", &(sa.sin_addr));
-    sa.sin_family = AF_INET;
-    sa.sin_port = htons(info->port);
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
 
-    listen_fd = initserver((struct sockaddr *)&sa, sizeof(sa));
+    getaddrinfo(0, info->argv[1], &hints, &bind_address);
+    listen_fd = socket(bind_address->ai_family,
+                    bind_address->ai_socktype, bind_address->ai_protocol);
+    if (listen_fd == -1) {
+        printf("socket error = %s\n", strerror(errno));
+        return -1;
+    }
+
+    struct sockaddr_in serv_addr;
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(info->port);
+    inet_aton("192.168.1.124", &serv_addr.sin_addr);
+    if (bind(listen_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
+        printf("bind error = %s\n", strerror(errno));
+        return -1;
+    }
+
+    if (listen(listen_fd, SOMAXCONN) == -1) {
+        printf("listen error = %s\n", strerror(errno));
+        return -1;
+    }
 
     printf("listen fd = %d\n", listen_fd);
 
     pthread_attr_t attr;
     pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    pthread_attr_setdetachstate(&attr, 1);
 
     while (1) {
         pthread_t client_thread;
@@ -40,14 +50,16 @@ void mx_start_server(t_info *info) {
             continue;
         }
         pthread_mutex_lock(&info->mutex);
-        if ((thread_error = pthread_create(&client_thread, &attr,
-        mx_start_client, info)) != 0) {
+        if ((thread_error = pthread_create(&client_thread, &attr, mx_worker, info)) != 0) {
             printf("error pthread_create = %s\n", strerror(thread_error));
             close(client_sock);
         }
         mx_push_client_back(&(info->clients), client_sock, client_thread);
         pthread_mutex_unlock(&info->mutex);
     }
+    pthread_attr_destroy(&attr);
+    close(listen_fd);
+    return 0;
 }
 
 
