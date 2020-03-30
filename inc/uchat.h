@@ -27,6 +27,7 @@
 #include <sqlite3.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <syslog.h>
 
 #include "../libmx/inc/libmx.h"
 
@@ -103,7 +104,7 @@ void mx_err_exit(char *err_msg); // вивести помилку і тоді в
 
 void mx_sigio_handler(int sigio);
 int mx_init_info_server(t_info **info, int argc, char **argv); // initialization of main structure (info)
-int mx_daemonize(t_info *info); // перейти в режим демона
+void mx_daemonize(t_info *info); // перейти в режим демона
 int mx_start_server(t_info *info); // створення сокетів та потоків для клієнтів
 
 // client_step ################################################################

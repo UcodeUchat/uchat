@@ -32,10 +32,14 @@ int main(int argc, char **argv) {
 
     mx_init_info_server(&info, argc, argv);
     printf("Configuring .\n");
+
+    mx_daemonize(info);
+    /*
     if (mx_daemonize(info) == -1) {
         printf("error = %s\n", strerror(errno));
         return -1;
     }
+     */
     printf("Configuring demon ++...\n");
     if (mx_start_server(info) == -1) {
         printf("error = %s\n", strerror(errno));
