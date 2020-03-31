@@ -38,6 +38,7 @@ void mx_sign_up(t_info *info, t_clients *client_info) {
     write(client_info->fd, "Enter your login: ", 18);
     client_info->login = mx_read_client_input(client_info->fd);
     write(client_info->fd, "Enter your password: ", 21);
+    client_info->password = mx_read_client_input(client_info->fd);
     command = malloc(1024);
     sprintf(command, "SELECT id FROM accounts WHERE login='%s'", client_info->login);
     if (sqlite3_exec(info->db, command, check_data, &times_exec, NULL) != SQLITE_OK
