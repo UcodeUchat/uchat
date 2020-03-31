@@ -13,7 +13,6 @@ void mx_daemonize(t_info *info) {
     if (getrlimit(RLIMIT_NOFILE, &rl) < 0)
         mx_err_exit("невозможно получить максимальный номер дескриптора");
 
-    printf("demon 1 .\n");
     if((pid = fork()) < 0) {
         perror("error fork");
         exit(1);
@@ -33,8 +32,6 @@ void mx_daemonize(t_info *info) {
     sa.sa_handler = SIG_IGN;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
-
-    printf("demon 2 .\n");
     if (sigaction(SIGHUP, &sa, NULL) < 0)
         mx_printerr("невозможно игнорировать сигнал SIGHUP");
     // Закрыть все открытые файловые дескрипторы.
