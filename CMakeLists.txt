@@ -1,0 +1,66 @@
+cmake_minimum_required(VERSION 3.15)
+project(uchat)
+
+set(CMAKE_CXX_STANDARD 14)
+
+include_directories(inc)
+include_directories(libmx)
+include_directories(libmx/inc)
+include_directories(src)
+
+add_executable(uchat
+        inc/uchat.h
+        libmx/inc/libmx.h
+        libmx/src/mx_atoi.c
+        libmx/src/mx_bubble_sort.c
+        libmx/src/mx_clear_list.c
+        libmx/src/mx_count_substr.c
+        libmx/src/mx_count_words.c
+        libmx/src/mx_create_node.c
+        libmx/src/mx_del_strarr.c
+        libmx/src/mx_file_to_str.c
+        libmx/src/mx_foreach.c
+        libmx/src/mx_get_char_index.c
+        libmx/src/mx_get_sub_index.c
+        libmx/src/mx_isalpha.c
+        libmx/src/mx_isdigit.c
+        libmx/src/mx_isspace.c
+        libmx/src/mx_itoa.c
+        libmx/src/mx_list_size.c
+        libmx/src/mx_memcpy.c
+        libmx/src/mx_pop_back.c
+        libmx/src/mx_pop_front.c
+        libmx/src/mx_pow.c
+        libmx/src/mx_printchar.c
+        libmx/src/mx_printerr.c
+        libmx/src/mx_printint.c
+        libmx/src/mx_printstr.c
+        libmx/src/mx_printstr_color.c
+        libmx/src/mx_push_back.c
+        libmx/src/mx_push_front.c
+        libmx/src/mx_realloc.c
+        libmx/src/mx_replace_substr.c
+        libmx/src/mx_str_reverse.c
+        libmx/src/mx_strcat.c
+        libmx/src/mx_strcmp.c
+        libmx/src/mx_strcpy.c
+        libmx/src/mx_strdel.c
+        libmx/src/mx_strdup.c
+        libmx/src/mx_strjoin.c
+        libmx/src/mx_strlen.c
+        libmx/src/mx_strncmp.c
+        libmx/src/mx_strncpy.c
+        libmx/src/mx_strndup.c
+        libmx/src/mx_strnew.c
+        libmx/src/mx_strsplit.c
+        libmx/src/mx_strstr.c
+        libmx/src/mx_strtrim.c
+        libmx/src/mx_swap_char.c
+        libmx/libmx.a
+        libmx/Makefile
+        src/client/main_client.c
+        src/server/functions.c
+        src/server/main_server.c
+        src/server/mx_server_worker.c
+        Makefile
+        README.md)

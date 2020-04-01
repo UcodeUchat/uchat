@@ -1,0 +1,64 @@
+Configuring demon ++...
+Configuring local address...
+listen fd = 0
+bind_adress 0.0.0.0
+server new client socket 2
+New connection from 
+New client created
+client_sock = 2
+pid 9133, tid 223485952: new thread, client socket = 2
+Thu Apr  2 00:06:57 2020	Received qq
+Sent 2 bytes.
+Thu Apr  2 00:07:28 2020	Received ww
+Sent 2 bytes.
+Thu Apr  2 00:09:55 2020	Received 
+Sent 0 bytes.
+server new client socket 2
+New connection from 
+New client created
+client_sock = 2
+pid 9133, tid 224022528: new thread, client socket = 2
+Thu Apr  2 00:10:54 2020	Received 
+Sent 0 bytes.
+server new client socket 2
+New connection from 
+New client created
+client_sock = 2
+pid 9133, tid 224559104: new thread, client socket = 2
+Thu Apr  2 00:11:20 2020	Received qq
+Sent 2 bytes.
+Thu Apr  2 00:11:27 2020	Received eee
+Sent 3 bytes.
+Thu Apr  2 00:11:44 2020	Received [Aww
+Sent 5 bytes.
+Thu Apr  2 00:11:46 2020	Received 
+Sent 0 bytes.
+server new client socket 2
+New connection from 
+New client created
+client_sock = 2
+pid 9133, tid 225095680: new thread, client socket = 2
+Thu Apr  2 00:12:49 2020	Received one
+Sent 3 bytes.
+Thu Apr  2 00:12:56 2020	Received ono1
+Sent 4 bytes.
+server new client socket 3
+New connection from 
+New client created
+client_sock = 3
+pid 9133, tid 225632256: new thread, client socket = 3
+Thu Apr  2 00:13:12 2020	Received ttttt
+Sent 5 bytes.
+Thu Apr  2 00:20:42 2020	Received sssssss
+Sent 7 bytes.
+Thu Apr  2 00:20:43 2020	Received 
+Sent 0 bytes.
+server new client socket 2
+New connection from 
+New client created
+client_sock = 2
+pid 9133, tid 226168832: new thread, client socket = 2
+Thu Apr  2 00:34:55 2020	Received aaaaaa
+Sent 6 bytes.
+Thu Apr  2 00:36:52 2020	Received dddddd
+Sent 6 bytes.
