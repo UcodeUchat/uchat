@@ -28,6 +28,8 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <syslog.h>
+#include <sys/event.h>
+#include <sys/time.h>
 
 #include "libmx/inc/libmx.h"
 

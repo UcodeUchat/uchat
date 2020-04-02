@@ -1,17 +1,19 @@
 #include "uchat.h"
 
-void *mx_worker(void *arg) {
-    int client_sock = *((int *)arg);
-//    ssize_t size;
-    time_t now;
+int mx_worker(int client_sock) {
+    ssize_t size;
+    int buffer;
 
-    printf("New client created\n");
     printf("client_sock = %d\n", client_sock);
+    now = time(0);
+    char * time_str = ctime(&now);
+    time_str[strlen(time_str)-1] = '\0';
 
-    pthread_t thread_id = pthread_self();
-    pid_t pid = getpid();
-    printf("pid %d, tid %d: new thread, client socket = %d\n",
-           (int)pid, (int)thread_id, *((int *) arg));
+    size = read(client_sock, &buffer, sizeof(buffer));
+    if (size == -1)
+        return -1;
+    printf("%s\tReceived %s\n", time_str, buffer);
+    int bytes_sent = send(client_sock, buffer, strlen(buffer), 0);
 
     while(1) {
 //        int buffer = 0;
@@ -31,9 +33,6 @@ void *mx_worker(void *arg) {
             break;
         }
          */
-        now = time(0);
-        char * time_str = ctime(&now);
-        time_str[strlen(time_str)-1] = '\0';
         printf("%s\tReceived %s\n", time_str, read);
 
         int bytes_sent = send(client_sock, read, strlen(read), 0);
