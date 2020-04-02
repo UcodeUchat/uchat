@@ -47,6 +47,13 @@ int mx_start_server(t_info *info) {
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, 1);
+
+
+    fd_set master;
+    FD_ZERO(&master);
+    FD_SET(socket_listen, &master);
+    SOCKET max_socket = socket_listen;
+
     while (1) {
         pthread_t worker_thread;
         struct sockaddr_storage client_address;
