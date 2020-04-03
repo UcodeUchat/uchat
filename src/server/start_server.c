@@ -1,7 +1,7 @@
 #include "uchat.h"
 
-int mx_start_server(t_info *info) {
-    int server_socket;
+int mx_start_server(t_server_info *info) {
+    int server;
     struct addrinfo hints;
     struct addrinfo *bind_address;
     struct sockaddr_in serv_addr;
@@ -14,71 +14,96 @@ int mx_start_server(t_info *info) {
     hints.ai_flags = AI_PASSIVE;
 
     getaddrinfo(0, info->argv[1], &hints, &bind_address);
-    server_socket = socket(bind_address->ai_family,
+    server = socket(bind_address->ai_family,
                        bind_address->ai_socktype, bind_address->ai_protocol);
-    if (server_socket == -1) {
+    if (server == -1) {
         printf("socket error = %s\n", strerror(errno));
         return -1;
     }
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(info->port);
     inet_aton("192.168.1.124", &serv_addr.sin_addr);
-    if (bind(server_socket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
+    if (bind(server, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
         printf("bind error = %s\n", strerror(errno));
         return -1;
     }
-    if (listen(server_socket, SOMAXCONN) == -1) {
+    if (listen(server, SOMAXCONN) == -1) {
         printf("listen error = %s\n", strerror(errno));
         return -1;
     }
-
-    printf("listen fd = %d\n", server_socket);
-////
-    char abuf[INET_ADDRSTRLEN];
-    const char *addr;
-    struct sockaddr_in *sinp;
-
-    sinp = (struct sockaddr_in *)bind_address->ai_addr;
-    addr = inet_ntop(AF_INET, &sinp->sin_addr, abuf, INET_ADDRSTRLEN);
-    printf("bind_adress %s\n", addr);
-////
-
+    printf("listen fd = %d\n", server);
     freeaddrinfo(bind_address);
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, 1);
 
+    int kq;
+    if ((kq = kqueue()) == -1) {
+        printf("error = %s\n", strerror(errno));
+        close(server);
+        return -1;
+    }
 
-    fd_set master;
-    FD_ZERO(&master);
-    FD_SET(socket_listen, &master);
-    SOCKET max_socket = socket_listen;
+    // add server sock in struct kevent
+    struct kevent new_ev;
+    EV_SET(&new_ev, server, EVFILT_READ, EV_ADD, 0, 0, 0);
+    if (kevent(kq, &new_ev, 1, 0, 0, NULL) == -1) {
+        printf("error = %s\n", strerror(errno));
+        close(server);
+        return -1;
+    }
+    struct timespec timeout;
+    timeout.tv_sec = 1;  // seconds
+    timeout.tv_nsec = 0;  // nanoseconds
 
     while (1) {
-        pthread_t worker_thread;
-        struct sockaddr_storage client_address;
-        socklen_t client_len = sizeof(client_address);
-        char address_buffer[100];
-
-        int client_sock = accept(server_socket, NULL, NULL);
-        if (client_sock == -1) {
-            printf("error = %s\n", strerror(errno));
+        int event = kevent(kq, NULL, 0, &new_ev, 1, &timeout);
+        if (event == 0) {  // check new event
             continue;
         }
-        printf("server new client socket %d\n", client_sock);
-        getnameinfo((struct sockaddr*)&client_address, client_len,
-                    address_buffer, sizeof(address_buffer), 0, 0,
-                    NI_NUMERICHOST);
-        printf("New connection from %s\n", address_buffer);
+        if (event == -1) {
+            printf("error = %s\n", strerror(errno));
+            break;
+        }
+        if (new_ev.ident == (uintptr_t) server) {  // if new connect - add new client
+            int client_sock = accept(server, NULL, NULL);
+            if (client_sock == -1) {
+                printf("error = %s\n", strerror(errno));
+                break;
+            }
+            // print info about new caccpted client
+            struct sockaddr_storage client_address;
+            socklen_t client_len = sizeof(client_address);
+            char address_buffer[100];
+            printf("server new client socket %d\n", client_sock);
+            getnameinfo((struct sockaddr*)&client_address, client_len,
+                        address_buffer, sizeof(address_buffer), 0, 0,
+                        NI_NUMERICHOST);
+            printf("New connection from %s\n", address_buffer);
 
-        int rc = pthread_create(&worker_thread, &attr, mx_worker, &client_sock);
-        if (rc != 0) {
-            printf("error pthread_create = %s\n", strerror(rc));
-            close(client_sock);
+            // add client_sock in struct kevent
+            EV_SET(&new_ev, client_sock, EVFILT_READ, EV_ADD,0, 0, 0);
+            if (kevent(kq, &new_ev, 1, 0, 0, NULL) == -1) {
+                printf("error = %s\n", strerror(errno));
+                break;
+            }
+//            int old_flags  = fcntl(client_sock, F_GETFL, 0);
+//            fcntl(client_sock, F_SETFL, old_flags | O_NONBLOCK);
+
+        }
+        else {  // if read from client
+            printf("work with client %d\n", (int) new_ev.ident);
+
+            if ((new_ev.flags & EV_EOF) != 0) {
+                printf("Client %lu disconnected\n", new_ev.ident);
+                close(new_ev.ident);
+            }
+            else {
+                int rc = mx_worker(new_ev.ident);
+                if (rc == -1) {
+                    printf("error = %s\n", strerror(errno));
+                    break;
+                }
+            }
         }
     }
-    pthread_attr_destroy(&attr);
-    close(server_socket);
     return 0;
 }
 

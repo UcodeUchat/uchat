@@ -40,14 +40,14 @@
 #define QLEN 10
 #define HOST_NAME_MAX 256
 
-typedef struct  s_info_client {  //struct client
+typedef struct  s_client_info {  //struct client
     int argc;
     char **argv;
     char *ip;
     uint16_t port;
     int fd;
     pthread_mutex_t mutex;
-}               t_info_client;
+}               t_client_info;
 
 #define MX_PATH_TO_DB "./server_db"
 
@@ -61,7 +61,7 @@ typedef struct  s_clients {
     struct s_clients *next;
 }               t_clients;
 
-typedef struct  s_info {  // struct server
+typedef struct  s_server_info {  // struct server
     int argc;
     char **argv;
 
@@ -70,19 +70,20 @@ typedef struct  s_info {  // struct server
     struct s_clients *clients; // структура де зберігаються усі клієнти, що приєдналися
     sqlite3 *db; // our database
     pthread_mutex_t mutex;
-}               t_info;
+}               t_server_info;
 
 
 // server
-int mx_start_server(t_info *info);
+int mx_start_server(t_server_info *info);
 //void mx_set_daemon(const char *log_file);
-int mx_set_daemon(t_info *info);
+int mx_set_daemon(t_server_info *info);
 
-void *mx_worker(void *arg);
+int mx_worker(int client_sock);
+
 int main2(int argc, char *argv[]);
 
 // client
-int mx_start_client(t_info_client *info);
+int mx_start_client(t_client_info *info);
 void mx_get_input(char *buffer);
 
 // functions

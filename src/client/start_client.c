@@ -1,6 +1,6 @@
 #include "uchat.h"
 
-int mx_start_client(t_info_client *info) {
+int mx_start_client(t_client_info *info) {
     char client_input[MAX_CLIENT_INPUT];
     char server_output[MAX_CLIENT_INPUT];
     struct addrinfo hints;

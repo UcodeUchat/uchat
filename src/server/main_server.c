@@ -2,14 +2,14 @@
 
 
 int main(int argc, char **argv) {
-    t_info *info = NULL;
+    t_server_info *info = NULL;
     struct servent *servent;
 
     if (argc != 2)
         mx_err_exit("usage: chat_server [port]\n");
 
-    info = (t_info *)malloc(sizeof(t_info));
-    memset(info, 0, sizeof(t_info));
+    info = (t_server_info *)malloc(sizeof(t_server_info));
+    memset(info, 0, sizeof(t_server_info));
 //    init_db(*info);
     (*info).argc = argc;
     (*info).argv = argv;

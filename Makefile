@@ -8,24 +8,24 @@ SRC_SERVER = main_server.c \
     start_server.c \
     set_daemon.c \
     server_worker.c \
-    functions.c
 
 SRC_CLIENT = main_client.c \
     start_client.c
 
 
-SRC_HELP = err_exit.c
+SRC_HELP = err_exit.c \
+    functions.c
 
 OBJ_SERVER = main_server.o \
     start_server.o \
     set_daemon.o \
     server_worker.o \
-    functions.o
 
 OBJ_CLIENT = main_client.o \
     start_client.o
 
-OBJ_HELP = err_exit.o
+OBJ_HELP = err_exit.o \
+    functions.o
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic
 

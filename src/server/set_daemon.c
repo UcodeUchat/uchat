@@ -1,6 +1,6 @@
 #include "uchat.h"
 
-int mx_set_daemon(t_info *info) {
+int mx_set_daemon(t_server_info *info) {
     int fd;
     pid_t pid;
     struct rlimit rl;

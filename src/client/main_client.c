@@ -1,15 +1,15 @@
 #include "uchat.h"
 
 int main(int argc, char **argv) {
-    t_info_client *info = NULL;
+    t_client_info *info = NULL;
 
     if (argc < 3) {
         mx_printerr("usage: uchat [ip_adress] [port]\n");
         return -1;
     }
 
-    info = (t_info_client *)malloc(sizeof(t_info_client));
-    memset(info, 0, sizeof(t_info_client));
+    info = (t_client_info *)malloc(sizeof(t_client_info));
+    memset(info, 0, sizeof(t_client_info));
     (*info).argc = argc;
     (*info).argv = argv;
     (*info).ip = argv[1];
