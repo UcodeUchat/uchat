@@ -1,5 +1,29 @@
 #include "uchat.h"
 
+void mx_get_input(char *buffer) {
+    int read;
+
+    buffer[0] = 0;
+    fgets(buffer, MAX_CLIENT_INPUT, stdin);
+    read = strlen(buffer);
+    if (read > 0)
+        buffer[read - 1] = 0;
+}
+
+
+int mx_get_input2(char *buffer) {
+    int read;
+
+    buffer[0] = 0;
+    fgets(buffer, MAX_CLIENT_INPUT, stdin);
+    read = strlen(buffer);
+    if (read > 0)
+        buffer[read - 1] = 0;
+    return read;
+}
+
+
+
 static void print_family(struct addrinfo *aip) {
 	printf(" family ");
 	switch (aip->ai_family) {

@@ -76,26 +76,17 @@ int mx_start_server(t_server_info *info) {
                         address_buffer, sizeof(address_buffer), 0, 0,
                         NI_NUMERICHOST);
             printf("New connection from %s\n", address_buffer);
-
-
             // add client_sock in struct kevent
             EV_SET(&new_ev, client_sock, EVFILT_READ, EV_ADD,0, 0, 0);
             if (kevent(kq, &new_ev, 1, 0, 0, NULL) == -1) {
                 printf("error = %s\n", strerror(errno));
                 break;
             }
-
-
-//            if ((mx_check_client(client_sock, info)) == -1)
-//                printf("not loggin\n");
-
-
 //            int old_flags  = fcntl(client_sock, F_GETFL, 0);
 //            fcntl(client_sock, F_SETFL, old_flags | O_NONBLOCK);
-
         }
         else {  // if read from client
-            printf("work with client %d\n", (int) new_ev.ident);
+            printf("\t\t\twork with client %d\n", (int) new_ev.ident);
 
             if ((new_ev.flags & EV_EOF) != 0) {
                 printf("Client %lu disconnected\n", new_ev.ident);

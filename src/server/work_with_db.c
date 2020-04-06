@@ -35,24 +35,24 @@ int mx_sign_in(int c_sock, char *login, char *password) {
 }
 
 int mx_check_client(int client_sock) {
+    printf ("start mx_sheck_client\n");
     char *data = mx_strnew(256);
-    char **log_pas = NULL;
-    ssize_t size = 0;
+//    char **log_pas = NULL;
+    int size = 0;
 
-//    size = read(client_sock, data, sizeof(data));
-//    printf(" recive %d from client1 %s\n", size, data);
+    size = read(client_sock, data, sizeof(data));
+//    size = recv(client_sock, data, strlen(data), 0);
+    printf(" recive %d from client1: %s\n", size, data);
+//    log_pas = mx_strsplit(data, ' ');
+    printf("recieve data: %s\n", data);
+//    printf(" recive from client %s\n", log_pas[0]);
+//    printf(" recive from client %s\n", log_pas[1]);
 
-    size = recv(client_sock, data, strlen(data), 0);
-
-    log_pas = mx_strsplit(data, ' ');
-    printf(" recive from client %s\n", log_pas[0]);
-    printf(" recive from client %s\n", log_pas[1]);
-
-    if ((mx_sign_in(client_sock, log_pas[0], log_pas[1])) == -1) {
-        write(client_sock, "not login\n", 11);
+    if ((mx_sign_in(client_sock, "snikolayen", "123123")) == -1) {
+        write(client_sock, "not login\n", 10);
+        return -1;
     }
     write(client_sock, "login\n", 6);
-        return -1;
     return 1;
 }
 

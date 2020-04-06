@@ -3,5 +3,11 @@ Configuring local address...
 listen fd = 0
 server new client socket 3
 New connection from 
-work with client 3
- recive from client (null)
+			work with client 3
+Mon Apr  6 23:27:46 2020	Received snikolay
+			work with client 3
+Mon Apr  6 23:27:53 2020	Received sss
+			work with client 3
+Mon Apr  6 23:27:56 2020	Received eee
+			work with client 3
+Client 3 disconnected

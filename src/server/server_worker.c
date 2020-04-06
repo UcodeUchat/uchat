@@ -4,22 +4,28 @@ int mx_worker(int client_sock) {
     ssize_t size = 0;
     char client_input[MAX_CLIENT_INPUT];
     time_t now;
+    int autorized = 0;
 
     now = time(0);
     char * time_str = ctime(&now);
     time_str[strlen(time_str) - 1] = '\0';
 
-    if ((mx_check_client(client_sock)) == -1)
-        printf("not loggin\n");
-    else {
+    //if check_user in db  == -1 -
+
+//    if ((autorized = mx_check_client(client_sock)) == -1)
+//        return 0;
+    autorized = 1;
+    if(autorized) {
         size = read(client_sock, &client_input, MAX_CLIENT_INPUT);
         if (size == -1)
             return -1;
         printf("%s\tReceived %s\n", time_str, client_input);
 
         size = write(client_sock, client_input, sizeof(client_input));
+        return (int) size;
     }
-    return (int) size;
+    else
+        return 0;
 }
 /*
 void mx_login(t_info *info, t_clients *client_info) {
