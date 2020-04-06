@@ -8,6 +8,8 @@ int mx_start_client(t_client_info *info) {
     int sock;
     int err;
     int enable = 1;
+    int registered = 0;
+//    char user;
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_STREAM;
@@ -39,9 +41,10 @@ int mx_start_client(t_client_info *info) {
     freeaddrinfo(peer_address);
     info->fd = sock;
 
+    registered = mx_authorization_client(sock);
 
 //    int number;
-    while (1) {
+    while (registered) {
         mx_get_input(client_input);
         if (strcmp(client_input, "exit") == 0)
             break;
@@ -74,3 +77,59 @@ void mx_get_input(char *buffer) {
     if (read > 0)
         buffer[read - 1] = 0;
 }
+
+
+int mx_get_input2(char *buffer) {
+    int read;
+
+    buffer[0] = 0;
+    fgets(buffer, MAX_CLIENT_INPUT, stdin);
+    read = strlen(buffer);
+    if (read > 0)
+        buffer[read - 1] = 0;
+    return read;
+}
+
+int mx_authorization_client(int sock) {
+    char client_login[MAX_CLIENT_INPUT];
+    char client_password[MAX_CLIENT_INPUT];
+    char server_output[MAX_CLIENT_INPUT];
+    (void)sock;
+
+    printf ("Enter your login: \n");
+    int s_login = mx_get_input2(client_login);
+
+    printf ("Enter your password: \n");
+    int s_pass = mx_get_input2(client_password);
+
+    printf ("login: %d %s\n", s_login, client_login);
+    printf ("password: %d %s\n", s_pass, client_password);
+
+    char *log_pas = mx_strnew(s_login - 1 + s_pass);
+//    char tmp;
+    log_pas = mx_strjoin(client_login, " ");
+    log_pas = mx_strjoin(log_pas, client_password);
+//    strncpy(log_pas, client_login, s_login - 1);
+//    strcat(log_pas, " ");
+//    strcat(log_pas, client_password);
+    printf("all %s size %lu \n", log_pas, strlen(log_pas));
+
+    if (send(sock, log_pas, strlen(log_pas),0 ) == -1) {
+        printf("error write= %s\n", strerror(errno));
+        return -1;
+    }
+
+    int rc = read(sock, server_output, sizeof(server_output));
+    if (rc == 0) {
+        printf("Closed connection\n");
+        return -1;
+   }
+    if (rc == -1)
+        printf("error read= %s\n", strerror(errno));
+    else
+        printf("Received %s\n", server_output);
+
+    return 1;
+}
+
+

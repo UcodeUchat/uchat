@@ -8,6 +8,7 @@ SRC_SERVER = main_server.c \
     start_server.c \
     set_daemon.c \
     server_worker.c \
+    work_with_db.c
 
 SRC_CLIENT = main_client.c \
     start_client.c
@@ -20,6 +21,7 @@ OBJ_SERVER = main_server.o \
     start_server.o \
     set_daemon.o \
     server_worker.o \
+    work_with_db.o
 
 OBJ_CLIENT = main_client.o \
     start_client.o
@@ -39,8 +41,8 @@ install:
 	@cp $(addprefix src/functions/, $(SRC_HELP)) .
 	@clang $(CFLAGS) -c $(SRC_SERVER) $(SRC_HELP) -I $(INC)
 	@clang $(CFLAGS) -c $(SRC_CLIENT) $(SRC_HELP) -I $(INC)
-	@clang $(CFLAGS) libmx/libmx.a $(OBJ_SERVER) $(OBJ_HELP) -o $(NAME_S)
-	@clang $(CFLAGS) libmx/libmx.a $(OBJ_CLIENT) $(OBJ_HELP) -o $(NAME_C)
+	@clang $(CFLAGS) libmx/libmx.a $(OBJ_SERVER) $(OBJ_HELP) -o $(NAME_S) -lsqlite3
+	@clang $(CFLAGS) libmx/libmx.a $(OBJ_CLIENT) $(OBJ_HELP) -o $(NAME_C) -lsqlite3
 	@mkdir -p obj
 	@mv $(OBJ_SERVER) $(OBJ_CLIENT) $(OBJ_HELP) ./obj
 

@@ -1,5 +1,13 @@
 #include "uchat.h"
 
+static void init_db(t_server_info *info) {
+    int status = sqlite3_open(MX_PATH_TO_DB, &(info->db));
+
+    if (status != SQLITE_OK) {
+        fprintf(stderr, "Can't open db: %s\n", sqlite3_errmsg(info->db));
+        exit(1);
+    }
+}
 
 int main(int argc, char **argv) {
     t_server_info *info = NULL;
@@ -10,7 +18,7 @@ int main(int argc, char **argv) {
 
     info = (t_server_info *)malloc(sizeof(t_server_info));
     memset(info, 0, sizeof(t_server_info));
-//    init_db(*info);
+    init_db(info);
     (*info).argc = argc;
     (*info).argv = argv;
     (*info).port = (uint16_t) atoi(argv[1]);

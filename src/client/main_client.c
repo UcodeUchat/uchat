@@ -3,7 +3,7 @@
 int main(int argc, char **argv) {
     t_client_info *info = NULL;
 
-    if (argc < 3) {
+    if (argc != 3) {
         mx_printerr("usage: uchat [ip_adress] [port]\n");
         return -1;
     }

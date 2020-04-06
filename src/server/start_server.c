@@ -40,7 +40,6 @@ int mx_start_server(t_server_info *info) {
         close(server);
         return -1;
     }
-
     // add server sock in struct kevent
     struct kevent new_ev;
     EV_SET(&new_ev, server, EVFILT_READ, EV_ADD, 0, 0, 0);
@@ -78,12 +77,19 @@ int mx_start_server(t_server_info *info) {
                         NI_NUMERICHOST);
             printf("New connection from %s\n", address_buffer);
 
+
             // add client_sock in struct kevent
             EV_SET(&new_ev, client_sock, EVFILT_READ, EV_ADD,0, 0, 0);
             if (kevent(kq, &new_ev, 1, 0, 0, NULL) == -1) {
                 printf("error = %s\n", strerror(errno));
                 break;
             }
+
+
+//            if ((mx_check_client(client_sock, info)) == -1)
+//                printf("not loggin\n");
+
+
 //            int old_flags  = fcntl(client_sock, F_GETFL, 0);
 //            fcntl(client_sock, F_SETFL, old_flags | O_NONBLOCK);
 

@@ -18,7 +18,6 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -49,7 +48,7 @@ typedef struct  s_client_info {  //struct client
     pthread_mutex_t mutex;
 }               t_client_info;
 
-#define MX_PATH_TO_DB "./server_db"
+#define MX_PATH_TO_DB "./server_db.bin"
 
 typedef struct  s_clients {
     pthread_t tid; // thread id
@@ -78,6 +77,8 @@ int mx_start_server(t_server_info *info);
 //void mx_set_daemon(const char *log_file);
 int mx_set_daemon(t_server_info *info);
 
+int mx_sign_in(int c_sock, char *login, char *password);
+int mx_check_client(int client_sock);
 int mx_worker(int client_sock);
 
 int main2(int argc, char *argv[]);
@@ -85,7 +86,9 @@ int main2(int argc, char *argv[]);
 // client
 int mx_start_client(t_client_info *info);
 void mx_get_input(char *buffer);
+int mx_get_input2(char *buffer);
 
+int mx_authorization_client(int sock);
 // functions
 
 void mx_err_exit(char *err_msg); // вивести помилку

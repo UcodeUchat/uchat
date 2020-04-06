@@ -4,6 +4,4 @@ listen fd = 0
 server new client socket 3
 New connection from 
 work with client 3
-Fri Apr  3 14:24:36 2020	Received qqq
-work with client 3
-Client 3 disconnected
+ recive from client (null)
