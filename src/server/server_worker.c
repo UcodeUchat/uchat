@@ -11,11 +11,11 @@ int mx_worker(int client_sock) {
     time_str[strlen(time_str) - 1] = '\0';
 
     //if check_user in db  == -1 -
-
-//    if ((autorized = mx_check_client(client_sock)) == -1)
+    if ((autorized = mx_check_client(client_sock)) == -1)
+        printf("client not loggin\n");
 //        return 0;
-    autorized = 1;
-    if(autorized) {
+//    autorized = 1;
+    if(autorized != 0) {
         size = read(client_sock, &client_input, MAX_CLIENT_INPUT);
         if (size == -1)
             return -1;
@@ -27,6 +27,7 @@ int mx_worker(int client_sock) {
     else
         return 0;
 }
+
 /*
 void mx_login(t_info *info, t_clients *client_info) {
     char *input = NULL;

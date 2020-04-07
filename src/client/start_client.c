@@ -8,7 +8,7 @@ int mx_start_client(t_client_info *info) {
     int sock;
     int err;
     int enable = 1;
-    bool registered = FALSE;
+    int registered = FALSE;
 //    char user;
 
     memset(&hints, 0, sizeof(hints));
@@ -44,7 +44,7 @@ int mx_start_client(t_client_info *info) {
     registered = mx_authorization_client(sock);
     printf("registred =%d\n", registered);
 //    int number;
-    if (registered) {
+    if (registered == 1) {
         while (1) {
             printf("+++\n");
             mx_get_input(client_input);
@@ -67,6 +67,7 @@ int mx_start_client(t_client_info *info) {
                 printf("Received %s\n", server_output);
         }
     }
+    printf("exit client\n");
     close(sock);
     return 0;
 }
@@ -79,12 +80,14 @@ int mx_authorization_client(int sock) {
 
     printf ("Enter your login: \n");
     int s_login = mx_get_input2(client_login);
+    client_login[s_login]= '\0';
 
     printf ("Enter your password: \n");
     int s_pass = mx_get_input2(client_password);
+    client_password[s_pass] = '\0';
 
-    printf ("login: %d %s\n", s_login, client_login);
-    printf ("password: %d %s\n", s_pass, client_password);
+    printf ("login: %d: %s\n", s_login, client_login);
+    printf ("password: %d: %s\n", s_pass, client_password);
 
     char *log_pas = mx_strnew(s_login - 1 + s_pass);
 //    char tmp;
@@ -94,7 +97,6 @@ int mx_authorization_client(int sock) {
 //    strcat(log_pas, " ");
 //    strcat(log_pas, client_password);
     printf("all %s\n size =%lu \n", log_pas, strlen(log_pas));
-
     if (write(sock, log_pas, sizeof(log_pas)) == -1) {
         printf("error write= %s\n", strerror(errno));
         return -1;
@@ -106,6 +108,8 @@ int mx_authorization_client(int sock) {
    }
     if (rc == -1)
         printf("error read= %s\n", strerror(errno));
+    server_output[rc] = '\0';
+    printf("server output %s\n", server_output);
     if (strcmp(server_output, "login") == 0)
         return 1;
     else

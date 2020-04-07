@@ -4,10 +4,29 @@ listen fd = 0
 server new client socket 3
 New connection from 
 			work with client 3
-Mon Apr  6 23:27:46 2020	Received snikolay
+start mx_sheck_client	Client sock = 3
+ recive 8 from client1: neo 1
+recieve data: neo 1
+ recive from client neo
+ recive from client 1
+start mx_find_sock_in_db
+SELECT sock FROM users WHERE login='neo'
+input your login or password
+SELECT password FROM users WHERE login='neo'
+argv[0] = 1
+Complete. Connecting server...
+Tue Apr  7 16:42:10 2020	Received aaa
 			work with client 3
-Mon Apr  6 23:27:53 2020	Received sss
-			work with client 3
-Mon Apr  6 23:27:56 2020	Received eee
+start mx_sheck_client	Client sock = 3
+ recive 256 from client1: ddd
+recieve data: ddd
+ recive from client ddd
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT sock FROM users WHERE login='ddd'
+input your login or password
+SELECT password FROM users WHERE login='ddd'
+Complete. Connecting server...
+Tue Apr  7 16:42:15 2020	Received 
 			work with client 3
 Client 3 disconnected

@@ -40,6 +40,8 @@
 #define HOST_NAME_MAX 256
 
 typedef struct  s_client_info {  //struct client
+    char *login;
+    char *password;
     int argc;
     char **argv;
     char *ip;
@@ -78,6 +80,9 @@ int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
 
 int mx_sign_in(int c_sock, char *login, char *password);
+
+int mx_find_sock_in_db(int c_sock, char *login);
+
 int mx_check_client(int client_sock);
 int mx_worker(int client_sock);
 
