@@ -47,6 +47,7 @@ typedef struct  s_client_info {  //struct client
     char *ip;
     uint16_t port;
     int socket;
+    int auth_client;
     pthread_mutex_t mutex;
 }               t_client_info;
 

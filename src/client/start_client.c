@@ -8,7 +8,6 @@ int mx_start_client(t_client_info *info) {
     int sock;
     int err;
     int enable = 1;
-    int registered = FALSE;
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_STREAM;
@@ -39,9 +38,10 @@ int mx_start_client(t_client_info *info) {
     }
     freeaddrinfo(peer_address);
     info->socket = sock;
-    registered = mx_authorization_client(info);
-    printf("registred =%d\n", registered);
-    if (registered == 1) {
+
+    if (info->auth_client == 0)
+        info->auth_client = mx_authorization_client(info);
+    if (info->auth_client) {
         while (1) {
             printf("%s\t: ", info->login);
             mx_get_input(client_input);
@@ -69,6 +69,64 @@ int mx_start_client(t_client_info *info) {
     return 0;
 }
 
+static char *input_validation(char *login, char *pass) {
+    char *new_log = 0;
+    char *new_pass = 0;
+    char *return_log_pass = mx_strnew(MAX_CLIENT_INPUT * 2);
+
+    new_log = mx_strtrim(login);
+    new_pass = mx_strtrim(pass);
+    strncat(return_log_pass, login, strlen(login));
+    strcat(return_log_pass, " ");
+    strncat(return_log_pass, pass, strlen(pass));
+    printf("return_log_pass = [%s]\n", return_log_pass);
+    return return_log_pass;
+}
+
+int mx_authorization_client(t_client_info  *info)  {
+    int auth = 0;
+    int try = 0;
+    int size = 0;
+    char login[MAX_CLIENT_INPUT];
+    char pass[MAX_CLIENT_INPUT];
+    char *to_server = mx_strnew(MAX_CLIENT_INPUT * 2);
+    char server_output[128];
+
+    while (try < 3 && auth == 0) {
+        printf ("Enter your login: \n");
+        mx_get_input(login);
+
+        printf ("Enter your password: \n");
+        mx_get_input(pass);
+        //проверка на валидность введеных данных, надо доработать
+        to_server = input_validation(login, pass);
+
+        if (write(info->socket, to_server, strlen(to_server)) == -1) {
+            printf("error write= %s\n", strerror(errno));
+            return -1;
+        }
+
+        size = read(info->socket, server_output, sizeof(server_output));
+        if (size == 0) {
+            printf("Closed connection\n");
+            return -1;
+        }
+        if (size == -1)
+            printf("error read= %s\n", strerror(errno));
+        printf("server_output = [%s]\n", server_output);
+        if (mx_strcmp(server_output, "login\0") == 0){
+            printf("ZASHLO\n");
+            auth = 1;
+        }
+        try++;
+    }
+    if (auth)
+        return 1;
+    return 0;
+}
+
+
+/*
 int mx_authorization_client(t_client_info  *info) {
     char client_login[MAX_CLIENT_INPUT];
     char client_password[MAX_CLIENT_INPUT];
@@ -113,5 +171,5 @@ int mx_authorization_client(t_client_info  *info) {
         return -1;
 
 }
-
+*/
 
