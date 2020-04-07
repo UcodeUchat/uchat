@@ -9,7 +9,6 @@ int mx_start_client(t_client_info *info) {
     int err;
     int enable = 1;
     int registered = FALSE;
-//    char user;
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_STREAM;
@@ -39,14 +38,12 @@ int mx_start_client(t_client_info *info) {
         return -1;
     }
     freeaddrinfo(peer_address);
-    info->fd = sock;
-
-    registered = mx_authorization_client(sock);
+    info->socket = sock;
+    registered = mx_authorization_client(info);
     printf("registred =%d\n", registered);
-//    int number;
     if (registered == 1) {
         while (1) {
-            printf("+++\n");
+            printf("%s\t: ", info->login);
             mx_get_input(client_input);
             if (strcmp(client_input, "exit") == 0)
                 break;
@@ -55,7 +52,7 @@ int mx_start_client(t_client_info *info) {
                 printf("error write= %s\n", strerror(errno));
                 continue;
             }
-            printf("Sent \n");
+//            printf("Sent \n");
             int rc = read(sock, server_output, sizeof(server_output));
             if (rc == 0) {
                 printf("Closed connection\n");
@@ -64,7 +61,7 @@ int mx_start_client(t_client_info *info) {
             if (rc == -1)
                 printf("error read= %s\n", strerror(errno));
             else
-                printf("Received %s\n", server_output);
+                printf("server: \t%s\n", server_output);
         }
     }
     printf("exit client\n");
@@ -72,11 +69,10 @@ int mx_start_client(t_client_info *info) {
     return 0;
 }
 
-int mx_authorization_client(int sock) {
+int mx_authorization_client(t_client_info  *info) {
     char client_login[MAX_CLIENT_INPUT];
     char client_password[MAX_CLIENT_INPUT];
     char server_output[MAX_CLIENT_INPUT];
-    (void)sock;
 
     printf ("Enter your login: \n");
     int s_login = mx_get_input2(client_login);
@@ -90,18 +86,17 @@ int mx_authorization_client(int sock) {
     printf ("password: %d: %s\n", s_pass, client_password);
 
     char *log_pas = mx_strnew(s_login - 1 + s_pass);
-//    char tmp;
     log_pas = mx_strjoin(client_login, " ");
     log_pas = mx_strjoin(log_pas, client_password);
 //    strncpy(log_pas, client_login, s_login - 1);
 //    strcat(log_pas, " ");
 //    strcat(log_pas, client_password);
     printf("all %s\n size =%lu \n", log_pas, strlen(log_pas));
-    if (write(sock, log_pas, sizeof(log_pas)) == -1) {
+    if (write(info->socket, log_pas, sizeof(log_pas)) == -1) {
         printf("error write= %s\n", strerror(errno));
         return -1;
     }
-    int rc = read(sock, server_output, sizeof(server_output));
+    int rc = read(info->socket, server_output, sizeof(server_output));
     if (rc == 0) {
         printf("Closed connection\n");
         return -1;
@@ -110,8 +105,10 @@ int mx_authorization_client(int sock) {
         printf("error read= %s\n", strerror(errno));
     server_output[rc] = '\0';
     printf("server output %s\n", server_output);
-    if (strcmp(server_output, "login") == 0)
+    if (strcmp(server_output, "login") == 0) {
+        info->login = strdup(client_login);
         return 1;
+    }
     else
         return -1;
 

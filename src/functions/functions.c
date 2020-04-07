@@ -1,5 +1,16 @@
 #include "uchat.h"
 
+void mx_print_curr_time(void) {
+    time_t now;
+    char *time_str;
+
+    now = time(0);
+    time_str = ctime(&now);
+    time_str[strlen(time_str) - 1] = '\0';
+    printf("%s\t", time_str);
+}
+
+
 void mx_get_input(char *buffer) {
     int read;
 

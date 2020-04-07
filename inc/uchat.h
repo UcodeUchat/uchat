@@ -46,7 +46,7 @@ typedef struct  s_client_info {  //struct client
     char **argv;
     char *ip;
     uint16_t port;
-    int fd;
+    int socket;
     pthread_mutex_t mutex;
 }               t_client_info;
 
@@ -86,15 +86,17 @@ int mx_find_sock_in_db(int c_sock, char *login);
 int mx_check_client(int client_sock);
 int mx_worker(int client_sock);
 
-int main2(int argc, char *argv[]);
+int main2(int argc, char *argv[]);  // test adress
 
 // client
 int mx_start_client(t_client_info *info);
 void mx_get_input(char *buffer);
 int mx_get_input2(char *buffer);
 
-int mx_authorization_client(int sock);
+int mx_authorization_client(t_client_info  *info);
+
 // functions
+void mx_print_curr_time(void);
 
 void mx_err_exit(char *err_msg); // вивести помилку
 #endif
