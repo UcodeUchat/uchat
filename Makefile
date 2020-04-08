@@ -8,7 +8,8 @@ SRC_SERVER = main_server.c \
     start_server.c \
     set_daemon.c \
     server_worker.c \
-    work_with_db.c
+    work_with_db.c \
+    request_for_bd.c
 
 SRC_CLIENT = main_client.c \
     start_client.c
@@ -21,7 +22,8 @@ OBJ_SERVER = main_server.o \
     start_server.o \
     set_daemon.o \
     server_worker.o \
-    work_with_db.o
+    work_with_db.o \
+    request_for_bd.o
 
 OBJ_CLIENT = main_client.o \
     start_client.o
