@@ -1,30 +1,24 @@
 #include "libmx.h"
 
-static char *check_zero(char *str_num) {
-    str_num = mx_strnew(1);
-    str_num[0] = '0';
-    return str_num;
-}
-
 char *mx_itoa(int number) {
-    char *str_num = NULL;
-    short size = 0;
-    long l = number;
-
-    if (number < 0) {
-        size++;
-        l *= -1;
+    char *num_to_str = mx_strnew(mx_digits_num(number));
+    long num = number;
+    bool sym = 0;
+    short i = 0;
+    
+    if (number == 0)
+        *num_to_str = '0';
+    else if (num < 0) {
+        num = -num;
+        sym = 1;
     }
-    if (number == 0) 
-        return check_zero(str_num);
-    for (long a = l; a > 0; a /= 10, size++);
-    str_num = mx_strnew(size);
-    if (number < 0)
-        str_num[0] = '-';
-    for ( ; l > 0; size-- ) {
-        str_num [size - 1] = l % 10  + '0';
-        l /= 10;
+    while (num) {
+        num_to_str[i] = num % 10 + '0';
+        num /= 10;
+        i++;
     }
-    return str_num;
+    if (sym)
+        num_to_str[i] = '-';
+    mx_str_reverse(num_to_str);
+    return num_to_str;
 }
-

@@ -1,5 +1,6 @@
 Configuring demon ++...
 Configuring local address...
+<<<<<<< HEAD
 listen fd = 0
 server new client socket 3
 New connection from 
@@ -54,3 +55,7 @@ Complete. Connecting server...
 Tue Apr  7 22:53:02 2020	Received 
 			work with client 3
 Client 3 disconnected
+=======
+bind error = Can't assign requested address
+error = Can't assign requested address
+>>>>>>> master
