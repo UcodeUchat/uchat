@@ -1,61 +1,17 @@
 Configuring demon ++...
 Configuring local address...
-<<<<<<< HEAD
 listen fd = 0
 server new client socket 3
 New connection from 
 			work with client 3
-start mx_sheck_client	Client sock = 3
- recive [5] from client1: [neo 1]
-recieve data: [neo 1]
- recive from client neo
- recive from client 1
-	start mx_find_sock_in_db
-SELECT sock FROM users WHERE login='neo'
-input your login or password
-SELECT password FROM users WHERE login='neo'
-argv[0] = 1
-Complete. Connecting server...
-Tue Apr  7 22:52:56 2020	Received aaaaa
-			work with client 3
-start mx_sheck_client	Client sock = 3
- recive [256] from client1: [sssss]
-recieve data: [sssss]
- recive from client sssss
- recive from client (null)
-	start mx_find_sock_in_db
-SELECT sock FROM users WHERE login='sssss'
-input your login or password
-SELECT password FROM users WHERE login='sssss'
-Complete. Connecting server...
-Tue Apr  7 22:52:57 2020	Received 
-			work with client 3
-start mx_sheck_client	Client sock = 3
- recive [256] from client1: [dddddd]
-recieve data: [dddddd]
- recive from client dddddd
- recive from client (null)
-	start mx_find_sock_in_db
-SELECT sock FROM users WHERE login='dddddd'
-input your login or password
-SELECT password FROM users WHERE login='dddddd'
-Complete. Connecting server...
-Tue Apr  7 22:52:59 2020	Received 
-			work with client 3
-start mx_sheck_client	Client sock = 3
- recive [256] from client1: [ggggg]
-recieve data: [ggggg]
- recive from client ggggg
- recive from client (null)
-	start mx_find_sock_in_db
-SELECT sock FROM users WHERE login='ggggg'
-input your login or password
-SELECT password FROM users WHERE login='ggggg'
-Complete. Connecting server...
-Tue Apr  7 22:53:02 2020	Received 
-			work with client 3
-Client 3 disconnected
-=======
-bind error = Can't assign requested address
-error = Can't assign requested address
->>>>>>> master
+start mx_sheck_client
+Client sock = 3
+ recive [17] from client1: [snikolayen 123123]
+recieve data: [snikolayen 123123]
+ recive from client snikolayen
+ recive from client 123123
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='snikolayen'
+argv[0] = 0
+Complete. Next step is authorization!
+login in base

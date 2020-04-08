@@ -42,6 +42,7 @@ int mx_start_client(t_client_info *info) {
     freeaddrinfo(peer_address);
     info->socket = sock;
     registered = mx_authorization_client(sock, &login);
+    info->login = login;
     printf("registred =%d\n", registered);
     if (registered == 1) {
         while (1) {

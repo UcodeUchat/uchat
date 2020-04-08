@@ -93,13 +93,14 @@ int mx_check_client(int client_sock) {
     //     mx_update_socket(0, log_pas[1]);
     if ((mx_find_sock_in_db(client_sock,log_pas[0])) == 1) {
         printf("login in base\n");
-        if ((mx_sign_in(client_sock, log_pas[0], log_pas[1])) == -1) {
+        return 1;
+    }
+    else if ((mx_sign_in(client_sock, log_pas[0], log_pas[1])) == -1) {
             printf("not login\n");
             return -1;
         }
+    else
         return 1;
-    }
-    return -1;
 }
 
 
