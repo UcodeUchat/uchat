@@ -1,2 +1,19 @@
 1--------++++
 load_cer----1
+load_cer----2
+load_cer----3
+2--------++++
+Configuring local address...
+bind_adress 0.0.0.0
+Creating socket...
+bind error = Address already in use
+server new client socket 2
+New connection from 192.168.1.124
+run worker
+client_sock = 2
+New client created
+pid 39874, tid 220545024: new thread, client socket = 2
+Wed Apr  8 10:52:54 2020	Received 16843542
+Sent 16843543
+
+Wed Apr  8 10:52:54 2020	Received 16777526

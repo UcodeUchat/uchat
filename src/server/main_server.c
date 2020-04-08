@@ -24,7 +24,7 @@ int mx_set_demon(const char *log_file) {
 
      // Закрыть все открытые файловые дескрипторы.
     if (rl.rlim_max == RLIM_INFINITY)
-        rl.rlim_max = 1025;
+        rl.rlim_max = 1024;
     for (rlim_t i = 0; i < rl.rlim_max; i++)
         close(i);
 //    if (chdir("/") < 0)
@@ -66,8 +66,8 @@ int main(int argc, char **argv) {
     ctx = mx_init_server_ctx();  // initialize SSL
     printf("1--------++++\n");
 
-    mx_load_certificates(ctx, "newreq.pem", "newreq.pem"); // load cert
-
+    mx_load_certificates(ctx, "localhost.crt", "localhost.key"); // load cert
+    printf("2--------++++\n");
     printf("Configuring local address...\n");
     struct addrinfo hints;
     memset(&hints, 0, sizeof(hints));
@@ -184,7 +184,7 @@ SSL_CTX* mx_init_server_ctx(void) {
 //    method = SSLv23_server_method();
 
     // create new server-method instance
-    ctx = SSL_CTX_new(SSLv23_server_method());			// create new context from method
+    ctx = SSL_CTX_new(TLS_server_method());			// create new context from method
     if ( ctx == NULL ) {
         ERR_print_errors_fp(stderr);
         abort();
