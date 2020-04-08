@@ -107,10 +107,12 @@ int mx_authorization_client(int sock, char **login_for_exit) {
     
     while (try < 3 && auth == 0) {
         printf ("Enter your login: \n");
-        mx_get_input(login);
+        int l_size = mx_get_input2(login);
+        login[l_size] = '\0';
 
         printf ("Enter your password: \n");
-        mx_get_input(pass);
+        int p_size = mx_get_input2(pass);
+        pass[p_size] = '\0';
         //проверка на валидность введеных данных, надо доработать
         to_server = input_validation(login, pass, login_for_exit);
 

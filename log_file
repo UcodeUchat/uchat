@@ -1,4 +1,34 @@
 Configuring demon ++...
 Configuring local address...
-bind error = Can't assign requested address
-error = Can't assign requested address
+listen fd = 0
+server new client socket 3
+New connection from 
+			work with client 3
+start mx_sheck_client
+Client sock = 3
+recieve data: [neo 1]
+ recive from client neo
+ recive from client 1
+	start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='neo'
+argv[0] = 3
+user exist in UCHAT!
+Wed Apr  8 16:41:36 2020	Received neo 1
+			work with client 3
+start mx_sheck_client
+Client sock = 3
+recieve data: [qq 1]
+ recive from client qq
+ recive from client 1
+	start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='qq'
+Wed Apr  8 16:42:20 2020	Received qq 1
+			work with client 3
+start mx_sheck_client
+Client sock = 3
+recieve data: [qq 22]
+ recive from client qq
+ recive from client 22
+	start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='qq'
+Wed Apr  8 16:42:23 2020	Received qq 22
