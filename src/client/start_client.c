@@ -89,7 +89,7 @@ static char *input_validation(char *login, char *pass, char **login_for_exit) {
     strcat(*login_for_exit, "exit ");
     strncat(*login_for_exit, login, strlen(login));
    
-    printf("login_for_exit = [%s]\n", *login_for_exit);
+//    printf("login_for_exit = [%s]\n", *login_for_exit);
     strncat(return_log_pass, login, strlen(login));
     strcat(return_log_pass, " ");
     strncat(return_log_pass, pass, strlen(pass));
@@ -119,7 +119,6 @@ int mx_authorization_client(int sock, char **login_for_exit) {
             printf("error write= %s\n", strerror(errno));
             return -1;
         }
-
         size = read(sock, server_output, sizeof(server_output));
         if (size == 0) {
             printf("Closed connection\n");

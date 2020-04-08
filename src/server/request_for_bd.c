@@ -54,6 +54,7 @@ int mx_update_socket(int client_sock, char *login) {
 }
 
 int mx_drop_socket(int client_sock) {
+    printf("start set socket to 0\n");
     char *command = malloc(1024);
     sqlite3 *db = NULL;
     int status = sqlite3_open(MX_PATH_TO_DB, &db);

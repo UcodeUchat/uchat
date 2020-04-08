@@ -5,17 +5,20 @@ int mx_worker(int client_sock) {
     char client_input[MAX_CLIENT_INPUT];
     
     size = read(client_sock, &client_input, MAX_CLIENT_INPUT);
-    client_input[sizeof(client_input) - 1] = '\0';
+    client_input[size] = '\0';
     if (size == -1)
         return -1;
     if ((mx_check_client(client_sock, client_input)) == 1) {
         printf("client loggin\n");
-        return 0;
-    }
-    mx_print_curr_time();
-    printf("Received %s\n", client_input);
+//        return 0;
+//    }
+        mx_print_curr_time();
+        printf("Received %s\n", client_input);
 
-    size = write(client_sock, client_input, sizeof(client_input));
-    return (int) size;
+        size = write(client_sock, client_input, sizeof(client_input));
+        return (int) size;
+    }
+    else
+        return 0;
 }
 

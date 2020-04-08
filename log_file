@@ -6,12 +6,201 @@ New connection from
 			work with client 3
 start mx_sheck_client
 Client sock = 3
- recive [17] from client1: [snikolayen 123123]
+recieve data: [neo 1]
+ recive from client neo
+ recive from client 1
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='neo'
+argv[0] = 0
+Complete. Next step is authorization!
+SELECT password FROM users WHERE login='neo'
+argv[0] = 1
+pass = 1
+UPDATE users SET socket='3' WHERE login='neo'
+SELECT * FROM users WHERE login='neo'
+user_id	socket	login		password	access
+4	3	neo		1		1		
+Complete. Connecting server...
+client loggin
+Wed Apr  8 19:41:46 2020	Received neo 1
+			work with client 3
+start mx_sheck_client
+Client sock = 3
+recieve data: [sss]
+ recive from client sss
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='sss'
+login in base
+client loggin
+Wed Apr  8 19:41:48 2020	Received sss
+			work with client 3
+start mx_sheck_client
+Client sock = 3
+recieve data: [ddd]
+ recive from client ddd
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='ddd'
+login in base
+client loggin
+Wed Apr  8 19:41:50 2020	Received ddd
+			work with client 3
+start mx_sheck_client
+Client sock = 3
+recieve data: [ggg]
+ recive from client ggg
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='ggg'
+login in base
+client loggin
+Wed Apr  8 19:41:52 2020	Received ggg
+			work with client 3
+start mx_sheck_client
+Client sock = 3
+recieve data: [hh]
+ recive from client hh
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='hh'
+login in base
+client loggin
+Wed Apr  8 19:41:53 2020	Received hh
+server new client socket 9
+New connection from 
+			work with client 9
+start mx_sheck_client
+Client sock = 9
 recieve data: [snikolayen 123123]
  recive from client snikolayen
  recive from client 123123
-start mx_find_sock_in_db
+start mx_find_sock_in_db
 SELECT socket FROM users WHERE login='snikolayen'
 argv[0] = 0
 Complete. Next step is authorization!
+SELECT password FROM users WHERE login='snikolayen'
+argv[0] = 123123
+pass = 123123
+UPDATE users SET socket='9' WHERE login='snikolayen'
+SELECT * FROM users WHERE login='snikolayen'
+user_id	socket	login		password	access
+2	9	snikolayen	123123		1		
+Complete. Connecting server...
+client loggin
+Wed Apr  8 19:42:48 2020	Received snikolayen 123123
+			work with client 9
+start mx_sheck_client
+Client sock = 9
+recieve data: [qqqqqqqqqqq]
+ recive from client qqqqqqqqqqq
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='qqqqqqqqqqq'
 login in base
+client loggin
+Wed Apr  8 19:42:53 2020	Received qqqqqqqqqqq
+			work with client 9
+start mx_sheck_client
+Client sock = 9
+recieve data: [qqqqqqqqqqqqqqq]
+ recive from client qqqqqqqqqqqqqqq
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='qqqqqqqqqqqqqqq'
+login in base
+client loggin
+Wed Apr  8 19:42:56 2020	Received qqqqqqqqqqqqqqq
+			work with client 9
+start mx_sheck_client
+Client sock = 9
+recieve data: [qqqqqqqqqqqqqq]
+ recive from client qqqqqqqqqqqqqq
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='qqqqqqqqqqqqqq'
+login in base
+client loggin
+Wed Apr  8 19:42:59 2020	Received qqqqqqqqqqqqqq
+			work with client 9
+start mx_sheck_client
+Client sock = 9
+recieve data: [wwsxx]
+ recive from client wwsxx
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='wwsxx'
+login in base
+client loggin
+Wed Apr  8 19:43:00 2020	Received wwsxx
+			work with client 9
+start mx_sheck_client
+Client sock = 9
+recieve data: [xxx]
+ recive from client xxx
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='xxx'
+login in base
+client loggin
+Wed Apr  8 19:43:02 2020	Received xxx
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket='0'
+SELECT * FROM users
+user_id	socket	login		password	access
+0	0	mmasniy		123123		1		
+1	0	vkmetyk		123123		1		
+2	0	snikolayen	123123		1		
+3	0	mlibovych	123123		1		
+4	0	neo		1		1		
+			work with client 9
+start mx_sheck_client
+Client sock = 9
+recieve data: [[A]
+ recive from client [A
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='[A'
+login in base
+client loggin
+Wed Apr  8 19:43:57 2020	Received [A
+			work with client 9
+start mx_sheck_client
+Client sock = 9
+recieve data: [ss]
+ recive from client ss
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='ss'
+login in base
+client loggin
+Wed Apr  8 19:44:00 2020	Received ss
+			work with client 9
+start mx_sheck_client
+Client sock = 9
+recieve data: [ssss]
+ recive from client ssss
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='ssss'
+login in base
+client loggin
+Wed Apr  8 19:44:27 2020	Received ssss
+			work with client 9
+start mx_sheck_client
+Client sock = 9
+recieve data: [dddddddd]
+ recive from client dddddddd
+ recive from client (null)
+start mx_find_sock_in_db
+SELECT socket FROM users WHERE login='dddddddd'
+login in base
+client loggin
+Wed Apr  8 19:44:29 2020	Received dddddddd
+			work with client 9
+start mx_sheck_client
+Client sock = 9
+recieve data: []
+ recive from client (null)

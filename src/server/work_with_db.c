@@ -21,6 +21,7 @@ static int check_socket(void* rep, int argc, char **argv, char **col_name) {
         (*(int *)rep)++;
         return 0;
     }
+    // user cosket != 0
     return 1;
 }
 
@@ -55,7 +56,7 @@ int mx_sign_in(int c_sock, char *login, char *pass) {
 }
 
 int mx_find_sock_in_db(int c_sock, char *login) {
-    printf("\vstart mx_find_sock_in_db\n");
+    printf("start mx_find_sock_in_db\n");
     char *command = malloc(1024);
     sqlite3 *db = NULL;
     int status = sqlite3_open(MX_PATH_TO_DB, &db);
@@ -70,14 +71,14 @@ int mx_find_sock_in_db(int c_sock, char *login) {
     if (sqlite3_exec(db, command, check_socket, &rep, NULL) != SQLITE_OK) {
         // write(c_sock, "user exist in UCHAT!\0", 21);
         printf("user exist in UCHAT!\n");
-        return -1;
+        return 1;
     }
-    if (rep == 0)
-        return -1;
+    if (rep == 0) // if socket in table != 0
+        return 1;
     printf("Complete. Next step is authorization!\n");
     mx_strdel(&command);
     sqlite3_close(db);
-    return 1;
+    return -1;
 }
 
 int mx_check_client(int client_sock, char *c_input) {
