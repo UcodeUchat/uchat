@@ -11,15 +11,16 @@ static int check_data(void *pass, int argc, char **argv, char **col_name) {
     return 1;
 }
 
-static int check_socket(void* c_sock, int argc, char **argv, char **col_name) {
+static int check_socket(void* rep, int argc, char **argv, char **col_name) {
     (void)argc;
     (void)col_name;
-    int *a = (int *)c_sock;
-    a++;
+
     for(int i = 0; argv[i]; i++)
         printf("argv[%i] = %s\n", i, argv[i]);
-    if (atoi(argv[0]) == 0)
+    if (atoi(argv[0]) == 0) {
+        (*(int *)rep)++;
         return 0;
+    }
     return 1;
 }
 
@@ -58,39 +59,41 @@ int mx_find_sock_in_db(int c_sock, char *login) {
     char *command = malloc(1024);
     sqlite3 *db = NULL;
     int status = sqlite3_open(MX_PATH_TO_DB, &db);
-
+    int rep = 0;
+    (void)c_sock;
     if (status != SQLITE_OK) {
         fprintf(stderr, "Can't open db: %s\n", sqlite3_errmsg(db));
         exit(1);
     }
     sprintf(command, "SELECT socket FROM users WHERE login='%s'", login);
     printf("%s\n", command);
-    if (sqlite3_exec(db, command, check_socket, &c_sock, NULL) != SQLITE_OK) {
-        write(c_sock, "user exist in UCHAT!\0", 21);
+    if (sqlite3_exec(db, command, check_socket, &rep, NULL) != SQLITE_OK) {
+        // write(c_sock, "user exist in UCHAT!\0", 21);
         printf("user exist in UCHAT!\n");
         return -1;
     }
+    if (rep == 0)
+        return -1;
     printf("Complete. Next step is authorization!\n");
     mx_strdel(&command);
     sqlite3_close(db);
     return 1;
 }
 
-int mx_check_client(int client_sock) {
+int mx_check_client(int client_sock, char *c_input) {
     printf ("start mx_sheck_client\nClient sock = %d\n", client_sock);
-    char data[256];
+    // char data[256];
     char **log_pas = NULL;
-    int size = 0;
+    // int size = 0;
 
-    size = recv(client_sock, data, sizeof(data), 0);
-    printf(" recive [%d] from client1: [%s]\n", size, data);
-    log_pas = mx_strsplit(data, ' ');
-    printf("recieve data: [%s]\n", data);
+    // size = recv(client_sock, data, sizeof(data), 0);
+    // printf(" recive [%d] from client1: [%s]\n", size, data);
+    log_pas = mx_strsplit(c_input, ' ');
+    printf("recieve data: [%s]\n", c_input);
 
     printf(" recive from client %s\n", log_pas[0]);
     printf(" recive from client %s\n", log_pas[1]);
-    // if (log_pas[0] && (mx_strcmp("exit\0", log_pas[0])) == 0)
-    //     mx_update_socket(0, log_pas[1]);
+
     if ((mx_find_sock_in_db(client_sock,log_pas[0])) == 1) {
         printf("login in base\n");
         return 1;
