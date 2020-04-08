@@ -9,7 +9,7 @@ int mx_worker(int client_sock) {
     if (size == -1)
         return -1;
     if ((mx_check_client(client_sock, client_input)) == 1) {
-        printf("client loggin\n");
+        printf("client login\n");
 //        return 0;
 //    }
         mx_print_curr_time();

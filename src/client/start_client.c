@@ -41,8 +41,7 @@ int mx_start_client(t_client_info *info) {
     }
     freeaddrinfo(peer_address);
     info->socket = sock;
-    registered = mx_authorization_client(sock, &login);
-    info->login = login;
+    registered = mx_authorization_client(info, &login);
     printf("registred =%d\n", registered);
     if (registered == 1) {
         while (1) {
@@ -97,7 +96,7 @@ static char *input_validation(char *login, char *pass, char **login_for_exit) {
     return return_log_pass;
 }
 
-int mx_authorization_client(int sock, char **login_for_exit) {
+int mx_authorization_client(t_client_info *info, char **login_for_exit) {
     int auth = 0;
     int try = 0;
     int size = 0;
@@ -108,18 +107,18 @@ int mx_authorization_client(int sock, char **login_for_exit) {
     
     while (try < 3 && auth == 0) {
         printf ("Enter your login: \n");
-        mx_get_input(login);
+        int l_size = mx_get_input2(login);
 
         printf ("Enter your password: \n");
-        mx_get_input(pass);
+        int p_size = mx_get_input2(pass);
         //проверка на валидность введеных данных, надо доработать
         to_server = input_validation(login, pass, login_for_exit);
 
-        if (write(sock, to_server, strlen(to_server)) == -1) {
+        if (write(info->socket, to_server, strlen(to_server)) == -1) {
             printf("error write= %s\n", strerror(errno));
             return -1;
         }
-        size = read(sock, server_output, sizeof(server_output));
+        size = read(info->socket, server_output, sizeof(server_output));
         if (size == 0) {
             printf("Closed connection\n");
             return -1;
@@ -128,7 +127,10 @@ int mx_authorization_client(int sock, char **login_for_exit) {
             printf("error read= %s\n", strerror(errno));
         printf("server_output = [%s]\n", server_output);
         if (mx_strcmp(server_output, "login\0") == 0){
-            printf("ZASHLO\n");
+//            printf("ZASHLO\n");
+            login[l_size] = '\0';
+            pass[p_size] = '\0';
+            info->login = strdup(login);
             auth = 1;
         }
         try++;

@@ -95,7 +95,7 @@ int mx_start_client(t_client_info *info);
 void mx_get_input(char *buffer);
 int mx_get_input2(char *buffer);
 
-int mx_authorization_client(int sock, char **login_for_exit);
+int mx_authorization_client(t_client_info *info, char **login_for_exit);
 
 // functions
 void mx_print_curr_time(void);
