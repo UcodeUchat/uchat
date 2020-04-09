@@ -64,7 +64,7 @@ int mx_drop_socket(int client_sock) {
         sqlite3_close(db);
         exit(1);
     }
-    sprintf(command, "UPDATE users SET socket='%d'",client_sock);
+    sprintf(command, "UPDATE users SET socket=0 WHERE socket=%d", client_sock);
     printf("%s\n", command);
     if (sqlite3_exec(db, command, 0, 0, NULL) != SQLITE_OK) {
         sqlite3_close(db);
@@ -75,7 +75,7 @@ int mx_drop_socket(int client_sock) {
     int count1 = 0;
     if (sqlite3_exec(db, command, print_users, &count1, NULL) != SQLITE_OK) {
         // write(client_sock, "Check your login or password\n", 29);
-        printf("Check your login or password\n");
+        // printf("Check your login or password\n");
         sqlite3_close(db);
         return -1;
     }

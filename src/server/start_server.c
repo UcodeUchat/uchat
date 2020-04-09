@@ -22,7 +22,7 @@ int mx_start_server(t_server_info *info) {
     }
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(info->port);
-    inet_aton("192.168.1.124", &serv_addr.sin_addr);
+    inet_aton("192.168.0.101", &serv_addr.sin_addr);
     if (bind(server, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
         printf("bind error = %s\n", strerror(errno));
         return -1;
@@ -90,7 +90,7 @@ int mx_start_server(t_server_info *info) {
 
             if ((new_ev.flags & EV_EOF) != 0) {
                 printf("Client %lu disconnected\n", new_ev.ident);
-                mx_drop_socket(0);
+                mx_drop_socket(new_ev.ident);
                 close(new_ev.ident);
             }
             else {

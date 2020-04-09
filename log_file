@@ -6,38 +6,38 @@ New connection from
 			work with client 3
 start mx_sheck_client
 Client sock = 3
-recieve data: [neo 1]
- recive from client neo
- recive from client 1
+recieve data: [mmasniy 123123]
+ recive from client mmasniy
+ recive from client 123123
 start mx_find_sock_in_db
-SELECT socket FROM users WHERE login='neo'
+SELECT socket FROM users WHERE login='mmasniy'
 argv[0] = 0
 Complete. Next step is authorization!
-SELECT password FROM users WHERE login='neo'
-argv[0] = 1
-pass = 1
-UPDATE users SET socket='3' WHERE login='neo'
-SELECT * FROM users WHERE login='neo'
+SELECT password FROM users WHERE login='mmasniy'
+argv[0] = 123123
+pass = 123123
+UPDATE users SET socket='3' WHERE login='mmasniy'
+SELECT * FROM users WHERE login='mmasniy'
 user_id	socket	login		password	access
-4	3	neo		1		1		
+0	3	mmasniy		123123		1		
 Complete. Connecting server...
 client login
-Wed Apr  8 22:54:58 2020	Received neo 1
+Thu Apr  9 11:09:02 2020	Received mmasniy 123123
 			work with client 3
 start mx_sheck_client
 Client sock = 3
-recieve data: [ls -la]
- recive from client ls
- recive from client -la
+recieve data: [hello]
+ recive from client hello
+ recive from client (null)
 start mx_find_sock_in_db
-SELECT socket FROM users WHERE login='ls'
+SELECT socket FROM users WHERE login='hello'
 login in base
 client login
-Wed Apr  8 22:55:05 2020	Received ls -la
+Thu Apr  9 11:09:08 2020	Received hello
 			work with client 3
 Client 3 disconnected
 start set socket to 0
-UPDATE users SET socket='0'
+UPDATE users SET socket=0 WHERE socket=3
 SELECT * FROM users
 user_id	socket	login		password	access
 0	0	mmasniy		123123		1		
