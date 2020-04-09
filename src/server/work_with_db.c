@@ -45,13 +45,8 @@ int mx_sign_in(t_server_info *i, int c_sock, char *login, char *pass) {
     return 1;
 }
 
-<<<<<<< HEAD
-int mx_find_sock_in_db(int c_sock, char *login) {
-    printf("\tstart mx_find_sock_in_db\n");
-=======
 int mx_find_sock_in_db(t_server_info *i, char *login) {
     printf("start mx_find_sock_in_db\n");
->>>>>>> master
     char *command = malloc(1024);
     int rep = 0;
 
@@ -68,7 +63,6 @@ int mx_find_sock_in_db(t_server_info *i, char *login) {
     mx_strdel(&command);
     return -1;
 }
-
 
 int mx_check_client(int client_sock, char *c_input, t_server_info *info) {
     printf ("start mx_sheck_client\nClient sock = %d\n", client_sock);

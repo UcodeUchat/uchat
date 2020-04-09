@@ -3,9 +3,8 @@
 int mx_worker(int client_sock, t_server_info *info) {
     ssize_t size = 0;
     char client_input[MAX_CLIENT_INPUT];
-    
-    size = read(client_sock, &client_input, MAX_CLIENT_INPUT);
 
+    size = read(client_sock, &client_input, MAX_CLIENT_INPUT);
     client_input[size] = '\0';
     if (size == -1)
         return -1;
