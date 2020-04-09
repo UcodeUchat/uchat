@@ -1,6 +1,6 @@
 #include "uchat.h"
 
-int mx_worker(int client_sock) {
+int mx_worker(int client_sock, t_server_info *info) {
     ssize_t size = 0;
     char client_input[MAX_CLIENT_INPUT];
     
@@ -8,7 +8,7 @@ int mx_worker(int client_sock) {
     client_input[size] = '\0';
     if (size == -1)
         return -1;
-    if ((mx_check_client(client_sock, client_input)) == 1) {
+    if ((mx_check_client(client_sock, client_input, info)) == 1) {
         printf("client login\n");
 //        return 0;
 //    }

@@ -80,13 +80,13 @@ int mx_start_server(t_server_info *info);
 //void mx_set_daemon(const char *log_file);
 int mx_set_daemon(t_server_info *info);
 
-int mx_sign_in(int c_sock, char *login, char *password);
-int mx_update_socket(int client_sock, char *login);
-int mx_find_sock_in_db(int c_sock, char *login);
-int mx_drop_socket(int client_sock);
+int mx_sign_in(t_server_info *i, int c_sock, char *login, char *pass);
+int mx_update_socket(t_server_info *i, int client_sock, char *login);
+int mx_find_sock_in_db(t_server_info *i, char *login);
+int mx_drop_socket(t_server_info *i, int client_sock);
 
-int mx_check_client(int client_sock, char *c_input);
-int mx_worker(int client_sock);
+int mx_check_client(int client_sock, char *c_input, t_server_info *info);
+int mx_worker(int client_sock, t_server_info *info);
 
 int main2(int argc, char *argv[]);  // test adress
 
