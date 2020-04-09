@@ -90,11 +90,11 @@ int mx_start_server(t_server_info *info) {
 
             if ((new_ev.flags & EV_EOF) != 0) {
                 printf("Client %lu disconnected\n", new_ev.ident);
-                mx_drop_socket(0);
+                mx_drop_socket(info, new_ev.ident);
                 close(new_ev.ident);
             }
             else {
-                int rc = mx_worker(new_ev.ident);
+                int rc = mx_worker(new_ev.ident, info);
                 if (rc == -1) {
                     printf("error = %s\n", strerror(errno));
                     break;

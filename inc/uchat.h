@@ -47,6 +47,7 @@ typedef struct  s_client_info {  //struct client
     char *ip;
     uint16_t port;
     int socket;
+    int auth_client;
     pthread_mutex_t mutex;
 }               t_client_info;
 
@@ -79,13 +80,13 @@ int mx_start_server(t_server_info *info);
 //void mx_set_daemon(const char *log_file);
 int mx_set_daemon(t_server_info *info);
 
-int mx_sign_in(int c_sock, char *login, char *password);
-int mx_update_socket(int client_sock, char *login);
-int mx_find_sock_in_db(int c_sock, char *login);
-int mx_drop_socket(int client_sock);
+int mx_sign_in(t_server_info *i, int c_sock, char *login, char *pass);
+int mx_update_socket(t_server_info *i, int client_sock, char *login);
+int mx_find_sock_in_db(t_server_info *i, char *login);
+int mx_drop_socket(t_server_info *i, int client_sock);
 
-int mx_check_client(int client_sock, char *c_input);
-int mx_worker(int client_sock);
+int mx_check_client(int client_sock, char *c_input, t_server_info *info);
+int mx_worker(int client_sock, t_server_info *info);
 
 int main2(int argc, char *argv[]);  // test adress
 
@@ -94,7 +95,7 @@ int mx_start_client(t_client_info *info);
 void mx_get_input(char *buffer);
 int mx_get_input2(char *buffer);
 
-int mx_authorization_client(int sock, char **login_for_exit);
+int mx_authorization_client(t_client_info *info, char **login_for_exit);
 
 // functions
 void mx_print_curr_time(void);

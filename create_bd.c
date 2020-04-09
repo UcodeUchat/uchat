@@ -48,6 +48,23 @@ static int print_rooms(void *status, int argc, char **argv, char **in) {
 	return 0;
 }
 
+static int print_msg(void *status, int argc, char **argv, char **in) {
+		for (int i = 0; in[i] && i < 6; i++) {
+			printf("%s ", in[i]);
+		}
+		printf("\n");
+		(*(int *)status)++;
+	for (int i = 0; argv[i]; i++) {
+		printf("%s ", argv[i]);
+		if (i == 3)
+			printf("  ");
+		else if (strlen(argv[i]) <= 8)
+			printf("\t   ");
+	}
+	printf("\n");
+	return 0;
+}
+
 int main(int argc, char *argv[]){
 	if (argc != 2) {
 		printf("YOU NEED ENTER ./FILENAME BD_NAME");
@@ -78,7 +95,7 @@ int main(int argc, char *argv[]){
 				\
 				create table msg_history (message_id integer PRIMERY KEY,\
 					user_id integer, room_id integer, message text,\
-					addition_cont text, access integer,\
+					addition_cont text, time data,\
 					FOREIGN KEY (user_id) REFERENCES users (user_id),\
 					FOREIGN KEY (room_id) REFERENCES rooms (room_id));\n");
 		sql = sqlite3_exec(db, req, 0, 0, &err);
@@ -105,11 +122,19 @@ int main(int argc, char *argv[]){
 				insert into users (user_id, socket, login, password, access)\
 				values (3, 0,'mlibovych', '123123', 1);\n\
 				insert into users (user_id, socket, login, password, access)\
-                values (4, 0,'neo', '1', 1);\
+                values (4, 0,'neo', '1', 1);\n\
+				values (0, 1);\n\
 				insert into rooms (room_id, user_id)\
 				values (0, 0);\n\
 				insert into rooms (room_id, user_id)\
-				values (0, 1);");
+				values (0, 1);\n\
+				insert into rooms (room_id, user_id)\
+				values (0, 2);\n\
+				insert into rooms (room_id, user_id)\
+				values (0, 3);\n\
+				insert into msg_history (message_id, user_id, room_id, message,\
+				addition_cont)\
+				values (0, 0, 0, 'hello', 'mes');");
 		sql = sqlite3_exec(db, req2, 0, 0, &err);
 		if (err)
 			fprintf(stderr, "%s\n", err);
@@ -143,6 +168,22 @@ int main(int argc, char *argv[]){
 		}
 		sprintf(req4, "select * from rooms;");
 		sql = sqlite3_exec(db, req4, print_rooms, &count1, &err);
+		if (err)
+			fprintf(stderr, "%s\n", err);
+		sqlite3_free(err);
+
+		printf("\n\n");
+
+		char req5[SIZE_RQ];
+		int count2 = 0;
+		sql = sqlite3_open(MX_PATH_TO_DB, &db);
+		if (sql != SQLITE_OK) {
+			fprintf(stderr, "Can't open db: %s\n", sqlite3_errmsg(db));
+			sqlite3_close(db);
+			exit(1);
+		}
+		sprintf(req5, "select * from msg_history;");
+		sql = sqlite3_exec(db, req5, print_msg, &count1, &err);
 		if (err)
 			fprintf(stderr, "%s\n", err);
 		sqlite3_free(err);
