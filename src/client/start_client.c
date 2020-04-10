@@ -2,15 +2,15 @@
 
 int mx_start_client(t_client_info *info) {
     char client_input[MAX_CLIENT_INPUT];
-    char server_output[MAX_CLIENT_INPUT];
+    // char server_output[MAX_CLIENT_INPUT];
     struct addrinfo hints;
     struct addrinfo *peer_address;
     int sock;
     int err;
     int enable = 1;
-    int registered = FALSE;
+    // int registered = FALSE;
     //костыль, но мы решим это, пока так
-    char *login = NULL;
+    // char *login = NULL;
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_STREAM;
@@ -41,9 +41,11 @@ int mx_start_client(t_client_info *info) {
     }
     freeaddrinfo(peer_address);
     info->socket = sock;
-    registered = mx_authorization_client(info, &login);
-    printf("registred =%d\n", registered);
-    if (registered == 1) {
+    info->login = strdup("Vova"); // #
+    info->password = strdup("123"); // #
+    // registered = mx_authorization_client(info, &login);
+    // printf("registred =%d\n", registered);
+    // if (registered == 1) {
         while (1) {
             printf("%s\t: ", info->login);
             mx_get_input(client_input);
@@ -54,23 +56,24 @@ int mx_start_client(t_client_info *info) {
                 // }
                 break;
             }
-
-            if (write(sock, client_input, sizeof(client_input)) == -1) {
-                printf("error write= %s\n", strerror(errno));
-                continue;
-            }
-//            printf("Sent \n");
-            int rc = read(sock, server_output, sizeof(server_output));
-            if (rc == 0) {
-                printf("Closed connection\n");
-                break;
-            }
-            if (rc == -1)
-                printf("error read= %s\n", strerror(errno));
-            else
-                printf("server: \t%s\n", server_output);
+            else if (strcmp(client_input, "msg") == 0) // #
+                mx_send_message(info); // #
+//             if (write(sock, client_input, sizeof(client_input)) == -1) {
+//                 printf("error write= %s\n", strerror(errno));
+//                 continue;
+//             }
+// //            printf("Sent \n");
+//             int rc = read(sock, server_output, sizeof(server_output));
+//             if (rc == 0) {
+//                 printf("Closed connection\n");
+//                 break;
+//             }
+//             if (rc == -1)
+//                 printf("error read= %s\n", strerror(errno));
+//             else
+//                 printf("server: \t%s\n", server_output);
         }
-    }
+    // }
     printf("exit client\n");
     close(sock);
     return 0;

@@ -9,27 +9,37 @@ SRC_SERVER = main_server.c \
     set_daemon.c \
     server_worker.c \
     work_with_db.c \
-    request_for_bd.c
+    request_for_bd.c \
+	run_function_type.c \
+	input_message.c \
+	input_file.c \
 
 SRC_CLIENT = main_client.c \
-    start_client.c
+    start_client.c \
+	send_message.c \
 
 
 SRC_HELP = err_exit.c \
-    functions.c
+    functions.c \
+	package.c \
 
 OBJ_SERVER = main_server.o \
     start_server.o \
     set_daemon.o \
     server_worker.o \
     work_with_db.o \
-    request_for_bd.o
+    request_for_bd.o \
+	run_function_type.c \
+	input_message.o \
+	input_file.o \
 
 OBJ_CLIENT = main_client.o \
-    start_client.o
+    start_client.o \
+	send_message.o \
 
 OBJ_HELP = err_exit.o \
-    functions.o
+    functions.o \
+	package.o \
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic
 

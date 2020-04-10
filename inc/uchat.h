@@ -101,4 +101,34 @@ int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_print_curr_time(void);
 
 void mx_err_exit(char *err_msg); // вивести помилку
+
+// Vova
+
+#define MX_MSG_TYPE 1
+#define MX_PACKAGE_SIZE sizeof(t_package)
+
+typedef struct  s_package {
+    char piece; // 0 - full, 1 - start, 2 - partition, 3 - end
+    int user_id; // sender unical id
+    int room_id; // room unical id
+    int add_info;
+    char type; // input type
+    char login[50]; // user login
+    char password[32]; // user password
+    char data[1024]; // user data
+}               t_package;
+
+// client
+void mx_send_message(t_client_info *info);
+
+// server
+int mx_run_function_type(t_server_info *info, t_package *package);
+int mx_input_message(t_server_info *info, t_package *package);
+int mx_input_file(t_server_info *info, t_package *package);
+
+// funcs for package
+t_package *mx_create_new_package();
+
+
+//
 #endif
