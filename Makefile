@@ -11,12 +11,14 @@ SRC_SERVER = main_server.c \
     work_with_db.c \
     request_for_bd.c \
 	run_function_type.c \
-	input_message.c \
-	input_file.c \
+	process_message_in_server.c \
+	process_file_in_server.c \
 
 SRC_CLIENT = main_client.c \
     start_client.c \
 	send_message.c \
+	send_file.c \
+	input_from_server.c \
 
 
 SRC_HELP = err_exit.c \
@@ -30,12 +32,14 @@ OBJ_SERVER = main_server.o \
     work_with_db.o \
     request_for_bd.o \
 	run_function_type.c \
-	input_message.o \
-	input_file.o \
+	process_message_in_server.o \
+	process_file_in_server.o \
 
 OBJ_CLIENT = main_client.o \
     start_client.o \
 	send_message.o \
+	send_file.o \
+	input_from_server.o \
 
 OBJ_HELP = err_exit.o \
     functions.o \

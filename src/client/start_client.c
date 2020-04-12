@@ -46,6 +46,11 @@ int mx_start_client(t_client_info *info) {
     // registered = mx_authorization_client(info, &login);
     // printf("registred =%d\n", registered);
     // if (registered == 1) {
+    pthread_t thread_input;
+    pthread_attr_t attr; // #
+    pthread_attr_init(&attr); // #
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE); // #
+    pthread_create(&thread_input, &attr, mx_process_input_from_server, info);
         while (1) {
             printf("%s\t: ", info->login);
             mx_get_input(client_input);
@@ -57,7 +62,9 @@ int mx_start_client(t_client_info *info) {
                 break;
             }
             else if (strcmp(client_input, "msg") == 0) // #
-                mx_send_message(info); // #
+                mx_process_message_in_client(info); // #
+            else if (strcmp(client_input, "file") == 0)
+                mx_send_file_from_client(info);
 //             if (write(sock, client_input, sizeof(client_input)) == -1) {
 //                 printf("error write= %s\n", strerror(errno));
 //                 continue;

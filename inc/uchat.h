@@ -105,13 +105,16 @@ void mx_err_exit(char *err_msg); // вивести помилку
 // Vova
 
 #define MX_MSG_TYPE 1
+#define MX_FILE_TYPE 2
+#define MX_MAX_DATA_SIZE (int)(sizeof(((t_package *)0)->data) - 1)
 #define MX_PACKAGE_SIZE sizeof(t_package)
-
+// sizeof((type *)0)->member)
 typedef struct  s_package {
+    int client_sock; // #
     char piece; // 0 - full, 1 - start, 2 - partition, 3 - end
     int user_id; // sender unical id
     int room_id; // room unical id
-    int add_info;
+    int add_info; // addition information which use different package types
     char type; // input type
     char login[50]; // user login
     char password[32]; // user password
@@ -119,12 +122,14 @@ typedef struct  s_package {
 }               t_package;
 
 // client
-void mx_send_message(t_client_info *info);
+void mx_process_message_in_client(t_client_info *info);
+void mx_send_file_from_client(t_client_info *info);
+void *mx_process_input_from_server(void *taken_info);
 
 // server
 int mx_run_function_type(t_server_info *info, t_package *package);
-int mx_input_message(t_server_info *info, t_package *package);
-int mx_input_file(t_server_info *info, t_package *package);
+int mx_process_message_in_server(t_server_info *info, t_package *package);
+int mx_process_file_in_server(t_server_info *info, t_package *package);
 
 // funcs for package
 t_package *mx_create_new_package();

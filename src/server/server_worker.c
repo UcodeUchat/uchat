@@ -1,10 +1,15 @@
 #include "uchat.h"
 
 int mx_worker(int client_sock, t_server_info *info) {
-    t_package *new_package = malloc(sizeof(t_package));
+    t_package *new_package = malloc(MX_PACKAGE_SIZE);
 
     recv(client_sock, new_package, MX_PACKAGE_SIZE, MSG_WAITALL);
+    new_package->client_sock = client_sock;// #
+    // check_is_it_correct_data
+    mx_memset(new_package->password, 0, sizeof(new_package->password));
+    //
     mx_run_function_type(info, new_package);
+    free(new_package);
     return 0;
 //     ssize_t size = 0;
 //     char client_input[MAX_CLIENT_INPUT];
