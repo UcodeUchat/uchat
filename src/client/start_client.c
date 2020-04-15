@@ -18,7 +18,6 @@ int mx_start_client(t_client_info *info) {
         fprintf(stderr, "getaddrinfo() failed. (%s)\n", gai_strerror(err));
         return 1;
     }
-
     printf("Remote address is: ");
     char address_buffer[100];
     char service_buffer[100];
@@ -47,11 +46,14 @@ int mx_start_client(t_client_info *info) {
     // printf("registred =%d\n", registered);
     // if (registered == 1) {
     pthread_t thread_input;
-    pthread_attr_t attr; // #
-    pthread_attr_init(&attr); // #
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE); // #
-    pthread_create(&thread_input, &attr, mx_process_input_from_server, info);
-        while (1) {
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED); // #
+    int tc = pthread_create(&thread_input, &attr, mx_process_input_from_server, info);
+    if (tc != 0)
+        printf("error = %s\n", strerror(tc));
+    mx_print_tid("main thread");
+    while (1) {
             printf("%s\t: ", info->login);
             mx_get_input(client_input);
             if (strcmp(client_input, "exit") == 0){
@@ -79,8 +81,9 @@ int mx_start_client(t_client_info *info) {
 //                 printf("error read= %s\n", strerror(errno));
 //             else
 //                 printf("server: \t%s\n", server_output);
-        }
     // }
+
+
     printf("exit client\n");
     close(sock);
     return 0;

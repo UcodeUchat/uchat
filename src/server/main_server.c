@@ -15,7 +15,6 @@ int main(int argc, char **argv) {
 
     if (argc != 2)
         mx_err_exit("usage: chat_server [port]\n");
-
     info = (t_server_info *)malloc(sizeof(t_server_info));
     memset(info, 0, sizeof(t_server_info));
     init_db(info);

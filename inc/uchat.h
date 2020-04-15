@@ -99,7 +99,7 @@ int mx_authorization_client(t_client_info *info, char **login_for_exit);
 
 // functions
 void mx_print_curr_time(void);
-
+void mx_print_tid(const char *s);
 void mx_err_exit(char *err_msg); // вивести помилку
 
 // Vova

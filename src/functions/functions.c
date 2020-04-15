@@ -33,7 +33,15 @@ int mx_get_input2(char *buffer) {
     return read;
 }
 
+void mx_print_tid(const char *s) {
+    pid_t       pid;
+    pthread_t   tid;
 
+    pid = getpid();
+    tid = pthread_self();
+    printf("%s pid %u tid %u (0x%x)\n", s,
+            (unsigned int)pid, (unsigned int)tid, (unsigned int)tid);
+}
 
 static void print_family(struct addrinfo *aip) {
 	printf(" family ");

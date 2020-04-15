@@ -5,8 +5,10 @@ bool pick_file_to_send(FILE **file, t_client_info *info, t_package *package) {
     (void)package;
     // need to write a function for picking a file
     struct stat file_stat;
-    char file_name[128] = "download.jpeg";
+    char file_name[128] = "Makefile";
+    printf("pick_file_to_send 1\n");
     if ((*file = fopen(file_name, "r")) != NULL) {
+        printf("pick_file_to_send 2+\n");
         stat(file_name, &file_stat);
         package->add_info = file_stat.st_size;
         strncat(package->data, file_name, MX_MAX_DATA_SIZE);
@@ -20,6 +22,7 @@ void mx_send_file_from_client(t_client_info *info) {
     t_package *package = mx_create_new_package();
     FILE *file_to_send;
 
+    printf ("mx_send_file \n");
     package->piece = 1;
     package->type = MX_FILE_TYPE;
     package->room_id = 0; // take that from info

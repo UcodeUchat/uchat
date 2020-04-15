@@ -3,7 +3,10 @@
 int mx_worker(int client_sock, t_server_info *info) {
     t_package *new_package = malloc(MX_PACKAGE_SIZE);
 
-    recv(client_sock, new_package, MX_PACKAGE_SIZE, MSG_WAITALL);
+    int rc = recv(client_sock, new_package, MX_PACKAGE_SIZE, MSG_WAITALL);
+    if (rc == -1)
+        mx_err_exit("error recv\n");
+
     new_package->client_sock = client_sock;// #
     // check_is_it_correct_data
     mx_memset(new_package->password, 0, sizeof(new_package->password));
