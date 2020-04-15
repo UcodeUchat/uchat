@@ -24,6 +24,7 @@ SRC_CLIENT = main_client.c \
 SRC_HELP = err_exit.c \
     functions.c \
 	package.c \
+	cryptographic_hash_f.c
 
 OBJ_SERVER = main_server.o \
     start_server.o \
@@ -44,6 +45,7 @@ OBJ_CLIENT = main_client.o \
 OBJ_HELP = err_exit.o \
     functions.o \
 	package.o \
+	cryptographic_hash_f.o
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic
 
@@ -57,8 +59,8 @@ install:
 	@cp $(addprefix src/functions/, $(SRC_HELP)) .
 	@clang $(CFLAGS) -c $(SRC_SERVER) $(SRC_HELP) -I $(INC)
 	@clang $(CFLAGS) -c $(SRC_CLIENT) $(SRC_HELP) -I $(INC)
-	@clang $(CFLAGS) libmx/libmx.a $(OBJ_SERVER) $(OBJ_HELP) -o $(NAME_S) -lsqlite3
-	@clang $(CFLAGS) libmx/libmx.a $(OBJ_CLIENT) $(OBJ_HELP) -o $(NAME_C) -lsqlite3
+	@clang $(CFLAGS) libmx/libmx.a $(OBJ_SERVER) $(OBJ_HELP) -o $(NAME_S) -lsqlite3 -lcrypto -lssl
+	@clang $(CFLAGS) libmx/libmx.a $(OBJ_CLIENT) $(OBJ_HELP) -o $(NAME_C) -lsqlite3 -lcrypto -lssl
 	@mkdir -p obj
 	@mv $(OBJ_SERVER) $(OBJ_CLIENT) $(OBJ_HELP) ./obj
 

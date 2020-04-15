@@ -30,6 +30,8 @@
 #include <sys/event.h>
 #include <sys/time.h>
 
+#include <openssl/sha.h>
+
 #include "libmx/inc/libmx.h"
 
 #define MAX_CLIENT_INPUT 1024
@@ -101,7 +103,7 @@ int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_print_curr_time(void);
 void mx_print_tid(const char *s);
 void mx_err_exit(char *err_msg); // вивести помилку
-
+void mx_sha_hash_password(char *password);
 // Vova
 
 #define MX_MSG_TYPE 1
