@@ -1,16 +1,12 @@
 #include "uchat.h"
 
 int mx_start_client(t_client_info *info) {
-    char client_input[MAX_CLIENT_INPUT];
-    // char server_output[MAX_CLIENT_INPUT];
     struct addrinfo hints;
     struct addrinfo *peer_address;
     int sock;
     int err;
     int enable = 1;
-    // int registered = FALSE;
-    //костыль, но мы решим это, пока так
-    // char *login = NULL;
+ 
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_STREAM;
@@ -41,11 +37,8 @@ int mx_start_client(t_client_info *info) {
     }
     freeaddrinfo(peer_address);
     info->socket = sock;
-    info->login = strdup("Vova"); // #
-    info->password = strdup("123iqazx"); // #
-    // registered = mx_authorization_client(info, &login);
-    // printf("registred =%d\n", registered);
-    // if (registered == 1) {
+    // info->login = strdup("Vova"); // #
+    // info->password = strdup("123iqazx"); // #
     pthread_t thread_input;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
@@ -54,38 +47,9 @@ int mx_start_client(t_client_info *info) {
     if (tc != 0)
         printf("error = %s\n", strerror(tc));
     mx_print_tid("main thread");
-    mx_sha_hash_password(info->password);
-    while (1) {
-            printf("%s\t: ", info->login);
-            mx_get_input(client_input);
-            if (strcmp(client_input, "exit") == 0){
-                // printf("TUT\nlogin for exit - [%s]\n", login);
-                // if (write(sock, login, strlen(login)) == -1) {
-                //     printf("error write for exit = %s\n", strerror(errno));
-                // }
-                break;
-            }
-            else if (strcmp(client_input, "msg") == 0) // #
-                mx_process_message_in_client(info); // #
-            else if (strcmp(client_input, "file") == 0)
-                mx_send_file_from_client(info);
-//             if (write(sock, client_input, sizeof(client_input)) == -1) {
-//                 printf("error write= %s\n", strerror(errno));
-//                 continue;
-//             }
-// //            printf("Sent \n");
-//             int rc = read(sock, server_output, sizeof(server_output));
-//             if (rc == 0) {
-//                 printf("Closed connection\n");
-//                 break;
-//             }
-//             if (rc == -1)
-//                 printf("error read= %s\n", strerror(errno));
-//             else
-//                 printf("server: \t%s\n", server_output);
-        }
-    // }
-
+    //-- В этом месте начинается вечный цикл вплоть до закрытия окна чата
+    mx_login(info);
+    //--
     printf("exit client\n");
     close(sock);
     return 0;

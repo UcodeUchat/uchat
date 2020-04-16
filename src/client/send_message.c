@@ -1,27 +1,27 @@
 #include "uchat.h"
 
-char *get_message() {
-    printf("get_message\n"); // #
-    char *message = malloc(1024);
-    int pos = 0;
-    int size = 1024;
+// char *get_message() {
+//     printf("get_message\n"); // #
+//     char *message = malloc(1024);
+//     int pos = 0;
+//     int size = 1024;
 
-    while (1) {
-        if (fgets(message + pos, MAX_CLIENT_INPUT, stdin) != NULL) {
-        pos += strlen(message + pos);
-        if (pos > 0 && message[pos - 1] == '\n') {
-            message[pos - 1] = '\0';
-            break;
-        }
-        pos > 0 ? pos-- : 0;
-        if (pos + 25 > size)
-            message = realloc(message, (size += size));
-        }
-        else
-            break;
-    }
-    return message;
-}
+//     while (1) {
+//         if (fgets(message + pos, MAX_CLIENT_INPUT, stdin) != NULL) {
+//         pos += strlen(message + pos);
+//         if (pos > 0 && message[pos - 1] == '\n') {
+//             message[pos - 1] = '\0';
+//             break;
+//         }
+//         pos > 0 ? pos-- : 0;
+//         if (pos + 25 > size)
+//             message = realloc(message, (size += size));
+//         }
+//         else
+//             break;
+//     }
+//     return message;
+// }
 
 int mx_send_message_from_client(t_client_info *info, t_package *package, char *message) {
     int msg_size = strlen(message);
@@ -59,7 +59,7 @@ void mx_process_message_in_client(t_client_info *info) {
     //
     package->type = MX_MSG_TYPE;
     while(1) {
-        message = get_message();
+        message = strdup((char *)gtk_entry_get_text(GTK_ENTRY(info->data->message_entry)));
         mx_send_message_from_client(info, package, message);
         mx_strdel(&message);
         mx_memset(package->data, 0, sizeof(package->data));

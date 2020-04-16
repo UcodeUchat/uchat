@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
         mx_printerr("usage: uchat [ip_adress] [port]\n");
         return -1;
     }
-
+    gtk_init (&argc, &argv);
     info = (t_client_info *)malloc(sizeof(t_client_info));
     memset(info, 0, sizeof(t_client_info));
     (*info).argc = argc;

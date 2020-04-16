@@ -15,6 +15,7 @@ void *mx_process_input_from_server(void *taken_info) {
             mx_print_curr_time();
             printf("input: piece.%d, type.%d, login.%s\n", input_package->piece, input_package->type,
                    input_package->login);
+            printf("%s\n", input_package->data);
         }
     }
     return NULL;

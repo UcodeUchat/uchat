@@ -30,7 +30,9 @@
 #include <sys/event.h>
 #include <sys/time.h>
 
-#include <openssl/sha.h>
+//#include <openssl/sha.h>
+
+#include <gtk/gtk.h>
 
 #include "libmx/inc/libmx.h"
 
@@ -40,6 +42,32 @@
 #define BUFLEN 128
 #define QLEN 10
 #define HOST_NAME_MAX 256
+
+typedef struct s_room {
+    int id;
+    int position;
+    char *name;
+    GtkWidget *scrolled_window;
+    GtkListStore *list;
+    GtkWidget *messagesTreeView;
+    GtkAdjustment *Adjust;
+    struct s_room *next;
+}              t_room;
+
+typedef struct s_data {
+    GtkWidget *window;
+    GtkWidget *main_box;
+    GtkWidget *login_box;
+    GtkWidget *login_entry;
+    GtkWidget *password_entry;
+    GtkWidget *general_box;
+    GtkWidget *message_entry;
+    GtkWidget *send_button;
+    GtkWidget *file_button;
+    t_room *rooms;
+    GtkWidget *notebook;
+    gint current_room;
+}              t_data;
 
 typedef struct  s_client_info {  //struct client
     char *login;
@@ -51,6 +79,7 @@ typedef struct  s_client_info {  //struct client
     int socket;
     int auth_client;
     pthread_mutex_t mutex;
+    t_data *data;
 }               t_client_info;
 
 #define MX_PATH_TO_DB "./server_db.bin"
@@ -136,6 +165,8 @@ int mx_process_file_in_server(t_server_info *info, t_package *package);
 // funcs for package
 t_package *mx_create_new_package();
 
+// krivoy dizayn
+int mx_login (t_client_info *info);
 
 //
 #endif

@@ -19,6 +19,7 @@ SRC_CLIENT = main_client.c \
 	send_message.c \
 	send_file.c \
 	input_from_server.c \
+	login.c \
 
 
 SRC_HELP = err_exit.c \
@@ -41,6 +42,7 @@ OBJ_CLIENT = main_client.o \
 	send_message.o \
 	send_file.o \
 	input_from_server.o \
+	login.o \
 
 OBJ_HELP = err_exit.o \
     functions.o \
@@ -57,10 +59,10 @@ install:
 	@cp $(addprefix src/server/, $(SRC_SERVER)) .
 	@cp $(addprefix src/client/, $(SRC_CLIENT)) .
 	@cp $(addprefix src/functions/, $(SRC_HELP)) .
-	@clang $(CFLAGS) -c $(SRC_SERVER) $(SRC_HELP) -I $(INC)
-	@clang $(CFLAGS) -c $(SRC_CLIENT) $(SRC_HELP) -I $(INC)
-	@clang $(CFLAGS) libmx/libmx.a $(OBJ_SERVER) $(OBJ_HELP) -o $(NAME_S) -lsqlite3 -lcrypto -lssl
-	@clang $(CFLAGS) libmx/libmx.a $(OBJ_CLIENT) $(OBJ_HELP) -o $(NAME_C) -lsqlite3 -lcrypto -lssl
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -c $(SRC_SERVER)  $(SRC_HELP) -I $(INC) 
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -c $(SRC_CLIENT)  $(SRC_HELP) -I $(INC) 
+	@clang $(CFLAGS)  `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJ_SERVER) $(OBJ_HELP) -o $(NAME_S) -lsqlite3 -lcrypto -lssl
+	@clang $(CFLAGS)  `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJ_CLIENT) $(OBJ_HELP) -o $(NAME_C) -lsqlite3 -lcrypto -lssl
 	@mkdir -p obj
 	@mv $(OBJ_SERVER) $(OBJ_CLIENT) $(OBJ_HELP) ./obj
 
