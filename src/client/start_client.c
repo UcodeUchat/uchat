@@ -37,8 +37,6 @@ int mx_start_client(t_client_info *info) {
     }
     freeaddrinfo(peer_address);
     info->socket = sock;
-    // info->login = strdup("Vova"); // #
-    // info->password = strdup("123iqazx"); // #
     pthread_t thread_input;
     pthread_attr_t attr;
     pthread_attr_init(&attr);

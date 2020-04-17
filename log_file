@@ -4,42 +4,230 @@ listen fd = 0
 server new client socket 3
 New connection from 
 			work with client 3
-msg from www, piece=0
-			work with client 3
-msg from www, piece=0
-server new client socket 4
-New connection from 
-			work with client 4
-msg from rrt, piece=0
-			work with client 4
-Client 4 disconnected
+Client 3 disconnected
 start set socket to 0
-UPDATE users SET socket=0 WHERE socket=4
-server new client socket 4
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
 New connection from 
 			work with client 3
-msg from www, piece=0
-			work with client 4
-Client 4 disconnected
-start set socket to 0
-UPDATE users SET socket=0 WHERE socket=4
+msg from gg, piece=0
+			work with client 3
+msg from gg, piece=0
+			work with client 3
+msg from gg, piece=0
+			work with client 3
+msg from gg, piece=0
+			work with client 3
+msg from gg, piece=0
+			work with client 3
+msg from gg, piece=0
+			work with client 3
+msg from gg, piece=0
+			work with client 3
+msg from gg, piece=0
+			work with client 3
+msg from gg, piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
 New connection from 
-server new client socket 4
-New connection from 
-			work with client 4
-msg from Vova, piece=0
-			work with client 3
-msg from Vova, piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
-			work with client 4
-Client 4 disconnected
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
 start set socket to 0
-UPDATE users SET socket=0 WHERE socket=4
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+msg from dfgdf, piece=0
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3

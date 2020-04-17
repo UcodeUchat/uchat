@@ -64,9 +64,11 @@ typedef struct s_data {
     GtkWidget *message_entry;
     GtkWidget *send_button;
     GtkWidget *file_button;
-    t_room *rooms;
+    GtkWidget *login_msg;
     GtkWidget *notebook;
+    t_room *rooms;
     gint current_room;
+    int login_msg_flag;
 }              t_data;
 
 typedef struct  s_client_info {  //struct client
