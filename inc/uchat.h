@@ -70,5 +70,6 @@ int main2(int argc, char *argv[]);
 void mx_show_certs(SSL* ssl);
 void mx_load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
 SSL_CTX* mx_init_server_ctx(void);
+void mx_worker_ssl(SSL* ssl);
 
 #endif
