@@ -231,3 +231,933 @@ New connection from
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+msg from rrrt, piece=0
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+msg from tt, piece=0
+			work with client 3
+msg from tt, piece=0
+			work with client 3
+msg from tt, piece=0
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+msg from rrrf, piece=0
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from 
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3

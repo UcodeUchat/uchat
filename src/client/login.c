@@ -127,9 +127,10 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         pthread_cancel(login_msg_t);
         if (info->data->login_msg_flag)
             gtk_widget_hide(info->data->login_msg);
-        info->data->login_msg = gtk_label_new("Your login or password is huynya");
+        info->data->login_msg = gtk_label_new(NULL);
+        gtk_label_set_markup(GTK_LABEL(info->data->login_msg), "<span color=\"red\">Your data is invalid</span>");
         info->data->login_msg_flag = 1;
-        gtk_fixed_put(GTK_FIXED(info->data->login_box), info->data->login_msg, 230, 75);
+        gtk_fixed_put(GTK_FIXED(info->data->login_box), info->data->login_msg, 260, 75);
         gtk_widget_show(info->data->login_msg);
         pthread_create(&login_msg_t, 0, login_msg_thread, info);
     }
