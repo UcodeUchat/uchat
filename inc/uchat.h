@@ -47,6 +47,7 @@ typedef struct s_room {
     int id;
     int position;
     char *name;
+    GtkWidget *room_box;
     GtkWidget *scrolled_window;
     GtkListStore *list;
     GtkWidget *messagesTreeView;
@@ -64,6 +65,7 @@ typedef struct s_data {
     GtkWidget *message_entry;
     GtkWidget *send_button;
     GtkWidget *file_button;
+    GtkWidget *menu_button;
     GtkWidget *login_msg;
     GtkWidget *notebook;
     GtkWidget *stop;

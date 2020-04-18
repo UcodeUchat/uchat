@@ -1,7 +1,10 @@
 label {
-	color: DeepSkyBlue;
+	color: LightSkyBlue;
 	font-weight: bold;
 	font-size: 140%;
-    text-shadow: Aquamarine 1px 1px 0, Aquamarine -1px -1px 0, 
-                 Aquamarine -1px 1px 0, Aquamarine 1px -1px 0;
+    text-shadow: Navy 1px 1px 0, Navy -1px -1px 0, 
+                 Navy -1px 1px 0, Navy 1px -1px 0;
+}
+label#title {
+  text-align: center;
 }

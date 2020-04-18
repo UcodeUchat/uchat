@@ -41,7 +41,7 @@ void *mx_process_input_from_server(void *taken_info) {
                 head = head->next;
             }
             room->position = 0;
-            gtk_notebook_reorder_child(GTK_NOTEBOOK(info->data->notebook), room->scrolled_window, 0);
+            gtk_notebook_reorder_child(GTK_NOTEBOOK(info->data->notebook), room->room_box, 0);
         }
     }
     return NULL;

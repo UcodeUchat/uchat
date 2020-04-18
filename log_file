@@ -2,211 +2,263 @@ Configuring demon ++...
 Configuring local address...
 listen fd = 0
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
+			work with client 3
+msg from t, piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
+			work with client 3
+msg from fe, piece=0
+			work with client 3
+msg from fe, piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
+			work with client 3
+msg from , piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
+			work with client 3
+msg from , piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
+			work with client 3
+msg from , piece=0
+			work with client 3
+msg from , piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
+			work with client 3
+msg from fr, piece=0
+			work with client 3
+msg from fr, piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
+			work with client 3
+msg from sdf, piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
+			work with client 3
+msg from gf, piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
+			work with client 3
+msg from , piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
+			work with client 3
+msg from fre, piece=0
+			work with client 3
+msg from fre, piece=0
+			work with client 3
+msg from fre, piece=0
+			work with client 3
+msg from fre, piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
 server new client socket 3
-New connection from 
+New connection from เสWÿ
 			work with client 3
-Client 3 disconnected
-start set socket to 0
-UPDATE users SET socket=0 WHERE socket=3
-server new client socket 3
-New connection from 
-			work with client 3
-Client 3 disconnected
-start set socket to 0
-UPDATE users SET socket=0 WHERE socket=3
-server new client socket 3
-New connection from 
-			work with client 3
-Client 3 disconnected
-start set socket to 0
-UPDATE users SET socket=0 WHERE socket=3
-server new client socket 3
-New connection from 
-			work with client 3
-Client 3 disconnected
-start set socket to 0
-UPDATE users SET socket=0 WHERE socket=3
-server new client socket 3
-New connection from 
+msg from ref, piece=0
 			work with client 3
 Client 3 disconnected
 start set socket to 0

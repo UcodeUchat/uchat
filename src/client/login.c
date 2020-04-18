@@ -123,7 +123,6 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         gtk_style_context_add_provider (context,
                                     GTK_STYLE_PROVIDER(provider),
                                     GTK_STYLE_PROVIDER_PRIORITY_USER);
-        //gtk_label_set_markup(GTK_LABEL(info->data->login_msg), "<span color=\"DeepSkyBlue\" font-family=\"Verdana\" font-weight=\"bold\" font-size=\"21000\">Your data is invalid</span>");
         info->data->login_msg_flag = 1;
         gtk_fixed_put(GTK_FIXED(info->data->login_box), info->data->login_msg, 196, 75);
         gtk_widget_show(info->data->login_msg);
@@ -140,7 +139,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         info->data->rooms = NULL;
         info->data->current_room = 0;
         info->data->general_box = gtk_fixed_new();
-        gtk_box_pack_start(GTK_BOX(info->data->main_box), info->data->general_box, TRUE, TRUE, 0);
+        gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->general_box, 0, 0);
         gtk_widget_show(info->data->general_box);
         //--message
         info->data->message_entry = gtk_entry_new ();
@@ -149,9 +148,16 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         gtk_editable_select_region(GTK_EDITABLE (info->data->message_entry),
                                     0, gtk_entry_get_text_length (GTK_ENTRY (info->data->message_entry)));
         g_signal_connect(G_OBJECT(info->data->message_entry),"activate", G_CALLBACK(send_callback), info);
-        gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->message_entry, 10, 350);
-        gtk_widget_set_size_request(info->data->message_entry, 500, -1);
+        gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->message_entry, 65, 350);
+        gtk_widget_set_size_request(info->data->message_entry, 445, -1);
         gtk_widget_show(info->data->message_entry);
+        //--
+        //--Menu button
+        info->data->menu_button = gtk_button_new();
+        //g_signal_connect(G_OBJECT(info->data->send_button), "clicked", G_CALLBACK(send_callback), info);
+        gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->menu_button, 10, 350);
+        gtk_widget_set_size_request(info->data->menu_button, 50, -1);
+        gtk_widget_show(info->data->menu_button);
         //--
         //--Send button
         info->data->send_button = gtk_button_new_with_label("Send");
@@ -176,19 +182,37 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         for (int i = 0; i < 4; i++) {
             char *str;
             if (i == 0) 
-                str = strdup("General");
+                str = strdup("General123456789123456");
             else {
                 str = strdup("Room  ");
                 str[5] = i + 48;
             }
             push_room(&info->data->rooms, str, i);
             t_room *room = find_room(info->data->rooms, i);
+            room->room_box = gtk_fixed_new();
+            gtk_widget_show(room->room_box);
+
+            GtkWidget *full_name = gtk_label_new(str);
+            gtk_widget_set_name (full_name, "title");
+            GtkStyleContext *context1 = gtk_widget_get_style_context (full_name);
+            gtk_style_context_add_provider (context1,
+                                    GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+            gtk_fixed_put(GTK_FIXED(room->room_box), full_name, 0, 10);
+            gtk_widget_set_size_request(full_name, 515, -1);
+            gtk_widget_show(full_name);
             room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-            gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 10);
+            gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 5);
+            gtk_fixed_put(GTK_FIXED(room->room_box), room->scrolled_window, 0, 20);
+            gtk_widget_set_size_request(room->scrolled_window, 515, 300);
             gtk_widget_show(room->scrolled_window);
             room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
+            if (strlen(str) > 15) {
+                str = strndup(str, 12);
+                strcat(str, "...");
+            }
             GtkWidget *label = gtk_label_new(str);
-            gtk_notebook_append_page(GTK_NOTEBOOK(info->data->notebook), room->scrolled_window, label);
+            gtk_notebook_append_page(GTK_NOTEBOOK(info->data->notebook), room->room_box, label);
             room->list = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
             room->messagesTreeView = gtk_tree_view_new_with_model(GTK_TREE_MODEL(room->list));
             GtkTreeViewColumn *column;
@@ -235,14 +259,15 @@ int mx_login (t_client_info *info) {
                               G_OBJECT (info->data->window));
     //--
     //--main box
-    info->data->main_box = gtk_box_new (FALSE, 0);
+    info->data->main_box = gtk_fixed_new ();
     gtk_container_add (GTK_CONTAINER (info->data->window), info->data->main_box);
     gtk_widget_show (info->data->main_box);
     //--
     //-login box
     info->data->login_msg_flag = 0;
     info->data->login_box = gtk_fixed_new ();
-    gtk_box_pack_start (GTK_BOX (info->data->main_box), info->data->login_box, TRUE, TRUE, 0);
+    gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->login_box, 0, 0);
+    //gtk_box_pack_start (GTK_BOX (info->data->main_box), info->data->login_box, TRUE, TRUE, 0);
     gtk_widget_show (info->data->login_box);
 
     info->data->stop = gtk_image_new_from_file("stop2.png");
