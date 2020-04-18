@@ -66,6 +66,7 @@ typedef struct s_data {
     GtkWidget *file_button;
     GtkWidget *login_msg;
     GtkWidget *notebook;
+    GtkWidget *stop;
     t_room *rooms;
     gint current_room;
     int login_msg_flag;

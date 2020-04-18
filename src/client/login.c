@@ -11,20 +11,6 @@ void sleep_ms (int milliseconds) {
     nanosleep(&ts, NULL);
 }
 
-// t_room *find_room(t_room *rooms, int id) {
-//    t_room *head = rooms;
-//    t_room *node = NULL;
-
-//     while (head != NULL) {
-//         if (head->position == id) {
-//             node = head;
-//             break;
-//         }
-//         head = head->next;
-//     }
-//     return node;
-// }
-
 t_room *find_room(t_room *rooms, int id) {
    t_room *head = rooms;
    t_room *node = NULL;
@@ -47,6 +33,7 @@ void *login_msg_thread (void *data) {
             if (n_data->data->login_msg_flag) {
                 n_data->data->login_msg_flag = 0;
                 gtk_widget_hide(n_data->data->login_msg);
+                gtk_widget_hide(n_data->data->stop);
             }
         }
     return 0;
@@ -119,19 +106,28 @@ void authentification(t_client_info *info) {
 
 void enter_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
+    GtkCssProvider *provider = gtk_css_provider_new ();
+    gtk_css_provider_load_from_path (provider,"my_style.css", NULL);
     //--auth
     info->login = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->login_entry));
     info->password = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->password_entry));
     authentification(info);
     if (!info->auth_client) {
         pthread_cancel(login_msg_t);
-        if (info->data->login_msg_flag)
+        if (info->data->login_msg_flag) {
             gtk_widget_hide(info->data->login_msg);
-        info->data->login_msg = gtk_label_new(NULL);
-        gtk_label_set_markup(GTK_LABEL(info->data->login_msg), "<span color=\"red\">Your data is invalid</span>");
+            gtk_widget_hide(info->data->stop);
+        }
+        info->data->login_msg = gtk_label_new("Your login or password is invalid");
+        GtkStyleContext *context = gtk_widget_get_style_context (info->data->login_msg);
+        gtk_style_context_add_provider (context,
+                                    GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+        //gtk_label_set_markup(GTK_LABEL(info->data->login_msg), "<span color=\"DeepSkyBlue\" font-family=\"Verdana\" font-weight=\"bold\" font-size=\"21000\">Your data is invalid</span>");
         info->data->login_msg_flag = 1;
-        gtk_fixed_put(GTK_FIXED(info->data->login_box), info->data->login_msg, 260, 75);
+        gtk_fixed_put(GTK_FIXED(info->data->login_box), info->data->login_msg, 196, 75);
         gtk_widget_show(info->data->login_msg);
+        gtk_widget_show(info->data->stop);
         pthread_create(&login_msg_t, 0, login_msg_thread, info);
     }
     else {
@@ -188,7 +184,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
             push_room(&info->data->rooms, str, i);
             t_room *room = find_room(info->data->rooms, i);
             room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-            gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 2);
+            gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 10);
             gtk_widget_show(room->scrolled_window);
             room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
             GtkWidget *label = gtk_label_new(str);
@@ -229,8 +225,8 @@ int mx_login (t_client_info *info) {
     //--window
     info->data->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_resizable (GTK_WINDOW (info->data->window), FALSE);
-    gtk_widget_set_size_request (GTK_WIDGET (info->data->window), 650, 400);
-    gtk_container_set_border_width (GTK_CONTAINER (info->data->window), 10);
+    gtk_widget_set_size_request (GTK_WIDGET (info->data->window), 650, 407);
+    gtk_container_set_border_width (GTK_CONTAINER (info->data->window), 1);
     gtk_window_set_title (GTK_WINDOW (info->data->window), "Sign in");
     g_signal_connect (G_OBJECT (info->data->window), "destroy",
                       G_CALLBACK (gtk_main_quit), NULL);
@@ -248,6 +244,9 @@ int mx_login (t_client_info *info) {
     info->data->login_box = gtk_fixed_new ();
     gtk_box_pack_start (GTK_BOX (info->data->main_box), info->data->login_box, TRUE, TRUE, 0);
     gtk_widget_show (info->data->login_box);
+
+    info->data->stop = gtk_image_new_from_file("stop2.png");
+    gtk_fixed_put(GTK_FIXED(info->data->login_box), info->data->stop, 60, 2);
 
     info->data->login_entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (info->data->login_entry), 50);

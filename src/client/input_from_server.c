@@ -14,20 +14,6 @@ t_room *mx_find_room(t_room *rooms, int id) {
     return node;
 }
 
-// t_room *mx_find_room(t_room *rooms, int id) {
-//    t_room *head = rooms;
-//    t_room *node = NULL;
-
-//     while (head != NULL) {
-//         if (head->id == id) {
-//             node = head;
-//             break;
-//         }
-//         head = head->next;
-//     }
-//     return node;
-// }
-
 void *mx_process_input_from_server(void *taken_info) {
     t_client_info *info = (t_client_info *)taken_info;
     t_package *input_package = malloc(MX_PACKAGE_SIZE);
