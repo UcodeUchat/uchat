@@ -30,7 +30,12 @@
 #include <sys/event.h>
 #include <sys/time.h>
 
-//#include <openssl/sha.h>
+#include <openssl/crypto.h>
+#include <openssl/x509.h>
+#include <openssl/pem.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <tls.h>
 
 #include <gtk/gtk.h>
 
@@ -119,6 +124,11 @@ int mx_find_sock_in_db(t_server_info *i, char *login);
 int mx_drop_socket(t_server_info *i, int client_sock);
 
 int mx_check_client(int client_sock, char *c_input, t_server_info *info);
+
+int mx_tls_worker(SSL *ssl, int client_sock, t_server_info *info);
+SSL_CTX* mx_create_context(void);
+void mx_load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
+
 int mx_worker(int client_sock, t_server_info *info);
 
 int main2(int argc, char *argv[]);  // test adress
@@ -127,6 +137,8 @@ int main2(int argc, char *argv[]);  // test adress
 int mx_start_client(t_client_info *info);
 void mx_get_input(char *buffer);
 int mx_get_input2(char *buffer);
+
+void mx_show_certs(SSL* ssl);
 
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
 

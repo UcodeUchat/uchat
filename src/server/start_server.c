@@ -13,10 +13,9 @@ int mx_start_server(t_server_info *info) {
 
 
     SSL_library_init();
-    ctx = mx_init_server_ctx();  // initialize SSL
+    ctx = mx_create_context();  // initialize SSL
     mx_load_certificates(ctx,  "mycert.pem", "mycert.pem"); // load cert
     printf("2--------++++\n");
-
 
     printf("Configuring local address...\n");
     memset(&hints, 0, sizeof(hints));
@@ -33,7 +32,7 @@ int mx_start_server(t_server_info *info) {
     }
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(info->port);
-    inet_aton("192.168.1.7", &serv_addr.sin_addr);
+    inet_aton("192.168.1.124", &serv_addr.sin_addr);
     if (bind(server, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
         printf("bind error = %s\n", strerror(errno));
         return -1;
@@ -62,7 +61,7 @@ int mx_start_server(t_server_info *info) {
     struct timespec timeout;
     timeout.tv_sec = 1;  // seconds
     timeout.tv_nsec = 0;  // nanoseconds
-
+    SSL *ssl;
     while (1) {
         int event = kevent(kq, NULL, 0, &new_ev, 1, &timeout);
         if (event == 0) {  // check new event
@@ -95,7 +94,7 @@ int mx_start_server(t_server_info *info) {
             }
 
             // TLS
-            SSL *ssl = SSL_new(ctx);
+            ssl = SSL_new(ctx);
             if (!ctx) {
                 fprintf(stderr, "SSL_new() failed.\n");
                 return 1;
@@ -106,13 +105,12 @@ int mx_start_server(t_server_info *info) {
             SSL_set_fd(ssl, client_sock);
 
             /* Establish TLS connection */
-            ret = wolfSSL_accept(ssl);
-            if (ret != SSL_SUCCESS) {
-                fprintf(stderr, "wolfSSL_accept error = %d\n",
-                        wolfSSL_get_error(ssl, ret));
+            int  ret = SSL_accept(ssl);
+            if (ret != 1) {
+                fprintf(stderr, "SSL_accept error = %d\n",
+                        SSL_get_error(ssl, ret));
                 return -1;
             }
-
             printf("Client connected successfully\n");
 
 //            int old_flags  = fcntl(client_sock, F_GETFL, 0);
@@ -124,24 +122,31 @@ int mx_start_server(t_server_info *info) {
             if ((new_ev.flags & EV_EOF) != 0) {
                 printf("Client %lu disconnected\n", new_ev.ident);
                 mx_drop_socket(info, new_ev.ident);
-
+                // close SSL
+//                SSL_CTX_free(ctx);
                 close(new_ev.ident);
             }
             else {
-
-                int rc = mx_worker_ssl(ssl, new_ev.ident, info);
-//                int rc = mx_worker(new_ev.ident, info);
+                int rc = mx_tls_worker(ssl, new_ev.ident, info);
                 if (rc == -1) {
                     printf("error = %s\n", strerror(errno));
                     break;
                 }
-            }
+//        else
+//            ERR_print_errors_fp(stderr);
+                }
+
+//                int rc = mx_tls_worker(ssl, new_ev.ident, info);
+//                int rc = mx_worker(new_ev.ident, info);
+//                if (rc == -1) {
+//                    printf("error = %s\n", strerror(errno));
+//                    break;
         }
     }
     return 0;
 }
 
-SSL_CTX* create_context(void) {
+SSL_CTX* mx_create_context(void) {
     SSL_CTX *ctx;
 
     OpenSSL_add_all_algorithms();  // load & register all cryptos, etc.
