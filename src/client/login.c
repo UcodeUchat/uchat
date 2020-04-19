@@ -11,12 +11,12 @@ void sleep_ms (int milliseconds) {
     nanosleep(&ts, NULL);
 }
 
-t_room *find_room(t_room *rooms, int id) {
+t_room *find_room(t_room *rooms, int position) {
    t_room *head = rooms;
    t_room *node = NULL;
 
     while (head != NULL) {
-        if (head->id == id) {
+        if (head->position == position) {
             node = head;
             break;
         }
@@ -41,7 +41,7 @@ void *login_msg_thread (void *data) {
 
 void *watcher_thread (void *data) {
     t_data *n_data = (t_data *)data;
-    gint current_room = n_data->current_room;
+    gint current_room = gtk_notebook_get_current_page(GTK_NOTEBOOK(n_data->notebook));
     t_room *room = find_room(n_data->rooms, current_room);
 
     while (1) {
@@ -90,9 +90,11 @@ void push_room(t_room **list, void *name, int id) {
 }
 
 void send_callback (GtkWidget *widget, t_client_info *info) {
-    mx_process_message_in_client(info);
     (void)widget;
-    info->data->current_room = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
+    int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
+    t_room *room = find_room(info->data->rooms, position);
+    info->data->current_room = room->id;
+    mx_process_message_in_client(info);
     gtk_entry_set_text(GTK_ENTRY(info->data->message_entry), "");
     send_flag = 1;
 }

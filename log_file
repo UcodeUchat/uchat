@@ -317,3 +317,99 @@ msg from ertyu, piece=0
 Client 3 disconnected
 start set socket to 0
 UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from àŠ&Rÿ
+			work with client 3
+msg from ert, piece=0
+			work with client 3
+msg from ert, piece=0
+			work with client 3
+msg from ert, piece=0
+			work with client 3
+msg from ert, piece=0
+			work with client 3
+msg from ert, piece=0
+			work with client 3
+msg from ert, piece=0
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from àŠ&Rÿ
+			work with client 3
+msg from 111, piece=0
+			work with client 3
+msg from 111, piece=0
+			work with client 3
+msg from 111, piece=0
+			work with client 3
+msg from 111, piece=0
+			work with client 3
+msg from 111, piece=0
+			work with client 3
+msg from 111, piece=0
+			work with client 3
+msg from 111, piece=0
+			work with client 3
+msg from 111, piece=0
+			work with client 3
+msg from 111, piece=0
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from àŠ&Rÿ
+			work with client 3
+msg from trg, piece=0
+			work with client 3
+msg from trg, piece=0
+			work with client 3
+msg from trg, piece=0
+			work with client 3
+msg from trg, piece=0
+			work with client 3
+msg from trg, piece=0
+			work with client 3
+msg from trg, piece=0
+			work with client 3
+msg from trg, piece=0
+			work with client 3
+msg from trg, piece=0
+			work with client 3
+msg from trg, piece=0
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3
+server new client socket 3
+New connection from àŠ&Rÿ
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+msg from 555, piece=0
+			work with client 3
+Client 3 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=3

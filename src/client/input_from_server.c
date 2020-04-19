@@ -5,7 +5,7 @@ t_room *mx_find_room(t_room *rooms, int id) {
    t_room *node = NULL;
 
     while (head != NULL) {
-        if (head->position == id) {
+        if (head->id == id) {
             node = head;
             break;
         }
@@ -31,7 +31,7 @@ void *mx_process_input_from_server(void *taken_info) {
                    //input_package->login);
             GtkTreeIter iter;
             info->data->current_room = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
-            t_room *room = mx_find_room(info->data->rooms, info->data->current_room /*input_package->room_id*/);
+            t_room *room = mx_find_room(info->data->rooms, input_package->room_id);
             gtk_list_store_append(GTK_LIST_STORE(room->list), &iter);
             gtk_list_store_set(GTK_LIST_STORE(room->list), &iter, 0, input_package->login, 1, input_package->data, -1);
             t_room *head = info->data->rooms;

@@ -42,6 +42,7 @@ void mx_process_message_in_client(t_client_info *info) {
     mx_memset(package->data, 0, sizeof(package->data));
     // tmp
     printf("back to menu\n");
+    //break;
         // mx_get_input(package->data);
         // printf("sizeof(package) = %zu\n", sizeof(package));
         // write(info->socket, package, MX_PACKAGE_SIZE);
