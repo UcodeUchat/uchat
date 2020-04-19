@@ -77,6 +77,7 @@ typedef struct s_data {
 typedef struct  s_client_info {  //struct client
     char *login;
     char *password;
+    int id;
     int argc;
     char **argv;
     char *ip;

@@ -1,28 +1,5 @@
 #include "uchat.h"
 
-// char *get_message() {
-//     printf("get_message\n"); // #
-//     char *message = malloc(1024);
-//     int pos = 0;
-//     int size = 1024;
-
-//     while (1) {
-//         if (fgets(message + pos, MAX_CLIENT_INPUT, stdin) != NULL) {
-//         pos += strlen(message + pos);
-//         if (pos > 0 && message[pos - 1] == '\n') {
-//             message[pos - 1] = '\0';
-//             break;
-//         }
-//         pos > 0 ? pos-- : 0;
-//         if (pos + 25 > size)
-//             message = realloc(message, (size += size));
-//         }
-//         else
-//             break;
-//     }
-//     return message;
-// }
-
 int mx_send_message_from_client(t_client_info *info, t_package *package, char *message) {
     int msg_size = strlen(message);
 
@@ -53,23 +30,21 @@ void mx_process_message_in_client(t_client_info *info) {
     char *message = NULL;
     t_package *package = mx_create_new_package();
     // tmp
-    package->user_id = 1;
+    package->user_id = info->id;
+    package->room_id = info->data->current_room;
     strncat(package->login, info->login, sizeof(package->login) - 1);
     strncat(package->password, info->password, sizeof(package->password) - 1);
     //
     package->type = MX_MSG_TYPE;
-    while(1) {
-        message = strdup((char *)gtk_entry_get_text(GTK_ENTRY(info->data->message_entry)));
-        mx_send_message_from_client(info, package, message);
-        mx_strdel(&message);
-        mx_memset(package->data, 0, sizeof(package->data));
-        // tmp
-        printf("back to menu\n");
-        break;
+    message = strdup((char *)gtk_entry_get_text(GTK_ENTRY(info->data->message_entry)));
+    mx_send_message_from_client(info, package, message);
+    mx_strdel(&message);
+    mx_memset(package->data, 0, sizeof(package->data));
+    // tmp
+    printf("back to menu\n");
         // mx_get_input(package->data);
         // printf("sizeof(package) = %zu\n", sizeof(package));
         // write(info->socket, package, MX_PACKAGE_SIZE);
         //
-    }
     free(package);
 }

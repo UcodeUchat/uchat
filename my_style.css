@@ -1,10 +1,19 @@
-label {
+label#auth_fail {
 	color: LightSkyBlue;
 	font-weight: bold;
 	font-size: 140%;
     text-shadow: Navy 1px 1px 0, Navy -1px -1px 0, 
                  Navy -1px 1px 0, Navy 1px -1px 0;
 }
+
 label#title {
-  text-align: center;
+	color: DarkOrange;
+	font-weight: bold;
+	font-size: 170%;
+    text-shadow: Black 1px 1px 0, Black -1px -1px 0, 
+                 Black -1px 1px 0, Black 1px -1px 0;
+}
+
+#room_box {
+	background-color: Silver;
 }
