@@ -111,7 +111,7 @@ void send_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 void authentification(t_client_info **info, t_package *p) {
-    fprintf(stderr, "socket = [%d]\n", (*info)->socket);
+    // fprintf(stderr, "socket = [%d]\n", (*info)->socket);
     char *answer = mx_strnew(1);
     // char *done = NULL;
     // char *massage не нужна, я сделал пока так, ибо при NULL - упадет strlen
