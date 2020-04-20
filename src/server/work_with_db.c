@@ -42,7 +42,7 @@ int mx_sign_in(t_server_info *i, int c_sock, char *login, char *pass) {
     // set socket-> c_sock  in db
     if ((mx_update_socket(i, c_sock, login)) == -1)
         printf("Socket wasn`t update\n");
-    write(c_sock, "login\0", 6);
+    // write(c_sock, "login\0", 6);
     printf("Complete. Connecting server...\n");
     mx_strdel(&command);
     return 1;
