@@ -9,11 +9,45 @@ label#auth_fail {
 label#title {
 	color: DarkOrange;
 	font-weight: bold;
-	font-size: 170%;
+	font-size: 140%;
     text-shadow: Black 1px 1px 0, Black -1px -1px 0, 
                  Black -1px 1px 0, Black 1px -1px 0;
+}
+
+label#title1 {
+	color: #F6F4F3;
+	font-weight: bold;
+	font-size: 300%;
+}
+
+label#title2 {
+	color: #1E1D1D;
+	background-color: DarkOrange;
+	font-weight: bold;
+	font-size: 300%;
+	border-radius: 2px;
 }
 
 #room_box {
 	background-color: Silver;
 }
+
+#back {
+	background-color: #1E1D1D;
+}
+
+#entry {
+	color: #F6F4F3;
+	background-color: #595959;
+}
+
+button#entry {
+	color: #595959;
+	background-color: #595959;
+}
+
+#entry:focus {
+	border-color: red;
+	caret-color: DarkOrange;
+} 
+

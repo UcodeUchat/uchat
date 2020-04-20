@@ -194,7 +194,9 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
             push_room(&info->data->rooms, str, i);
             t_room *room = find_room(info->data->rooms, i);
             room->room_box = gtk_box_new(FALSE, 0);
-            //gtk_container_set_border_width(GTK_CONTAINER(room->room_box), 5);
+            GtkWidget *fixed = gtk_fixed_new();
+            gtk_box_pack_start (GTK_BOX (room->room_box), fixed, TRUE, TRUE, 0);
+            gtk_widget_show(fixed);
             gtk_widget_set_name (room->room_box, "room_box");
             context = gtk_widget_get_style_context (room->room_box);
             gtk_style_context_add_provider (context,
@@ -203,7 +205,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
             gtk_widget_show(room->room_box);
             //--table
             GtkWidget *table = gtk_grid_new();
-            gtk_box_pack_start (GTK_BOX (room->room_box), table, TRUE, TRUE, 0);
+            gtk_fixed_put (GTK_FIXED(fixed), table, 0, 10);
             gtk_widget_show(table);
             //--
             GtkWidget *full_name = gtk_label_new(str);
@@ -213,16 +215,13 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
                                     GTK_STYLE_PROVIDER(provider),
                                     GTK_STYLE_PROVIDER_PRIORITY_USER);
             gtk_grid_attach (GTK_GRID (table), full_name, 0, 1, 1, 1);
-            //gtk_grid_insert_row (GTK_GRID (table), 0);
-            //gtk_box_pack_start (GTK_BOX (room->room_box), full_name, TRUE, TRUE, 0);
-            //gtk_fixed_put(GTK_FIXED(room->room_box), full_name, 0, 0);
+
             gtk_widget_set_size_request(full_name, 515, -1);
             gtk_widget_show(full_name);
             room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
             gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 5);
             gtk_grid_attach (GTK_GRID (table), room->scrolled_window, 0, 2, 1, 10);
-            //gtk_fixed_put(GTK_FIXED(room->room_box), room->scrolled_window, 0, 25);
-            //gtk_box_pack_start (GTK_BOX (room->room_box), room->scrolled_window, TRUE, TRUE, 0);
+            
             gtk_widget_set_size_request(room->scrolled_window, 515, 295);
             gtk_widget_show(room->scrolled_window);
             room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
@@ -263,6 +262,10 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 int mx_login (t_client_info *info) {
+    GtkStyleContext *context;
+    GtkCssProvider *provider = gtk_css_provider_new ();
+    gtk_css_provider_load_from_path (provider,"my_style.css", NULL);
+
     info->data = (t_data *)malloc(sizeof(t_data));
     
     //--window
@@ -286,9 +289,35 @@ int mx_login (t_client_info *info) {
     info->data->login_msg_flag = 0;
     info->data->login_box = gtk_fixed_new ();
     gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->login_box, 0, 0);
-    //gtk_box_pack_start (GTK_BOX (info->data->main_box), info->data->login_box, TRUE, TRUE, 0);
     gtk_widget_show (info->data->login_box);
-
+    //--
+    gtk_widget_set_name(info->data->window, "back");
+    context = gtk_widget_get_style_context (info->data->window);
+    gtk_style_context_add_provider (context,
+                                    GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+    //--
+    //--table
+    GtkWidget *table = gtk_grid_new();
+    gtk_fixed_put(GTK_FIXED(info->data->login_box), table, 225, 40);
+    gtk_widget_show(table);
+    GtkWidget *title1 = gtk_label_new("Ucode");
+    gtk_widget_show (title1);
+    gtk_widget_set_name(title1, "title1");
+    context = gtk_widget_get_style_context (title1);
+    gtk_style_context_add_provider (context,
+                                    GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+    gtk_grid_attach (GTK_GRID (table), title1, 0, 0, 1, 1);
+    GtkWidget *title2 = gtk_label_new("chat");
+    gtk_widget_show (title2);
+    gtk_widget_set_name(title2, "title2");
+    context = gtk_widget_get_style_context (title2);
+    gtk_style_context_add_provider (context,
+                                    GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+    gtk_grid_attach (GTK_GRID (table), title2, 1, 0, 1, 1);
+    //--
     info->data->stop = gtk_image_new_from_file("stop2.png");
     gtk_fixed_put(GTK_FIXED(info->data->login_box), info->data->stop, 60, 2);
 
@@ -299,6 +328,11 @@ int mx_login (t_client_info *info) {
                                 0, gtk_entry_get_text_length (GTK_ENTRY (info->data->login_entry)));
     gtk_fixed_put (GTK_FIXED (info->data->login_box), info->data->login_entry, 235, 100);
     gtk_widget_show (info->data->login_entry);
+    gtk_widget_set_name(info->data->login_entry, "entry");
+    context = gtk_widget_get_style_context (info->data->login_entry);
+    gtk_style_context_add_provider (context,
+                                    GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     info->data->password_entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (info->data->password_entry), 50);
@@ -307,18 +341,34 @@ int mx_login (t_client_info *info) {
                                 0, gtk_entry_get_text_length (GTK_ENTRY (info->data->password_entry)));
     gtk_fixed_put (GTK_FIXED (info->data->login_box), info->data->password_entry, 235, 150);
     gtk_widget_show (info->data->password_entry);
+    gtk_widget_set_name(info->data->password_entry, "entry");
+    context = gtk_widget_get_style_context (info->data->password_entry);
+    gtk_style_context_add_provider (context,
+                                    GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
                                                                
     GtkWidget *button = gtk_button_new_with_label("Sign in");
     g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (enter_callback),info);
     gtk_fixed_put (GTK_FIXED (info->data->login_box), button, 268, 200);
     gtk_widget_set_size_request(button, 100, -1);
     gtk_widget_show (button);
+    //gtk_button_set_relief (GTK_BUTTON(button), GTK_RELIEF_NONE);
+    gtk_widget_set_name(button, "entry");
+    context = gtk_widget_get_style_context (button);
+    gtk_style_context_add_provider (context,
+                                    GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     button = gtk_button_new_with_label("Registration");
     g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (enter_callback),info);
     gtk_fixed_put (GTK_FIXED (info->data->login_box), button, 268, 239);
     gtk_widget_set_size_request(button, 100, -1);
     gtk_widget_show (button);
+    gtk_widget_set_name(button, "entry");
+    context = gtk_widget_get_style_context (button);
+    gtk_style_context_add_provider (context,
+                                    GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
     //--
     gtk_widget_show (info->data->window);
     gtk_main();
