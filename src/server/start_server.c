@@ -22,7 +22,7 @@ int mx_start_server(t_server_info *info) {
     }
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(info->port);
-    inet_aton("192.168.1.7", &serv_addr.sin_addr);
+    inet_aton("192.168.0.100", &serv_addr.sin_addr);
     if (bind(server, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
         printf("bind error = %s\n", strerror(errno));
         return -1;

@@ -27,15 +27,18 @@ static int check_socket(void* rep, int argc, char **argv, char **col_name) {
 
 int mx_sign_in(t_server_info *i, int c_sock, char *login, char *pass) {
     char *command = malloc(1024);
+    // int check = 0;
 
     sprintf(command, "SELECT password FROM users WHERE login='%s'", login);
     printf("%s\n", command);
-    if (sqlite3_exec(i->db, command, check_data, pass, 0) != SQLITE_OK) {
-        write(c_sock, "Check your login or password\n", 29);
+    if ((sqlite3_exec(i->db, command, check_data, pass, 0) != SQLITE_OK)) { //&& ++(check)) {
+        // write(c_sock, "Check your login or password\n", 29);
         printf("Check your login or password\n");
         return -1;
     }
-
+    // fprintf(stderr, "check = [%d]\n", check);
+    // if (check == 0)
+    //     return -1;
     // set socket-> c_sock  in db
     if ((mx_update_socket(i, c_sock, login)) == -1)
         printf("Socket wasn`t update\n");
@@ -64,25 +67,14 @@ int mx_find_sock_in_db(t_server_info *i, char *login) {
     return -1;
 }
 
-int mx_check_client(int client_sock, char *c_input, t_server_info *info) {
-    printf ("start mx_sheck_client\nClient sock = %d\n", client_sock);
-    // char data[256];
-    char **log_pas = NULL;
-    // int size = 0;
+int mx_check_client(t_server_info *info, t_package *p) {
+    printf ("start mx_sheck_client\nClient sock = %d\n", p->client_sock);
 
-    // size = recv(client_sock, data, sizeof(data), 0);
-    // printf(" recive [%d] from client1: [%s]\n", size, data);
-    log_pas = mx_strsplit(c_input, ' ');
-    printf("recieve data: [%s]\n", c_input);
-
-    printf(" recive from client %s\n", log_pas[0]);
-    printf(" recive from client %s\n", log_pas[1]);
-
-    if ((mx_find_sock_in_db(info, log_pas[0])) == 1) {
+    if ((mx_find_sock_in_db(info, p->login)) == 1) {
         printf("login in base\n");
         return 1;
     }
-    else if ((mx_sign_in(info, client_sock, log_pas[0], log_pas[1])) == -1) {
+    else if ((mx_sign_in(info, p->client_sock, p->login, p->password)) == -1) {
             printf("not login\n");
             return -1;
         }

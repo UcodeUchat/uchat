@@ -9,8 +9,12 @@ int mx_worker(int client_sock, t_server_info *info) {
 
     new_package->client_sock = client_sock;// #
     // check_is_it_correct_data
-    mx_memset(new_package->password, 0, sizeof(new_package->password));
+    // mx_memset(new_package->password, 0, sizeof(new_package->password));
     //
+
+    fprintf(stderr, "LOGIN!!!\n");
+    fprintf(stderr, "log = [%s]\n", new_package->login);
+    fprintf(stderr, "pas = [%s]\n", new_package->password);
     mx_run_function_type(info, new_package);
     free(new_package);
     return 0;

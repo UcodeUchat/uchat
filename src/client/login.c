@@ -110,19 +110,33 @@ void send_callback (GtkWidget *widget, t_client_info *info) {
     send_flag = 1;
 }
 
-void authentification(t_client_info *info) {
-    if (strcmp(info->login, "rrr") == 0)
+void authentification(t_client_info *info, t_package *p) {
+    fprintf(stderr, "socket = [%d]\n", info->socket);
+    char *answer = mx_strnew(1);
+    // char *done = NULL;
+    // char *massage не нужна, я сделал пока так, ибо при NULL - упадет strlen
+    mx_send_message_from_client(info, p, " ");
+    mx_memset(p->data, 0, sizeof(p->data));
+    recv(p->client_sock, answer, 1, MSG_WAITALL);
+    // read(p->client_sock, answer, 1);
+    if (atoi(answer) == 0)
         info->auth_client = 0;
     else
         info->auth_client = 1;
+    mx_strdel(&answer);
 }
 
 void enter_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
+    t_package *p = mx_create_new_package();
     //--auth
     info->login = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->login_entry));
     info->password = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->password_entry));
-    authentification(info);
+    strncat(p->login, info->login, sizeof(p->login) - 1);
+    strncat(p->password, info->password, sizeof(p->password) - 1);
+    p->type = MX_AUTH_TYPE;
+    p->client_sock = info->socket;
+    authentification(info, p);
     if (!info->auth_client) {
         pthread_cancel(login_msg_t);
         if (info->data->login_msg_flag)
