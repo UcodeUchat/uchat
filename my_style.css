@@ -41,13 +41,27 @@ label#title2 {
 	background-color: #595959;
 }
 
+#entry selection {
+	color: black;
+	background-color: DarkOrange;
+}
+
 button#entry {
-	color: #595959;
-	background-color: #595959;
+	color: #C0C0C0;
+	background: #595959;
+	text-shadow: 1px  1px 1px Black;
+}
+
+button#entry:hover {
+	color: white;
+	background-color : DarkOrange;
+}
+button#entry:active {
+	color: white;
+	background-color : #C0732F;
 }
 
 #entry:focus {
-	border-color: red;
 	caret-color: DarkOrange;
-} 
+}
 

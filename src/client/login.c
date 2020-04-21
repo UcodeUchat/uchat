@@ -99,6 +99,134 @@ void send_callback (GtkWidget *widget, t_client_info *info) {
     send_flag = 1;
 }
 
+int validation (char *login, char *password, char *repeat_password) {
+    (void)login;
+    (void)password;
+    (void)repeat_password;
+    return 1;
+}
+
+void send_data_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    char *login = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->registration->login_entry));
+    char *password = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->registration->password_entry));
+    char *repeat = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->registration->repeat_password_entry));
+    if (validation(login, password, repeat)) {
+        gtk_widget_hide(info->data->register_box);
+        gtk_entry_set_text(GTK_ENTRY(info->data->registration->login_entry), "");
+        gtk_entry_set_text(GTK_ENTRY(info->data->registration->password_entry), "");
+        gtk_entry_set_text(GTK_ENTRY(info->data->registration->repeat_password_entry), "");
+        gtk_widget_show(info->data->login_box);
+        //succes thread
+    }
+    else {
+
+    }
+}
+
+void cancel_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    gtk_widget_hide(info->data->register_box);
+    gtk_entry_set_text(GTK_ENTRY(info->data->registration->login_entry), "");
+    gtk_entry_set_text(GTK_ENTRY(info->data->registration->password_entry), "");
+    gtk_entry_set_text(GTK_ENTRY(info->data->registration->repeat_password_entry), "");
+    gtk_widget_show(info->data->login_box);
+}
+
+void reg_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+
+    gtk_widget_hide(info->data->login_box);
+    info->data->register_box = gtk_fixed_new ();
+    gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->register_box, 0, 0);
+    gtk_widget_show (info->data->register_box);
+
+    info->data->registration = (t_reg *)malloc(sizeof(t_reg));
+    info->data->registration->login_entry = gtk_entry_new ();
+ 
+    gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->login_entry), 50);
+    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->login_entry), "Write your login");
+    gtk_editable_select_region (GTK_EDITABLE (info->data->registration->login_entry),
+                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->registration->login_entry)));
+    GtkWidget *box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, 100);
+    gtk_box_pack_start (GTK_BOX (box), info->data->registration->login_entry, TRUE, FALSE, 0);
+    gtk_widget_show (box);
+    gtk_widget_show (info->data->registration->login_entry);
+    gtk_widget_set_name(info->data->registration->login_entry, "entry");
+
+    info->data->registration->password_entry = gtk_entry_new ();
+    gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->password_entry), 50);
+    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->password_entry), "Write your password");
+    gtk_editable_select_region (GTK_EDITABLE (info->data->registration->password_entry),
+                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->registration->password_entry)));
+    box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, 150);
+    gtk_box_pack_start (GTK_BOX (box), info->data->registration->password_entry, TRUE, FALSE, 0);
+    gtk_widget_show (box);
+    gtk_widget_show (info->data->registration->password_entry);
+    gtk_widget_set_name(info->data->registration->password_entry, "entry");
+
+    info->data->registration->repeat_password_entry = gtk_entry_new ();
+    gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->repeat_password_entry), 50);
+    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->repeat_password_entry), "Repeat your password");
+    gtk_editable_select_region (GTK_EDITABLE (info->data->registration->repeat_password_entry),
+                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->registration->repeat_password_entry)));
+    box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, 200);
+    gtk_box_pack_start (GTK_BOX (box), info->data->registration->repeat_password_entry, TRUE, FALSE, 0);
+    gtk_widget_show (box);
+    gtk_widget_show (info->data->registration->repeat_password_entry);
+    gtk_widget_set_name(info->data->registration->repeat_password_entry, "entry");
+                                                    
+    GtkWidget *button = gtk_button_new_with_label("Register");
+    g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (send_data_callback),info);
+    box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, 250);
+    gtk_box_pack_start (GTK_BOX (box), button, TRUE, FALSE, 0);
+    gtk_widget_show (box);
+    gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_show (button);
+    gtk_widget_set_name(button, "entry");
+
+    button = gtk_button_new_with_label("Cancel");
+    g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (cancel_callback),info);
+    box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, 290);
+    gtk_box_pack_start (GTK_BOX (box), button, TRUE, FALSE, 0);
+    gtk_widget_show (box);
+    gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_show (button);
+    gtk_widget_set_name(button, "entry");
+}
+
+// void authentification(t_client_info **info, t_package *p) {
+//     // fprintf(stderr, "socket = [%d]\n", (*info)->socket);
+//     char *answer = mx_strnew(1);
+//     // char *done = NULL;
+//     // char *massage не нужна, я сделал пока так, ибо при NULL - упадет strlen
+//     mx_send_message_from_client(*info, p, " ");
+//     mx_memset(p->data, 0, sizeof(p->data));
+//     recv(p->client_sock, answer, 2, MSG_WAITALL);
+//     // read(p->client_sock, answer, 1);
+//     fprintf(stderr, "ANSWER = [%s]\n", answer);
+//     if (atoi(answer) == 1)
+//         (*info)->auth_client = 1;
+//     else
+//         (*info)->auth_client = 0;
+//     mx_strdel(&answer);
+// }
+
 void authentification(t_client_info *info) {
     if (strcmp(info->login, "rrr") == 0)
         info->auth_client = 0;
@@ -108,11 +236,17 @@ void authentification(t_client_info *info) {
 
 void enter_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
+    //t_package *p = mx_create_new_package();
     GtkCssProvider *provider = gtk_css_provider_new ();
     gtk_css_provider_load_from_path (provider,"my_style.css", NULL);
     //--auth
     info->login = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->login_entry));
     info->password = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->password_entry));
+    // strncat(p->login, info->login, sizeof(p->login) - 1);
+    // strncat(p->password, info->password, sizeof(p->password) - 1);
+    // p->type = MX_AUTH_TYPE;
+    // p->client_sock = info->socket;
+    // authentification(&info, p);
     authentification(info);
     if (!info->auth_client) {
         pthread_cancel(login_msg_t);
@@ -272,7 +406,9 @@ int mx_login (t_client_info *info) {
     info->data->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_resizable (GTK_WINDOW (info->data->window), FALSE);
     gtk_widget_set_size_request (GTK_WIDGET (info->data->window), 650, 407);
-    gtk_container_set_border_width (GTK_CONTAINER (info->data->window), 1);
+    gtk_widget_show (info->data->window);
+    //sleep_ms(150);
+    //gtk_container_set_border_width (GTK_CONTAINER (info->data->window), 1);
     gtk_window_set_title (GTK_WINDOW (info->data->window), "Sign in");
     g_signal_connect (G_OBJECT (info->data->window), "destroy",
                       G_CALLBACK (gtk_main_quit), NULL);
@@ -299,7 +435,7 @@ int mx_login (t_client_info *info) {
     //--
     //--table
     GtkWidget *table = gtk_grid_new();
-    gtk_fixed_put(GTK_FIXED(info->data->login_box), table, 225, 40);
+    gtk_fixed_put(GTK_FIXED(info->data->login_box), table, 230, 40);
     gtk_widget_show(table);
     GtkWidget *title1 = gtk_label_new("Ucode");
     gtk_widget_show (title1);
@@ -326,7 +462,12 @@ int mx_login (t_client_info *info) {
     gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->login_entry), "login");
     gtk_editable_select_region (GTK_EDITABLE (info->data->login_entry),
                                 0, gtk_entry_get_text_length (GTK_ENTRY (info->data->login_entry)));
-    gtk_fixed_put (GTK_FIXED (info->data->login_box), info->data->login_entry, 235, 100);
+    GtkWidget *box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->login_box), box, 0, 100);
+    gtk_box_pack_start (GTK_BOX (box), info->data->login_entry, TRUE, FALSE, 0);
+    gtk_widget_show (box);
     gtk_widget_show (info->data->login_entry);
     gtk_widget_set_name(info->data->login_entry, "entry");
     context = gtk_widget_get_style_context (info->data->login_entry);
@@ -339,7 +480,12 @@ int mx_login (t_client_info *info) {
     gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->password_entry), "password");
     gtk_editable_select_region (GTK_EDITABLE (info->data->password_entry),
                                 0, gtk_entry_get_text_length (GTK_ENTRY (info->data->password_entry)));
-    gtk_fixed_put (GTK_FIXED (info->data->login_box), info->data->password_entry, 235, 150);
+    box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->login_box), box, 0, 150);
+    gtk_box_pack_start (GTK_BOX (box), info->data->password_entry, TRUE, FALSE, 0);
+    gtk_widget_show (box);
     gtk_widget_show (info->data->password_entry);
     gtk_widget_set_name(info->data->password_entry, "entry");
     context = gtk_widget_get_style_context (info->data->password_entry);
@@ -349,7 +495,12 @@ int mx_login (t_client_info *info) {
                                                                
     GtkWidget *button = gtk_button_new_with_label("Sign in");
     g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (enter_callback),info);
-    gtk_fixed_put (GTK_FIXED (info->data->login_box), button, 268, 200);
+    box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->login_box), box, 0, 200);
+    gtk_box_pack_start (GTK_BOX (box), button, TRUE, FALSE, 0);
+    gtk_widget_show (box);
     gtk_widget_set_size_request(button, 100, -1);
     gtk_widget_show (button);
     //gtk_button_set_relief (GTK_BUTTON(button), GTK_RELIEF_NONE);
@@ -360,8 +511,13 @@ int mx_login (t_client_info *info) {
                                     GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     button = gtk_button_new_with_label("Registration");
-    g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (enter_callback),info);
-    gtk_fixed_put (GTK_FIXED (info->data->login_box), button, 268, 239);
+    g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (reg_callback),info);
+    box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->login_box), box, 0, 240);
+    gtk_box_pack_start (GTK_BOX (box), button, TRUE, FALSE, 0);
+    gtk_widget_show (box);
     gtk_widget_set_size_request(button, 100, -1);
     gtk_widget_show (button);
     gtk_widget_set_name(button, "entry");
@@ -370,7 +526,6 @@ int mx_login (t_client_info *info) {
                                     GTK_STYLE_PROVIDER(provider),
                                     GTK_STYLE_PROVIDER_PRIORITY_USER);
     //--
-    gtk_widget_show (info->data->window);
     gtk_main();
     return 0;
 }

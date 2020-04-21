@@ -55,10 +55,17 @@ typedef struct s_room {
     struct s_room *next;
 }              t_room;
 
+typedef struct s_reg {
+    GtkWidget *login_entry;
+    GtkWidget *password_entry;
+    GtkWidget *repeat_password_entry;
+}              t_reg;
+
 typedef struct s_data {
     GtkWidget *window;
     GtkWidget *main_box;
     GtkWidget *login_box;
+    GtkWidget *register_box;
     GtkWidget *login_entry;
     GtkWidget *password_entry;
     GtkWidget *general_box;
@@ -70,6 +77,7 @@ typedef struct s_data {
     GtkWidget *notebook;
     GtkWidget *stop;
     t_room *rooms;
+    t_reg *registration;
     gint current_room;
     int login_msg_flag;
 }              t_data;
@@ -111,18 +119,37 @@ typedef struct  s_server_info {  // struct server
     pthread_mutex_t mutex;
 }               t_server_info;
 
+#define MX_AUTH_TYPE 3
+#define MX_MSG_TYPE 1
+#define MX_FILE_TYPE 2
+#define MX_MAX_DATA_SIZE (int)(sizeof(((t_package *)0)->data) - 1)
+#define MX_PACKAGE_SIZE sizeof(t_package)
+// sizeof((type *)0)->member)
+typedef struct  s_package {
+    int client_sock; // #
+    char piece; // 0 - full, 1 - start, 2 - partition, 3 - end
+    int user_id; // sender unical id
+    int room_id; // room unical id
+    int add_info; // addition information which use different package types
+    char type; // input type
+    char login[50]; // user login
+    char password[32]; // user password
+    char data[1024]; // user data
+}               t_package;
+
 
 // server
 int mx_start_server(t_server_info *info);
 //void mx_set_daemon(const char *log_file);
 int mx_set_daemon(t_server_info *info);
 
-int mx_sign_in(t_server_info *i, int c_sock, char *login, char *pass);
+int mx_sign_in(t_server_info *i, t_package *p);
 int mx_update_socket(t_server_info *i, int client_sock, char *login);
 int mx_find_sock_in_db(t_server_info *i, char *login);
 int mx_drop_socket(t_server_info *i, int client_sock);
+int mx_authorization(t_server_info *i, t_package *p);
 
-int mx_check_client(int client_sock, char *c_input, t_server_info *info);
+int mx_check_client(t_server_info *info, t_package *p);
 int mx_worker(int client_sock, t_server_info *info);
 
 int main2(int argc, char *argv[]);  // test adress
@@ -141,27 +168,12 @@ void mx_err_exit(char *err_msg); // вивести помилку
 void mx_sha_hash_password(char *password);
 // Vova
 
-#define MX_MSG_TYPE 1
-#define MX_FILE_TYPE 2
-#define MX_MAX_DATA_SIZE (int)(sizeof(((t_package *)0)->data) - 1)
-#define MX_PACKAGE_SIZE sizeof(t_package)
-// sizeof((type *)0)->member)
-typedef struct  s_package {
-    int client_sock; // #
-    char piece; // 0 - full, 1 - start, 2 - partition, 3 - end
-    int user_id; // sender unical id
-    int room_id; // room unical id
-    int add_info; // addition information which use different package types
-    char type; // input type
-    char login[50]; // user login
-    char password[32]; // user password
-    char data[1024]; // user data
-}               t_package;
 
 // client
 void mx_process_message_in_client(t_client_info *info);
 void mx_send_file_from_client(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);
+int mx_send_message_from_client(t_client_info *info, t_package *package, char *message);
 
 // server
 int mx_run_function_type(t_server_info *info, t_package *package);
