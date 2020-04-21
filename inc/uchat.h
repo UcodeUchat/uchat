@@ -132,7 +132,7 @@ int mx_start_server(t_server_info *info);
 //void mx_set_daemon(const char *log_file);
 int mx_set_daemon(t_server_info *info);
 
-int mx_sign_in(t_server_info *i, int c_sock, char *login, char *pass);
+int mx_sign_in(t_server_info *i, t_package *p);
 int mx_update_socket(t_server_info *i, int client_sock, char *login);
 int mx_find_sock_in_db(t_server_info *i, char *login);
 int mx_drop_socket(t_server_info *i, int client_sock);

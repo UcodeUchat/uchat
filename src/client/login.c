@@ -117,7 +117,7 @@ void authentification(t_client_info **info, t_package *p) {
     // char *massage не нужна, я сделал пока так, ибо при NULL - упадет strlen
     mx_send_message_from_client(*info, p, " ");
     mx_memset(p->data, 0, sizeof(p->data));
-    recv(p->client_sock, answer, 1, MSG_WAITALL);
+    recv(p->client_sock, answer, 2, MSG_WAITALL);
     // read(p->client_sock, answer, 1);
     fprintf(stderr, "ANSWER = [%s]\n", answer);
     if (atoi(answer) == 1)
