@@ -210,44 +210,44 @@ void reg_callback (GtkWidget *widget, t_client_info *info) {
     gtk_widget_set_name(button, "entry");
 }
 
-// void authentification(t_client_info **info, t_package *p) {
-//     // fprintf(stderr, "socket = [%d]\n", (*info)->socket);
-//     char *answer = mx_strnew(1);
-//     // char *done = NULL;
-//     // char *massage не нужна, я сделал пока так, ибо при NULL - упадет strlen
-//     mx_send_message_from_client(*info, p, " ");
-//     mx_memset(p->data, 0, sizeof(p->data));
-//     recv(p->client_sock, answer, 2, MSG_WAITALL);
-//     // read(p->client_sock, answer, 1);
-//     fprintf(stderr, "ANSWER = [%s]\n", answer);
-//     if (atoi(answer) == 1)
-//         (*info)->auth_client = 1;
-//     else
-//         (*info)->auth_client = 0;
-//     mx_strdel(&answer);
-// }
-
-void authentification(t_client_info *info) {
-    if (strcmp(info->login, "rrr") == 0)
-        info->auth_client = 0;
+void authentification(t_client_info **info, t_package *p) {
+    // fprintf(stderr, "socket = [%d]\n", (*info)->socket);
+    char *answer = mx_strnew(1);
+    // char *done = NULL;
+    // char *massage не нужна, я сделал пока так, ибо при NULL - упадет strlen
+    mx_send_message_from_client(*info, p, " ");
+    mx_memset(p->data, 0, sizeof(p->data));
+    recv(p->client_sock, answer, 2, MSG_WAITALL);
+    // read(p->client_sock, answer, 1);
+    fprintf(stderr, "ANSWER = [%s]\n", answer);
+    if (atoi(answer) == 1)
+        (*info)->auth_client = 1;
     else
-        info->auth_client = 1;
+        (*info)->auth_client = 0;
+    mx_strdel(&answer);
 }
+
+// void authentification(t_client_info *info) {
+//     if (strcmp(info->login, "rrr") == 0)
+//         info->auth_client = 0;
+//     else
+//         info->auth_client = 1;
+// }
 
 void enter_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
-    //t_package *p = mx_create_new_package();
+    t_package *p = mx_create_new_package();
     GtkCssProvider *provider = gtk_css_provider_new ();
     gtk_css_provider_load_from_path (provider,"my_style.css", NULL);
     //--auth
     info->login = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->login_entry));
     info->password = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->password_entry));
-    // strncat(p->login, info->login, sizeof(p->login) - 1);
-    // strncat(p->password, info->password, sizeof(p->password) - 1);
-    // p->type = MX_AUTH_TYPE;
-    // p->client_sock = info->socket;
-    // authentification(&info, p);
-    authentification(info);
+    strncat(p->login, info->login, sizeof(p->login) - 1);
+    strncat(p->password, info->password, sizeof(p->password) - 1);
+    p->type = MX_AUTH_TYPE;
+    p->client_sock = info->socket;
+    authentification(&info, p);
+    //authentification(info);
     if (!info->auth_client) {
         pthread_cancel(login_msg_t);
         if (info->data->login_msg_flag) {

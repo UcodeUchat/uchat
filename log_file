@@ -2,7 +2,16 @@ Configuring demon ++...
 Configuring local address...
 listen fd = 0
 server new client socket 3
-New connection from ÐZÎVÿ
+New connection from Ð*ÄRÿ
+			work with client 3
+SELECT socket FROM users WHERE login='mlibovych'
+user exist in UCHAT!
+			work with client 3
+SELECT socket FROM users WHERE login='neo'
+user exist in UCHAT!
+			work with client 3
+SELECT socket FROM users WHERE login='neo'
+user exist in UCHAT!
 			work with client 3
 Client 3 disconnected
 start set socket to 0

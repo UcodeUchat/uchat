@@ -27,14 +27,14 @@ int main(int argc, char **argv) {
         || (servent = getservbyport((*info).port, "udp")) != NULL)
         mx_err_exit("port was taken by another process\n");
     pthread_mutex_init(&((*info).mutex), NULL);
-    printf("Configuring .\n");
+    // printf("Configuring .\n");
 
-      if (mx_set_daemon(info) == -1) {
-          printf("error = %s\n", strerror(errno));
-          return -1;
-      }
+    //   if (mx_set_daemon(info) == -1) {
+    //       printf("error = %s\n", strerror(errno));
+    //       return -1;
+    //   }
 
-    printf("Configuring demon ++...\n");
+    // printf("Configuring demon ++...\n");
     if (mx_start_server(info) == -1) {
         printf("error = %s\n", strerror(errno));
         return -1;
