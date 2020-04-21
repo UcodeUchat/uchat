@@ -1,5 +1,53 @@
 #include "uchat.h"
 
+int mx_set_demon(const char *log_file) {
+    int fd;
+    pid_t pid;
+    struct rlimit rl;
+    struct sigaction sa;
+
+    if((pid = fork()) < 0) {
+        perror("error fork");
+        exit(1);
+    }
+    if (pid > 0)
+        exit(0);
+    umask(0);  // Сбросить маску режима создания файла.
+
+//     Обеспечить невозможность обретения управляющего терминала в будущем.
+    sa.sa_handler = SIG_IGN;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    if (sigaction(SIGHUP, &sa, NULL) < 0)
+        mx_printerr("невозможно игнорировать сигнал SIGHUP");
+
+
+    // Закрыть все открытые файловые дескрипторы.
+    if (rl.rlim_max == RLIM_INFINITY)
+        rl.rlim_max = 1024;
+    for (rlim_t i = 0; i < rl.rlim_max; i++)
+        close(i);
+//    if (chdir("/") < 0)
+//        mx_printerr("%s: невозможно сделать текущим рабочим каталогом /\n");
+
+    if ((fd = open(log_file, O_CREAT | O_WRONLY | O_TRUNC | O_APPEND, S_IRWXU)) == -1) {
+        printf("open error\n");
+        return -1;
+    }
+    printf("log_file fd  %d\n", fd);
+    int rc = dup2(fd, STDOUT_FILENO);
+    rc = dup2(fd, STDERR_FILENO);
+    close(fd);
+    if (rc == -1) {
+        printf("dup error\n");
+        return -1;
+    }
+    close(STDIN_FILENO);
+    close(STDERR_FILENO);
+    return setsid();
+}
+
+
 static void print_family(struct addrinfo *aip) {
 	printf(" family ");
 	switch (aip->ai_family) {
@@ -139,5 +187,40 @@ void mx_show_certs(SSL* ssl) {
         printf("No certificates.\n");
 }
 
+
+
+SSL_CTX* mx_init_server_ctx(void) {
+    SSL_CTX *ctx;
+
+    OpenSSL_add_all_algorithms();  // load & register all cryptos, etc.
+    SSL_load_error_strings();  // load all error messages
+    ctx = SSL_CTX_new(TLS_server_method());  // create new context from method
+    if (ctx == NULL ) {
+        ERR_print_errors_fp(stderr);
+        abort();
+    }
+    return ctx;
+}
+
+
+void mx_load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file) {
+    // set the local certificate from CertFile
+
+    if (SSL_CTX_use_certificate_file(ctx, cert_file, SSL_FILETYPE_PEM) <= 0) {
+        ERR_print_errors_fp(stderr);
+        abort();
+    }
+    // set the private key from KeyFile (may be the same as CertFile)
+    if (SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0) {
+        ERR_print_errors_fp(stderr);
+        abort();
+    }
+    // verify private key
+    if (!SSL_CTX_check_private_key(ctx)) {
+        fprintf(stderr, "Private key does not match the public certificate\n");
+        abort();
+    }
+    printf("load_cer sucsess\n");
+}
 
 

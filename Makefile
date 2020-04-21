@@ -27,8 +27,8 @@ install:
 	@cp $(addprefix src/client/, $(SRC_CLIENT)) .
 	@clang $(CFLAGS) -c $(SRC_SERVER) -I $(INC)
 	@clang $(CFLAGS) -c $(SRC_CLIENT) -I $(INC)
-	@clang $(CFLAGS) libmx/libmx.a $(OBJ_SERVER) -o $(NAME_S) -L/usr/local/lib/ -lssl -lcrypto
-	@clang $(CFLAGS) libmx/libmx.a $(OBJ_CLIENT) -o $(NAME_C) -L/usr/local/lib/ -lssl -lcrypto
+	@clang $(CFLAGS) libmx/libmx.a $(OBJ_SERVER) -o $(NAME_S) -L/usr/local/lib/ -lssl -lcrypto -ltls
+	@clang $(CFLAGS) libmx/libmx.a $(OBJ_CLIENT) -o $(NAME_C) -L/usr/local/lib/ -lssl -lcrypto -ltls
 	@mkdir -p obj
 	@mv $(OBJ_SERVER) $(OBJ_CLIENT) ./obj
 

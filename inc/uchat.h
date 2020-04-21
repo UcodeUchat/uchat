@@ -36,6 +36,8 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
+#include "tls.h"
+
 
 #include "libmx/inc/libmx.h"
 

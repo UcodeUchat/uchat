@@ -1,58 +1,12 @@
 #include "uchat.h"
 
-
-int mx_set_demon(const char *log_file) {
-    int fd;
-    pid_t pid;
-    struct rlimit rl;
-    struct sigaction sa;
-
-    if((pid = fork()) < 0) {
-        perror("error fork");
-        exit(1);
-    }
-    if (pid > 0)
-        exit(0);
-    umask(0);  // Сбросить маску режима создания файла.
-
-//     Обеспечить невозможность обретения управляющего терминала в будущем.
-    sa.sa_handler = SIG_IGN;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    if (sigaction(SIGHUP, &sa, NULL) < 0)
-        mx_printerr("невозможно игнорировать сигнал SIGHUP");
-
-     // Закрыть все открытые файловые дескрипторы.
-    if (rl.rlim_max == RLIM_INFINITY)
-        rl.rlim_max = 1024;
-    for (rlim_t i = 0; i < rl.rlim_max; i++)
-        close(i);
-//    if (chdir("/") < 0)
-//        mx_printerr("%s: невозможно сделать текущим рабочим каталогом /\n");
-
-    if ((fd = open(log_file, O_CREAT | O_WRONLY | O_TRUNC | O_APPEND, S_IRWXU)) == -1) {
-        printf("open error\n");
-        return -1;
-    }
-    printf("log_file fd  %d\n", fd);
-    int rc = dup2(fd, STDOUT_FILENO);
-    rc = dup2(fd, STDERR_FILENO);
-    close(fd);
-    if (rc == -1) {
-        printf("dup error\n");
-        return -1;
-    }
-    close(STDIN_FILENO);
-    close(STDERR_FILENO);
-    return setsid();
-}
-
 int main(int argc, char **argv) {
-//    main2(argc, argv);  // test info
-
-    SSL_CTX *ctx;
     uint16_t port = atoi(argv[1]);
+    struct pollfd pfd[2];
+    char bufs[1000], bufc[1000];
     int server;
+    unsigned int protocols = 0;
+
     if (argc != 2) {
         mx_printerr("usage: uchat_server [port]\n");
         _exit(1);
@@ -61,10 +15,61 @@ int main(int argc, char **argv) {
 //        printf("error = %s\n", strerror(errno));
 //        return 0;
 //    }
+    struct tls_config *config = NULL;
+    struct tls *tls = NULL;
+    struct tls *tls_accept = NULL;
+//    char *ciphers = "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384";
 
-    SSL_library_init();
-    ctx = mx_init_server_ctx();  // initialize SSL
-    mx_load_certificates(ctx,  "mycert.pem", "mycert.pem"); // load cert
+    if (tls_init() < 0) {
+        printf("tls_init error\n");
+        exit(1);
+    }
+    config = tls_config_new();
+    if (config == NULL) {
+        printf("error tls_config_new\n");
+        exit(1);
+    }
+//    tls_config_set_protocols(config, TLS_PROTOCOLS_DEFAULT);
+//    tls_config_set_ciphers(config, "AEAD-AES256-GCM-SHA384:AEAD-CHACHA20-POLY1305-SHA256:AEAD-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256");
+    tls_config_set_protocols(config, TLS_PROTOCOL_TLSv1_3);
+//    tls_config_set_ca_path(config, "./CA3/");
+
+    if(tls_config_parse_protocols(&protocols, "secure") < 0) {
+        printf("tls_config_parse_protocols error\n");
+        exit(1);
+    }
+    tls_config_set_protocols(config, protocols);
+
+    if (tls_config_set_ca_file(config, "./CA3/root.pem") < 0) {
+        printf("tls_default_ca_cert_file error\n");
+        exit(1);
+    }
+//
+//    if(tls_config_set_ciphers(config, ciphers) < 0) {
+//        printf("tls_config_set_ciphers error\n");
+//        exit(1);
+//    }
+    if (tls_config_set_key_file(config, "./CA3/server.key") < 0) {
+        printf("tls_config_set_key_file error\n");
+        exit(1);
+    }
+
+    if (tls_config_set_cert_file(config, "./CA3/server.pem") < 0) {
+        printf("tls_config_set_cert_file error\n");
+        exit(1);
+    }
+//    tls_config_verify_client_optional(config);
+//    tls_config_verify_client(config);
+    tls = tls_server();
+    if (tls == NULL) {
+        printf("tls_server error\n");
+        exit(1);
+    }
+    if (tls_configure(tls, config) < 0) {
+        printf("tls_configure error: %s\n", tls_error(tls));
+        exit(1);
+    }
+
     printf("2--------++++\n");
     printf("Configuring local address...\n");
 
@@ -78,7 +83,7 @@ int main(int argc, char **argv) {
 
     printf("Creating socket...\n");
     server = socket(bind_address->ai_family,
-            bind_address->ai_socktype, bind_address->ai_protocol);
+                    bind_address->ai_socktype, bind_address->ai_protocol);
     if (server == -1) {
         printf("socket error = %s\n", strerror(errno));
         return -1;
@@ -97,11 +102,54 @@ int main(int argc, char **argv) {
         printf("listen error = %s\n", strerror(errno));
         return -1;
     }
+    printf("listen fd = %d\n", server);
+//    freeaddrinfo(bind_address);
+
+    int client_sock = accept(server, NULL, NULL);
+    if (client_sock == -1) {
+        printf("error = %s\n", strerror(errno));
+        return -1;
+    }
+
+    if (tls_accept_socket(tls, &tls_accept, client_sock) < 0) {
+        printf("tls_accept_socket error\n");
+        exit(1);
+    }
+    printf("tls accept \n");
+
+    char *msg = "tls server";
+    tls_write(tls_accept, msg, strlen(msg));
+
+    pfd[0].fd = 0;
+    pfd[0].events = POLLIN;
+    pfd[1].fd = client_sock;
+    pfd[1].events = POLLIN;
+    ssize_t len;
+    while (bufc[0] != ':' && bufc[1] != 'q') {
+        poll(pfd, 2, -1);
+        bzero(bufs, 1000);
+        bzero(bufc, 1000);
+        if (pfd[0].revents & POLLIN) {
+            int q = read(0, bufc, 1000);
+            tls_write(tls_accept, bufc, q);
+        }
+        if (pfd[1].revents & POLLIN) {
+            if ((len = tls_read(tls_accept, bufs, 1000)) <= 0) break;
+            printf("Mensage (%lu): %s\n", len, bufs);
+        }
+    }
+    tls_close(tls_accept);
+    tls_free(tls_accept);
+    tls_free(tls);
+    tls_config_free(config);
+    return 0;
+}
+
+/*
     while (1) {
         struct sockaddr_storage client_address;
         socklen_t client_len = sizeof(client_address);
         int client_sock;
-        printf("4--------++++\n");
         client_sock = accept(server, (struct sockaddr*) &client_address,
                              &client_len);
         printf("server new client socket %d\n", client_sock);
@@ -116,80 +164,15 @@ int main(int argc, char **argv) {
                     NI_NUMERICHOST);
         printf("New connection from %s\n", address_buffer);
 
-        SSL *ssl = SSL_new(ctx);
-        if (!ctx) {
-            fprintf(stderr, "SSL_new() failed.\n");
-            return 1;
+        if(tls_accept_socket(tls, &tls_accept, client_sock) < 0) {
+            printf("tls_accept_socket error\n");
+            exit(1);
         }
-        printf("5--------++++\n");
-//        if (!SSL_set_tlsext_host_name(ssl, "192.168.1.124")) {
-//            fprintf(stderr, "SSL_set_tlsext_host_name() failed.\n");
-//            ERR_print_errors_fp(stderr);
-//            return 1;
-//        }
-        printf("SSL/TLS using %s\n", SSL_get_cipher(ssl));
-//        mx_show_certs(ssl);
-        printf("6--------++++\n");
-        SSL_set_fd(ssl, client_sock);
-//        if (SSL_connect(ssl) <= 0) {
-//            fprintf(stderr, "SSL_connect() failed.\n");
-//            ERR_print_errors_fp(stderr);
-//            return 1;
-//        }
 
-        printf("7--------++++\n");
+        tls_write(tls_accept, "TLS", strlen("TLS"));
 
-        mx_worker_ssl(ssl);
-//        if ( SSL_accept(ssl) == 0 )					/* do SSL-protocol accept */
-//            ERR_print_errors_fp(stderr);
-//        else {
-//            mx_show_certs(ssl);
-//        }
-
-
-//        int rc = pthread_create(&worker_thread, &attr, mx_worker, &client_sock);
-//        if (rc != 0) {
-//            printf("error pthread_create = %s\n", strerror(rc));
-//            close(client_sock);
-//        }
-    }
-//    pthread_attr_destroy(&attr);
-    close(server);
-    SSL_CTX_free(ctx);
-    return 0;
 }
 
-
-SSL_CTX* mx_init_server_ctx(void) {
-    SSL_CTX *ctx;
-
-    OpenSSL_add_all_algorithms();  // load & register all cryptos, etc.
-    SSL_load_error_strings();  // load all error messages
-    ctx = SSL_CTX_new(TLS_server_method());  // create new context from method
-    if (ctx == NULL ) {
-        ERR_print_errors_fp(stderr);
-        abort();
-    }
-    return ctx;
-}
+*/
 
 
-void mx_load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file) {
-    // set the local certificate from CertFile
-
-    if (SSL_CTX_use_certificate_file(ctx, cert_file, SSL_FILETYPE_PEM) <= 0) {
-        ERR_print_errors_fp(stderr);
-        abort();
-    }
-    // set the private key from KeyFile (may be the same as CertFile)
-    if (SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0) {
-        ERR_print_errors_fp(stderr);
-        abort();
-    }
-    // verify private key
-    if (!SSL_CTX_check_private_key(ctx)) {
-        fprintf(stderr, "Private key does not match the public certificate\n");
-        abort();
-    }
-    printf("load_cer sucsess\n");
-}
