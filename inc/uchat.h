@@ -39,6 +39,19 @@
 
 #include <gtk/gtk.h>
 
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <netdb.h>
+
+
 #include "libmx/inc/libmx.h"
 
 #define MAX_CLIENT_INPUT 1024
@@ -124,12 +137,12 @@ int mx_find_sock_in_db(t_server_info *i, char *login);
 int mx_drop_socket(t_server_info *i, int client_sock);
 
 int mx_check_client(int client_sock, char *c_input, t_server_info *info);
-
-int mx_tls_worker(SSL *ssl, int client_sock, t_server_info *info);
 SSL_CTX* mx_create_context(void);
 void mx_load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
 
-int mx_worker(int client_sock, t_server_info *info);
+//int mx_worker(int client_sock, t_server_info *info);
+
+int mx_tls_worker(struct tls *tls_accept, t_server_info *info);
 
 int main2(int argc, char *argv[]);  // test adress
 

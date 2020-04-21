@@ -9,14 +9,58 @@ int mx_start_server(t_server_info *info) {
     struct addrinfo hints;
     struct addrinfo *bind_address;
     struct sockaddr_in serv_addr;
-    SSL_CTX *ctx;
 
+    struct tls_config *config = NULL;
+    struct tls *tls = NULL;
+    struct tls *tls_accept = NULL;
+//    char *ciphers = "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384";
 
-    SSL_library_init();
-    ctx = mx_create_context();  // initialize SSL
-    mx_load_certificates(ctx,  "mycert.pem", "mycert.pem"); // load cert
-    printf("2--------++++\n");
+    if(tls_init() < 0) {
+        printf("tls_init error\n");
+        exit(1);
+    }
+    config = tls_config_new();
+    if(config == NULL) {
+        printf("error tls_config_new\n");
+        exit(1);
+    }
 
+    tls_config_set_protocols(config, TLS_PROTOCOLS_DEFAULT);
+//    tls_config_set_ciphers(config, "AEAD-AES256-GCM-SHA384:AEAD-CHACHA20-POLY1305-SHA256:AEAD-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256");
+//    tls_config_set_protocols(config, TLS_PROTOCOL_TLSv1_3);
+//    tls_config_set_ca_path(config, "./CA3/");
+
+    if (tls_config_set_ca_file(config, "./CA3/root.pem") < 0) {
+        printf("tls_default_ca_cert_file error\n");
+        exit(1);
+    }
+//
+//    if(tls_config_set_ciphers(config, ciphers) < 0) {
+//        printf("tls_config_set_ciphers error\n");
+//        exit(1);
+//    }
+
+    if(tls_config_set_key_file(config, "./CA3/server.key") < 0) {
+        printf("tls_config_set_key_file error\n");
+        exit(1);
+    }
+
+    if(tls_config_set_cert_file(config, "./CA3/server.pem") < 0) {
+        printf("tls_config_set_cert_file error\n");
+        exit(1);
+    }
+//    tls_config_verify_client_optional(config);
+    tls_config_verify_client(config);
+
+    tls = tls_server();
+    if(tls == NULL) {
+        printf("tls_server error\n");
+        exit(1);
+    }
+    if(tls_configure(tls, config) < 0) {
+        printf("tls_configure error: %s\n", tls_error(tls));
+        exit(1);
+    }
     printf("Configuring local address...\n");
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -33,6 +77,8 @@ int mx_start_server(t_server_info *info) {
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(info->port);
     inet_aton("192.168.1.124", &serv_addr.sin_addr);
+
+//    setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &opt, 4);
     if (bind(server, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
         printf("bind error = %s\n", strerror(errno));
         return -1;
@@ -61,7 +107,6 @@ int mx_start_server(t_server_info *info) {
     struct timespec timeout;
     timeout.tv_sec = 1;  // seconds
     timeout.tv_nsec = 0;  // nanoseconds
-    SSL *ssl;
     while (1) {
         int event = kevent(kq, NULL, 0, &new_ev, 1, &timeout);
         if (event == 0) {  // check new event
@@ -93,28 +138,14 @@ int mx_start_server(t_server_info *info) {
                 break;
             }
 
-            // TLS
-            ssl = SSL_new(ctx);
-            if (!ctx) {
-                fprintf(stderr, "SSL_new() failed.\n");
-                return 1;
+            if(tls_accept_socket(tls, &tls_accept, client_sock) < 0) {
+                printf("tls_accept_socket error\n");
+                exit(1);
             }
-            printf("SSL/TLS using %s\n", SSL_get_cipher(ssl));
-//        mx_show_certs(ssl);
-            printf("6--------++++\n");
-            SSL_set_fd(ssl, client_sock);
 
-            /* Establish TLS connection */
-            int  ret = SSL_accept(ssl);
-            if (ret != 1) {
-                fprintf(stderr, "SSL_accept error = %d\n",
-                        SSL_get_error(ssl, ret));
-                return -1;
-            }
+            tls_write(tls_accept, "TLS 1_3", strlen("TLS 1_3"));
+//            printf("tls version %s\n", tls_conn_version(tls));
             printf("Client connected successfully\n");
-
-//            int old_flags  = fcntl(client_sock, F_GETFL, 0);
-//            fcntl(client_sock, F_SETFL, old_flags | O_NONBLOCK);
         }
         else {  // if read from client
             printf("\t\t\twork with client %d\n", (int) new_ev.ident);
@@ -127,22 +158,17 @@ int mx_start_server(t_server_info *info) {
                 close(new_ev.ident);
             }
             else {
-                int rc = mx_tls_worker(ssl, new_ev.ident, info);
+                int rc = mx_tls_worker(tls_accept, info);
                 if (rc == -1) {
                     printf("error = %s\n", strerror(errno));
                     break;
                 }
-//        else
-//            ERR_print_errors_fp(stderr);
-                }
-
-//                int rc = mx_tls_worker(ssl, new_ev.ident, info);
-//                int rc = mx_worker(new_ev.ident, info);
-//                if (rc == -1) {
-//                    printf("error = %s\n", strerror(errno));
-//                    break;
+            }
         }
     }
+    tls_close(tls);
+    tls_free(tls);
+    tls_config_free(config);
     return 0;
 }
 

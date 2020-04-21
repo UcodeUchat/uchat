@@ -6,18 +6,36 @@ int mx_start_client(t_client_info *info) {
     int sock;
     int err;
     int enable = 1;
-//    struct tls *client;
+    struct tls *tls = NULL;
+    struct tls_config *config = NULL;
 
-    SSL_library_init();
-    OpenSSL_add_all_algorithms();
-    SSL_load_error_strings();
-
-    SSL_CTX *ctx = SSL_CTX_new(TLS_client_method());
-    if (!ctx) {
-        fprintf(stderr, "SSL_CTX_new() failed.\n");
-        return 1;
+    if (tls_init() < 0) {
+        printf("tls_init error\n");
+        exit(1);
     }
-    printf("OpenSSL version: %s\n", OpenSSL_version(SSLEAY_VERSION));
+
+    config = tls_config_new();
+    tls = tls_client();
+//    tls_config_verify_client_optional(config);
+//    tls_config_insecure_noverifycert(config);
+//    tls_config_insecure_noverifyname(config);
+
+    //"./CA/client.key"
+//    "./CA/root/newcerts/1000.pem"
+    if(tls_config_set_key_file(config,  "./CA3/client.key") < 0) {
+        printf("tls_config_set_key_file error\n");
+        exit(1);
+    }
+
+    if(tls_config_set_cert_file(config,  "./CA3/client.pem") < 0) {
+        printf("tls_config_set_cert_file error\n");
+        exit(1);
+    }
+//    if (tls_config_verify_client(config) < 0) {
+//        printf("tls_config_verify_client error\n");
+//        exit(1);
+//    }
+    tls_configure(tls, config);
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_STREAM;
@@ -46,50 +64,68 @@ int mx_start_client(t_client_info *info) {
         printf("connect error = %s\n", strerror(errno));
         return -1;
     }
-    //SSL
-    SSL *ssl = SSL_new(ctx);
-    if (!ssl) {
-        fprintf(stderr, "SSL_new() failed.\n");
-        return 1;
-    }
-
-    SSL_set_fd(ssl, sock);
-    printf("SSL_set_fd +\n");
-    if (SSL_connect(ssl) <= 0) {
-        fprintf(stderr, "SSL_connect() failed.\n");
-        ERR_print_errors_fp(stderr);
-        return 1;
-    }
-    else {
-        char *msg = "Hello???";
-        char buf[1024];
-        printf("Connected with %s encryption\n", SSL_get_cipher(ssl));
-        mx_show_certs(ssl);                                /* get any certs */
-        SSL_write(ssl, msg, strlen(msg));            /* encrypt & send message */
-        int bytes = SSL_read(ssl, buf, sizeof(buf));    /* get reply & decrypt */
-        buf[bytes] = 0;
-        printf("Received: \"%s\"\n", buf);
-//        printf("SSL/TLS using %s\n", tls_conn_version(client));
-    }
-
     freeaddrinfo(peer_address);
     info->socket = sock;
-    while (1) {
-        char read[4096];
-        if (!fgets(read, 4096, stdin)) break;
-        printf("Sending: %s", read);
-        int bytes_sent = SSL_write(ssl, read, strlen(read));
-        printf("Sent %d bytes.\n", bytes_sent);
+    printf("connect TCP sock =%d\n", sock);
+//    tls_connect(, const char *host, const char *port);
 
-        char server_read[4096];
-        int bytes_received = SSL_read(ssl, server_read, 4096);
-        if (bytes_received < 1) {
-            printf("Connection closed by peer.\n");
-            break;
-        }
-        printf("Received (%d bytes): %.*s",
-               bytes_received, bytes_received, read);
+    if (tls_connect_socket(tls, sock, "uchat_server") < 0) {
+        printf("tls_connect error\n");
+        printf("%s\n", tls_error(tls));
+        exit(1);
     }
+    if (tls_handshake(tls) < 0) {
+        printf("tls_handshake error\n");
+        printf("%s\n", tls_error(tls));
+        exit(1);
+    }
+
+    tls_write(tls, "TLS client", strlen("TLS client"));
+    printf("tls version %s\n", tls_conn_version(tls));
+
+    char bufs[1000], bufc[1000];
+    struct pollfd pfd[2];
+    ssize_t rc = 0;
+
+    pfd[0].fd = 0;
+    pfd[0].events = POLLIN;
+    pfd[1].fd = sock;
+    pfd[1].events = POLLIN;
+
+    while(bufc[0] != ':' && bufc[1] != 'q') {
+        bzero(bufs, 1000);
+        bzero(bufc, 1000);
+
+        poll(pfd, 2, -1);
+
+        if(pfd[0].revents & POLLIN) {
+            int q = read(0, bufc, 1000);
+            tls_write(tls, bufc, q);
+        }
+
+        if(pfd[1].revents & POLLIN) {
+            if((rc = tls_read(tls, bufs, 1000)) <= 0) break;
+            printf("Mensagem (%lu): %s\n", rc, bufs);
+        }
+
+    }
+
+//    while (1) {
+//        char read[4096];
+//        if (!fgets(read, 4096, stdin)) break;
+//        printf("Sending: %s", read);
+//        int bytes_sent = tls_write(tls, read, strlen(read));
+//        printf("Sent %d bytes.\n", bytes_sent);
+//
+//        char server_read[4096];
+//        int bytes_received = tls_read(tls, server_read, 4096);
+//        if (bytes_received < 1) {
+//            printf("Connection closed by peer.\n");
+//            break;
+//        }
+//        printf("Received (%d bytes): %.*s",
+//               bytes_received, bytes_received, read);
+//    }
 
 /*
     pthread_t thread_input;
@@ -103,11 +139,11 @@ int mx_start_client(t_client_info *info) {
 
     */
     //-- В этом месте начинается вечный цикл вплоть до закрытия окна чата
-    mx_login(info);
+//    mx_login(info);
     //--
-    SSL_shutdown(ssl);
-    SSL_free(ssl);
-    SSL_CTX_free(ctx);
+    tls_close(tls);
+    tls_free(tls);
+    tls_config_free(config);
     printf("Closing socket...\n");
     close(sock);
     printf("exit client\n");
