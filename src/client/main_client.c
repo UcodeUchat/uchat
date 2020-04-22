@@ -23,12 +23,12 @@ int main(int argc, const char **argv) {
     tls_config_insecure_noverifycert(config);
     tls_config_insecure_noverifyname(config);
 
-    if (tls_config_set_key_file(config, "./CA3/client.key") < 0) {
+    if (tls_config_set_key_file(config, "./CA3/client2.key") < 0) {
         printf("tls_config_set_key_file error\n");
         exit(1);
     }
 
-    if (tls_config_set_cert_file(config, "./CA3/client.pem") < 0) {
+    if (tls_config_set_cert_file(config, "./CA3/client2.pem") < 0) {
         printf("tls_config_set_cert_file error\n");
         exit(1);
     }
@@ -41,7 +41,6 @@ int main(int argc, const char **argv) {
         fprintf(stderr, "getaddrinfo() failed. (%s)\n", gai_strerror(err));
         return 1;
     }
-
     printf("Remote address is: ");
     char address_buffer[100];
     char service_buffer[100];
@@ -79,7 +78,7 @@ int main(int argc, const char **argv) {
     }
     mx_report_tls_client(tls, "client");
     printf("\n");
-//    tls_write(tls, "TLS client", strlen("TLS client"));
+    tls_write(tls, "TLS connect", strlen("TLS connect"));
 //    printf("tls version %s\n", tls_conn_version(tls));
     char bufs[1000], bufc[1000];
     struct pollfd pfd[2];
