@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     }
 //    tls_config_set_protocols(config, TLS_PROTOCOLS_DEFAULT);
 //    tls_config_set_ciphers(config, "AEAD-AES256-GCM-SHA384:AEAD-CHACHA20-POLY1305-SHA256:AEAD-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256");
-    tls_config_set_protocols(config, TLS_PROTOCOL_TLSv1_3);
+//    tls_config_set_protocols(config, TLS_PROTOCOL_TLSv1_3);
 //    tls_config_set_ca_path(config, "./CA3/");
 
     if(tls_config_parse_protocols(&protocols, "secure") < 0) {
@@ -56,8 +56,9 @@ int main(int argc, char **argv) {
         printf("tls_config_set_cert_file error\n");
         exit(1);
     }
+    tls_config_verify_client(config);
 //    tls_config_verify_client_optional(config);
-//    tls_config_verify_client(config);
+
     tls = tls_server();
     if (tls == NULL) {
         printf("tls_server error\n");
@@ -152,9 +153,13 @@ int main(int argc, char **argv) {
                 printf("tls_accept_socket error\n");
                 exit(1);
             }
-
-            mx_report_tls(tls_accept, "new client");
-
+            if (tls_handshake(tls_accept) < 0) {
+                printf("tls_handshake error\n");
+                printf("%s\n", tls_error(tls_accept));
+                exit(1);
+            }
+            mx_report_tls(tls_accept, "new client connected");
+            printf("\n");
 //            tls_write(tls_accept, "TLS 1_3", strlen("TLS 1_3"));
 //            printf("tls version %s\n", tls_conn_version(tls));
             printf("Client connected successfully\n");
@@ -163,12 +168,13 @@ int main(int argc, char **argv) {
             printf("\t\t\twork with client %d\n", (int) new_ev.ident);
 
             if ((new_ev.flags & EV_EOF) != 0) {
-                printf("Client %lu disconnected\n", new_ev.ident);
-//                mx_drop_socket(info, new_ev.ident);
-                close(new_ev.ident);
-                tls_close(tls_accept);
-                tls_free(tls_accept);
-            }
+//              if ((new_ev.flags & EV_EOF) < 0) {
+                    printf("Client %lu disconnected\n", new_ev.ident);
+                    //                mx_drop_socket(info, new_ev.ident);
+                    close(new_ev.ident);
+                    tls_close(tls_accept);
+                    tls_free(tls_accept);
+                }
             else {
                 int rc = mx_tls_worker(tls_accept);
                 if (rc == -1) {

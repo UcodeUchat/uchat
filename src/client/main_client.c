@@ -20,7 +20,6 @@ int main(int argc, const char **argv) {
     }
     config = tls_config_new();
     tls = tls_client();
-//    tls_config_verify_client_optional(config);
     tls_config_insecure_noverifycert(config);
     tls_config_insecure_noverifyname(config);
 
@@ -33,12 +32,9 @@ int main(int argc, const char **argv) {
         printf("tls_config_set_cert_file error\n");
         exit(1);
     }
-//    if (tls_config_verify_client(config) < 0) {
-//        printf("tls_config_verify_client error\n");
-//        exit(1);
-//    }
-    tls_configure(tls, config);
 
+    tls_configure(tls, config);
+/************************************/
     memset(&hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_STREAM;
     if ((err = getaddrinfo(argv[1], argv[2], &hints, &peer_address)) != 0) {
