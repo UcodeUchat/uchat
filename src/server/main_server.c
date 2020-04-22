@@ -2,8 +2,6 @@
 
 int main(int argc, char **argv) {
     uint16_t port = atoi(argv[1]);
-    struct pollfd pfd[2];
-    char bufs[1000], bufc[1000];
     int server;
     unsigned int protocols = 0;
 
@@ -69,8 +67,6 @@ int main(int argc, char **argv) {
         printf("tls_configure error: %s\n", tls_error(tls));
         exit(1);
     }
-
-    printf("2--------++++\n");
     printf("Configuring local address...\n");
 
     struct addrinfo hints;
@@ -105,74 +101,89 @@ int main(int argc, char **argv) {
     printf("listen fd = %d\n", server);
 //    freeaddrinfo(bind_address);
 
-    int client_sock = accept(server, NULL, NULL);
-    if (client_sock == -1) {
+    int kq;
+    if ((kq = kqueue()) == -1) {
         printf("error = %s\n", strerror(errno));
+        close(server);
         return -1;
     }
-
-    if (tls_accept_socket(tls, &tls_accept, client_sock) < 0) {
-        printf("tls_accept_socket error\n");
-        exit(1);
+    struct kevent new_ev;  // add server sock in struct kevent
+    EV_SET(&new_ev, server, EVFILT_READ, EV_ADD, 0, 0, 0);
+    if (kevent(kq, &new_ev, 1, 0, 0, NULL) == -1) {
+        printf("error = %s\n", strerror(errno));
+        close(server);
+        return -1;
     }
-    printf("tls accept \n");
-
-    char *msg = "tls server";
-    tls_write(tls_accept, msg, strlen(msg));
-
-    pfd[0].fd = 0;
-    pfd[0].events = POLLIN;
-    pfd[1].fd = client_sock;
-    pfd[1].events = POLLIN;
-    ssize_t len;
-    while (bufc[0] != ':' && bufc[1] != 'q') {
-        poll(pfd, 2, -1);
-        bzero(bufs, 1000);
-        bzero(bufc, 1000);
-        if (pfd[0].revents & POLLIN) {
-            int q = read(0, bufc, 1000);
-            tls_write(tls_accept, bufc, q);
+    struct timespec timeout;
+    timeout.tv_sec = 1;  // seconds
+    timeout.tv_nsec = 0;  // nanoseconds
+    while (1) {
+        int event = kevent(kq, NULL, 0, &new_ev, 1, &timeout);
+        if (event == 0) {  // check new event
+            continue;
         }
-        if (pfd[1].revents & POLLIN) {
-            if ((len = tls_read(tls_accept, bufs, 1000)) <= 0) break;
-            printf("Mensage (%lu): %s\n", len, bufs);
+        if (event == -1) {
+            printf("error = %s\n", strerror(errno));
+            break;
+        }
+        if (new_ev.ident == (uintptr_t) server) {  // if new connect - add new client
+            int client_sock = accept(server, NULL, NULL);
+            if (client_sock == -1) {
+                printf("error = %s\n", strerror(errno));
+                break;
+            }
+            // print info about new caccpted client
+            struct sockaddr_storage client_address;
+            socklen_t client_len = sizeof(client_address);
+            char address_buffer[100];
+            printf("server new client socket %d\n", client_sock);
+            getnameinfo((struct sockaddr*)&client_address, client_len,
+                        address_buffer, sizeof(address_buffer), 0, 0,
+                        NI_NUMERICHOST);
+            printf("New connection from %s\n", address_buffer);
+            // add client_sock in struct kevent
+            EV_SET(&new_ev, client_sock, EVFILT_READ, EV_ADD,0, 0, 0);
+            if (kevent(kq, &new_ev, 1, 0, 0, NULL) == -1) {
+                printf("error = %s\n", strerror(errno));
+                break;
+            }
+
+            if(tls_accept_socket(tls, &tls_accept, client_sock) < 0) {
+                printf("tls_accept_socket error\n");
+                exit(1);
+            }
+
+            mx_report_tls(tls_accept, "new client");
+
+//            tls_write(tls_accept, "TLS 1_3", strlen("TLS 1_3"));
+//            printf("tls version %s\n", tls_conn_version(tls));
+            printf("Client connected successfully\n");
+        }
+        else {  // if read from client
+            printf("\t\t\twork with client %d\n", (int) new_ev.ident);
+
+            if ((new_ev.flags & EV_EOF) != 0) {
+                printf("Client %lu disconnected\n", new_ev.ident);
+//                mx_drop_socket(info, new_ev.ident);
+                close(new_ev.ident);
+                tls_close(tls_accept);
+                tls_free(tls_accept);
+            }
+            else {
+                int rc = mx_tls_worker(tls_accept);
+                if (rc == -1) {
+                    printf("error = %s\n", strerror(errno));
+                    break;
+                }
+            }
         }
     }
-    tls_close(tls_accept);
-    tls_free(tls_accept);
+    tls_close(tls);
     tls_free(tls);
     tls_config_free(config);
     return 0;
-}
-
-/*
-    while (1) {
-        struct sockaddr_storage client_address;
-        socklen_t client_len = sizeof(client_address);
-        int client_sock;
-        client_sock = accept(server, (struct sockaddr*) &client_address,
-                             &client_len);
-        printf("server new client socket %d\n", client_sock);
-        if (client_sock == -1) {
-            printf("error = %s\n", strerror(errno));
-//            continue;
-            return -1;
-        }
-        char address_buffer[101];
-        getnameinfo((struct sockaddr*)&client_address, client_len,
-                    address_buffer, sizeof(address_buffer), 0, 0,
-                    NI_NUMERICHOST);
-        printf("New connection from %s\n", address_buffer);
-
-        if(tls_accept_socket(tls, &tls_accept, client_sock) < 0) {
-            printf("tls_accept_socket error\n");
-            exit(1);
-        }
-
-        tls_write(tls_accept, "TLS", strlen("TLS"));
 
 }
 
-*/
 
 
