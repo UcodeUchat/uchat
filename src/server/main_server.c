@@ -15,7 +15,23 @@ int main(int argc, char **argv) {
 //    }
     struct tls_config *config = NULL;
     struct tls *tls = NULL;
-    struct tls *tls_accept = NULL;
+//    struct tls *tls_accept = NULL;
+    struct tls *tls_accept3 = NULL;
+    struct tls *tls_accept4 = NULL;
+    struct tls *tls_accept5 = NULL;
+    struct tls *tls_accept6 = NULL;
+    struct tls *tls_accept7 = NULL;
+    struct tls *tls_accept8 = NULL;
+    struct tls *tls_accept9 = NULL;
+
+    struct tls *tls_array[10];
+    tls_array[3] = tls_accept3;
+    tls_array[4] = tls_accept4;
+    tls_array[5] = tls_accept5;
+    tls_array[6] = tls_accept6;
+    tls_array[7] = tls_accept7;
+    tls_array[8] = tls_accept8;
+    tls_array[9] = tls_accept9;
 //    char *ciphers = "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384";
 
     if (tls_init() < 0) {
@@ -149,16 +165,16 @@ int main(int argc, char **argv) {
                 break;
             }
 
-            if(tls_accept_socket(tls, &tls_accept, client_sock) < 0) {
+            if(tls_accept_socket(tls, &tls_array[client_sock], client_sock) < 0) {
                 printf("tls_accept_socket error\n");
                 exit(1);
             }
-            if (tls_handshake(tls_accept) < 0) {
+            if (tls_handshake(tls_array[client_sock]) < 0) {
                 printf("tls_handshake error\n");
-                printf("%s\n", tls_error(tls_accept));
+                printf("%s\n", tls_error(tls_array[client_sock]));
                 exit(1);
             }
-            mx_report_tls(tls_accept, "new client connected");
+            mx_report_tls(tls_array[client_sock], "new client connected");
             printf("\n");
 //            tls_write(tls_accept, "TLS 1_3", strlen("TLS 1_3"));
 //            printf("tls version %s\n", tls_conn_version(tls));
@@ -172,11 +188,11 @@ int main(int argc, char **argv) {
                     printf("Client %lu disconnected\n", new_ev.ident);
                     //                mx_drop_socket(info, new_ev.ident);
                     close(new_ev.ident);
-                    tls_close(tls_accept);
-                    tls_free(tls_accept);
+                    tls_close(tls_array[new_ev.ident]);
+                    tls_free(tls_array[new_ev.ident]);
                 }
             else {
-                int rc = mx_tls_worker(tls_accept);
+                int rc = mx_tls_worker(tls_array[new_ev.ident]);
                 if (rc == -1) {
                     printf("error = %s\n", strerror(errno));
                     break;
@@ -191,5 +207,9 @@ int main(int argc, char **argv) {
 
 }
 
-
-
+//struct tls *mx_find_tls_cntx(int index) {
+//    for (int i = 0; i < 10; i++) {
+//        if ()
+//    }
+//    return NUll;
+//}

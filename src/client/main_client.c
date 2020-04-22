@@ -71,6 +71,7 @@ int main(int argc, const char **argv) {
         printf("%s\n", tls_error(tls));
         exit(1);
     }
+    printf("tls connect +\n");
     if (tls_handshake(tls) < 0) {
         printf("tls_handshake error\n");
         printf("%s\n", tls_error(tls));
