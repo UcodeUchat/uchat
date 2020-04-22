@@ -47,6 +47,62 @@ int mx_set_demon(const char *log_file) {
     return setsid();
 }
 
+void mx_report_tls(struct tls * tls_ctx, char * host) {
+    time_t t;
+    const char *ocsp_url;
+
+    fprintf(stderr, "TLS handshake negotiated %s/%s with host %s\n",
+            tls_conn_version(tls_ctx), tls_conn_cipher(tls_ctx), host);
+    fprintf(stderr, "Peer name: %s\n", host);
+    if (tls_peer_cert_subject(tls_ctx))
+        fprintf(stderr, "Subject: %s\n",
+                tls_peer_cert_subject(tls_ctx));
+    if (tls_peer_cert_issuer(tls_ctx))
+        fprintf(stderr, "Issuer: %s\n",
+                tls_peer_cert_issuer(tls_ctx));
+    if ((t = tls_peer_cert_notbefore(tls_ctx)) != -1)
+        fprintf(stderr, "Valid From: %s", ctime(&t));
+    if ((t = tls_peer_cert_notafter(tls_ctx)) != -1)
+        fprintf(stderr, "Valid Until: %s", ctime(&t));
+    if (tls_peer_cert_hash(tls_ctx))
+        fprintf(stderr, "Cert Hash: %s\n",
+                tls_peer_cert_hash(tls_ctx));
+    ocsp_url = tls_peer_ocsp_url(tls_ctx);
+    if (ocsp_url != NULL)
+        fprintf(stderr, "OCSP URL: %s\n", ocsp_url);
+    switch (tls_peer_ocsp_response_status(tls_ctx)) {
+        case TLS_OCSP_RESPONSE_SUCCESSFUL:
+            fprintf(stderr, "OCSP Stapling: %s\n",
+                    tls_peer_ocsp_result(tls_ctx) == NULL ?  "" :
+                    tls_peer_ocsp_result(tls_ctx));
+            fprintf(stderr,
+                    "  response_status=%d cert_status=%d crl_reason=%d\n",
+                    tls_peer_ocsp_response_status(tls_ctx),
+                    tls_peer_ocsp_cert_status(tls_ctx),
+                    tls_peer_ocsp_crl_reason(tls_ctx));
+            t = tls_peer_ocsp_this_update(tls_ctx);
+            fprintf(stderr, "  this update: %s",
+                    t != -1 ? ctime(&t) : "\n");
+            t =  tls_peer_ocsp_next_update(tls_ctx);
+            fprintf(stderr, "  next update: %s",
+                    t != -1 ? ctime(&t) : "\n");
+            t =  tls_peer_ocsp_revocation_time(tls_ctx);
+            fprintf(stderr, "  revocation: %s",
+                    t != -1 ? ctime(&t) : "\n");
+            break;
+        case -1:
+            break;
+        default:
+            fprintf(stderr, "OCSP Stapling:  failure - response_status %d (%s)\n",
+                    tls_peer_ocsp_response_status(tls_ctx),
+                    tls_peer_ocsp_result(tls_ctx) == NULL ?  "" :
+                    tls_peer_ocsp_result(tls_ctx));
+            break;
+
+    }
+}
+
+
 
 static void print_family(struct addrinfo *aip) {
 	printf(" family ");
@@ -167,60 +223,6 @@ int main2(int argc, char *argv[]) {
 	// exit(0);
 }
 
-void mx_show_certs(SSL* ssl) {
-    X509 *cert;
-    char *line;
 
-    cert = SSL_get_peer_certificate(ssl); /* Get certificates (if available) */
-    if ( cert != NULL )
-    {
-        printf("Server certificates:\n");
-        line = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
-        printf("Subject: %s\n", line);
-        free(line);
-        line = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
-        printf("Issuer: %s\n", line);
-        free(line);
-        X509_free(cert);
-    }
-    else
-        printf("No certificates.\n");
-}
-
-
-
-SSL_CTX* mx_init_server_ctx(void) {
-    SSL_CTX *ctx;
-
-    OpenSSL_add_all_algorithms();  // load & register all cryptos, etc.
-    SSL_load_error_strings();  // load all error messages
-    ctx = SSL_CTX_new(TLS_server_method());  // create new context from method
-    if (ctx == NULL ) {
-        ERR_print_errors_fp(stderr);
-        abort();
-    }
-    return ctx;
-}
-
-
-void mx_load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file) {
-    // set the local certificate from CertFile
-
-    if (SSL_CTX_use_certificate_file(ctx, cert_file, SSL_FILETYPE_PEM) <= 0) {
-        ERR_print_errors_fp(stderr);
-        abort();
-    }
-    // set the private key from KeyFile (may be the same as CertFile)
-    if (SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0) {
-        ERR_print_errors_fp(stderr);
-        abort();
-    }
-    // verify private key
-    if (!SSL_CTX_check_private_key(ctx)) {
-        fprintf(stderr, "Private key does not match the public certificate\n");
-        abort();
-    }
-    printf("load_cer sucsess\n");
-}
 
 

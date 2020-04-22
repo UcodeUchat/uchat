@@ -47,7 +47,7 @@ void mx_worker_ssl(SSL* ssl) {  // Serve the connection -- threadable
     if (SSL_accept(ssl) < 0 )					/* do SSL-protocol accept */
         ERR_print_errors_fp(stderr);
         printf("SSL/TLS using %s\n", SSL_get_cipher(ssl));
-        mx_show_certs(ssl);							// get any certificates
+//        mx_show_certs(ssl);							// get any certificates
     while(1) {
         rc = SSL_read(ssl, buf, sizeof(buf));	// get request
         if (rc > 0 ) {

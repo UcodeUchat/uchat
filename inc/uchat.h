@@ -68,10 +68,11 @@
 
 int mx_set_demon(const char *log_file);
 void *mx_worker(void *arg);
-int main2(int argc, char *argv[]);
-void mx_show_certs(SSL* ssl);
-void mx_load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
-SSL_CTX* mx_init_server_ctx(void);
+//int main2(int argc, char *argv[]);
 void mx_worker_ssl(SSL* ssl);
+
+
+void mx_report_tls(struct tls * tls_ctx, char * host);
+void mx_report_tls_client(struct tls * tls_ctx, char * host);
 
 #endif
