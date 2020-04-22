@@ -63,7 +63,12 @@ int main(int argc, const char **argv) {
     }
     freeaddrinfo(peer_address);
     printf("connect TCP sock =%d\n", sock);
-//    tls_connect(, const char *host, const char *port);
+
+//    if(tls_connect(tls, argv[1], argv[2]) < 0) {
+//        printf("tls_connect error\n");
+//        printf("%s\n", tls_error(tls));
+//        exit(1);
+//    }
 
     if (tls_connect_socket(tls, sock, "uchat_server") < 0) {
         printf("tls_connect error\n");
