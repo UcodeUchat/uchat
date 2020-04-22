@@ -1,18 +1,94 @@
 Configuring demon ++...
 Configuring local address...
-listen fd = 0
-server new client socket 3
-New connection from –*ƒRˇ
-			work with client 3
-SELECT socket FROM users WHERE login='mlibovych'
-user exist in UCHAT!
-			work with client 3
-SELECT socket FROM users WHERE login='neo'
-user exist in UCHAT!
-			work with client 3
-SELECT socket FROM users WHERE login='neo'
-user exist in UCHAT!
-			work with client 3
-Client 3 disconnected
+listen fd = 4
+server new client socket 6
+New connection from êx†‰ˇ
+			work with client 6
+Client 6 disconnected
 start set socket to 0
-UPDATE users SET socket=0 WHERE socket=3
+UPDATE users SET socket=0 WHERE socket=6
+SELECT * FROM users
+user_id	socket	login		password	access
+0	0	mmasniy		123123		1		
+1	0	vkmetyk		123123		1		
+2	0	snikolayen	123123		1		
+3	0	mlibovych	123123		1		
+4	0	neo		1		1		
+server new client socket 6
+New connection from êx†‰ˇ
+			work with client 6
+Client 6 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=6
+SELECT * FROM users
+user_id	socket	login		password	access
+0	0	mmasniy		123123		1		
+1	0	vkmetyk		123123		1		
+2	0	snikolayen	123123		1		
+3	0	mlibovych	123123		1		
+4	0	neo		1		1		
+server new client socket 6
+New connection from êx†‰ˇ
+			work with client 6
+Client 6 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=6
+SELECT * FROM users
+user_id	socket	login		password	access
+0	0	mmasniy		123123		1		
+1	0	vkmetyk		123123		1		
+2	0	snikolayen	123123		1		
+3	0	mlibovych	123123		1		
+4	0	neo		1		1		
+server new client socket 6
+New connection from êx†‰ˇ
+			work with client 6
+Client 6 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=6
+SELECT * FROM users
+user_id	socket	login		password	access
+0	0	mmasniy		123123		1		
+1	0	vkmetyk		123123		1		
+2	0	snikolayen	123123		1		
+3	0	mlibovych	123123		1		
+4	0	neo		1		1		
+server new client socket 6
+New connection from êx†‰ˇ
+			work with client 6
+Client 6 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=6
+SELECT * FROM users
+user_id	socket	login		password	access
+0	0	mmasniy		123123		1		
+1	0	vkmetyk		123123		1		
+2	0	snikolayen	123123		1		
+3	0	mlibovych	123123		1		
+4	0	neo		1		1		
+server new client socket 6
+New connection from êx†‰ˇ
+			work with client 6
+Client 6 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=6
+SELECT * FROM users
+user_id	socket	login		password	access
+0	0	mmasniy		123123		1		
+1	0	vkmetyk		123123		1		
+2	0	snikolayen	123123		1		
+3	0	mlibovych	123123		1		
+4	0	neo		1		1		
+server new client socket 6
+New connection from êx†‰ˇ
+			work with client 6
+Client 6 disconnected
+start set socket to 0
+UPDATE users SET socket=0 WHERE socket=6
+SELECT * FROM users
+user_id	socket	login		password	access
+0	0	mmasniy		123123		1		
+1	0	vkmetyk		123123		1		
+2	0	snikolayen	123123		1		
+3	0	mlibovych	123123		1		
+4	0	neo		1		1		
