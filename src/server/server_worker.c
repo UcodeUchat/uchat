@@ -38,4 +38,3 @@ int mx_worker(int client_sock, t_server_info *info) {
 //     else
 //         return 0;
 }
-

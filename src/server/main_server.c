@@ -17,7 +17,6 @@ int main(int argc, char **argv) {
         mx_err_exit("usage: chat_server [port]\n");
     info = (t_server_info *)malloc(sizeof(t_server_info));
     memset(info, 0, sizeof(t_server_info));
-    init_db(info);
     (*info).argc = argc;
     (*info).argv = argv;
     (*info).port = (uint16_t) atoi(argv[1]);
@@ -27,14 +26,13 @@ int main(int argc, char **argv) {
         || (servent = getservbyport((*info).port, "udp")) != NULL)
         mx_err_exit("port was taken by another process\n");
     pthread_mutex_init(&((*info).mutex), NULL);
-    // printf("Configuring .\n");
-
-    //   if (mx_set_daemon(info) == -1) {
-    //       printf("error = %s\n", strerror(errno));
-    //       return -1;
-    //   }
-
-    // printf("Configuring demon ++...\n");
+    printf("Configuring .\n");
+    if (mx_set_daemon(info) == -1) {
+        printf("error = %s\n", strerror(errno));
+        return -1;
+    }
+    printf("Configuring demon ++...\n");
+    init_db(info);
     if (mx_start_server(info) == -1) {
         printf("error = %s\n", strerror(errno));
         return -1;

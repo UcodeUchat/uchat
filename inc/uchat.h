@@ -47,6 +47,7 @@ typedef struct s_room {
     int id;
     int position;
     char *name;
+    GtkWidget *room_box;
     GtkWidget *scrolled_window;
     GtkListStore *list;
     GtkWidget *messagesTreeView;
@@ -54,19 +55,29 @@ typedef struct s_room {
     struct s_room *next;
 }              t_room;
 
+typedef struct s_reg {
+    GtkWidget *login_entry;
+    GtkWidget *password_entry;
+    GtkWidget *repeat_password_entry;
+}              t_reg;
+
 typedef struct s_data {
     GtkWidget *window;
     GtkWidget *main_box;
     GtkWidget *login_box;
+    GtkWidget *register_box;
     GtkWidget *login_entry;
     GtkWidget *password_entry;
     GtkWidget *general_box;
     GtkWidget *message_entry;
     GtkWidget *send_button;
     GtkWidget *file_button;
+    GtkWidget *menu_button;
     GtkWidget *login_msg;
     GtkWidget *notebook;
+    GtkWidget *stop;
     t_room *rooms;
+    t_reg *registration;
     gint current_room;
     int login_msg_flag;
 }              t_data;
@@ -74,6 +85,7 @@ typedef struct s_data {
 typedef struct  s_client_info {  //struct client
     char *login;
     char *password;
+    int id;
     int argc;
     char **argv;
     char *ip;
@@ -107,8 +119,6 @@ typedef struct  s_server_info {  // struct server
     pthread_mutex_t mutex;
 }               t_server_info;
 
-
-// Vova
 #define MX_AUTH_TYPE 3
 #define MX_MSG_TYPE 1
 #define MX_FILE_TYPE 2
@@ -126,6 +136,7 @@ typedef struct  s_package {
     char password[32]; // user password
     char data[1024]; // user data
 }               t_package;
+
 
 // server
 int mx_start_server(t_server_info *info);
@@ -155,6 +166,8 @@ void mx_print_curr_time(void);
 void mx_print_tid(const char *s);
 void mx_err_exit(char *err_msg); // вивести помилку
 void mx_sha_hash_password(char *password);
+// Vova
+
 
 // client
 void mx_process_message_in_client(t_client_info *info);

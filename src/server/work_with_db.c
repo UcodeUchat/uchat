@@ -79,4 +79,3 @@ int mx_check_client(t_server_info *info, t_package *p) {
         return -1;
     return 1;
 }
-

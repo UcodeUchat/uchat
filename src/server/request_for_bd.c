@@ -50,7 +50,7 @@ static int print_users(void *status, int argc, char **argv, char **in) {
 //         sqlite3_close(db);
 //         return -1;
 //     }
-//     return 1;
+//     return 1; 
 // }
 
 int mx_update_socket(t_server_info *i, int client_sock, char *login) {
@@ -62,14 +62,14 @@ int mx_update_socket(t_server_info *i, int client_sock, char *login) {
     if (sqlite3_exec(i->db, command, 0, 0, NULL) != SQLITE_OK) {
         return -1;
     }
-    sprintf(command, "SELECT * FROM users WHERE login='%s'", login);
-    printf("%s\n", command);
-    int count1 = 0;
-    if (sqlite3_exec(i->db, command, print_users, &count1, NULL) != SQLITE_OK) {
-        write(client_sock, "Check your login or password\n", 29);
-        printf("Check your login or password\n");
-        return -1;
-    }
+    // sprintf(command, "SELECT * FROM users WHERE login='%s'", login);
+    // printf("%s\n", command);
+    // int count1 = 0;
+    // if (sqlite3_exec(i->db, command, print_users, &count1, NULL) != SQLITE_OK) {
+    //     write(client_sock, "Check your login or password\n", 29);
+    //     printf("Check your login or password\n");
+    //     return -1;
+    // }
     return 1;
 }
 
