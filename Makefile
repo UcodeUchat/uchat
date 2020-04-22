@@ -63,8 +63,8 @@ install:
 	@cp $(addprefix src/functions/, $(SRC_HELP)) .
 	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -c $(SRC_SERVER)  $(SRC_HELP) -I $(INC) 
 	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -c $(SRC_CLIENT)  $(SRC_HELP) -I $(INC) 
-	@clang $(CFLAGS)  `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJ_SERVER) $(OBJ_HELP) -o $(NAME_S) -lsqlite3 -lcrypto -lssl
-	@clang $(CFLAGS)  `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJ_CLIENT) $(OBJ_HELP) -o $(NAME_C) -lsqlite3 -lcrypto -lssl
+	@clang $(CFLAGS)  `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJ_SERVER) $(OBJ_HELP) -o $(NAME_S) -lsqlite3 -lcrypto -lssl -ltls
+	@clang $(CFLAGS)  `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJ_CLIENT) $(OBJ_HELP) -o $(NAME_C) -lsqlite3 -lcrypto -lssl -ltls
 	@mkdir -p obj
 	@mv $(OBJ_SERVER) $(OBJ_CLIENT) $(OBJ_HELP) ./obj
 

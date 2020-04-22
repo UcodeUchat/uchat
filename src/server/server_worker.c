@@ -1,5 +1,24 @@
 #include "uchat.h"
 
+int mx_tls_worker(struct tls *tls_accept, t_server_info *info) {
+    char buf[1024];
+    int rc;
+    (void)info;
+
+    rc = tls_read(tls_accept, buf, sizeof(buf));	// get request
+    if (rc > 0 ) {
+        buf[rc] = 0;
+        printf("Client msg: %s\n", buf);
+        tls_write(tls_accept, buf, strlen(buf));    // send reply
+    }
+    if (rc == -1 ) {
+        tls_close(tls_accept);
+        tls_free(tls_accept);
+    }
+    return 0;
+}
+
+
 int mx_worker(int client_sock, t_server_info *info) {
     t_package *new_package = malloc(MX_PACKAGE_SIZE);
 

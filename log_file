@@ -1,8 +1,13 @@
 Configuring demon ++...
 Configuring local address...
+Configuring local address...
 listen fd = 4
 server new client socket 6
-New connection from x äÿ
+New connection from P<Aª
+
+Client connected successfully
+			work with client 6
+Client msg: TLS connect
 			work with client 6
 Client 6 disconnected
 start set socket to 0

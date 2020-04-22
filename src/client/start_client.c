@@ -1,12 +1,42 @@
 #include "uchat.h"
+/*
+static int set_client_socket(t_client_info *info, struct addrinfo *peer_address) {
+    return sock;
+}
+
+static void set_config_tls(struct tls *tls, struct tls_config *config) {
+
+}
+*/
 
 int mx_start_client(t_client_info *info) {
-    struct addrinfo hints;
-    struct addrinfo *peer_address;
+    struct addrinfo *peer_address = NULL;
     int sock;
+    struct tls *tls = NULL;
+    struct tls_config *config = NULL;
+
+    if (tls_init() < 0) {
+        printf("tls_init error\n");
+        exit(1);
+    }
+    config = tls_config_new();
+    tls = tls_client();
+    tls_config_insecure_noverifycert(config);
+    tls_config_insecure_noverifyname(config);
+    if (tls_config_set_key_file(config, "./CA/client.key") < 0) {
+        printf("tls_config_set_key_file error\n");
+        exit(1);
+    }
+    if (tls_config_set_cert_file(config, "./CA/client.pem") < 0) {
+        printf("tls_config_set_cert_file error\n");
+        exit(1);
+    }
+
+    tls_configure(tls, config);
+
+    struct addrinfo hints;
     int err;
     int enable = 1;
- 
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_STREAM;
@@ -14,7 +44,6 @@ int mx_start_client(t_client_info *info) {
         fprintf(stderr, "getaddrinfo() failed. (%s)\n", gai_strerror(err));
         return 1;
     }
-
     printf("Remote address is: ");
     char address_buffer[100];
     char service_buffer[100];
@@ -31,12 +60,31 @@ int mx_start_client(t_client_info *info) {
         return -1;
     }
     setsockopt(sock, IPPROTO_TCP, SO_KEEPALIVE, &enable, sizeof(int));
+
+
     if (connect(sock, peer_address->ai_addr, peer_address->ai_addrlen)) {
         printf("connect error = %s\n", strerror(errno));
         return -1;
     }
     freeaddrinfo(peer_address);
     info->socket = sock;
+
+    if (tls_connect_socket(tls, sock, "uchat_server") < 0) {
+        printf("tls_connect error\n");
+        printf("%s\n", tls_error(tls));
+        exit(1);
+    }
+    printf("tls connect +\n");
+    if (tls_handshake(tls) < 0) {
+        printf("tls_handshake error\n");
+        printf("%s\n", tls_error(tls));
+        exit(1);
+    }
+    mx_report_tls(tls, "client");
+    printf("\n");
+    tls_write(tls, "TLS connect", strlen("TLS connect"));
+
+    info->tls_client = tls;
     pthread_t thread_input;
     pthread_attr_t attr;
     pthread_attr_init(&attr);

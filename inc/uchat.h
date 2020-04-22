@@ -34,6 +34,8 @@
 
 #include <gtk/gtk.h>
 
+#include <tls.h>
+
 #include "libmx/inc/libmx.h"
 
 #define MAX_CLIENT_INPUT 1024
@@ -91,6 +93,7 @@ typedef struct  s_client_info {  //struct client
     char *ip;
     uint16_t port;
     int socket;
+    struct tls *tls_client;
     int auth_client;
     pthread_mutex_t mutex;
     t_data *data;
@@ -151,8 +154,10 @@ int mx_authorization(t_server_info *i, t_package *p);
 
 int mx_check_client(t_server_info *info, t_package *p);
 int mx_worker(int client_sock, t_server_info *info);
+int mx_tls_worker(struct tls *tls_accept, t_server_info *info);
 
 int main2(int argc, char *argv[]);  // test adress
+void mx_report_tls(struct tls * tls_ctx, char * host);
 
 // client
 int mx_start_client(t_client_info *info);
