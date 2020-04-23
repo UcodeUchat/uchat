@@ -43,22 +43,23 @@ static void create_client_socket(t_client_info *info) {
 static void set_tls_config(t_client_info *info) {
     struct tls_config *config = NULL;
 
-    if (tls_init() < 0)
-        mx_err_exit("tls_init error\n");
-
-    config = tls_config_new();
-    info->tls_client = tls_client();
+    if ((config = tls_config_new()) == NULL)
+        mx_err_exit("unable to allocate config");
+    if ((info->tls_client = tls_client()) == NULL)
+        mx_err_exit("tls client creation failed");
     tls_config_insecure_noverifycert(config);
     tls_config_insecure_noverifyname(config);
-    if (tls_config_set_key_file(config, "./CA/client.key") < 0) {
-        printf("tls_config_set_key_file error\n");
+    if (tls_config_set_dheparams(config, "auto") != 0)
+        mx_err_exit(tls_config_error(config));
+    if (tls_config_set_key_file(config, "./CA/client.key") != 0)
+        mx_err_exit(tls_config_error(config));
+    if (tls_config_set_cert_file(config, "./CA/client.pem") != 0)
+        mx_err_exit(tls_config_error(config));
+    if (tls_configure(info->tls_client, config) != 0) {
+        printf("tls_configure error: %s\n", tls_error(info->tls_client));
         exit(1);
     }
-    if (tls_config_set_cert_file(config, "./CA/client.pem") < 0) {
-        printf("tls_config_set_cert_file error\n");
-        exit(1);
-    }
-    tls_configure(info->tls_client, config);
+    tls_config_free(config);
 }
 static void make_tls_connect(t_client_info *info) {
     if (tls_connect_socket(info->tls_client, info->socket, "uchat_server") < 0) {
@@ -74,7 +75,7 @@ static void make_tls_connect(t_client_info *info) {
     }
     mx_report_tls(info->tls_client, "client");
     printf("\n");
-    tls_write(info->tls_client, "TLS connect", strlen("TLS connect"));
+//    tls_write(info->tls_client, "TLS connect", strlen("TLS connect"));
 }
 
 int mx_start_client(t_client_info *info) {

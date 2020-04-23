@@ -9,8 +9,6 @@ int mx_set_daemon(t_server_info *info) {
 
     if (getrlimit(RLIMIT_NOFILE, &rl) < 0)
         mx_err_exit("невозможно получить максимальный номер дескриптора");
-
-
     if((pid = fork()) < 0) {
         perror("error fork");
         exit(1);

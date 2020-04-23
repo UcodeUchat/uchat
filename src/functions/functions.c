@@ -1,5 +1,16 @@
 #include "uchat.h"
 
+void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len) {
+    // print info about new accepted client
+    char host[100];
+    char serv[100];
+
+    getnameinfo((struct sockaddr*)&client_address, client_len,
+                host, sizeof(host), serv, sizeof(serv),
+                NI_NUMERICHOST | NI_NUMERICSERV);
+    printf("New connection from %s %s\n", host, serv);
+}
+
 void mx_report_tls(struct tls * tls_ctx, char * host) {
     time_t t;
     const char *ocsp_url;

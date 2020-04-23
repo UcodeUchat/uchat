@@ -1,23 +1,85 @@
 #include "uchat.h"
 
-/*
-static int set_server_socket(t_server_info *info) {
+static struct tls *create_tls_configuration(t_server_info *info) {
+    struct tls_config *tls_cfg = NULL;
+    struct tls *tls;
+    uint32_t protocols = 0;
+    (void)info;
 
-    return server;
+//    if (tls_init() != 0)  // not
+//        mx_err_exit("tls_init error\n");
+    if ((tls_cfg = tls_config_new()) == NULL)
+        mx_err_exit("unable to allocate tls_cnfg");
+    if(tls_config_parse_protocols(&protocols, "secure") != 0)
+        mx_err_exit("tls_config_parse_protocols error\n");
+    if(tls_config_set_protocols(tls_cfg, protocols) != 0)
+        mx_err_exit(tls_config_error(tls_cfg));
+    if(tls_config_set_dheparams(tls_cfg, "auto") != 0)
+        mx_err_exit(tls_config_error(tls_cfg));
+    if (tls_config_set_ca_file(tls_cfg, "./CA/root.pem") != 0)
+        mx_err_exit(tls_config_error(tls_cfg));
+    if (tls_config_set_key_file(tls_cfg, "./CA/server.key") != 0)
+        mx_err_exit(tls_config_error(tls_cfg));
+    if (tls_config_set_cert_file(tls_cfg, "./CA/server.pem") != 0)
+        mx_err_exit(tls_config_error(tls_cfg));
+    tls_config_verify_client(tls_cfg);
+    if ((tls = tls_server()) == NULL)
+        mx_err_exit("tls server creation failed");
+    if (tls_configure(tls, tls_cfg) != 0) {
+        printf("tls_configure error: %s\n", tls_error(tls));
+        exit(1);
+    }
+    tls_config_free(tls_cfg);
+    return tls;
 }
 
-static void set_config_tls(struct tls *tls_array[10], struct tls_config **config) {
-
+static void make_tls_connect(struct tls *tls, struct tls *tls_array[], int client_sock) {
+    if(tls_accept_socket(tls, &tls_array[client_sock], client_sock) < 0) {
+        printf("tls_accept_socket error\n");
+        exit(1);
+    }
+    if (tls_handshake(tls_array[client_sock]) < 0) {
+        printf("tls_handshake error\n");
+        printf("%s\n", tls_error(tls_array[client_sock]));
+        exit(1);
+    }
+    mx_report_tls(tls_array[client_sock], "new client ");
+//    tls_write(tls_array[client_sock], "TLS send server", strlen("TLS send server"));
+    printf("\nClient connected successfully\n");
 }
-*/
-int mx_start_server(t_server_info *info) {
-    int server;
+
+static int create_server_socket(t_server_info *info) {
     struct addrinfo hints;
     struct addrinfo *bind_address;
-    unsigned int protocols = 0;
-
     struct sockaddr_in serv_addr;
-    struct tls_config *config = NULL;
+    int server_socket;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+    getaddrinfo(0, info->argv[1], &hints, &bind_address);
+    server_socket = socket(bind_address->ai_family,
+                    bind_address->ai_socktype, bind_address->ai_protocol);
+    if (server_socket == -1) {
+        printf("socket error = %s\n", strerror(errno));
+        return -1;
+    }
+    freeaddrinfo(bind_address);
+    printf("Configuring local address...\n");
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(info->port);
+    inet_aton("192.168.1.124", &serv_addr.sin_addr);
+    if (bind(server_socket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
+        printf("bind error = %s\n", strerror(errno));
+        return -1;
+    }
+    return server_socket;
+}
+
+int mx_start_server(t_server_info *info) {
+    int server;
+
     struct tls *tls = NULL;
     struct tls *tls_array[10];
     struct tls *tls_accept3 = NULL;
@@ -35,65 +97,9 @@ int mx_start_server(t_server_info *info) {
     tls_array[8] = tls_accept8;
     tls_array[9] = tls_accept9;
 
-    if (tls_init() < 0) {
-        printf("tls_init error\n");
-        exit(1);
-    }
-    config = tls_config_new();
-    if (config == NULL) {
-        printf("error tls_config_new\n");
-        exit(1);
-    }
-    if(tls_config_parse_protocols(&protocols, "secure") < 0) {
-        printf("tls_config_parse_protocols error\n");
-        exit(1);
-    }
-    tls_config_set_protocols(config, protocols);
-    if (tls_config_set_ca_file(config, "./CA/root.pem") < 0) {
-        printf("tls_default_ca_cert_file error\n");
-        exit(1);
-    }
-    if (tls_config_set_key_file(config, "./CA/server.key") < 0) {
-        printf("tls_config_set_key_file error\n");
-        exit(1);
-    }
-    if (tls_config_set_cert_file(config, "./CA/server.pem") < 0) {
-        printf("tls_config_set_cert_file error\n");
-        exit(1);
-    }
-    tls_config_verify_client(config);
+    tls = create_tls_configuration(info);
+    server = create_server_socket(info);
 
-    printf("Configuring local address...\n");
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE;
-    getaddrinfo(0, info->argv[1], &hints, &bind_address);
-    server = socket(bind_address->ai_family,
-                    bind_address->ai_socktype, bind_address->ai_protocol);
-    freeaddrinfo(bind_address);
-    if (server == -1) {
-        printf("socket error = %s\n", strerror(errno));
-        return -1;
-    }
-    tls = tls_server();
-    if (tls == NULL) {
-        printf("tls_server error\n");
-        exit(1);
-    }
-    if (tls_configure(tls, config) < 0) {
-        printf("tls_configure error: %s\n", tls_error(tls));
-        exit(1);
-    }
-    printf("Configuring local address...\n");
-
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(info->port);
-    inet_aton("192.168.1.124", &serv_addr.sin_addr);
-    if (bind(server, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
-        printf("bind error = %s\n", strerror(errno));
-        return -1;
-    }
     if (listen(server, SOMAXCONN) == -1) {
         printf("listen error = %s\n", strerror(errno));
         return -1;
@@ -128,39 +134,23 @@ int mx_start_server(t_server_info *info) {
             break;
         }
         if (new_ev.ident == (uintptr_t) server) {  // if new connect - add new client
-            int client_sock = accept(server, NULL, NULL);
+            struct sockaddr_storage client_address;
+            socklen_t client_len = sizeof(client_address);
+
+            int client_sock = accept(server, (struct sockaddr*) &client_address, &client_len);
             if (client_sock == -1) {
                 printf("error = %s\n", strerror(errno));
                 break;
             }
-            // print info about new caccpted client
-            struct sockaddr_storage client_address;
-            socklen_t client_len = sizeof(client_address);
-            char address_buffer[100];
             printf("server new client socket %d\n", client_sock);
-            getnameinfo((struct sockaddr*)&client_address, client_len,
-                        address_buffer, sizeof(address_buffer), 0, 0,
-                        NI_NUMERICHOST);
-            printf("New connection from %s\n", address_buffer);
+            mx_print_client_address(client_address, client_len);
             // add client_sock in struct kevent
             EV_SET(&new_ev, client_sock, EVFILT_READ, EV_ADD,0, 0, 0);
             if (kevent(kq, &new_ev, 1, 0, 0, NULL) == -1) {
                 printf("error = %s\n", strerror(errno));
                 break;
             }
-            if(tls_accept_socket(tls, &tls_array[client_sock], client_sock) < 0) {
-                printf("tls_accept_socket error\n");
-                exit(1);
-            }
-            if (tls_handshake(tls_array[client_sock]) < 0) {
-                printf("tls_handshake error\n");
-                printf("%s\n", tls_error(tls_array[client_sock]));
-                exit(1);
-            }
-            mx_report_tls(tls_array[client_sock], "new client connected");
-            printf("\n");
-//            tls_write(tls_accept, "TLS 1_3", strlen("TLS 1_3"));
-            printf("Client connected successfully\n");
+            make_tls_connect(tls, &tls_array[client_sock], client_sock);
         }
         else {  // if read from client
             printf("\t\t\twork with client %d\n", (int) new_ev.ident);

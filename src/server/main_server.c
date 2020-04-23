@@ -27,10 +27,10 @@ int main(int argc, char **argv) {
         mx_err_exit("port was taken by another process\n");
     pthread_mutex_init(&((*info).mutex), NULL);
     printf("Configuring .\n");
-    if (mx_set_daemon(info) == -1) {
-        printf("error = %s\n", strerror(errno));
-        return -1;
-    }
+//    if (mx_set_daemon(info) == -1) {
+//        printf("error = %s\n", strerror(errno));
+//        return -1;
+//    }
     printf("Configuring demon ++...\n");
     init_db(info);
     if (mx_start_server(info) == -1) {

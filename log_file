@@ -1,9 +1,8 @@
 Configuring demon ++...
 Configuring local address...
-Configuring local address...
 listen fd = 4
 server new client socket 6
-New connection from °Dp”
+New connection from `xàþ
 
 Client connected successfully
 			work with client 6

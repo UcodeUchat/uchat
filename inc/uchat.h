@@ -164,13 +164,13 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
 // functions
 void mx_print_curr_time(void);
 void mx_print_tid(const char *s);
-void mx_err_exit(char *err_msg); // вивести помилку
+void mx_err_exit(const char *err_msg);  // вивести помилку
 void mx_sha_hash_password(char *password);
-int addr_socet_info(int argc, char *argv[])  // test adress
+int addr_socet_info(int argc, char *argv[]);  // test adress
 void mx_get_input(char *buffer);
 int mx_get_input2(char *buffer);
-int addr_socet_info(int argc, char *argv[])  // test adress
 void mx_report_tls(struct tls * tls_ctx, char * host);
+void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
 
 // funcs for package
 t_package *mx_create_new_package();
