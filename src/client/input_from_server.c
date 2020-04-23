@@ -21,6 +21,7 @@ void *mx_process_input_from_server(void *taken_info) {
     (void)info;
     (void)input_package;
     mx_print_tid("new thread");
+
     while(1) { // read all input from server
         int rc = tls_read(info->tls_client, input_package, (ssize_t) MX_PACKAGE_SIZE);
         if (rc == -1)
@@ -30,7 +31,7 @@ void *mx_process_input_from_server(void *taken_info) {
             //printf("input: piece.%d, type.%d, login.%s\n", input_package->piece, input_package->type,
                    //input_package->login);
             GtkTreeIter iter;
-            info->data->current_room = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
+//            info->data->current_room = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
             t_room *room = mx_find_room(info->data->rooms, input_package->room_id);
             gtk_list_store_append(GTK_LIST_STORE(room->list), &iter);
             gtk_list_store_set(GTK_LIST_STORE(room->list), &iter, 0, input_package->login, 1, input_package->data, -1);
@@ -44,5 +45,6 @@ void *mx_process_input_from_server(void *taken_info) {
             gtk_notebook_reorder_child(GTK_NOTEBOOK(info->data->notebook), room->room_box, 0);
         }
     }
+
     return NULL;
 }

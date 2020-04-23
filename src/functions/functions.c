@@ -178,7 +178,7 @@ static void print_flags(struct addrinfo *aip) {
 	}
 }
 
-int main2(int argc, char *argv[]) {
+int addr_socet_info(int argc, char *argv[]) {
 	struct addrinfo		*ailist, *aip;
 	struct addrinfo		hint;
 	struct sockaddr_in	*sinp;

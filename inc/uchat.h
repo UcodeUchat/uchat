@@ -33,13 +33,10 @@
 //#include <openssl/sha.h>
 
 #include <gtk/gtk.h>
-
 #include <tls.h>
-
 #include "libmx/inc/libmx.h"
 
 #define MAX_CLIENT_INPUT 1024
-
 #define REPORT_FILENAME "server_log.txt"
 #define BUFLEN 128
 #define QLEN 10
@@ -128,6 +125,7 @@ typedef struct  s_server_info {  // struct server
 #define MX_MAX_DATA_SIZE (int)(sizeof(((t_package *)0)->data) - 1)
 #define MX_PACKAGE_SIZE sizeof(t_package)
 // sizeof((type *)0)->member)
+
 typedef struct  s_package {
     int client_sock; // #
     char piece; // 0 - full, 1 - start, 2 - partition, 3 - end
@@ -140,50 +138,39 @@ typedef struct  s_package {
     char data[1024]; // user data
 }               t_package;
 
-
 // server
 int mx_start_server(t_server_info *info);
-//void mx_set_daemon(const char *log_file);
 int mx_set_daemon(t_server_info *info);
-
+int mx_worker(int client_sock, t_server_info *info);
+int mx_tls_worker(struct tls *tls_accept, t_server_info *info);
 int mx_sign_in(t_server_info *i, t_package *p);
 int mx_update_socket(t_server_info *i, int client_sock, char *login);
 int mx_find_sock_in_db(t_server_info *i, char *login);
 int mx_drop_socket(t_server_info *i, int client_sock);
 int mx_authorization(t_server_info *i, t_package *p);
-
 int mx_check_client(t_server_info *info, t_package *p);
-int mx_worker(int client_sock, t_server_info *info);
-int mx_tls_worker(struct tls *tls_accept, t_server_info *info);
-
-int main2(int argc, char *argv[]);  // test adress
-void mx_report_tls(struct tls * tls_ctx, char * host);
+int mx_run_function_type(t_server_info *info, t_package *package);
+int mx_process_message_in_server(t_server_info *info, t_package *package);
+int mx_process_file_in_server(t_server_info *info, t_package *package);
 
 // client
 int mx_start_client(t_client_info *info);
-void mx_get_input(char *buffer);
-int mx_get_input2(char *buffer);
-
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
+void mx_process_message_in_client(t_client_info *info);
+void mx_send_file_from_client(t_client_info *info);
+void *mx_process_input_from_server(void *taken_info);
+int mx_send_message_from_client(t_client_info *info, t_package *package, char *message);
 
 // functions
 void mx_print_curr_time(void);
 void mx_print_tid(const char *s);
 void mx_err_exit(char *err_msg); // вивести помилку
 void mx_sha_hash_password(char *password);
-// Vova
-
-
-// client
-void mx_process_message_in_client(t_client_info *info);
-void mx_send_file_from_client(t_client_info *info);
-void *mx_process_input_from_server(void *taken_info);
-int mx_send_message_from_client(t_client_info *info, t_package *package, char *message);
-
-// server
-int mx_run_function_type(t_server_info *info, t_package *package);
-int mx_process_message_in_server(t_server_info *info, t_package *package);
-int mx_process_file_in_server(t_server_info *info, t_package *package);
+int addr_socet_info(int argc, char *argv[])  // test adress
+void mx_get_input(char *buffer);
+int mx_get_input2(char *buffer);
+int addr_socet_info(int argc, char *argv[])  // test adress
+void mx_report_tls(struct tls * tls_ctx, char * host);
 
 // funcs for package
 t_package *mx_create_new_package();

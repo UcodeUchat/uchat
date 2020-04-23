@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
     (*info).argv = argv;
     (*info).ip = argv[1];
     (*info).port = (uint16_t) atoi(argv[2]);
+    (*info).tls_client = NULL;
     if (mx_start_client(info)) {
         printf("error = %s\n", strerror(errno));
         return -1;
