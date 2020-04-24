@@ -70,7 +70,7 @@ static int create_server_socket(t_server_info *info) {
     printf("Configuring local address...\n");
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(info->port);
-    inet_aton("192.168.1.7", &serv_addr.sin_addr);
+    inet_aton("127.0.0.1", &serv_addr.sin_addr);
     if (bind(server_socket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
         printf("bind error = %s\n", strerror(errno));
         return -1;
