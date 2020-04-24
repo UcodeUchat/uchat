@@ -84,13 +84,13 @@ int mx_start_client(t_client_info *info) {
     create_client_socket(info);  // socket create and connect
     make_tls_connect(info); // tls connect and handshake
 
-    pthread_t thread_input;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED); // #
-    int tc = pthread_create(&thread_input, &attr, mx_process_input_from_server, info);
-    if (tc != 0)
-        printf("error = %s\n", strerror(tc));
+    // pthread_t thread_input;
+    // pthread_attr_t attr;
+    // pthread_attr_init(&attr);
+    // pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED); // #
+    // int tc = pthread_create(&thread_input, &attr, mx_process_input_from_server, info);
+    // if (tc != 0)
+    //     printf("error = %s\n", strerror(tc));
     mx_print_tid("main thread");
     //-- В этом месте начинается вечный цикл вплоть до закрытия окна чата
     mx_login(info);
@@ -144,7 +144,7 @@ int mx_authorization_client(t_client_info *info, char **login_for_exit) {
             printf("error write= %s\n", strerror(errno));
             return -1;
         }
-        size = read(info->socket, server_output, sizeof(server_output));
+        size = tls_read(info->tls_client, server_output, sizeof(server_output));
         if (size == 0) {
             printf("Closed connection\n");
             return -1;

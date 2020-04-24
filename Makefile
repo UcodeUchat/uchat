@@ -51,7 +51,7 @@ OBJ_HELP = err_exit.o \
 	package.o \
 	cryptographic_hash_f.o
 
-CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic# -g -fsanitize=address
+CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
 
 all: install clean
 

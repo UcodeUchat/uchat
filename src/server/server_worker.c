@@ -14,6 +14,8 @@ int mx_tls_worker(int client_sock, struct tls *tls_accept, t_server_info *info) 
         new_package->client_tls_sock = tls_accept;
         mx_run_function_type(info, new_package);
     }
+    else
+        printf("Readed 0 bytes\n");
     free(new_package);
     return 0;
 }
