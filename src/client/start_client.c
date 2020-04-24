@@ -140,7 +140,7 @@ int mx_authorization_client(t_client_info *info, char **login_for_exit) {
         //проверка на валидность введеных данных, надо доработать
         to_server = input_validation(login, pass, login_for_exit);
 
-        if (write(info->socket, to_server, strlen(to_server)) == -1) {
+        if (tls_write(info->tls_client, to_server, strlen(to_server)) == -1) {
             printf("error write= %s\n", strerror(errno));
             return -1;
         }

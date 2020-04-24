@@ -9,19 +9,19 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
 
         package->piece = 1;
         strncat(package->data, message, MX_MAX_DATA_SIZE);
-        write(info->socket, package, MX_PACKAGE_SIZE);
+        tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
         while ((pos_in_data += MX_MAX_DATA_SIZE) < msg_size) {
             package->piece = pos_in_data + MX_MAX_DATA_SIZE < msg_size ? 2 : 3;
             mx_memset(package->data, 0, MX_MAX_DATA_SIZE);
             strncat(package->data, message + pos_in_data, MX_MAX_DATA_SIZE);
-            write(info->socket, package, MX_PACKAGE_SIZE);
+            tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
         }
     }
     else {
         printf("send 1 piece\n"); // #
         package->piece = 0;
         strncat(package->data, message, MX_MAX_DATA_SIZE);
-        write(info->socket, package, MX_PACKAGE_SIZE);
+        tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
     }
     return 0;
 }

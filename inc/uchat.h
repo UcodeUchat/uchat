@@ -127,6 +127,7 @@ typedef struct  s_server_info {  // struct server
 // sizeof((type *)0)->member)
 
 typedef struct  s_package {
+    struct tls *client_tls_sock; // #
     int client_sock; // #
     char piece; // 0 - full, 1 - start, 2 - partition, 3 - end
     int user_id; // sender unical id
@@ -142,7 +143,7 @@ typedef struct  s_package {
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
 int mx_worker(int client_sock, t_server_info *info);
-int mx_tls_worker(struct tls *tls_accept, t_server_info *info);
+int mx_tls_worker(int client_sock, struct tls *tls_accept, t_server_info *info);
 int mx_sign_in(t_server_info *i, t_package *p);
 int mx_update_socket(t_server_info *i, int client_sock, char *login);
 int mx_find_sock_in_db(t_server_info *i, char *login);

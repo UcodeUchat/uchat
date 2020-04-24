@@ -30,12 +30,12 @@ void mx_send_file_from_client(t_client_info *info) {
     if (pick_file_to_send(&file_to_send, info, package) == 0) {
         int num_bytes = 1;
 
-        write(info->socket, package, MX_PACKAGE_SIZE);
+        tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
         mx_memset(package->data, 0, MX_MAX_DATA_SIZE);
         while(num_bytes > 0 && !feof(file_to_send)) {
             num_bytes = fread(package->data, 1, MX_MAX_DATA_SIZE, file_to_send);
             package->piece = feof(file_to_send) ? 3 : 2;
-            write(info->socket, package, MX_PACKAGE_SIZE);
+            tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
             mx_memset(package->data, 0, MX_MAX_DATA_SIZE);
         }
         fclose(file_to_send);

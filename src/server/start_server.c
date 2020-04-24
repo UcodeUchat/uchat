@@ -33,17 +33,18 @@ static struct tls *create_tls_configuration(t_server_info *info) {
     return tls;
 }
 
-static void make_tls_connect(struct tls *tls, struct tls *tls_array[], int client_sock) {
-    if(tls_accept_socket(tls, &tls_array[client_sock], client_sock) < 0) {
+static void make_tls_connect(struct tls *tls, struct tls **tls_array, int client_sock) {
+    printf("client_sock = %d\n", client_sock);
+    if(tls_accept_socket(tls, tls_array, client_sock) < 0) {
         printf("tls_accept_socket error\n");
         exit(1);
     }
-    if (tls_handshake(tls_array[client_sock]) < 0) {
+    if (tls_handshake(*tls_array) < 0) {
         printf("tls_handshake error\n");
-        printf("%s\n", tls_error(tls_array[client_sock]));
+        printf("%s\n", tls_error(*tls_array));
         exit(1);
     }
-    mx_report_tls(tls_array[client_sock], "new client ");
+    mx_report_tls(*tls_array, "new client ");
 //    tls_write(tls_array[client_sock], "TLS send server", strlen("TLS send server"));
     printf("\nClient connected successfully\n");
 }
@@ -69,7 +70,7 @@ static int create_server_socket(t_server_info *info) {
     printf("Configuring local address...\n");
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(info->port);
-    inet_aton("192.168.1.124", &serv_addr.sin_addr);
+    inet_aton("192.168.137.128", &serv_addr.sin_addr);
     if (bind(server_socket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
         printf("bind error = %s\n", strerror(errno));
         return -1;
@@ -150,7 +151,7 @@ int mx_start_server(t_server_info *info) {
                 printf("error = %s\n", strerror(errno));
                 break;
             }
-            make_tls_connect(tls, &tls_array[client_sock], client_sock);
+            make_tls_connect(tls, &(tls_array[client_sock]), client_sock);
         }
         else {  // if read from client
             printf("\t\t\twork with client %d\n", (int) new_ev.ident);
@@ -163,7 +164,7 @@ int mx_start_server(t_server_info *info) {
                 tls_free(tls_array[new_ev.ident]);
             }
             else {
-                int rc = mx_tls_worker(tls_array[new_ev.ident], info);
+                int rc = mx_tls_worker(new_ev.ident, tls_array[new_ev.ident], info);
                 if (rc == -1) {
                     printf("error = %s\n", strerror(errno));
                     break;
