@@ -220,10 +220,12 @@ void authentification(t_client_info **info, t_package *p) {
     tls_read((*info)->tls_client, answer, 2);
     // read(p->client_sock, answer, 1);
     fprintf(stderr, "ANSWER = [%s]\n", answer);
-    if (atoi(answer) == 1)
+    if (atoi(answer) == 1){
         (*info)->auth_client = 1;
-    else
+    }
+    else{
         (*info)->auth_client = 0;
+    }
     mx_strdel(&answer);
 }
 
@@ -248,7 +250,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
     p->client_sock = info->socket;
     authentification(&info, p);
     //authentification(info);
-    if (!info->auth_client) {
+    if (info->auth_client == 0) {
         pthread_cancel(login_msg_t);
         if (info->data->login_msg_flag) {
             gtk_widget_hide(info->data->login_msg);
@@ -266,7 +268,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         gtk_widget_show(info->data->stop);
         pthread_create(&login_msg_t, 0, login_msg_thread, info);
     }
-    else {
+    else if(info->auth_client == 1) {
         if (info->data->login_msg_flag)
             gtk_widget_hide(info->data->login_msg);
         GtkStyleContext *context;
@@ -361,7 +363,8 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
             room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
             if (strlen(str) > 15) {
                 str = strndup(str, 12);
-                strcat(str, "...");
+                str = mx_strjoin(str, "...");
+                //strcat(str, "...");
             }
             GtkWidget *label = gtk_label_new(str);
             gtk_notebook_append_page(GTK_NOTEBOOK(info->data->notebook), room->room_box, label);
