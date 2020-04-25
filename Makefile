@@ -13,7 +13,9 @@ SRC_SERVER = main_server.c \
 	run_function_type.c \
 	process_message_in_server.c \
 	process_file_in_server.c \
-	authorization.c
+	authorization.c \
+	work_with_socket_list.c \
+	work_with_socket_list_2.c \
 
 SRC_CLIENT = main_client.c \
     start_client.c \
@@ -37,7 +39,9 @@ OBJ_SERVER = main_server.o \
 	run_function_type.c \
 	process_message_in_server.o \
 	process_file_in_server.o \
-	authorization.o
+	authorization.o \
+	work_with_socket_list.o \
+	work_with_socket_list_2.o \
 
 OBJ_CLIENT = main_client.o \
     start_client.o \

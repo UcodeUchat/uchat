@@ -33,19 +33,19 @@ static struct tls *create_tls_configuration(t_server_info *info) {
     return tls;
 }
 
-static void make_tls_connect(struct tls *tls, struct tls **tls_array, int client_sock) {
+static void make_tls_connect(struct tls *tls, struct tls **tls_sock, int client_sock) {
     printf("client_sock = %d\n", client_sock);
-    if(tls_accept_socket(tls, tls_array, client_sock) < 0) {
+    if(tls_accept_socket(tls, tls_sock, client_sock) < 0) {
         printf("tls_accept_socket error\n");
         exit(1);
     }
-    if (tls_handshake(*tls_array) < 0) {
+    if (tls_handshake(*tls_sock) < 0) {
         printf("tls_handshake error\n");
-        printf("%s\n", tls_error(*tls_array));
+        printf("%s\n", tls_error(*tls_sock));
         exit(1);
     }
-    mx_report_tls(*tls_array, "new client ");
-//    tls_write(tls_array[client_sock], "TLS send server", strlen("TLS send server"));
+    mx_report_tls(*tls_sock, "new client ");
+//    tls_write(tls_sock, "TLS send server", strlen("TLS send server"));
     printf("\nClient connected successfully\n");
 }
 
@@ -82,21 +82,7 @@ int mx_start_server(t_server_info *info) {
     int server;
 
     struct tls *tls = NULL;
-    struct tls *tls_array[10];
-    struct tls *tls_accept3 = NULL;
-    struct tls *tls_accept4 = NULL;
-    struct tls *tls_accept5 = NULL;
-    struct tls *tls_accept6 = NULL;
-    struct tls *tls_accept7 = NULL;
-    struct tls *tls_accept8 = NULL;
-    struct tls *tls_accept9 = NULL;
-    tls_array[3] = tls_accept3;
-    tls_array[4] = tls_accept4;
-    tls_array[5] = tls_accept5;
-    tls_array[6] = tls_accept6;
-    tls_array[7] = tls_accept7;
-    tls_array[8] = tls_accept8;
-    tls_array[9] = tls_accept9;
+    struct tls *tls_socket = NULL;
 
     tls = create_tls_configuration(info);
     server = create_server_socket(info);
@@ -151,7 +137,9 @@ int mx_start_server(t_server_info *info) {
                 printf("error = %s\n", strerror(errno));
                 break;
             }
-            make_tls_connect(tls, &(tls_array[client_sock]), client_sock);
+            tls_socket = NULL;
+            make_tls_connect(tls, &tls_socket, client_sock);
+            mx_add_socket_elem(&(info->socket_list), client_sock, tls_socket);
         }
         else {  // if read from client
             printf("\t\t\twork with client %d\n", (int) new_ev.ident);
@@ -159,12 +147,10 @@ int mx_start_server(t_server_info *info) {
             if ((new_ev.flags & EV_EOF) != 0) {
                 printf("Client %lu disconnected\n", new_ev.ident);
                 mx_drop_socket(info, new_ev.ident);
-                close(new_ev.ident);
-                tls_close(tls_array[new_ev.ident]);
-                tls_free(tls_array[new_ev.ident]);
+                mx_delete_socket_elem(&(info->socket_list), new_ev.ident);
             }
             else {
-                int rc = mx_tls_worker(new_ev.ident, tls_array[new_ev.ident], info);
+                int rc = mx_tls_worker(mx_find_socket_elem(info->socket_list, new_ev.ident), info);
                 if (rc == -1) {
                     printf("error = %s\n", strerror(errno));
                     break;

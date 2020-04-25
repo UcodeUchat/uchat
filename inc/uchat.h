@@ -115,6 +115,7 @@ typedef struct  s_server_info {  // struct server
     char *ip; // my ip address
     uint16_t port;
     struct s_clients *clients; // структура де зберігаються усі клієнти, що приєдналися
+    struct  s_socket_list *socket_list;
     sqlite3 *db; // our database
     pthread_mutex_t mutex;
 }               t_server_info;
@@ -139,11 +140,19 @@ typedef struct  s_package {
     char data[1024]; // user data
 }               t_package;
 
+typedef struct  s_socket_list {
+    int socket;
+    struct tls *tls_socket;
+    struct s_socket_list *left;
+    struct s_socket_list *right;
+    struct s_socket_list *parent;
+}               t_socket_list;
+
 // server
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
 int mx_worker(int client_sock, t_server_info *info);
-int mx_tls_worker(int client_sock, struct tls *tls_accept, t_server_info *info);
+int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info);
 int mx_sign_in(t_server_info *i, t_package *p);
 int mx_update_socket(t_server_info *i, int client_sock, char *login);
 int mx_find_sock_in_db(t_server_info *i, char *login);
@@ -153,6 +162,17 @@ int mx_check_client(t_server_info *info, t_package *p);
 int mx_run_function_type(t_server_info *info, t_package *package);
 int mx_process_message_in_server(t_server_info *info, t_package *package);
 int mx_process_file_in_server(t_server_info *info, t_package *package);
+
+// (socket_list)
+t_socket_list *mx_create_socket_elem(int socket, struct tls *tls_socket,
+                                     t_socket_list *parent);
+void mx_add_socket_elem(t_socket_list **head, int sock, struct tls *tls_sock);
+t_socket_list *mx_get_min_socket_elem(t_socket_list *head);
+t_socket_list *mx_get_max_socket_elem(t_socket_list *head);
+t_socket_list *mx_find_socket_elem(t_socket_list *head, int socket);
+void mx_remove_socket_elem_by_link(t_socket_list **target);
+void mx_delete_socket_elem(t_socket_list **head, int socket);
+void mx_print_socket_tree(t_socket_list *head, const char *dir, int level);
 
 // client
 int mx_start_client(t_client_info *info);

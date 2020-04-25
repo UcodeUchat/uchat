@@ -1,17 +1,17 @@
 #include "uchat.h"
 
-int mx_tls_worker(int client_sock, struct tls *tls_accept, t_server_info *info) {
+int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info) {
     t_package *new_package = malloc(MX_PACKAGE_SIZE);
     int rc;
 
-    rc = tls_read(tls_accept, new_package, MX_PACKAGE_SIZE);	// get request
+    rc = tls_read(client_socket_list->tls_socket, new_package, MX_PACKAGE_SIZE);    // get request
     if (rc == -1) {
-        tls_close(tls_accept);
-        tls_free(tls_accept);
+        tls_close(client_socket_list->tls_socket);
+        tls_free(client_socket_list->tls_socket);
     }
     if (rc > 0) {
-        new_package->client_sock = client_sock;
-        new_package->client_tls_sock = tls_accept;
+        new_package->client_sock = client_socket_list->socket;
+        new_package->client_tls_sock = client_socket_list->tls_socket;
         mx_run_function_type(info, new_package);
     }
     else
