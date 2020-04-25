@@ -50,6 +50,7 @@ typedef struct s_room {
     int position;
     char *name;
     GtkWidget *room_box;
+    GtkWidget *message_box;
     GtkWidget *scrolled_window;
     GtkListStore *list;
     GtkWidget *messagesTreeView;
@@ -97,6 +98,7 @@ typedef struct  s_client_info {  //struct client
     int auth_client;
     pthread_mutex_t mutex;
     t_data *data;
+    int responce;
 }               t_client_info;
 
 #define MX_PATH_TO_DB "./server_db.bin"
@@ -122,9 +124,15 @@ typedef struct  s_server_info {  // struct server
     pthread_mutex_t mutex;
 }               t_server_info;
 
-#define MX_AUTH_TYPE 3
+
 #define MX_MSG_TYPE 1
 #define MX_FILE_TYPE 2
+#define MX_AUTH_TYPE 3
+#define MX_AUTH_TYPE_V 4
+#define MX_AUTH_TYPE_NV 5
+#define MX_REG_TYPE 6
+#define MX_REG_TYPE_V 7
+#define MX_REG_TYPE_NV 8
 #define MX_MAX_DATA_SIZE (int)(sizeof(((t_package *)0)->data) - 1)
 #define MX_PACKAGE_SIZE sizeof(t_package)
 // sizeof((type *)0)->member)
@@ -156,6 +164,10 @@ int mx_check_client(t_server_info *info, t_package *p);
 int mx_run_function_type(t_server_info *info, t_package *package);
 int mx_process_message_in_server(t_server_info *info, t_package *package);
 int mx_process_file_in_server(t_server_info *info, t_package *package);
+
+//reg
+int mx_registration(t_server_info *i, t_package *p);
+int mx_search_in_db(t_server_info *i, t_package *p, char *l, char *pa);
 
 // client
 int mx_start_client(t_client_info *info);
