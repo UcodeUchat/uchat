@@ -21,24 +21,25 @@ t_socket_list* deleteNode(t_socket_list *head, int socket) {
     if (head == NULL)
         return head; 
     if (socket < head->socket)
-        head->left = deleteNode(head->left, socket); 
-    else if (socket > head->socket) 
-        head->right = deleteNode(head->right, socket); 
-    else { 
-        if (head->left == NULL) { 
-            t_socket_list *temp = head->right; 
-            free(head); 
-            return temp; 
+        head->left = deleteNode(head->left, socket);
+    else if (socket > head->socket)
+        head->right = deleteNode(head->right, socket);
+    else {
+        if (head->left == NULL) {
+            t_socket_list *temp = head->right;
+            free(head);
+            return temp;
         }
-        else if (head->right == NULL) { 
-            t_socket_list *temp = head->left; 
-            free(head); 
-            return temp; 
+        else if (head->right == NULL) {
+            t_socket_list *temp = head->left;
+            free(head);
+            return temp;
         }
         else {
             t_socket_list *temp = mx_get_min_socket_elem(head->right);
 
             head->socket = temp->socket;
+            head->tls_socket = temp->tls_socket;
             head->right = deleteNode(head->right, temp->socket);
         }
     }
