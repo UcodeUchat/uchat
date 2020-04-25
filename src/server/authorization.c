@@ -6,13 +6,15 @@ int mx_authorization(t_server_info *i, t_package *p) {
 	mx_memset(p->data, 0, sizeof(p->data));
 	mx_memset(p->login, 0, sizeof(p->login));
 	mx_memset(p->password, 0, sizeof(p->password));
-	if (valid == 1){
+	if (valid == 1) {
+        p->type = MX_AUTH_TYPE_V;
 		p->add_info = MX_AUTH_TYPE_V;
 		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
 		//Vse kruto, chel in system
 		fprintf(stderr, "Your answer = 1\n");
 	}
 	else {
+        p->type = MX_AUTH_TYPE_NV;
 		p->add_info = MX_AUTH_TYPE_NV;
 		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
 		//Uvi, but go to dick :)
