@@ -95,6 +95,7 @@ typedef struct  s_client_info {  //struct client
     int auth_client;
     pthread_mutex_t mutex;
     t_data *data;
+    int responce;
 }               t_client_info;
 
 #define MX_PATH_TO_DB "./server_db.bin"
@@ -160,6 +161,10 @@ int mx_check_client(t_server_info *info, t_package *p);
 int mx_run_function_type(t_server_info *info, t_package *package);
 int mx_process_message_in_server(t_server_info *info, t_package *package);
 int mx_process_file_in_server(t_server_info *info, t_package *package);
+
+//reg
+int mx_registration(t_server_info *i, t_package *p);
+int mx_search_in_db(t_server_info *i, t_package *p, char *l, char *pa);
 
 // client
 int mx_start_client(t_client_info *info);

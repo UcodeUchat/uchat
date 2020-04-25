@@ -126,7 +126,8 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
         strncat(p->password, password, sizeof(p->password) - 1);
         p->type = MX_REG_TYPE;
         p->client_sock = info->socket;
-        mx_send_message_from_client(info, p, " ");
+        //mx_send_message_from_client(info, p, " ");
+        tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
 
         //wait responce from server
 
@@ -228,31 +229,13 @@ void reg_callback (GtkWidget *widget, t_client_info *info) {
     gtk_widget_set_name(button, "entry");
 }
 
-void authentification(t_client_info **info, t_package *p) {
-    // fprintf(stderr, "socket = [%d]\n", (*info)->socket);
-    char *answer = mx_strnew(1);
-    // char *done = NULL;
-    // char *massage не нужна, я сделал пока так, ибо при NULL - упадет strlen
-    mx_send_message_from_client(*info, p, " ");
-    mx_memset(p->data, 0, sizeof(p->data));
-    tls_read((*info)->tls_client, answer, 2);
-    // read(p->client_sock, answer, 1);
-    fprintf(stderr, "ANSWER = [%s]\n", answer);
-    if (atoi(answer) == 1){
-        (*info)->auth_client = 1;
-    }
-    else{
-        (*info)->auth_client = 0;
-    }
-    mx_strdel(&answer);
-}
+void authentification(t_client_info *info, t_package *p) {
+    tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
+    while (info->responce == 0) {
 
-// void authentification(t_client_info *info) {
-//     if (strcmp(info->login, "rrr") == 0)
-//         info->auth_client = 0;
-//     else
-//         info->auth_client = 1;
-// }
+    }
+    info->responce = 0;
+}
 
 void enter_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
@@ -266,8 +249,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
     strncat(p->password, info->password, sizeof(p->password) - 1);
     p->type = MX_AUTH_TYPE;
     p->client_sock = info->socket;
-    authentification(&info, p);
-    //authentification(info);
+    authentification(info, p);
     if (info->auth_client == 0) {
         pthread_cancel(login_msg_t);
         if (info->data->login_msg_flag) {
@@ -385,32 +367,12 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
             }
             GtkWidget *label = gtk_label_new(str);
             gtk_notebook_append_page(GTK_NOTEBOOK(info->data->notebook), room->room_box, label);
-            room->list = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
-            room->messagesTreeView = gtk_tree_view_new_with_model(GTK_TREE_MODEL(room->list));
-            GtkTreeViewColumn *column;
-            GtkCellRenderer *renderer;
-            renderer = gtk_cell_renderer_text_new();
-            g_object_set(G_OBJECT (renderer),"foreground", "red", NULL);
-            column = gtk_tree_view_column_new_with_attributes("Author", renderer,
-                                                              "text", 0,
-                                                              NULL);
-            gtk_tree_view_append_column(GTK_TREE_VIEW(room->messagesTreeView), column);
-            renderer = gtk_cell_renderer_text_new ();
-            column = gtk_tree_view_column_new_with_attributes("Message", renderer,
-                                                              "text", 1,
-                                                              NULL);
-            gtk_tree_view_append_column(GTK_TREE_VIEW(room->messagesTreeView), column);
             //--
             room->message_box = gtk_box_new(FALSE, 0);
             gtk_container_add(GTK_CONTAINER(room->scrolled_window), room->message_box);
             gtk_widget_show(room->message_box);
             gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);
             //--
-            //gtk_container_add(GTK_CONTAINER(room->scrolled_window), room->messagesTreeView);
-            gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(room->messagesTreeView), FALSE);
-            gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(room->messagesTreeView), FALSE);
-            gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(room->messagesTreeView)), GTK_SELECTION_NONE);
-           // gtk_widget_show(room->messagesTreeView);
         }
         gtk_widget_show(info->data->notebook);
         //--
