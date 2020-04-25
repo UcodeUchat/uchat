@@ -24,13 +24,12 @@ int mx_authorization(t_server_info *i, t_package *p) {
 }
 
 static int search_data(void *p, int argc, char **argv, char **col_name) {
-
     (void)p;
     (void)col_name;
     printf("argv[0] = %s\n", argv[0]);
-   	if (argc > 0)
-   		return 1;
-   	printf("Login is free!\n");
+    if (argc > 0)
+        return 1;
+    printf("Login is free!\n");
     return 0;
 }
 
@@ -47,19 +46,46 @@ int mx_search_in_db(t_server_info *i, t_package *p, char *l, char *pa) {
     return 1;
 }
 
+static int get_user_id(void *p, int argc, char **argv, char **col_name) {
+    int *id = (int *)p;
+
+    (void)col_name;
+    if (argc > 1 || !argv[0])
+        return 1;
+    printf("argv[0] = %s\n", argv[0]);
+    *id = atoi(argv[0]);
+    printf("id = %d\n", *id);
+    return 0;
+}
+
 int mx_add_to_db(t_server_info *i, t_package *p, char *l, char *pa){
-	char *command = malloc(1024);
+    char *command = malloc(1024);
+    char *command1 = malloc(1024);
+    int user_id = -1;
     
     (void)p;
     sprintf(command, "insert into users (socket, login, password, access)\
-				values (0,'%s', '%s', 1);", l, pa);
+                values (0,'%s', '%s', 1);\nselect user_id from users where\
+                login='%s'", l, pa, l);
     printf("%s\n", command);
-    if (sqlite3_exec(i->db, command, NULL, NULL, 0) != SQLITE_OK) {
+    if (sqlite3_exec(i->db, command, get_user_id, &user_id, 0) != SQLITE_OK) {
         printf("User with this login exist in our Uchat!\n");
         return -1;
     }
     printf("User has been added to the database!!\n");
     mx_strdel(&command);
+
+    printf("user_id = %d\n", user_id);
+    // add user in general room
+    sprintf(command1, "insert into rooms (room_id, user_id)\
+                values (0,%d);", user_id);
+    printf("%s\n", command1);
+    if (sqlite3_exec(i->db, command1, NULL, NULL, 0) != SQLITE_OK) {
+        printf("User_id wasnt added!\n");
+        return -1;
+    }
+    printf("User_id was added in rooms table\n");
+    mx_strdel(&command1);
     return 1;
 }
 
