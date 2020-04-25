@@ -100,9 +100,18 @@ void send_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 int validation (char *login, char *password, char *repeat_password) {
-    (void)login;
-    (void)password;
-    (void)repeat_password;
+    if (!login || strlen(login) < 6) {
+        printf("Твой логин хуйня\n");
+        return 0;
+    }
+    if (!password || strlen(password) < 6) {
+        printf("Твой пароль хуйня\n");
+        return 0;
+    }
+    if (strcmp(password, repeat_password) != 0) {
+        printf("Пароли не совпадают\n");
+        return 0;
+    }
     return 1;
 }
 
@@ -112,6 +121,15 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
     char *password = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->registration->password_entry));
     char *repeat = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->registration->repeat_password_entry));
     if (validation(login, password, repeat)) {
+        t_package *p = mx_create_new_package();
+        strncat(p->login, login, sizeof(p->login) - 1);
+        strncat(p->password, password, sizeof(p->password) - 1);
+        p->type = MX_REG_TYPE;
+        p->client_sock = info->socket;
+        mx_send_message_from_client(info, p, " ");
+
+        //wait responce from server
+
         gtk_widget_hide(info->data->register_box);
         gtk_entry_set_text(GTK_ENTRY(info->data->registration->login_entry), "");
         gtk_entry_set_text(GTK_ENTRY(info->data->registration->password_entry), "");
@@ -120,7 +138,7 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
         //succes thread
     }
     else {
-
+        printf("Не брат ты мне, гнида не завалидированная\n");
     }
 }
 
@@ -364,7 +382,6 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
             if (strlen(str) > 15) {
                 str = strndup(str, 12);
                 str = mx_strjoin(str, "...");
-                //strcat(str, "...");
             }
             GtkWidget *label = gtk_label_new(str);
             gtk_notebook_append_page(GTK_NOTEBOOK(info->data->notebook), room->room_box, label);
@@ -383,11 +400,17 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
                                                               "text", 1,
                                                               NULL);
             gtk_tree_view_append_column(GTK_TREE_VIEW(room->messagesTreeView), column);
-            gtk_container_add(GTK_CONTAINER(room->scrolled_window), room->messagesTreeView);
+            //--
+            room->message_box = gtk_box_new(FALSE, 0);
+            gtk_container_add(GTK_CONTAINER(room->scrolled_window), room->message_box);
+            gtk_widget_show(room->message_box);
+            gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);
+            //--
+            //gtk_container_add(GTK_CONTAINER(room->scrolled_window), room->messagesTreeView);
             gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(room->messagesTreeView), FALSE);
             gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(room->messagesTreeView), FALSE);
             gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(room->messagesTreeView)), GTK_SELECTION_NONE);
-            gtk_widget_show(room->messagesTreeView);
+           // gtk_widget_show(room->messagesTreeView);
         }
         gtk_widget_show(info->data->notebook);
         //--

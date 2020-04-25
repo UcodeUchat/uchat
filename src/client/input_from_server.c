@@ -33,6 +33,12 @@ void *mx_process_input_from_server(void *taken_info) {
             GtkTreeIter iter;
 //            info->data->current_room = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
             t_room *room = mx_find_room(info->data->rooms, input_package->room_id);
+            GtkWidget *box = gtk_box_new(FALSE, 0);
+            gtk_box_pack_start (GTK_BOX (room->message_box), box, FALSE, FALSE, 0);
+            gtk_widget_show(box);
+            GtkWidget *button = gtk_button_new_with_label(input_package->data);
+            gtk_box_pack_end (GTK_BOX (box), button, FALSE, FALSE, 0);
+            gtk_widget_show(button);
             gtk_list_store_append(GTK_LIST_STORE(room->list), &iter);
             gtk_list_store_set(GTK_LIST_STORE(room->list), &iter, 0, input_package->login, 1, input_package->data, -1);
             t_room *head = info->data->rooms;
