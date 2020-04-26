@@ -44,6 +44,7 @@
 #define BUFLEN 128
 #define QLEN 10
 #define HOST_NAME_MAX 256
+#define MAXINPUT 512
 
 typedef struct s_room {
     int id;
