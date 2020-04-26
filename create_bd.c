@@ -86,7 +86,7 @@ int main(int argc, char *argv[]){
 		}
 		sprintf(req, "\
 				create table users (\
-					user_id integer PRIMERY KEY, socket integer,\
+					user_id INTEGER PRIMARY KEY AUTOINCREMENT, socket integer,\
 					login text, password text, access integer);\n\
 				\
 				create table rooms (\
@@ -113,16 +113,16 @@ int main(int argc, char *argv[]){
 			exit(1);
 		}
 		sprintf(req2, "\
-				insert into users (user_id, socket, login, password, access)\
-				values (0, 0,'mmasniy', '123123', 1);\n\
-				insert into users (user_id, socket, login, password, access)\
-				values (1, 0,'vkmetyk', '123123', 1);\n\
-				insert into users (user_id, socket, login, password, access)\
-				values (2, 0,'snikolayen', '123123', 1);\n\
-				insert into users (user_id, socket, login, password, access)\
-				values (3, 0,'mlibovych', '123123', 1);\n\
-				insert into users (user_id, socket, login, password, access)\
-                values (4, 0,'neo', '1', 1);\n\
+				insert into users (socket, login, password, access)\
+				values (0,'mmasniy', '123123', 1);\n\
+				insert into users (socket, login, password, access)\
+				values (0,'vkmetyk', '123123', 1);\n\
+				insert into users (socket, login, password, access)\
+				values (0,'snikolayen', '123123', 1);\n\
+				insert into users (socket, login, password, access)\
+				values (0,'mlibovych', '123123', 1);\n\
+				insert into users (socket, login, password, access)\
+                values (0,'neo', '1', 1);\n\
 				values (0, 1);\n\
 				insert into rooms (room_id, user_id)\
 				values (0, 0);\n\
