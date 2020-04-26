@@ -237,6 +237,71 @@ void authentification(t_client_info *info, t_package *p) {
     info->responce = 0;
 }
 
+void close_menu_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info) {
+    (void)widget;
+    (void)event;
+    gtk_widget_hide(info->data->menu);
+}
+
+void menu_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    GtkStyleContext *context;
+    GtkCssProvider *provider = gtk_css_provider_new ();
+    gtk_css_provider_load_from_path (provider,"my_style.css", NULL);
+    info->data->menu = gtk_box_new(FALSE, 0);
+    gtk_widget_show(info->data->menu);
+    gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->menu, 0, 0);
+    gtk_widget_set_size_request(info->data->menu, gtk_widget_get_allocated_width (info->data->window), 
+                                gtk_widget_get_allocated_height (info->data->window));
+    GtkWidget *main_box = gtk_event_box_new();
+    gtk_box_pack_start (GTK_BOX (info->data->menu), main_box, FALSE, FALSE, 0);
+    gtk_widget_set_size_request(main_box, 150, -1);
+    gtk_widget_set_name (main_box, "menu_main");
+    context = gtk_widget_get_style_context (main_box);
+    gtk_style_context_add_provider (context,
+                                    GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+    GtkWidget *fixed = gtk_fixed_new();
+    gtk_container_add(GTK_CONTAINER(main_box), fixed);
+    GtkWidget *box = gtk_box_new(FALSE, 10);
+    gtk_widget_set_size_request(box, 150, -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(box), GTK_ORIENTATION_VERTICAL);
+    gtk_fixed_put (GTK_FIXED (fixed), box, 0, 10);
+    GtkWidget *box1 = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
+    GtkWidget *button = gtk_button_new_with_label("Create room");
+    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_show(button);
+    gtk_widget_show(box1);
+    box1 = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
+    button = gtk_button_new_with_label("Profile");
+    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_show(button);
+    gtk_widget_show(box1);
+    gtk_widget_show (box);
+    gtk_widget_show(fixed);
+    gtk_widget_show(main_box);
+    
+    GtkWidget *exit_box = gtk_event_box_new();
+    gtk_box_pack_start (GTK_BOX (info->data->menu), exit_box, TRUE, TRUE, 0);
+    gtk_widget_realize (exit_box);
+    gtk_widget_add_events (exit_box, GDK_BUTTON_PRESS_MASK);
+    g_signal_connect (G_OBJECT (exit_box), "button_press_event", G_CALLBACK (close_menu_callback), info);
+    gtk_widget_set_name (exit_box, "menu_exit");
+    context = gtk_widget_get_style_context (exit_box);
+    gtk_style_context_add_provider (context,
+                                    GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+    gtk_widget_show(exit_box);
+
+}
+
 void enter_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
     t_package *p = mx_create_new_package();
@@ -294,9 +359,11 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         //--
         //--Menu button
         info->data->menu_button = gtk_button_new();
-        //g_signal_connect(G_OBJECT(info->data->send_button), "clicked", G_CALLBACK(send_callback), info);
+        GtkWidget *image0 = gtk_image_new_from_file("a.png");
+        gtk_button_set_image(GTK_BUTTON(info->data->menu_button), image0);
+        g_signal_connect(G_OBJECT(info->data->menu_button), "clicked", G_CALLBACK(menu_callback), info);
         gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->menu_button, 10, 350);
-        gtk_widget_set_size_request(info->data->menu_button, 50, -1);
+        //gtk_widget_set_size_request(info->data->menu_button, 50, -1);
         gtk_widget_show(info->data->menu_button);
         //--
         //--Send button
@@ -308,8 +375,8 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         //--
         //--File selection
         info->data->file_button = gtk_button_new();
-        GtkWidget *image = gtk_image_new_from_file("c.png");
-        gtk_button_set_image(GTK_BUTTON(info->data->file_button), image);
+        GtkWidget *image1 = gtk_image_new_from_file("c.png");
+        gtk_button_set_image(GTK_BUTTON(info->data->file_button), image1);
         //g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info->data);
         gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->file_button, 600, 350);
         gtk_widget_show(info->data->file_button);

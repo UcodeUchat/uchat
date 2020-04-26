@@ -49,8 +49,6 @@ typedef struct s_room {
     GtkWidget *room_box;
     GtkWidget *message_box;
     GtkWidget *scrolled_window;
-    GtkListStore *list;
-    GtkWidget *messagesTreeView;
     GtkAdjustment *Adjust;
     struct s_room *next;
 }              t_room;
@@ -76,6 +74,7 @@ typedef struct s_data {
     GtkWidget *login_msg;
     GtkWidget *notebook;
     GtkWidget *stop;
+    GtkWidget *menu;
     t_room *rooms;
     t_reg *registration;
     gint current_room;
