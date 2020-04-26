@@ -1,8 +1,6 @@
 #include "uchat.h"
 
-pthread_t watcher;
 pthread_t login_msg_t;
-int send_flag = 0;
 
 void sleep_ms (int milliseconds) {
     struct timespec ts;
@@ -36,24 +34,6 @@ void *login_msg_thread (void *data) {
                 gtk_widget_hide(n_data->data->stop);
             }
         }
-    return 0;
-}
-
-void *watcher_thread (void *data) {
-    t_data *n_data = (t_data *)data;
-    gint current_room = gtk_notebook_get_current_page(GTK_NOTEBOOK(n_data->notebook));
-    t_room *room = find_room(n_data->rooms, current_room);
-
-    while (1) {
-        sleep_ms(100);
-        if (send_flag) {
-            sleep_ms(100);
-            gtk_adjustment_set_value(room->Adjust, 
-                gtk_adjustment_get_upper(room->Adjust) - 
-                gtk_adjustment_get_page_size(room->Adjust));
-            send_flag = 0;
-        }
-    }
     return 0;
 }
 
@@ -91,12 +71,13 @@ void push_room(t_room **list, void *name, int id) {
 
 void send_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
-    int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
-    t_room *room = find_room(info->data->rooms, position);
-    info->data->current_room = room->id;
-    mx_process_message_in_client(info);
-    gtk_entry_set_text(GTK_ENTRY(info->data->message_entry), "");
-    send_flag = 1;
+    if (strcmp(gtk_entry_get_text(GTK_ENTRY(info->data->message_entry)),"") != 0) {
+        int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
+        t_room *room = find_room(info->data->rooms, position);
+        info->data->current_room = room->id;
+        mx_process_message_in_client(info);
+        gtk_entry_set_text(GTK_ENTRY(info->data->message_entry), "");
+    }
 }
 
 int validation (char *login, char *password, char *repeat_password) {
@@ -152,13 +133,10 @@ void cancel_callback (GtkWidget *widget, t_client_info *info) {
     gtk_widget_show(info->data->login_box);
 }
 
-void reg_callback (GtkWidget *widget, t_client_info *info) {
-    (void)widget;
-
-    gtk_widget_hide(info->data->login_box);
+void init_reg(t_client_info *info) {
     info->data->register_box = gtk_fixed_new ();
     gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->register_box, 0, 0);
-    gtk_widget_show (info->data->register_box);
+    
 
     info->data->registration = (t_reg *)malloc(sizeof(t_reg));
     info->data->registration->login_entry = gtk_entry_new ();
@@ -229,6 +207,13 @@ void reg_callback (GtkWidget *widget, t_client_info *info) {
     gtk_widget_set_name(button, "entry");
 }
 
+
+void reg_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    gtk_widget_hide(info->data->login_box);
+    gtk_widget_show (info->data->register_box);
+}
+
 void authentification(t_client_info *info, t_package *p) {
     tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
     while (info->responce == 0) {
@@ -274,6 +259,7 @@ void menu_callback (GtkWidget *widget, t_client_info *info) {
     GtkWidget *button = gtk_button_new_with_label("Create room");
     gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
     gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_set_name(button, "entry");
     gtk_widget_show(button);
     gtk_widget_show(box1);
     box1 = gtk_box_new(FALSE, 0);
@@ -282,6 +268,7 @@ void menu_callback (GtkWidget *widget, t_client_info *info) {
     button = gtk_button_new_with_label("Profile");
     gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
     gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_set_name(button, "entry");
     gtk_widget_show(button);
     gtk_widget_show(box1);
     gtk_widget_show (box);
@@ -355,6 +342,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         g_signal_connect(G_OBJECT(info->data->message_entry),"activate", G_CALLBACK(send_callback), info);
         gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->message_entry, 65, 350);
         gtk_widget_set_size_request(info->data->message_entry, 445, -1);
+        gtk_widget_set_name(info->data->message_entry, "entry");
         gtk_widget_show(info->data->message_entry);
         //--
         //--Menu button
@@ -363,7 +351,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         gtk_button_set_image(GTK_BUTTON(info->data->menu_button), image0);
         g_signal_connect(G_OBJECT(info->data->menu_button), "clicked", G_CALLBACK(menu_callback), info);
         gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->menu_button, 10, 350);
-        //gtk_widget_set_size_request(info->data->menu_button, 50, -1);
+        gtk_widget_set_name(info->data->menu_button, "entry");
         gtk_widget_show(info->data->menu_button);
         //--
         //--Send button
@@ -371,6 +359,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         g_signal_connect(G_OBJECT(info->data->send_button), "clicked", G_CALLBACK(send_callback), info);
         gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->send_button, 520, 350);
         gtk_widget_set_size_request(info->data->send_button, 75, -1);
+        gtk_widget_set_name(info->data->send_button, "entry");
         gtk_widget_show(info->data->send_button);
         //--
         //--File selection
@@ -379,6 +368,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         gtk_button_set_image(GTK_BUTTON(info->data->file_button), image1);
         //g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info->data);
         gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->file_button, 600, 350);
+        gtk_widget_set_name(info->data->file_button, "entry");
         gtk_widget_show(info->data->file_button);
         //--
         //--notebook
@@ -435,7 +425,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
             GtkWidget *label = gtk_label_new(str);
             gtk_notebook_append_page(GTK_NOTEBOOK(info->data->notebook), room->room_box, label);
             //--
-            room->message_box = gtk_box_new(FALSE, 0);
+            room->message_box = gtk_box_new(FALSE, 5);
             gtk_container_add(GTK_CONTAINER(room->scrolled_window), room->message_box);
             gtk_widget_show(room->message_box);
             gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);
@@ -443,17 +433,16 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         }
         gtk_widget_show(info->data->notebook);
         //--
-        //--Send thread
-        pthread_create(&watcher, 0, watcher_thread, info->data);
-        //--
     }
     
 }
 
 int mx_login (t_client_info *info) {
-    GtkStyleContext *context;
     GtkCssProvider *provider = gtk_css_provider_new ();
     gtk_css_provider_load_from_path (provider,"my_style.css", NULL);
+    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
+                               GTK_STYLE_PROVIDER(provider),
+                               GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     info->data = (t_data *)malloc(sizeof(t_data));
     
@@ -482,11 +471,7 @@ int mx_login (t_client_info *info) {
     gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->login_box, 0, 0);
     gtk_widget_show (info->data->login_box);
     //--
-    gtk_widget_set_name(info->data->window, "back");
-    context = gtk_widget_get_style_context (info->data->window);
-    gtk_style_context_add_provider (context,
-                                    GTK_STYLE_PROVIDER(provider),
-                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+    gtk_widget_set_name(info->data->window, "back");  
     //--
     //--table
     GtkWidget *table = gtk_grid_new();
@@ -495,18 +480,11 @@ int mx_login (t_client_info *info) {
     GtkWidget *title1 = gtk_label_new("Ucode");
     gtk_widget_show (title1);
     gtk_widget_set_name(title1, "title1");
-    context = gtk_widget_get_style_context (title1);
-    gtk_style_context_add_provider (context,
-                                    GTK_STYLE_PROVIDER(provider),
-                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+    
     gtk_grid_attach (GTK_GRID (table), title1, 0, 0, 1, 1);
     GtkWidget *title2 = gtk_label_new("chat");
     gtk_widget_show (title2);
     gtk_widget_set_name(title2, "title2");
-    context = gtk_widget_get_style_context (title2);
-    gtk_style_context_add_provider (context,
-                                    GTK_STYLE_PROVIDER(provider),
-                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
     gtk_grid_attach (GTK_GRID (table), title2, 1, 0, 1, 1);
     //--
     info->data->stop = gtk_image_new_from_file("stop2.png");
@@ -525,10 +503,6 @@ int mx_login (t_client_info *info) {
     gtk_widget_show (box);
     gtk_widget_show (info->data->login_entry);
     gtk_widget_set_name(info->data->login_entry, "entry");
-    context = gtk_widget_get_style_context (info->data->login_entry);
-    gtk_style_context_add_provider (context,
-                                    GTK_STYLE_PROVIDER(provider),
-                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     info->data->password_entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (info->data->password_entry), 50);
@@ -543,10 +517,6 @@ int mx_login (t_client_info *info) {
     gtk_widget_show (box);
     gtk_widget_show (info->data->password_entry);
     gtk_widget_set_name(info->data->password_entry, "entry");
-    context = gtk_widget_get_style_context (info->data->password_entry);
-    gtk_style_context_add_provider (context,
-                                    GTK_STYLE_PROVIDER(provider),
-                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
                                                                
     GtkWidget *button = gtk_button_new_with_label("Sign in");
     g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (enter_callback),info);
@@ -558,12 +528,9 @@ int mx_login (t_client_info *info) {
     gtk_widget_show (box);
     gtk_widget_set_size_request(button, 100, -1);
     gtk_widget_show (button);
-    //gtk_button_set_relief (GTK_BUTTON(button), GTK_RELIEF_NONE);
     gtk_widget_set_name(button, "entry");
-    context = gtk_widget_get_style_context (button);
-    gtk_style_context_add_provider (context,
-                                    GTK_STYLE_PROVIDER(provider),
-                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+    init_reg(info);
 
     button = gtk_button_new_with_label("Registration");
     g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (reg_callback),info);
@@ -576,11 +543,8 @@ int mx_login (t_client_info *info) {
     gtk_widget_set_size_request(button, 100, -1);
     gtk_widget_show (button);
     gtk_widget_set_name(button, "entry");
-    context = gtk_widget_get_style_context (button);
-    gtk_style_context_add_provider (context,
-                                    GTK_STYLE_PROVIDER(provider),
-                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
     //--
+
     gtk_main();
     return 0;
 }

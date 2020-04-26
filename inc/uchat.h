@@ -172,6 +172,7 @@ void mx_process_message_in_client(t_client_info *info);
 void mx_send_file_from_client(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);
 int mx_send_message_from_client(t_client_info *info, t_package *package, char *message);
+void sleep_ms (int milliseconds);
 
 // functions
 void mx_print_curr_time(void);

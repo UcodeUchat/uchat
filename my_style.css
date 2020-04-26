@@ -78,3 +78,10 @@ entry#entry:focus {
 	background-color: black;
 }
 
+#message {
+	border-radius: 3px;
+	color: black;
+	background: DarkOrange;
+	background-color: DarkOrange;
+}
+
