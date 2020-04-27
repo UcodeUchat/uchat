@@ -47,6 +47,7 @@ typedef struct s_room {
     int position;
     char *name;
     GtkWidget *room_box;
+    GtkWidget *message_box;
     GtkWidget *scrolled_window;
     GtkListStore *list;
     GtkWidget *messagesTreeView;
@@ -94,6 +95,7 @@ typedef struct  s_client_info {  //struct client
     int auth_client;
     pthread_mutex_t mutex;
     t_data *data;
+    int responce;
 }               t_client_info;
 
 #define MX_PATH_TO_DB "./server_db.bin"
@@ -108,6 +110,12 @@ typedef struct  s_clients {
     struct s_clients *next;
 }               t_clients;
 
+//struct for work with db!
+typedef struct s_work {
+    int i;
+    int *array;
+}               t_work;
+
 typedef struct  s_server_info {  // struct server
     int argc;
     char **argv;
@@ -117,8 +125,11 @@ typedef struct  s_server_info {  // struct server
     struct s_clients *clients; // структура де зберігаються усі клієнти, що приєдналися
     sqlite3 *db; // our database
     pthread_mutex_t mutex;
+    struct s_work *wdb;
 }               t_server_info;
 
+
+#define MX_MAX_USERS_IN_ROOM 1024
 #define MX_MSG_TYPE 1
 #define MX_FILE_TYPE 2
 #define MX_AUTH_TYPE 3
@@ -144,6 +155,7 @@ typedef struct  s_package {
     char data[1024]; // user data
 }               t_package;
 
+
 // server
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
@@ -158,6 +170,9 @@ int mx_check_client(t_server_info *info, t_package *p);
 int mx_run_function_type(t_server_info *info, t_package *package);
 int mx_process_message_in_server(t_server_info *info, t_package *package);
 int mx_process_file_in_server(t_server_info *info, t_package *package);
+
+//get_users_sock_in_room
+int *mx_get_users_sock_in_room(t_server_info **i, int room);
 
 //reg
 int mx_registration(t_server_info *i, t_package *p);
@@ -188,15 +203,5 @@ t_package *mx_create_new_package();
 // krivoy dizayn
 int mx_login (t_client_info *info);
 
-//TABLE VALUE, WHICH CONTAINE PACKAGE!!
-/*
-    1 - сообщение
-    2 - файл
-    3 - авторизация
-    4 - авторизация успешна!
-    5 - авторизация неудачна
-    6 - регистрация
-    7 - регистрация успешна!
-    8 - регистрация неудачна
-*/
+//
 #endif

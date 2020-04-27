@@ -13,7 +13,8 @@ SRC_SERVER = main_server.c \
 	run_function_type.c \
 	process_message_in_server.c \
 	process_file_in_server.c \
-	authorization.c
+	authorization.c \
+	request_for_rooms.c
 
 SRC_CLIENT = main_client.c \
     start_client.c \
@@ -37,7 +38,8 @@ OBJ_SERVER = main_server.o \
 	run_function_type.c \
 	process_message_in_server.o \
 	process_file_in_server.o \
-	authorization.o
+	authorization.o \
+	request_for_rooms.o
 
 OBJ_CLIENT = main_client.o \
     start_client.o \
