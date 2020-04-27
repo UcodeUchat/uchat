@@ -188,7 +188,9 @@ void mx_get_input(char *buffer);
 int mx_get_input2(char *buffer);
 void mx_report_tls(struct tls * tls_ctx, char * host);
 void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
-void mx_send_mail(char *message);
+//void mx_send_mail(char *message);
+char *mx_date_to_char(void);
+void *mx_send_mail(void *message1);
 
 // funcs for package
 t_package *mx_create_new_package();

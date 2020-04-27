@@ -75,6 +75,16 @@ void mx_print_curr_time(void) {
     time_str[strlen(time_str) - 1] = '\0';
     printf("%s\t", time_str);
 }
+char *mx_date_to_char(void) {
+    time_t timer;
+    struct tm *timeinfo;
+    char date[128];
+
+    time(&timer);
+    timeinfo = gmtime(&timer);
+    strftime(date, 128, "%a, %d %b %Y %H:%M:%S +0000", timeinfo);
+    return strdup(date);
+}
 
 
 void mx_get_input(char *buffer) {
