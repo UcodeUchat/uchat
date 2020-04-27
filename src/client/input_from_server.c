@@ -56,11 +56,11 @@ void *mx_process_input_from_server(void *taken_info) {
                 data = mx_strjoin(tmp, input_package->data);
                 free(tmp);
                 GtkWidget *button = gtk_label_new(data);
-                gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_RIGHT);
                 free(data);
                 gtk_widget_set_name(button, "message");
                 sleep_ms(100);
                 if (input_package->user_id == info->id) {
+                    gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_RIGHT);
                     gtk_box_pack_end (GTK_BOX (h_box), button, FALSE, FALSE, 0);
                     gtk_widget_show(button);
                     sleep_ms(100);
@@ -69,6 +69,7 @@ void *mx_process_input_from_server(void *taken_info) {
                                             gtk_adjustment_get_page_size(room->Adjust));
                 }
                 else {
+                    gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_LEFT);
                     gtk_box_pack_start (GTK_BOX (h_box), button, FALSE, FALSE, 0);
                     gtk_widget_show(button);
                 }
