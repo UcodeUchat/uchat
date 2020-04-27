@@ -161,7 +161,7 @@ void *mx_send_mail(void *message1) {
     struct tls *tls_c = NULL;
     // char *hostname = "alt1.gmail-smtp-in.l.google.com.";
     char *hostname = "smtp.gmail.com";
-    char *sender = "zempro912@gmail.com";
+    char *sender = "uchat.server@gmail.com";
     char *receiver = "zempro911@gmail.com";
     char *subject = "UCHAT";
     char *port = "587";
@@ -170,7 +170,7 @@ void *mx_send_mail(void *message1) {
     emVtcHJvOTEyQGdtYWlsLmNvbQ==
     NDE0OTUwMDA=
     run in shell
-    perl -MMIME::Base64 -e 'print encode_base64("zempro912@gmail.com");'
+    perl -MMIME::Base64 -e 'print encode_base64("uchat.server@gmail.com");'
     perl -MMIME::Base64 -e 'print encode_base64("password");'
     */
 
@@ -199,10 +199,10 @@ void *mx_send_mail(void *message1) {
     send_format_tls(tls_c, "AUTH LOGIN\r\n");
     wait_on_response_tls(tls_c, 334);
 
-    send_format_tls(tls_c, "emVtcHJvOTEyQGdtYWlsLmNvbQ==\r\n");
+    send_format_tls(tls_c, "dWNoYXQuc2VydmVyQGdtYWlsLmNvbQ==\r\n");
     wait_on_response_tls(tls_c, 334);
 
-    send_format_tls(tls_c, "NDE0OTUwMDA=\r\n");
+    send_format_tls(tls_c, "MTk5NDI0MjRx\r\n");
     wait_on_response_tls(tls_c, 235);
 
     send_format_tls(tls_c, "MAIL FROM:<%s>\r\n", sender);
