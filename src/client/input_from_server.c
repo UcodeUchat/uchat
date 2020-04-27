@@ -51,8 +51,13 @@ void *mx_process_input_from_server(void *taken_info) {
                 gtk_box_pack_start (GTK_BOX (room->message_box), h_box, FALSE, FALSE, 0);
                 gtk_widget_show(h_box);
                 char *data = mx_strjoin(input_package->login, "\n");
-                data = mx_strjoin(data, input_package->data);
-                GtkWidget *button = gtk_button_new_with_label(data);
+                char *tmp = strdup(data);
+                free(data);
+                data = mx_strjoin(tmp, input_package->data);
+                free(tmp);
+                GtkWidget *button = gtk_label_new(data);
+                gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_RIGHT);
+                free(data);
                 gtk_widget_set_name(button, "message");
                 sleep_ms(100);
                 if (input_package->user_id == info->id) {
