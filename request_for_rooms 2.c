@@ -8,7 +8,7 @@ static void init_work_for_db(t_server_info **i) {
 }
 
 static int get_user_id(void *wdb, int argc, char **argv, char **col_name) {
-	t_work *wdb1 = (t_work *)wdb;
+	t_work *wdb1 = *(t_work *)wdb;
 	int j = 0;
 
     (void)col_name;

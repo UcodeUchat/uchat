@@ -113,7 +113,8 @@ typedef struct  s_clients {
 //struct for work with db!
 typedef struct s_work {
     int i;
-    int *array;
+    int *user_id;
+    int *user_sock;
 }               t_work;
 
 typedef struct  s_server_info {  // struct server

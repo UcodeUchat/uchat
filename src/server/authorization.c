@@ -20,9 +20,10 @@ int mx_authorization(t_server_info *i, t_package *p) {
 		//Uvi, but go to dick :)
 		fprintf(stderr, "Your answer = 0\n");
 	}
-
-    int *array = mx_get_users_sock_in_room(&i, 0);
-    (void)array;
+    if (p->type == MX_AUTH_TYPE_V){
+        int *array = mx_get_users_sock_in_room(&i, 0);
+        (void)array;
+    }
 	return 1;
 }
 
@@ -80,7 +81,7 @@ int mx_add_to_db(t_server_info *i, t_package *p, char *l, char *pa){
 
     printf("user_id = %d\n", user_id);
     // add user in general room
-    sprintf(command1, "insert into rooms (room_id, user_id)\
+    sprintf(command1, "insert into room_user (room_id, user_id)\
                 values (0,%d);", user_id);
     printf("%s\n", command1);
     if (sqlite3_exec(i->db, command1, NULL, NULL, 0) != SQLITE_OK) {
