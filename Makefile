@@ -1,8 +1,15 @@
 NAME_S = uchat_server
 NAME_C = uchat
 
+SRCD = src
+INCD = inc
+OBJD = obj
 
-INC = uchat.h
+LMXD	=	libmx
+LMXA:=	$(LMXD)/libmx.a
+LMXI:=	$(LMXD)/inc
+
+INCS = inc/uchat.h
 
 SRC_SERVER = main_server.c \
     start_server.c \
@@ -25,64 +32,73 @@ SRC_CLIENT = main_client.c \
 	input_from_server.c \
 	login.c \
 
-
+# SRC_HELP = $(wildcard *.c)
 SRC_HELP = err_exit.c \
     functions.c \
 	package.c \
 	cryptographic_hash_f.c
 
-OBJ_SERVER = main_server.o \
-    start_server.o \
-    set_daemon.o \
-    server_worker.o \
-    work_with_db.o \
-    request_for_bd.o \
-	run_function_type.c \
-	process_message_in_server.o \
-	process_file_in_server.o \
-	authorization.o \
-	work_with_socket_list.o \
-	work_with_socket_list_2.o \
-	request_for_rooms.o
+INCLUDE = -I $(LBMXD) \
+	-I $(INCD) \
 
-OBJ_CLIENT = main_client.o \
-    start_client.o \
-	send_message.o \
-	send_file.o \
-	input_from_server.o \
-	login.o \
+SRCS_SERVER = $(addprefix $(SRCD)/server/, $(SRC_SERVER))
+SRCS_CLIENT = $(addprefix $(SRCD)/client/, $(SRC_CLIENT))
+SRCS_HELP = $(addprefix $(SRCD)/functions/, $(SRC_HELP))
 
-OBJ_HELP = err_exit.o \
-    functions.o \
-	package.o \
-	cryptographic_hash_f.o
+OBJS_SERVER = $(addprefix $(OBJD)/, $(SRC_SERVER:%.c=%.o))
+OBJS_CLIENT = $(addprefix $(OBJD)/, $(SRC_CLIENT:%.c=%.o))
+OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
 
-all: install clean
+TLSFLAGS =  -lcrypto -lssl -ltls
+SQLFLAGS = -lsqlite3
 
-install:
-	#@make install -C libmx
-	@cp $(addprefix inc/, $(INC)) .
-	@cp $(addprefix src/server/, $(SRC_SERVER)) .
-	@cp $(addprefix src/client/, $(SRC_CLIENT)) .
-	@cp $(addprefix src/functions/, $(SRC_HELP)) .
-	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -c $(SRC_SERVER)  $(SRC_HELP) -I $(INC) 
-	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -c $(SRC_CLIENT)  $(SRC_HELP) -I $(INC) 
-	@clang $(CFLAGS)  `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJ_SERVER) $(OBJ_HELP) -o $(NAME_S) -lsqlite3 -lcrypto -lssl -ltls
-	@clang $(CFLAGS)  `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJ_CLIENT) $(OBJ_HELP) -o $(NAME_C) -lsqlite3 -lcrypto -lssl -ltls
-	@mkdir -p obj
-	@mv $(OBJ_SERVER) $(OBJ_CLIENT) $(OBJ_HELP) ./obj
+all: install
 
-uninstall: clean
-	#@make uninstall -C libmx
-	@rm -rf $(NAME_S) $(NAME_C)
+install: $(LMXA) $(NAME_S) $(NAME_C)
+
+$(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS)
+	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
+
+$(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS)
+	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
+
+$(OBJD)/%.o: src/server/%.c $(INCS)
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@printf "\r\33[2K  \033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
+
+$(OBJD)/%.o: src/client/%.c $(INCS)
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@printf "\r\33[2K  \033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
+
+$(OBJD)/%.o: src/functions/%.c $(INCS)
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@printf "\r\33[2K  \033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
+
+$(OBJS_SERVER): | $(OBJD)
+
+$(OBJS_CLIENT): | $(OBJD)
+
+$(OBJS_HELP): | $(OBJD)
+
+$(OBJD):
+	@mkdir -p $@
+
+# $(LMXA):
+# 	@make -sC $(LMXD)
 
 clean:
-	#@make clean -C libmx
-	@rm -rf $(INC)
-	@rm -rf $(SRC) $(SRC_SERVER) $(SRC_CLIENT) $(SRC_HELP)
-	@rm -rf $(OBJ) $(OBJ_SERVER) $(OBJ_CLIENT) $(OBJ_HELP)
-	@rm -rf ./obj
+	@rm -rf $(OBJD)
+	@printf "$(OBJD)\t   \033[31;1mdeleted\033[0m\n"
+
+uninstall: clean
+#     @make uninstall -C libmx
+	@rm -rf $(NAME_S) $(NAME_C)
+    @make -C ./libmx/ uninstall
+	@printf "$(NAME_S)\t   \033[31;1muninstalled\033[0m\n"
+	@printf "$(NAME_C)\t   \033[31;1muninstalled\033[0m\n"
 
 reinstall: uninstall install

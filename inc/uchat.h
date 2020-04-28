@@ -34,7 +34,7 @@
 
 #include <gtk/gtk.h>
 #include <tls.h>
-#include "libmx/inc/libmx.h"
+#include "../../libmx/inc/libmx.h"
 
 #define MAX_CLIENT_INPUT 1024
 #define REPORT_FILENAME "server_log.txt"
