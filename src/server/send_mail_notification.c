@@ -2,11 +2,14 @@
 
 static void send_format(int socket, const char *text, ...) {
     char buffer[1024];
+
+    /*
     va_list args;
     va_start(args, text);
     vsprintf(buffer, text, args);
     va_end(args);
-
+*/
+    strcpy(buffer, text);
     send(socket, buffer, strlen(buffer), 0);
     printf("C: %s", buffer);
 }
