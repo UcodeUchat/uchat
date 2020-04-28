@@ -150,13 +150,13 @@ int main(int argc, char *argv[]){
 				insert into rooms (id, name, access)\
 				values (0, 'General', 1);\n\
 				insert into room_user(room_id, user_id)\
-				values (0, 0);\n\
-				insert into room_user (room_id, user_id)\
 				values (0, 1);\n\
 				insert into room_user (room_id, user_id)\
 				values (0, 2);\n\
 				insert into room_user (room_id, user_id)\
 				values (0, 3);\n\
+				insert into room_user (room_id, user_id)\
+				values (0, 4);\n\
 				insert into msg_history (id, user_id, room_id, message,\
 				addition_cont)\
 				values (0, 0, 0, 'hello', 'mes');");
