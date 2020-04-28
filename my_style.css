@@ -67,3 +67,20 @@ entry#entry:focus {
 	caret-color: DarkOrange;
 }
 
+#menu_main {
+	color: #F6F4F3;
+	background: rgba(255, 140, 0, 0.5);
+}
+
+#menu_exit {
+	color: #F6F4F3;
+	opacity: .22;
+	background-color: black;
+}
+
+#message {
+	border-radius: 5px;
+	color: black;
+	background-color: DarkOrange;
+}
+

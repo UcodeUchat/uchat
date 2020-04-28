@@ -7,8 +7,8 @@ static int check_data(void *p, int argc, char **argv, char **col_name) {
     for(int i = 0; argv[i]; i++)
         printf("argv[%i] = %s\n", i, argv[i]);
     printf("pass = %s\n", p1->password);
-    if (argv[0] && strcmp(argv[0], p1->password) == 0){
-        p1->type = 100;
+    if (argv[0] && strcmp(argv[0], p1->password) == 0) {
+        p1->user_id = atoi(argv[1]);
         return 0;
     }
     return 1;
@@ -31,13 +31,12 @@ static int check_socket(void *rep, int argc, char **argv, char **col_name) {
 int mx_sign_in(t_server_info *i, t_package *p) {
     char *command = malloc(1024);
 
-    sprintf(command, "SELECT password FROM users WHERE login='%s'", p->login);
+    sprintf(command, "SELECT password, id FROM users WHERE login='%s'", p->login);
     printf("%s\n", command);
     if (sqlite3_exec(i->db, command, check_data, p, 0) != SQLITE_OK) {
         printf("Check your login or password\n");
         return -1;
     }
-    fprintf(stderr, "type = [%d]\n", p->type);
 
     if ((mx_update_socket(i, p->client_sock, p->login)) == -1)
         printf("Socket wasn`t update\n");

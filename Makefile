@@ -16,6 +16,7 @@ SRC_SERVER = main_server.c \
 	authorization.c \
 	work_with_socket_list.c \
 	work_with_socket_list_2.c \
+	request_for_rooms.c \
 
 SRC_CLIENT = main_client.c \
     start_client.c \
@@ -42,6 +43,7 @@ OBJ_SERVER = main_server.o \
 	authorization.o \
 	work_with_socket_list.o \
 	work_with_socket_list_2.o \
+	request_for_rooms.o
 
 OBJ_CLIENT = main_client.o \
     start_client.o \

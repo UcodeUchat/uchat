@@ -28,21 +28,61 @@ void *mx_process_input_from_server(void *taken_info) {
             mx_err_exit("error recv\n");
         if (rc != 0) {
             //mx_print_curr_time();
-            //printf("input: piece.%d, type.%d, login.%s\n", input_package->piece, input_package->type,
-                   //input_package->login);
-            GtkTreeIter iter;
-//            info->data->current_room = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
-            t_room *room = mx_find_room(info->data->rooms, input_package->room_id);
-            gtk_list_store_append(GTK_LIST_STORE(room->list), &iter);
-            gtk_list_store_set(GTK_LIST_STORE(room->list), &iter, 0, input_package->login, 1, input_package->data, -1);
-            t_room *head = info->data->rooms;
-            while (head != NULL) {
-                if (head && head->position < room->position)
-                    head->position = head->position + 1;
-                head = head->next;
+            if (input_package->add_info == MX_AUTH_TYPE || input_package->add_info == MX_AUTH_TYPE_V ||
+                input_package->add_info == MX_AUTH_TYPE_NV) {
+                if ((*info).auth_client == 0){
+                    fprintf(stderr, "ANSWER = [%d]\n", input_package->add_info);
+                    if (input_package->add_info == 4) {
+                        info->id = input_package->user_id;
+                        (*info).auth_client = 1;
+                    }
+                    else
+                        (*info).auth_client = 0;
+                    fprintf(stderr, "(*info).auth_client = [%d]\n", (*info).auth_client);
+                    (*info).responce = 1;
+                }
             }
-            room->position = 0;
-            gtk_notebook_reorder_child(GTK_NOTEBOOK(info->data->notebook), room->room_box, 0);
+            else if (input_package->add_info == MX_REG_TYPE) {
+
+            }
+            else if (input_package->add_info == MX_MSG_TYPE) {
+                t_room *room = mx_find_room(info->data->rooms, input_package->room_id);
+                GtkWidget *h_box = gtk_box_new(FALSE, 0);
+                gtk_box_pack_start (GTK_BOX (room->message_box), h_box, FALSE, FALSE, 0);
+                gtk_widget_show(h_box);
+                char *data = mx_strjoin(input_package->login, "\n");
+                char *tmp = strdup(data);
+                free(data);
+                data = mx_strjoin(tmp, input_package->data);
+                free(tmp);
+                GtkWidget *button = gtk_label_new(data);
+                free(data);
+                gtk_widget_set_name(button, "message");
+                sleep_ms(100);
+                if (input_package->user_id == info->id) {
+                    gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_RIGHT);
+                    gtk_box_pack_end (GTK_BOX (h_box), button, FALSE, FALSE, 0);
+                    gtk_widget_show(button);
+                    sleep_ms(100);
+                    gtk_adjustment_set_value(room->Adjust, 
+                                            gtk_adjustment_get_upper(room->Adjust) - 
+                                            gtk_adjustment_get_page_size(room->Adjust));
+                }
+                else {
+                    gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_LEFT);
+                    gtk_box_pack_start (GTK_BOX (h_box), button, FALSE, FALSE, 0);
+                    gtk_widget_show(button);
+                }
+                
+                t_room *head = info->data->rooms;
+                while (head != NULL) {
+                    if (head && head->position < room->position)
+                        head->position = head->position + 1;
+                    head = head->next;
+                }
+                room->position = 0;
+                gtk_notebook_reorder_child(GTK_NOTEBOOK(info->data->notebook), room->room_box, 0);
+            }         
         }
     }
 

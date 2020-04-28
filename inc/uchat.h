@@ -47,9 +47,8 @@ typedef struct s_room {
     int position;
     char *name;
     GtkWidget *room_box;
+    GtkWidget *message_box;
     GtkWidget *scrolled_window;
-    GtkListStore *list;
-    GtkWidget *messagesTreeView;
     GtkAdjustment *Adjust;
     struct s_room *next;
 }              t_room;
@@ -75,6 +74,7 @@ typedef struct s_data {
     GtkWidget *login_msg;
     GtkWidget *notebook;
     GtkWidget *stop;
+    GtkWidget *menu;
     t_room *rooms;
     t_reg *registration;
     gint current_room;
@@ -94,6 +94,7 @@ typedef struct  s_client_info {  //struct client
     int auth_client;
     pthread_mutex_t mutex;
     t_data *data;
+    int responce;
 }               t_client_info;
 
 #define MX_PATH_TO_DB "./server_db.bin"
@@ -108,6 +109,13 @@ typedef struct  s_clients {
     struct s_clients *next;
 }               t_clients;
 
+//struct for work with db!
+typedef struct s_work {
+    int i;
+    int *user_id;
+    int *user_sock;
+}               t_work;
+
 typedef struct  s_server_info {  // struct server
     int argc;
     char **argv;
@@ -118,11 +126,19 @@ typedef struct  s_server_info {  // struct server
     struct  s_socket_list *socket_list;
     sqlite3 *db; // our database
     pthread_mutex_t mutex;
+    struct s_work *wdb;
 }               t_server_info;
 
-#define MX_AUTH_TYPE 3
+
+#define MX_MAX_USERS_IN_ROOM 1024
 #define MX_MSG_TYPE 1
 #define MX_FILE_TYPE 2
+#define MX_AUTH_TYPE 3
+#define MX_AUTH_TYPE_V 4
+#define MX_AUTH_TYPE_NV 5
+#define MX_REG_TYPE 6
+#define MX_REG_TYPE_V 7
+#define MX_REG_TYPE_NV 8
 #define MX_MAX_DATA_SIZE (int)(sizeof(((t_package *)0)->data) - 1)
 #define MX_PACKAGE_SIZE sizeof(t_package)
 // sizeof((type *)0)->member)
@@ -174,6 +190,13 @@ void mx_remove_socket_elem_by_link(t_socket_list **target);
 void mx_delete_socket_elem(t_socket_list **head, int socket);
 void mx_print_socket_tree(t_socket_list *head, const char *dir, int level);
 
+//get_users_sock_in_room
+int *mx_get_users_sock_in_room(t_server_info **i, int room);
+
+//reg
+int mx_registration(t_server_info *i, t_package *p);
+int mx_search_in_db(t_server_info *i, t_package *p, char *l, char *pa);
+
 // client
 int mx_start_client(t_client_info *info);
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
@@ -181,6 +204,7 @@ void mx_process_message_in_client(t_client_info *info);
 void mx_send_file_from_client(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);
 int mx_send_message_from_client(t_client_info *info, t_package *package, char *message);
+void sleep_ms (int milliseconds);
 
 // functions
 void mx_print_curr_time(void);

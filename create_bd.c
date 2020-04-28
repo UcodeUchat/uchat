@@ -33,7 +33,26 @@ static int print_users(void *status, int argc, char **argv, char **in) {
 
 static int print_rooms(void *status, int argc, char **argv, char **in) {
 	if (*(int *)status == 0) {
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 3; i++) {
+			if (i != 2)
+				printf("%s \t", in[i]);
+		}
+		printf("\t%s", in[2]);
+		printf("\n");
+		(*(int *)status)++;
+	}
+	for (int i = 0; argv[i]; i++) {
+		printf("%s ", argv[i]);
+		if (strlen(argv[i]) <= 8)
+			printf("\t");
+	}
+	printf("\n");
+	return 0;
+}
+
+static int print_room_user(void *status, int argc, char **argv, char **in) {
+	if (*(int *)status == 0) {
+		for (int i = 0; i < 3; i++) {
 			printf("%s ", in[i]);
 		}
 		printf("\n");
@@ -86,18 +105,23 @@ int main(int argc, char *argv[]){
 		}
 		sprintf(req, "\
 				create table users (\
-					user_id integer PRIMERY KEY, socket integer,\
+					id INTEGER PRIMARY KEY AUTOINCREMENT, socket integer,\
 					login text, password text, access integer);\n\
 				\
 				create table rooms (\
-					room_id integer PRIMERY KEY, user_id integer, \
-					FOREIGN KEY (user_id) REFERENCES users (user_id));\n\
+					id integer PRIMERY KEY, name text, access integer);\n\
 				\
-				create table msg_history (message_id integer PRIMERY KEY,\
+				create table room_user (\
+					id INTEGER PRIMARY KEY AUTOINCREMENT, room_id integer,\
+					user_id integer,\
+					FOREIGN KEY (user_id) REFERENCES users (id)\
+					FOREIGN KEY (room_id) REFERENCES rooms (id));\n\
+				\
+				create table msg_history (id integer PRIMERY KEY,\
 					user_id integer, room_id integer, message text,\
 					addition_cont text, time data,\
-					FOREIGN KEY (user_id) REFERENCES users (user_id),\
-					FOREIGN KEY (room_id) REFERENCES rooms (room_id));\n");
+					FOREIGN KEY (user_id) REFERENCES users (id),\
+					FOREIGN KEY (room_id) REFERENCES rooms (id));\n");
 		sql = sqlite3_exec(db, req, 0, 0, &err);
 		if (err)
 			fprintf(stderr, "%s\n", err);
@@ -113,26 +137,29 @@ int main(int argc, char *argv[]){
 			exit(1);
 		}
 		sprintf(req2, "\
-				insert into users (user_id, socket, login, password, access)\
-				values (0, 0,'mmasniy', '123123', 1);\n\
-				insert into users (user_id, socket, login, password, access)\
-				values (1, 0,'vkmetyk', '123123', 1);\n\
-				insert into users (user_id, socket, login, password, access)\
-				values (2, 0,'snikolayen', '123123', 1);\n\
-				insert into users (user_id, socket, login, password, access)\
-				values (3, 0,'mlibovych', '123123', 1);\n\
-				insert into users (user_id, socket, login, password, access)\
-                values (4, 0,'neo', '1', 1);\n\
+				insert into users (socket, login, password, access)\
+				values (100,'mmasniy', '123123', 1);\n\
+				insert into users (socket, login, password, access)\
+				values (110,'vkmetyk', '123123', 1);\n\
+				insert into users (socket, login, password, access)\
+				values (120,'snikolayen', '123123', 1);\n\
+				insert into users (socket, login, password, access)\
+				values (130,'mlibovych', '123123', 1);\n\
+				insert into users (socket, login, password, access)\
+                values (0,'neo', '1', 1);\n\
+				insert into rooms (id, name, access)\
+				values (0, 'General', 1);\n\
+				insert into room_user(room_id, user_id)\
 				values (0, 1);\n\
-				insert into rooms (room_id, user_id)\
-				values (0, 0);\n\
-				insert into rooms (room_id, user_id)\
-				values (0, 1);\n\
-				insert into rooms (room_id, user_id)\
+				insert into room_user (room_id, user_id)\
 				values (0, 2);\n\
-				insert into rooms (room_id, user_id)\
+				insert into room_user (room_id, user_id)\
 				values (0, 3);\n\
-				insert into msg_history (message_id, user_id, room_id, message,\
+				insert into room_user (room_id, user_id)\
+				values (0, 4);\n\
+				insert into room_user (room_id, user_id)\
+				values (0, 5);\n\
+				insert into msg_history (id, user_id, room_id, message,\
 				addition_cont)\
 				values (0, 0, 0, 'hello', 'mes');");
 		sql = sqlite3_exec(db, req2, 0, 0, &err);
@@ -168,6 +195,22 @@ int main(int argc, char *argv[]){
 		}
 		sprintf(req4, "select * from rooms;");
 		sql = sqlite3_exec(db, req4, print_rooms, &count1, &err);
+		if (err)
+			fprintf(stderr, "%s\n", err);
+		sqlite3_free(err);
+
+		printf("\n\n");
+
+		char req6[SIZE_RQ];
+		int count3 = 0;
+		sql = sqlite3_open(MX_PATH_TO_DB, &db);
+		if (sql != SQLITE_OK) {
+			fprintf(stderr, "Can't open db: %s\n", sqlite3_errmsg(db));
+			sqlite3_close(db);
+			exit(1);
+		}
+		sprintf(req6, "select * from room_user;");
+		sql = sqlite3_exec(db, req6, print_room_user, &count3, &err);
 		if (err)
 			fprintf(stderr, "%s\n", err);
 		sqlite3_free(err);
