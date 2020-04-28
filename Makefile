@@ -97,7 +97,7 @@ clean:
 uninstall: clean
 #     @make uninstall -C libmx
 	@rm -rf $(NAME_S) $(NAME_C)
-    @make -C ./libmx/ uninstall
+	@make -C ./libmx/ uninstall
 	@printf "$(NAME_S)\t   \033[31;1muninstalled\033[0m\n"
 	@printf "$(NAME_C)\t   \033[31;1muninstalled\033[0m\n"
 
