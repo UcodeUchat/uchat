@@ -49,8 +49,6 @@ typedef struct s_room {
     GtkWidget *room_box;
     GtkWidget *message_box;
     GtkWidget *scrolled_window;
-    GtkListStore *list;
-    GtkWidget *messagesTreeView;
     GtkAdjustment *Adjust;
     struct s_room *next;
 }              t_room;
@@ -76,6 +74,7 @@ typedef struct s_data {
     GtkWidget *login_msg;
     GtkWidget *notebook;
     GtkWidget *stop;
+    GtkWidget *menu;
     t_room *rooms;
     t_reg *registration;
     gint current_room;
@@ -156,7 +155,6 @@ typedef struct  s_package {
     char data[1024]; // user data
 }               t_package;
 
-
 // server
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
@@ -172,6 +170,7 @@ int mx_run_function_type(t_server_info *info, t_package *package);
 int mx_process_message_in_server(t_server_info *info, t_package *package);
 int mx_process_file_in_server(t_server_info *info, t_package *package);
 
+
 //get_users_sock_in_room
 int *mx_get_users_sock_in_room(t_server_info **i, int room);
 
@@ -186,6 +185,7 @@ void mx_process_message_in_client(t_client_info *info);
 void mx_send_file_from_client(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);
 int mx_send_message_from_client(t_client_info *info, t_package *package, char *message);
+void sleep_ms (int milliseconds);
 
 // functions
 void mx_print_curr_time(void);

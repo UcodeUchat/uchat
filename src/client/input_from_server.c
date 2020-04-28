@@ -32,8 +32,10 @@ void *mx_process_input_from_server(void *taken_info) {
                 input_package->add_info == MX_AUTH_TYPE_NV) {
                 if ((*info).auth_client == 0){
                     fprintf(stderr, "ANSWER = [%d]\n", input_package->add_info);
-                    if (input_package->add_info == 4)
+                    if (input_package->add_info == 4) {
+                        info->id = input_package->user_id;
                         (*info).auth_client = 1;
+                    }
                     else
                         (*info).auth_client = 0;
                     fprintf(stderr, "(*info).auth_client = [%d]\n", (*info).auth_client);
@@ -45,12 +47,33 @@ void *mx_process_input_from_server(void *taken_info) {
             }
             else if (input_package->add_info == MX_MSG_TYPE) {
                 t_room *room = mx_find_room(info->data->rooms, input_package->room_id);
-                GtkWidget *box = gtk_box_new(FALSE, 0);
-                gtk_box_pack_start (GTK_BOX (room->message_box), box, FALSE, FALSE, 0);
-                gtk_widget_show(box);
-                GtkWidget *button = gtk_button_new_with_label(input_package->data);
-                gtk_box_pack_end (GTK_BOX (box), button, FALSE, FALSE, 0);
-                gtk_widget_show(button);
+                GtkWidget *h_box = gtk_box_new(FALSE, 0);
+                gtk_box_pack_start (GTK_BOX (room->message_box), h_box, FALSE, FALSE, 0);
+                gtk_widget_show(h_box);
+                char *data = mx_strjoin(input_package->login, "\n");
+                char *tmp = strdup(data);
+                free(data);
+                data = mx_strjoin(tmp, input_package->data);
+                free(tmp);
+                GtkWidget *button = gtk_label_new(data);
+                free(data);
+                gtk_widget_set_name(button, "message");
+                sleep_ms(100);
+                if (input_package->user_id == info->id) {
+                    gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_RIGHT);
+                    gtk_box_pack_end (GTK_BOX (h_box), button, FALSE, FALSE, 0);
+                    gtk_widget_show(button);
+                    sleep_ms(100);
+                    gtk_adjustment_set_value(room->Adjust, 
+                                            gtk_adjustment_get_upper(room->Adjust) - 
+                                            gtk_adjustment_get_page_size(room->Adjust));
+                }
+                else {
+                    gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_LEFT);
+                    gtk_box_pack_start (GTK_BOX (h_box), button, FALSE, FALSE, 0);
+                    gtk_widget_show(button);
+                }
+                
                 t_room *head = info->data->rooms;
                 while (head != NULL) {
                     if (head && head->position < room->position)
