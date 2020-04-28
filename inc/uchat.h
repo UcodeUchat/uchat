@@ -42,6 +42,9 @@
 #define QLEN 10
 #define HOST_NAME_MAX 256
 
+#define MX_SAVE_FOLDER_IN_CLIENT "./Uchat_downloads/"
+#define MX_SAVE_FOLDER_IN_SERVER "./files/"
+
 typedef struct s_room {
     int id;
     int position;
@@ -95,6 +98,7 @@ typedef struct  s_client_info {  //struct client
     pthread_mutex_t mutex;
     t_data *data;
     int responce;
+    struct s_file_list *input_files;
 }               t_client_info;
 
 #define MX_PATH_TO_DB "./server_db.bin"
@@ -123,7 +127,8 @@ typedef struct  s_server_info {  // struct server
     char *ip; // my ip address
     uint16_t port;
     struct s_clients *clients; // структура де зберігаються усі клієнти, що приєдналися
-    struct  s_socket_list *socket_list;
+    struct s_socket_list *socket_list;
+    struct s_file_list *input_files;
     sqlite3 *db; // our database
     pthread_mutex_t mutex;
     struct s_work *wdb;
@@ -146,11 +151,11 @@ typedef struct  s_server_info {  // struct server
 typedef struct  s_package {
     struct tls *client_tls_sock; // #
     int client_sock; // #
+    char type; // input type
     char piece; // 0 - full, 1 - start, 2 - partition, 3 - end
     int user_id; // sender unical id
     int room_id; // room unical id
     int add_info; // addition information which use different package types
-    char type; // input type
     char login[50]; // user login
     char password[32]; // user password
     char data[1024]; // user data
@@ -163,6 +168,15 @@ typedef struct  s_socket_list {
     struct s_socket_list *right;
     struct s_socket_list *parent;
 }               t_socket_list;
+
+typedef struct  s_file_list {
+    int user_id;
+    int file_size;
+    int package_size;
+    FILE *file;
+    struct s_package *package;
+    struct s_file_list *next;
+}               t_file_list;
 
 // server
 int mx_start_server(t_server_info *info);
@@ -186,12 +200,17 @@ void mx_add_socket_elem(t_socket_list **head, int sock, struct tls *tls_sock);
 t_socket_list *mx_get_min_socket_elem(t_socket_list *head);
 t_socket_list *mx_get_max_socket_elem(t_socket_list *head);
 t_socket_list *mx_find_socket_elem(t_socket_list *head, int socket);
+struct tls *mx_find_tls_socket(t_socket_list *head, int socket);
 void mx_remove_socket_elem_by_link(t_socket_list **target);
 void mx_delete_socket_elem(t_socket_list **head, int socket);
 void mx_print_socket_tree(t_socket_list *head, const char *dir, int level);
 
-//get_users_sock_in_room
 int *mx_get_users_sock_in_room(t_server_info **i, int room);
+void mx_send_package_to_all_in_room(t_server_info *info, t_package *package);
+
+int mx_add_new_file_server(t_file_list **input_files, t_package *package);
+int mx_add_data_to_file_server(t_file_list **input_files, t_package *package);
+int mx_final_file_input_server(t_server_info *info, t_package *package);
 
 //reg
 int mx_registration(t_server_info *i, t_package *p);
@@ -200,6 +219,10 @@ int mx_search_in_db(t_server_info *i, t_package *p, char *l, char *pa);
 // client
 int mx_start_client(t_client_info *info);
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
+int mx_process_file_in_client(t_client_info *info, t_package *package);
+int mx_add_data_to_file_client(t_file_list **input_files, t_package *package);
+int mx_add_new_file_client(t_file_list **input_files, t_package *package);
+int mx_final_file_input_client(t_client_info *info, t_package *package);
 void mx_process_message_in_client(t_client_info *info);
 void mx_send_file_from_client(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);

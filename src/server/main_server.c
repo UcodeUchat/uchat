@@ -1,5 +1,13 @@
 #include "uchat.h"
 
+void create_download_folder() {
+    struct stat st = {0};
+
+    if (stat(MX_SAVE_FOLDER_IN_SERVER, &st) == -1) {
+        mkdir(MX_SAVE_FOLDER_IN_SERVER, 0700);
+    }
+}
+
 static void init_db(t_server_info *info) {
     int status = sqlite3_open(MX_PATH_TO_DB, &(info->db));
 
@@ -33,6 +41,7 @@ int main(int argc, char **argv) {
 //    }
     printf("Configuring demon ++...\n");
     init_db(info);
+    create_download_folder();
     if (mx_start_server(info) == -1) {
         printf("error = %s\n", strerror(errno));
         return -1;

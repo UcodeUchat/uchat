@@ -16,10 +16,10 @@ int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info) {
     }
     else
         printf("Readed 0 bytes\n");
-    free(new_package);
+    if (new_package->type != MX_FILE_TYPE)
+        free(new_package);
     return 0;
 }
-
 
 int mx_worker(int client_sock, t_server_info *info) {
     t_package *new_package = malloc(MX_PACKAGE_SIZE);

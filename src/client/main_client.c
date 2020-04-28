@@ -1,5 +1,13 @@
 #include "uchat.h"
 
+void create_download_folder() {
+    struct stat st = {0};
+
+    if (stat(MX_SAVE_FOLDER_IN_CLIENT, &st) == -1) {
+        mkdir(MX_SAVE_FOLDER_IN_CLIENT, 0700);
+    }
+}
+
 int main(int argc, char **argv) {
     t_client_info *info = NULL;
 
@@ -16,6 +24,7 @@ int main(int argc, char **argv) {
     (*info).port = (uint16_t) atoi(argv[2]);
     (*info).tls_client = NULL;
     (*info).responce = 0;
+    create_download_folder();
     if (mx_start_client(info)) {
         printf("error = %s\n", strerror(errno));
         return -1;

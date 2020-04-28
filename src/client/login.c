@@ -2,6 +2,11 @@
 
 pthread_t login_msg_t;
 
+void choose_file_callback(GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    mx_send_file_from_client(info);
+}
+
 void sleep_ms (int milliseconds) {
     struct timespec ts;
     ts.tv_sec = milliseconds / 1000;
@@ -320,7 +325,7 @@ void init_general (t_client_info *info) {
     info->data->file_button = gtk_button_new();
     GtkWidget *image1 = gtk_image_new_from_file("c.png");
     gtk_button_set_image(GTK_BUTTON(info->data->file_button), image1);
-    //g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info->data);
+    g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->file_button, 600, 350);
     gtk_widget_set_name(info->data->file_button, "entry");
     gtk_widget_show(info->data->file_button);
