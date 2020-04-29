@@ -109,7 +109,8 @@ int main(int argc, char *argv[]){
 					login text, password text, access integer);\n\
 				\
 				create table rooms (\
-					id integer PRIMERY KEY, name text, access integer);\n\
+					id INTEGER PRIMARY KEY AUTOINCREMENT, name text,\
+					access integer);\n\
 				\
 				create table room_user (\
 					id INTEGER PRIMARY KEY AUTOINCREMENT, room_id integer,\
@@ -147,18 +148,32 @@ int main(int argc, char *argv[]){
 				values (130,'mlibovych', '123123', 1);\n\
 				insert into users (socket, login, password, access)\
                 values (0,'neo', '1', 1);\n\
+				insert into rooms (name, access) values ('First', 1);\
+				insert into rooms (name, access) values ('Second', 1);\
 				insert into rooms (id, name, access)\
 				values (0, 'General', 1);\n\
 				insert into room_user(room_id, user_id)\
 				values (0, 1);\n\
+				insert into room_user(room_id, user_id)\
+				values (1, 1);\n\
+				insert into room_user(room_id, user_id)\
+				values (2, 1);\n\
 				insert into room_user (room_id, user_id)\
 				values (0, 2);\n\
+				insert into room_user (room_id, user_id)\
+				values (1, 2);\n\
+				insert into room_user (room_id, user_id)\
+				values (2, 2);\n\
 				insert into room_user (room_id, user_id)\
 				values (0, 3);\n\
 				insert into room_user (room_id, user_id)\
 				values (0, 4);\n\
 				insert into room_user (room_id, user_id)\
 				values (0, 5);\n\
+				insert into room_user (room_id, user_id)\
+				values (1, 5);\n\
+				insert into room_user (room_id, user_id)\
+				values (2, 5);\n\
 				insert into msg_history (id, user_id, room_id, message,\
 				addition_cont)\
 				values (0, 0, 0, 'hello', 'mes');");

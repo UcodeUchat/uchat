@@ -149,6 +149,12 @@ typedef struct  s_server_info {  // struct server
 #define MX_PACKAGE_SIZE sizeof(t_package)
 // sizeof((type *)0)->member)
 
+typedef struct  s_server_room {
+    int room_id;
+    char *name;
+    struct  s_server_room *next;
+}   t_server_room;
+
 typedef struct  s_package {
     struct tls *client_tls_sock; // #
     int client_sock; // #
@@ -160,6 +166,7 @@ typedef struct  s_package {
     char login[50]; // user login
     char password[32]; // user password
     char data[1024]; // user data
+    struct  s_server_room *rooms;
 }               t_package;
 
 typedef struct  s_socket_list {
@@ -212,6 +219,9 @@ void mx_send_package_to_all_in_room(t_server_info *info, t_package *package);
 int mx_add_new_file_server(t_file_list **input_files, t_package *package);
 int mx_add_data_to_file_server(t_file_list **input_files, t_package *package);
 int mx_final_file_input_server(t_server_info *info, t_package *package);
+
+//get_rooms
+void mx_get_rooms(t_server_info *i, t_package **p);
 
 //reg
 int mx_registration(t_server_info *i, t_package *p);
