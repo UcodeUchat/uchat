@@ -24,6 +24,7 @@ SRC_SERVER = main_server.c \
 	work_with_socket_list.c \
 	work_with_socket_list_2.c \
 	request_for_rooms.c \
+	list_room.c \
 
 SRC_CLIENT = main_client.c \
 	start_client.c \
