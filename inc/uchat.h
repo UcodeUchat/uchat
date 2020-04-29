@@ -35,7 +35,7 @@
 
 #include <gtk/gtk.h>
 #include <tls.h>
-#include "libmx/inc/libmx.h"
+#include "../../xsbmx/inc/libmx.h"
 
 #define MAX_CLIENT_INPUT 1024
 #define MAXRESPONSE 1024

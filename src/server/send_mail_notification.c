@@ -1,6 +1,6 @@
 #include "uchat.h"
 
-static void send_format(int socket, const char *text, ...) {
+static void send_format(int socket, const char *text) {
     char buffer[1024];
 
     /*
@@ -14,13 +14,15 @@ static void send_format(int socket, const char *text, ...) {
     printf("C: %s", buffer);
 }
 
-static void send_format_tls(struct tls *tls, const char *text, ...) {
+static void send_format_tls(struct tls *tls, const char *text, const char *text2) {
     char buffer[1024];
-    va_list args;
-    va_start(args, text);
-    vsprintf(buffer, text, args);
-    va_end(args);
+//    va_list args;
+//    va_start(args, text);
+//    vsprintf(buffer, text, args);
+//    va_end(args);
 
+    strcpy(buffer, text);
+    strcpy(buffer + )
     tls_write(tls, buffer, strlen(buffer));
     printf("C: %s", buffer);
 }

@@ -82,8 +82,6 @@ char *mx_date_to_char(void) {
 
     time(&timer);
     timeinfo = gmtime(&timer);
-
-    ssize_t  = sizeof(timinfo);
     strftime(date, 128, "%a, %d %b %Y %H:%M:%S +0000", timeinfo);
     return strdup(date);
 }
