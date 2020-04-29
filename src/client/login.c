@@ -126,6 +126,7 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
 
 void cancel_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
+    gtk_window_set_title(GTK_WINDOW(info->data->window), "Sign in");
     gtk_widget_hide(info->data->register_box);
     gtk_entry_set_text(GTK_ENTRY(info->data->registration->login_entry), "");
     gtk_entry_set_text(GTK_ENTRY(info->data->registration->password_entry), "");
@@ -134,13 +135,18 @@ void cancel_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 void init_reg(t_client_info *info) {
-    info->data->register_box = gtk_fixed_new ();
+    info->data->register_box = gtk_fixed_new();
     gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->register_box, 0, 0);
     
 
     info->data->registration = (t_reg *)malloc(sizeof(t_reg));
     info->data->registration->login_entry = gtk_entry_new ();
- 
+    //--stop image
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("lr3.png", 400, 320, TRUE, NULL);
+    info->data->registration->stop = gtk_image_new_from_pixbuf(pixbuf);
+    gtk_fixed_put (GTK_FIXED (info->data->register_box), info->data->registration->stop, 100, 50);
+    gtk_widget_show(info->data->registration->stop);
+    //--
     gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->login_entry), 50);
     gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->login_entry), "Write your login");
     gtk_editable_select_region (GTK_EDITABLE (info->data->registration->login_entry),
@@ -210,6 +216,7 @@ void init_reg(t_client_info *info) {
 
 void reg_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
+    gtk_window_set_title(GTK_WINDOW(info->data->window), "Registration");
     gtk_widget_hide(info->data->login_box);
     gtk_widget_show (info->data->register_box);
 }

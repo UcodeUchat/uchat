@@ -57,6 +57,7 @@ typedef struct s_reg {
     GtkWidget *login_entry;
     GtkWidget *password_entry;
     GtkWidget *repeat_password_entry;
+    GtkWidget *stop;
 }              t_reg;
 
 typedef struct s_data {
