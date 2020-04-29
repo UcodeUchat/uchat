@@ -9,6 +9,7 @@ int mx_authorization(t_server_info *i, t_package *p) {
 	if (valid == 1) {
         p->type = MX_AUTH_TYPE_V;
 		p->add_info = MX_AUTH_TYPE_V;
+        mx_get_rooms(i, &p);
 		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
 		//Vse kruto, chel in system
 		fprintf(stderr, "Your answer = 1\n");
@@ -20,6 +21,7 @@ int mx_authorization(t_server_info *i, t_package *p) {
 		//Uvi, but go to dick :)
 		fprintf(stderr, "Your answer = 0\n");
 	}
+
     if (p->type == MX_AUTH_TYPE_V){
         int *array = mx_get_users_sock_in_room(&i, 0);
         (void)array;

@@ -18,8 +18,8 @@ static int get_user_sock(void *point, int argc, char **argv, char **col_name) {
     //     fprintf(stderr, "infa: %s\n", argv[j]);
     // fprintf(stderr, "\n");
     wdb1->user_sock[(wdb1->i)] = atoi(argv[1]);
-    printf("wdb1->array[(wdb1->i)] = %d\n", wdb1->user_sock[(wdb1->i)]);
-    printf("wdb1->i = %d\n", wdb1->i);
+    // printf("wdb1->array[(wdb1->i)] = %d\n", wdb1->user_sock[(wdb1->i)]);
+    // printf("wdb1->i = %d\n", wdb1->i);
     wdb1->i++;
     return 0;
 }
