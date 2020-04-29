@@ -19,7 +19,7 @@ int mx_run_function_type(t_server_info *info, t_package *package) {
     fprintf(stderr, "type = [%d]\n", type);
     if (type == MX_MSG_TYPE)
         return_value = mx_process_message_in_server(info, package);
-    else if (type == MX_FILE_TYPE)
+    else if (type == MX_FILE_SEND_TYPE)
         return_value = mx_process_file_in_server(info, package);
     else if (type == MX_AUTH_TYPE)
     	return_value = mx_authorization(info, package);

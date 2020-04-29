@@ -137,7 +137,8 @@ typedef struct  s_server_info {  // struct server
 
 #define MX_MAX_USERS_IN_ROOM 1024
 #define MX_MSG_TYPE 1
-#define MX_FILE_TYPE 2
+#define MX_FILE_SEND_TYPE 2
+#define MX_FILE_DOWNLOAD_TYPE 12
 #define MX_AUTH_TYPE 3
 #define MX_AUTH_TYPE_V 4
 #define MX_AUTH_TYPE_NV 5
@@ -242,6 +243,7 @@ void mx_print_client_address(struct sockaddr_storage client_address, socklen_t c
 
 // funcs for package
 t_package *mx_create_new_package();
+t_package *mx_copy_package(t_package *package);
 
 // krivoy dizayn
 int mx_login (t_client_info *info);

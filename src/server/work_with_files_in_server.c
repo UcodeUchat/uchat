@@ -20,7 +20,7 @@ int mx_add_new_file_server(t_file_list **input_files, t_package *package) {
                     tmp = tmp->next;
                 tmp->next = new_file;
             }
-            new_file->package = package;
+            new_file->package = mx_copy_package(package);
             return 0;
         }
         else

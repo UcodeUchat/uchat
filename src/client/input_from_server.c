@@ -26,7 +26,7 @@ void *mx_process_input_from_server(void *taken_info) {
             mx_err_exit("error recv\n");
         if (rc != 0) {
             printf("New_package! Type:%d\n", input_package->type);
-            if (input_package->type == MX_FILE_TYPE)
+            if (input_package->type == MX_FILE_SEND_TYPE)
                 mx_process_file_in_client(info, input_package);
             //mx_print_curr_time();
             if (input_package->add_info == MX_AUTH_TYPE || input_package->add_info == MX_AUTH_TYPE_V ||

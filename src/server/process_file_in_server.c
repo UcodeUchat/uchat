@@ -12,7 +12,7 @@ void set_file_name(t_package *package) {
 }
 
 int mx_process_file_in_server(t_server_info *info, t_package *package) {
-    printf("PIECE:%d, TYPE:%d, DATA-SIZE:%d\n", package->piece, package->type, mx_strlen(package->data));
+    printf("ID:%d, PIECE:%d, TYPE:%d, DATA-SIZE:%d\n", package->user_id, package->piece, package->type, mx_strlen(package->data));
 
     if (package->piece == 1) {
         set_file_name(package);
@@ -23,6 +23,5 @@ int mx_process_file_in_server(t_server_info *info, t_package *package) {
         if (package->piece == 3)
             printf("3=%d\n", mx_final_file_input_server(info, package) ? 1 : 0);
     }
-
     return 0;
 }

@@ -16,8 +16,7 @@ int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info) {
     }
     else
         printf("Readed 0 bytes\n");
-    if (new_package->type != MX_FILE_TYPE)
-        free(new_package);
+    free(new_package);
     return 0;
 }
 
