@@ -64,11 +64,11 @@ OBJS_SERVER = $(addprefix $(OBJD)/, $(SRC_SERVER:%.c=%.o))
 OBJS_CLIENT = $(addprefix $(OBJD)/, $(SRC_CLIENT:%.c=%.o))
 OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 
-JSON_C_DIR=./json
-CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
+JSON_C_DIR=./json/
 
-LDFLAGS+= -L$(JSON_C_DIR)/lib -ljson-c
-CFLAGS += -I$(JSON_C_DIR)/include/json-c
+CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
+CFLAGS += -I$(JSON_C_DIR)
+LDFLAGS = -L$(JSON_C_DIR) -ljson-c
 
 TLSFLAGS =  -lcrypto -lssl -ltls
 SQLFLAGS = -lsqlite3
@@ -78,7 +78,7 @@ all: install
 server: $(LMXA) $(NAME_S)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a   $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a json/libjson-c.5.0.0.dylib  $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS) $(LDFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/server/%.c $(INCS)
@@ -98,7 +98,7 @@ $(OBJD):
 client: $(LMXA) $(NAME_C)
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a  json/libjson-c.5.0.0.dylib $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS)
 	@printf "\r\33[2K$@\t\t  \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/client/%.c $(INCS)
