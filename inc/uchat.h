@@ -148,7 +148,7 @@ typedef struct  s_server_room {
     int room_id;
     char *name;
     struct  s_server_room *next;
-}   t_server_room;
+}               t_server_room;
 
 typedef struct  s_package {
     struct tls *client_tls_sock; // #

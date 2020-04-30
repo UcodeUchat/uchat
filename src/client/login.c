@@ -107,7 +107,6 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
         strncat(p->password, password, sizeof(p->password) - 1);
         p->type = MX_REG_TYPE;
         p->client_sock = info->socket;
-        //mx_send_message_from_client(info, p, " ");
         tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
 
         //wait responce from server
@@ -142,7 +141,7 @@ void init_reg(t_client_info *info) {
     info->data->registration = (t_reg *)malloc(sizeof(t_reg));
     info->data->registration->login_entry = gtk_entry_new ();
     //--stop image
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("lr3.png", 400, 320, TRUE, NULL);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/uk1.png", 400, 320, TRUE, NULL);
     info->data->registration->stop = gtk_image_new_from_pixbuf(pixbuf);
     gtk_fixed_put (GTK_FIXED (info->data->register_box), info->data->registration->stop, 100, 50);
     gtk_widget_show(info->data->registration->stop);
@@ -308,7 +307,7 @@ void init_general (t_client_info *info) {
     //--
     //--Menu button
     info->data->menu_button = gtk_button_new();
-    GtkWidget *image0 = gtk_image_new_from_file("a.png");
+    GtkWidget *image0 = gtk_image_new_from_file("img/a.png");
     gtk_button_set_image(GTK_BUTTON(info->data->menu_button), image0);
     g_signal_connect(G_OBJECT(info->data->menu_button), "clicked", G_CALLBACK(menu_callback), info);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->menu_button, 10, 350);
@@ -325,7 +324,7 @@ void init_general (t_client_info *info) {
     //--
     //--File selection
     info->data->file_button = gtk_button_new();
-    GtkWidget *image1 = gtk_image_new_from_file("c.png");
+    GtkWidget *image1 = gtk_image_new_from_file("img/c.png");
     gtk_button_set_image(GTK_BUTTON(info->data->file_button), image1);
     //g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info->data);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->file_button, 600, 350);
@@ -442,8 +441,11 @@ void init_login(t_client_info *info) {
     gtk_widget_set_name(title2, "title2");
     gtk_grid_attach (GTK_GRID (table), title2, 1, 0, 1, 1);
     //--
-    info->data->stop = gtk_image_new_from_file("stop2.png");
-    gtk_fixed_put(GTK_FIXED(info->data->login_box), info->data->stop, 60, 2);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/cz1.png", 400, 320, TRUE, NULL);
+    info->data->stop = gtk_image_new_from_pixbuf(pixbuf);
+    gtk_fixed_put (GTK_FIXED (info->data->login_box), info->data->stop, 2, 40);
+    //info->data->stop = gtk_image_new_from_file("img/stop1.png");
+    //gtk_fixed_put(GTK_FIXED(info->data->login_box), info->data->stop, 60, 2);
 
     info->data->login_entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (info->data->login_entry), 50);

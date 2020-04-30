@@ -1,9 +1,17 @@
-label#auth_fail {
+label#auth_fail1 {
 	color: LightSkyBlue;
 	font-weight: bold;
 	font-size: 140%;
     text-shadow: Navy 1px 1px 0, Navy -1px -1px 0, 
                  Navy -1px 1px 0, Navy 1px -1px 0;
+}
+
+label#auth_fail {
+	color: DarkCyan;
+	font-weight: bold;
+	font-size: 140%;
+    text-shadow: DarkSlateGrey 1px 1px 0, DarkSlateGrey -1px -1px 0, 
+                 DarkSlateGrey -1px 1px 0, DarkSlateGrey 1px -1px 0;
 }
 
 label#title {

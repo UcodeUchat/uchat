@@ -42,7 +42,7 @@ void *mx_process_input_from_server(void *taken_info) {
                     (*info).responce = 1;
                 }
             }
-            else if (input_package->add_info == MX_REG_TYPE) {
+            else if (input_package->add_info == MX_REG_TYPE_V || input_package->add_info == MX_REG_TYPE_NV) {
 
             }
             else if (input_package->add_info == MX_MSG_TYPE) {
@@ -57,7 +57,6 @@ void *mx_process_input_from_server(void *taken_info) {
                 free(tmp);
                 GtkWidget *button = gtk_label_new(data);
                 free(data);
-                gtk_widget_set_name(button, "message");
                 sleep_ms(100);
                 if (input_package->user_id == info->id) {
                     gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_RIGHT);
@@ -73,6 +72,7 @@ void *mx_process_input_from_server(void *taken_info) {
                     gtk_box_pack_start (GTK_BOX (h_box), button, FALSE, FALSE, 0);
                     gtk_widget_show(button);
                 }
+                gtk_widget_set_name(button, "message");
                 
                 t_room *head = info->data->rooms;
                 while (head != NULL) {
