@@ -64,7 +64,7 @@ OBJS_SERVER = $(addprefix $(OBJD)/, $(SRC_SERVER:%.c=%.o))
 OBJS_CLIENT = $(addprefix $(OBJD)/, $(SRC_CLIENT:%.c=%.o))
 OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 
-JSON_C_DIR=./json
+JSON_C_DIR=./json_library
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
 
 LDFLAGS+= -L$(JSON_C_DIR)/lib -ljson-c
