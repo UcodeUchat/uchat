@@ -30,6 +30,8 @@
 #include <sys/event.h>
 #include <sys/time.h>
 
+#include "../json/json.h"
+
 //#include <openssl/sha.h>
 
 #include <gtk/gtk.h>
