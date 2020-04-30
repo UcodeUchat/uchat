@@ -23,29 +23,35 @@ LMXI:=	$(LMXD)/inc
 INCS = inc/uchat.h
 
 SRC_SERVER = main_server.c \
-    start_server.c \
-    set_daemon.c \
-    server_worker.c \
-    work_with_db.c \
-    request_for_bd.c \
+	start_server.c \
+	set_daemon.c \
+	server_worker.c \
+	work_with_db.c \
+	request_for_bd.c \
 	run_function_type.c \
 	process_message_in_server.c \
 	process_file_in_server.c \
 	authorization.c \
-	send_mail_notification.c
+	work_with_socket_list.c \
+	work_with_socket_list_2.c \
+	work_with_files_in_server.c \
+	request_for_rooms.c \
+	list_room.c \
 
 SRC_CLIENT = main_client.c \
-    start_client.c \
+	start_client.c \
 	send_message.c \
 	send_file.c \
 	input_from_server.c \
 	login.c \
+	process_file_in_client.c \
+	work_with_files_in_client.c \
 
-# SRC_HELP = $(wildcard /functions/*.c)
+# SRC_HELP = $(wildcard *.c)
 SRC_HELP = err_exit.c \
-    functions.c \
+	functions.c \
 	package.c \
-	cryptographic_hash_f.c
+	cryptographic_hash_f.c \
 
 INCLUDE = -I $(LBMXD) \
 	-I $(INCD) \
