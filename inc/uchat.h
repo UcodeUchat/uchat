@@ -35,7 +35,10 @@
 
 #include <gtk/gtk.h>
 #include <tls.h>
-#include "../../xsbmx/inc/libmx.h"
+#include "../../libmx/inc/libmx.h"
+
+
+//#include <json_object.h>
 
 #define MAX_CLIENT_INPUT 1024
 #define MAXRESPONSE 1024
@@ -154,6 +157,7 @@ typedef struct  s_package {
 // server
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
+void mx_set_daemon2(const char *log_file);
 int mx_worker(int client_sock, t_server_info *info);
 int mx_tls_worker(int client_sock, struct tls *tls_accept, t_server_info *info);
 int mx_sign_in(t_server_info *i, t_package *p);

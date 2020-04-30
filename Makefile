@@ -58,7 +58,11 @@ OBJS_SERVER = $(addprefix $(OBJD)/, $(SRC_SERVER:%.c=%.o))
 OBJS_CLIENT = $(addprefix $(OBJD)/, $(SRC_CLIENT:%.c=%.o))
 OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 
+JSON_C_DIR=/json-c
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
+
+LDFLAGS+= -L$(JSON_C_DIR)/lib -ljson-c
+CFLAGS += -I$(JSON_C_DIR)/include/json-c
 
 TLSFLAGS =  -lcrypto -lssl -ltls
 SQLFLAGS = -lsqlite3
@@ -68,7 +72,7 @@ all: install
 server: $(LMXA) $(NAME_S)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a   $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/server/%.c $(INCS)

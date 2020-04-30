@@ -1,0 +1,15 @@
+GET http://{"messages":{"message":[%20
+		{"id":%20%20"17",
+			"user":%20"Ryan%20Smith",
+			"text":%20"This%20is%20an%20example%20of%20JSON",
+			"time":%20"04:41"
+		},{"id":%20%20"18",
+			"user":%20"Ryan%20Smith",
+			"text":%20"Here%20is%20another%20Element",
+			"time":%20"04:41"
+		}%20]
+	}
+}:
+
+###
+

@@ -1,0 +1,49 @@
+{
+  "messages": [
+    {
+      "general_room": [
+        {
+          "id": "17",
+          "user": "",
+          "text": "JSON",
+          "time": "04:41"
+        },
+        {
+          "id": "18",
+          "user": "Ryan Smith",
+          "text": "Here is another Element",
+          "time": "04:41"
+        }
+      ]
+    },
+    {
+      "room_2": [
+        {
+          "id": "10",
+          "user": "neo",
+          "text": "TdddddddddddN",
+          "time": "02:22"
+        },
+        {
+          "id": "11",
+          "user": "snikolayen",
+          "text": "Here is another Element",
+          "time": "02:41"
+        }
+      ]
+    }
+  ]
+}
+,
+{
+  "contacts": [
+    {"user_id": 1,
+      "login": "neo",
+      "password": 1
+    }, {
+      "user_id": 2,
+      "login": "snikolayen",
+      "password": 123123
+    }
+  ]
+}
