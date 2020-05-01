@@ -51,7 +51,7 @@ SRC_CLIENT = main_client.c \
 SRC_HELP = err_exit.c \
 	functions.c \
 	package.c \
-	cryptographic_hash_f.c \
+	cryptographic_hash_f.c
 
 INCLUDE = -I $(LBMXD) \
 	-I $(INCD) \
@@ -78,7 +78,7 @@ all: install
 server: $(LMXA) $(NAME_S)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a json/libjson-c.5.0.0.dylib  $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS) $(LDFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a  json/libjson-c.a  $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS) $(LDFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/server/%.c $(INCS)
