@@ -167,9 +167,9 @@ typedef struct  s_package {
     int user_id; // sender unical id
     int room_id; // room unical id
     int add_info; // addition information which use different package types
-    char login[50]; // user login
-    char password[32]; // user password
-    char data[1024]; // user data
+    char *login; // user login
+    char *password; // user password
+    char *data; // user data
     struct  s_server_room *rooms;
 }               t_package;
 
@@ -246,6 +246,7 @@ void sleep_ms (int milliseconds);
 
 // functions
 void mx_print_curr_time(void);
+char *mx_curr_time(void);
 void mx_print_tid(const char *s);
 void mx_err_exit(const char *err_msg);  // вивести помилку
 void mx_sha_hash_password(char *password);
@@ -253,14 +254,20 @@ int addr_socet_info(int argc, char *argv[]);  // test adress
 void mx_get_input(char *buffer);
 int mx_get_input2(char *buffer);
 void mx_report_tls(struct tls * tls_ctx, char * host);
-void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
 
+void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
 // funcs for package
 t_package *mx_create_new_package();
+
 t_package *mx_copy_package(t_package *package);
 
 // krivoy dizayn
 int mx_login (t_client_info *info);
 
-//
+//json
+void mx_print_json_object(struct json_object *jobj, const char *msg);
+struct json_object * mx_find_something(struct json_object *jobj, const char *key);
+void mx_glitch_in_the_matrix(struct json_object *jobj);
+const char *mx_message_to_json_string(t_client_info *info, char *message);
+
 #endif

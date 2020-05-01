@@ -20,8 +20,11 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
     else {
         printf("send 1 piece\n"); // #
         package->piece = 0;
+        const char *json_string = mx_message_to_json_string(info, message);
+        printf(" created json %s\n", json_string);
         strncat(package->data, message, MX_MAX_DATA_SIZE);
-        tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
+        tls_write(info->tls_client, json_string, strlen(json_string));
+//        tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
     }
     return 0;
 }

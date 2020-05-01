@@ -20,26 +20,27 @@ static void init_db(t_server_info *info) {
 int main(int argc, char **argv) {
     t_server_info *info = NULL;
     struct servent *servent;
+//    json_object *new_obj;
 
+    /*
+    new_obj = json_tokener_parse(
+            "//more difficult test case "
+            "{ \"glossary\": { \"title\": \"example glossary\", \"GlossDiv\": { \"title\": \"S\", "
+            "\"GlossList\": [ { \"ID\": \"SGML\", \"SortAs\": \"SGML\", \"GlossTerm\": \"Standard "
+            "Generalized Markup Language\", \"Acronym\": \"SGML\", \"Abbrev\": \"ISO 8879:1986\", "
+            "\"GlossDef\": \"A meta-markup language, used to create markup languages such as "
+            "DocBook.\", \"GlossSeeAlso\": [\"GML\", \"XML\", \"markup\"] } ] } } }");
+    printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+    json_object_put(new_obj);
 
+*/
 // test json
-    struct json_object *jobj;
-    char *str = "{ \"msg-type\": [ \"0xdeadbeef\", \"irc log\" ], \
-\"msg-from\": { \"class\": \"soldier\", \"name\": \"Wixilav\" }, \
-\"msg-to\": { \"class\": \"supreme-commander\", \"name\": \"[Redacted]\" }, \
-\"msg-log\": [ \
-   \"soldier: Boss there is a slight problem with the piece offering to humans\", \
-   \"supreme-commander: Explain yourself soldier!\", \
-   \"soldier: Well they don't seem to move anymore...\", \
-   \"supreme-commander: Oh snap, I came here to see them twerk!\" \
-   ] \
-}";
+#define KEY1 "id"
+#define KEY2 "user"
+#define KEY3 "room"
+#define KEY4 "text"
+#define KEY5 "time"
 
-
-    printf("str:\n---\n%s\n---\n\n", str);
-
-    jobj = json_tokener_parse(str);
-    printf("jobj from str:\n---\n%s\n---\n", json_object_to_json_string_ext(jobj, JSON_C_TO_STRING_SPACED | JSON_C_TO_STRING_PRETTY));
 
     if (argc != 2)
         mx_err_exit("usage: chat_server [port]\n");

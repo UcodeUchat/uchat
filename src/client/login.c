@@ -227,6 +227,7 @@ void reg_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 void authentification(t_client_info *info, t_package *p) {
+
     tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
     while (info->responce == 0) {
 
