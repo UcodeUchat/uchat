@@ -20,7 +20,7 @@ o*.d
 
 # Libraries
 *.lib
-#*.a
+*.a
 *.la
 *.lo
 
@@ -28,7 +28,7 @@ o*.d
 *.dll
 *.so
 *.so.*
-#*.dylib
+*.dylib
 
 # Executables
 *.exe

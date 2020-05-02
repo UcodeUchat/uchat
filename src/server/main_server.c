@@ -34,12 +34,14 @@ int main(int argc, char **argv) {
    \"supreme-commander: Oh snap, I came here to see them twerk!\" \
    ] \
 }";
-
-
     printf("str:\n---\n%s\n---\n\n", str);
+
 
     jobj = json_tokener_parse(str);
     printf("jobj from str:\n---\n%s\n---\n", json_object_to_json_string_ext(jobj, JSON_C_TO_STRING_SPACED | JSON_C_TO_STRING_PRETTY));
+
+
+
 
     if (argc != 2)
         mx_err_exit("usage: chat_server [port]\n");
