@@ -72,7 +72,6 @@
 /json_config.h
 /config.h
 /json-c.pc
-/Makefile
 /CMakeCache.txt
 /CMakeFiles
 /CMakeDoxyfile.in
