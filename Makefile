@@ -16,7 +16,7 @@ SRCD = src
 INCD = inc
 OBJD = obj
 
-LMXD	=	libmx
+LMXD =	libmx
 LBMX = libmx.a
 LMXA:=	$(addprefix $(LMXD)/, $(LBMX))
 
@@ -148,13 +148,15 @@ $(LIBMX): $(LMXA)
 install: server client
 
 clean:
+	@#make -sC $(LBMXD) clean
+	@#make -sC $(JSOND) clean
 	@rm -rf $(OBJD)
 	@printf "$(OBJD)\t   \033[31;1mdeleted\033[0m\n"
 
 uninstall: clean
-#     @make uninstall -C libmx
+	@make -sC $(LBMXD) uninstall
+	@make -sC $(JSOND) uninstall
 	@rm -rf $(NAME_S) $(NAME_C)
-#     @make -C ./libmx/ uninstall
 	@printf "$(NAME_S)\t   \033[31;1muninstalled\033[0m\n"
 	@printf "$(NAME_C)\t   \033[31;1muninstalled\033[0m\n"
 

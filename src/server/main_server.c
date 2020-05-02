@@ -40,9 +40,6 @@ int main(int argc, char **argv) {
     jobj = json_tokener_parse(str);
     printf("jobj from str:\n---\n%s\n---\n", json_object_to_json_string_ext(jobj, JSON_C_TO_STRING_SPACED | JSON_C_TO_STRING_PRETTY));
 
-
-
-
     if (argc != 2)
         mx_err_exit("usage: chat_server [port]\n");
     info = (t_server_info *)malloc(sizeof(t_server_info));

@@ -17,7 +17,6 @@ SRC = arraylist.c \
 	random_seed.c \
 	strerror_override.c
 
-
 OBJ = arraylist.o \
 	debug.o \
 	json_c_version.o \
@@ -47,7 +46,7 @@ install:
 	@mkdir -p obj
 	@mv $(OBJ) ./obj
 
-uninstall: clean
+uninstall:
 	@rm -rf $(NAME)
 
 clean:

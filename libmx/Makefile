@@ -146,7 +146,7 @@ install:
 	@mkdir -p obj
 	@mv $(OBJ) ./obj
 
-uninstall: clean
+uninstall:
 	@rm -rf $(NAME)
 
 clean:
