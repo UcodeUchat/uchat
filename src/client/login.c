@@ -113,6 +113,8 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
         p->type = MX_REG_TYPE;
         p->client_sock = info->socket;
         //mx_send_message_from_client(info, p, " ");
+
+
         tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
 
         //wait responce from server

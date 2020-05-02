@@ -16,9 +16,15 @@ SRCD = src
 INCD = inc
 OBJD = obj
 
-LMXD	=	libmx
-LMXA:=	$(LMXD)/libmx.a
+LMXD =	libmx
+LBMX = libmx.a
+LMXA:=	$(addprefix $(LMXD)/, $(LBMX))
+
 LMXI:=	$(LMXD)/inc
+
+LBMXD = libmx
+LIBMX = libmx
+
 
 INCS = inc/uchat.h
 
@@ -54,6 +60,7 @@ SRC_HELP = err_exit.c \
 	cryptographic_hash_f.c \
 	json_functions.c
 
+
 INCLUDE = -I $(LBMXD) \
 	-I $(INCD) \
 
@@ -65,21 +72,27 @@ OBJS_SERVER = $(addprefix $(OBJD)/, $(SRC_SERVER:%.c=%.o))
 OBJS_CLIENT = $(addprefix $(OBJD)/, $(SRC_CLIENT:%.c=%.o))
 OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 
-JSON_C_DIR=./json/
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
-CFLAGS += -I$(JSON_C_DIR)
-LDFLAGS = -L$(JSON_C_DIR) -ljson-c
+CFLAGS += -I$(LJSOND)
 
+LJSOND	= json-c-0.14
+LJSONX  = libjson-c.a
+LBMXA = $(addprefix $(LBMXD)/, $(LBMX))
+LJSONA = $(addprefix $(LJSOND)/, $(LJSON))
+
+LJSONFLAGS = -ljson-c
 TLSFLAGS =  -lcrypto -lssl -ltls
 SQLFLAGS = -lsqlite3
 
+#json-c-0.14/libjson-c.a
 all: install
 
-server: $(LMXA) $(NAME_S)
+server: $(LIBMX) $(LJSONX) $(NAME_S)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a  json/libjson-c.a  $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS) $(LDFLAGS)
+	@#make -sC $(LJSOND)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA)  $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS) $(LJSONFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/server/%.c $(INCS)
@@ -87,19 +100,28 @@ $(OBJD)/%.o: src/server/%.c $(INCS)
 	@printf "\r\33[2K  \033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
 
 $(OBJS_SERVER): | $(OBJD)
-
 $(OBJS_HELP): | $(OBJD)
 
 $(OBJD):
 	@mkdir -pv $@
 
-# $(LMXA):
-# 	@make -sC $(LMXD)
+$(LMXA):
+	@make -sC $(LBMXD)
 
-client: $(LMXA) $(NAME_C)
+$(LIBMX): $(LMXA)
+	@make -sC $(LBMXD)
+
+$(LJSONA):
+	@make -sC $(LJSOND)
+
+$(LJSONX): $(LJSONA)
+	@make -sC $(LJSOND)
+
+
+client: $(LIBMX) $(NAME_C)
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` libmx/libmx.a  json/libjson-c.5.0.0.dylib $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA)  $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(LJSONFLAGS)
 	@printf "\r\33[2K$@\t\t  \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/client/%.c $(INCS)
@@ -118,19 +140,25 @@ $(OBJS_HELP): | $(OBJD)
 $(OBJD):
 	@mkdir -pv $@
 
-# $(LMXA):
-# 	@make -sC $(LMXD)
+$(LMXA):
+	@make -sC $(LBMXD)
+$(LIBMX): $(LMXA)
+	@make -sC $(LBMXD)
+
+
 
 install: server client
 
 clean:
+	@#make -sC $(LBMXD) clean
+	@#make -sC $(JSOND) clean
 	@rm -rf $(OBJD)
 	@printf "$(OBJD)\t   \033[31;1mdeleted\033[0m\n"
 
 uninstall: clean
-#     @make uninstall -C libmx
+	@make -sC $(LBMXD) uninstall
+	@make -sC $(JSOND) uninstall
 	@rm -rf $(NAME_S) $(NAME_C)
-#     @make -C ./libmx/ uninstall
 	@printf "$(NAME_S)\t   \033[31;1muninstalled\033[0m\n"
 	@printf "$(NAME_C)\t   \033[31;1muninstalled\033[0m\n"
 

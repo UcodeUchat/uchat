@@ -22,8 +22,8 @@ int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info) {
     json_object *new_obj;
 //    char json_str;
 
-//    rc = tls_read(client_socket_list->tls_socket, new_package, MX_PACKAGE_SIZE);    // get request
-    rc = tls_read(client_socket_list->tls_socket, buf, 1024);    // get request
+    rc = tls_read(client_socket_list->tls_socket, new_package, MX_PACKAGE_SIZE);    // get request
+//    rc = tls_read(client_socket_list->tls_socket, buf, 1024);    // get request
 
     new_obj = json_tokener_parse(buf);
     mx_print_json_object(new_obj, "json from client");

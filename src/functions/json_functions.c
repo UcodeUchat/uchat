@@ -1,11 +1,12 @@
 #include "uchat.h"
-//
 
 #define KEY1 "id"
 #define KEY2 "user"
 #define KEY3 "room"
 #define KEY4 "text"
 #define KEY5 "time"
+
+
 
 const char *mx_message_to_json_string(t_client_info *info, char *message) {
     struct json_object *mesg;
