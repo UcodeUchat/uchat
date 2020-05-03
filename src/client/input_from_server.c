@@ -18,14 +18,33 @@ void *mx_process_input_from_server(void *taken_info) {
     t_client_info *info = (t_client_info *)taken_info;
     t_package *input_package = malloc(MX_PACKAGE_SIZE);
 
+    int rc;
+
     mx_print_tid("new thread");
 
     while(1) { // read all input from server
-        int rc = tls_read(info->tls_client, input_package, (ssize_t) MX_PACKAGE_SIZE);
+//.. read json
+        char buf[2048];
+        json_object *new_json;
+//        char json_str;
+
+        rc = tls_read(info->tls_client, buf, 2048);    // get json
+
+////****
+//        int rc = tls_read(info->tls_client, input_package, (ssize_t) MX_PACKAGE_SIZE);
+
         if (rc == -1)
             mx_err_exit("error recv\n");
         if (rc != 0) {
+
+            new_json = json_tokener_parse(buf);
+            mx_print_json_object(new_json, "mx_process_input_from_server");
+            input_package = mx_json_to_package(new_json);
             printf("New_package! Type:%d\n", input_package->type);
+
+//            json_object *new_json = mx_packege_to_json(input_package);
+//            mx_print_json_object(new_json, "process_input_from_server");
+
             if (input_package->type == MX_FILE_SEND_TYPE)
                 mx_process_file_in_client(info, input_package);
             //mx_print_curr_time();

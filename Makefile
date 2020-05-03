@@ -57,7 +57,8 @@ SRC_CLIENT = main_client.c \
 SRC_HELP = err_exit.c \
 	functions.c \
 	package.c \
-	cryptographic_hash_f.c
+	cryptographic_hash_f.c \
+	json_functions.c
 
 INCLUDE = -I $(LBMXD) \
 	-I $(INCD) \

@@ -246,6 +246,7 @@ void sleep_ms (int milliseconds);
 
 // functions
 void mx_print_curr_time(void);
+char *mx_curr_time(void);
 void mx_print_tid(const char *s);
 void mx_err_exit(const char *err_msg);  // вивести помилку
 void mx_sha_hash_password(char *password);
@@ -262,5 +263,12 @@ t_package *mx_copy_package(t_package *package);
 // krivoy dizayn
 int mx_login (t_client_info *info);
 
-//
+//json
+void mx_print_json_object(struct json_object *jobj, const char *msg);
+struct json_object * mx_find_something(struct json_object *jobj, const char *key);
+void mx_glitch_in_the_matrix(struct json_object *jobj);
+const char *mx_message_to_json_string(t_client_info *info, char *message);
+json_object *mx_package_to_json(t_package *package);
+t_package *mx_json_to_package(json_object *new_json);
+
 #endif

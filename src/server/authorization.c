@@ -1,7 +1,12 @@
 #include "uchat.h"
 
 int mx_authorization(t_server_info *i, t_package *p) {
+
+    printf("function mx_authorization\n");
+
 	int valid = mx_check_client(i, p);
+    json_object *new_json = NULL;
+    const char *json_string = NULL;
 
 	mx_memset(p->data, 0, sizeof(p->data));
 	mx_memset(p->login, 0, sizeof(p->login));
@@ -10,14 +15,31 @@ int mx_authorization(t_server_info *i, t_package *p) {
         p->type = MX_AUTH_TYPE_V;
 		p->add_info = MX_AUTH_TYPE_V;
         mx_get_rooms(i, &p);
-		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
+
+///******
+        new_json = mx_package_to_json(p);
+        mx_print_json_object(new_json, "mx_authorization 1");
+        json_string = json_object_to_json_string(new_json);
+        printf("json string %s\n", json_string);
+        tls_write(p->client_tls_sock, json_string, strlen(json_string));
+/////***
+
+//		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
 		//Vse kruto, chel in system
 		fprintf(stderr, "Your answer = 1\n");
 	}
 	else {
         p->type = MX_AUTH_TYPE_NV;
 		p->add_info = MX_AUTH_TYPE_NV;
-		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
+
+/////***
+        new_json = mx_package_to_json(p);
+        mx_print_json_object(new_json, "mx_authorization 2");
+        json_string = json_object_to_json_string(new_json);
+        printf("json string %s\n", json_string);
+        tls_write(p->client_tls_sock, json_string, strlen(json_string));
+/////***
+//		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
 		//Uvi, but go to dick :)
 		fprintf(stderr, "Your answer = 0\n");
 	}

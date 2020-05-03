@@ -9,6 +9,9 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
 
         package->piece = 1;
         strncat(package->data, message, MX_MAX_DATA_SIZE);
+        json_object *new_json = mx_package_to_json(package);
+        mx_print_json_object(new_json, "mx_send_message_from_client");
+
         tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
         while ((pos_in_data += MX_MAX_DATA_SIZE) < msg_size) {
             package->piece = pos_in_data + MX_MAX_DATA_SIZE < msg_size ? 2 : 3;
