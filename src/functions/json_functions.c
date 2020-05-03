@@ -35,16 +35,11 @@ t_package *mx_json_to_package(json_object *new_json) {
     new_package->user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
     new_package->room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
     new_package->add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
-    char *login = strdup(json_object_to_json_string(json_object_object_get(new_json, "login")));
-    for (size_t i = 0; i <= strlen(login); i++)
-        new_package->login[i] = login[i];
-    char *password = strdup(json_object_to_json_string(json_object_object_get(new_json, "password")));
-    for (size_t i = 0; i <= strlen(password); i++)
-        new_package->password[i] = password[i];
-    char *data = strdup(json_object_to_json_string(json_object_object_get(new_json, "data")));
-    for (size_t i = 0; i <= strlen(data); i++)
-        new_package->password[i] = data[i];
-    mx_strdel(&login);
+    strcpy(new_package->login, json_object_to_json_string(json_object_object_get(new_json, "login")));
+    strcpy(new_package->password, json_object_to_json_string(json_object_object_get(new_json, "password")));
+    strcpy(new_package->data, json_object_to_json_string(json_object_object_get(new_json, "data")));
+
+    printf("password pack %s\n", new_package->password);
     return new_package;
 }
 

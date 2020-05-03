@@ -25,13 +25,12 @@ int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info) {
 //    char json_str;
 
 //    rc = tls_read(client_socket_list->tls_socket, new_package, MX_PACKAGE_SIZE);    // get request
-
     rc = tls_read(client_socket_list->tls_socket, &json_string, 2048);    // get json
     printf("read json %s\n", json_string);
 
 //    int stringlen = strlen(json_string);
     new_json = json_tokener_parse(json_string);
-//    mx_print_json_object(new_json, "mx_tls_worker");
+    mx_print_json_object(new_json, "mx_tls_worker");
 
     if (rc == -1) {
         tls_close(client_socket_list->tls_socket);
@@ -39,6 +38,9 @@ int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info) {
     }
     if (rc > 0) {
         new_package = mx_json_to_package(new_json);
+
+        printf(" login %s\n", new_package->login);
+        printf(" password %s\n", new_package->password);
 
         new_package->client_sock = client_socket_list->socket;
         new_package->client_tls_sock = client_socket_list->tls_socket;
