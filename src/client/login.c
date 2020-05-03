@@ -237,7 +237,6 @@ void authentification(t_client_info *info, t_package *p) {
 
 
 
-    printf("password!!!!8 - %s\n" , p->password);
     ////****
     json_object *new_json = mx_package_to_json(p);
     mx_print_json_object(new_json, "login authentification");

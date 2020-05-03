@@ -35,9 +35,9 @@ t_package *mx_json_to_package(json_object *new_json) {
     new_package->user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
     new_package->room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
     new_package->add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
-    strcpy(new_package->login, json_object_to_json_string(json_object_object_get(new_json, "login")));
-    strcpy(new_package->password, json_object_to_json_string(json_object_object_get(new_json, "password")));
-    strcpy(new_package->data, json_object_to_json_string(json_object_object_get(new_json, "data")));
+    strcpy(new_package->login, json_object_get_string(json_object_object_get(new_json, "login")));
+    strcpy(new_package->password, json_object_get_string(json_object_object_get(new_json, "password")));
+    strcpy(new_package->data, json_object_get_string(json_object_object_get(new_json, "data")));
 
     printf("password pack %s\n", new_package->password);
     return new_package;
