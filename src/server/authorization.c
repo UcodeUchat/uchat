@@ -1,23 +1,46 @@
 #include "uchat.h"
 
 int mx_authorization(t_server_info *i, t_package *p) {
-	int valid = mx_check_client(i, p);
 
-	mx_memset(p->data, 0, sizeof(p->data));
+    printf("function mx_authorization\n");
+
+	int valid = mx_check_client(i, p);
+    json_object *new_json = NULL;
+    const char *json_string = NULL;
+
+    mx_memset(p->data, 0, sizeof(p->data));
 	mx_memset(p->login, 0, sizeof(p->login));
 	mx_memset(p->password, 0, sizeof(p->password));
 	if (valid == 1) {
         p->type = MX_AUTH_TYPE_V;
 		p->add_info = MX_AUTH_TYPE_V;
         mx_get_rooms(i, &p);
-		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
+
+        printf("password!!!! - %s\n" , p->password);
+///******
+        new_json = mx_package_to_json(p);
+        mx_print_json_object(new_json, "mx_authorization 1");
+        json_string = json_object_to_json_string(new_json);
+        printf("json string %s\n", json_string);
+        tls_write(p->client_tls_sock, json_string, strlen(json_string));
+/////***
+
+//		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
 		//Vse kruto, chel in system
 		fprintf(stderr, "Your answer = 1\n");
 	}
 	else {
         p->type = MX_AUTH_TYPE_NV;
 		p->add_info = MX_AUTH_TYPE_NV;
-		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
+
+/////***
+        new_json = mx_package_to_json(p);
+        mx_print_json_object(new_json, "mx_authorization 2");
+        json_string = json_object_to_json_string(new_json);
+        printf("json string %s\n", json_string);
+        tls_write(p->client_tls_sock, json_string, strlen(json_string));
+/////***
+//		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
 		//Uvi, but go to dick :)
 		fprintf(stderr, "Your answer = 0\n");
 	}
@@ -99,6 +122,8 @@ int mx_add_to_db(t_server_info *i, t_package *p, char *l, char *pa){
 int mx_registration(t_server_info *i, t_package *p) {
 	char *login = strdup(p->login);
 	char *pass = strdup(p->password);
+    json_object *new_json = NULL;
+    const char *json_string = NULL;
 
     if (mx_search_in_db(i, p, login, pass) == -1) {
     	printf("STOP!!!\n");
@@ -109,6 +134,14 @@ int mx_registration(t_server_info *i, t_package *p) {
     	mx_add_to_db(i, p, login, pass);
     	p->add_info = MX_REG_TYPE_V;
     }
-    tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
+
+/////***
+    new_json = mx_package_to_json(p);
+    mx_print_json_object(new_json, "mx_registration");
+    json_string = json_object_to_json_string(new_json);
+    printf("json string %s\n", json_string);
+    tls_write(p->client_tls_sock, json_string, strlen(json_string));
+/////***
+//    tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
     return 1;
 }

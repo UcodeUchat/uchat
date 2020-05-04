@@ -9,6 +9,9 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
 
         package->piece = 1;
         strncat(package->data, message, MX_MAX_DATA_SIZE);
+        json_object *new_json = mx_package_to_json(package);
+        mx_print_json_object(new_json, "mx_send_message_from_client");
+
         tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
         while ((pos_in_data += MX_MAX_DATA_SIZE) < msg_size) {
             package->piece = pos_in_data + MX_MAX_DATA_SIZE < msg_size ? 2 : 3;
@@ -21,7 +24,14 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
         printf("send 1 piece\n"); // #
         package->piece = 0;
         strncat(package->data, message, MX_MAX_DATA_SIZE);
-        tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
+
+    ////****
+        json_object *new_json = mx_package_to_json(package);
+        mx_print_json_object(new_json, "mx_send_message_from_client");
+        const char *json_string = json_object_to_json_string(new_json);
+        tls_write(info->tls_client, json_string, strlen(json_string));
+    ////****
+//        tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
     }
     return 0;
 }

@@ -17,6 +17,22 @@ t_socket_list *mx_find_socket_elem(t_socket_list *head, int socket) {
     return NULL;
 }
 
+struct tls *mx_find_tls_socket(t_socket_list *head, int socket) {
+    while (head) {
+        if (head->socket > socket) {
+            head = head->left;
+            continue;
+        }
+        else if (head->socket < socket) {
+            head = head->right;
+            continue;
+        }
+        else
+            return head->tls_socket;
+    }
+    return NULL;
+}
+
 t_socket_list* deleteNode(t_socket_list *head, int socket) {
     if (head == NULL)
         return head; 

@@ -29,15 +29,15 @@ static void mx_get_users_sock(t_server_info **i, t_work *wdb, int room) {
 
     sprintf(command, "SELECT room_id, socket FROM room_user, users WHERE \
             room_id=%d and room_user.user_id=users.id and users.socket!=0;", room);
-    printf("%s\n", command);
+    // printf("%s\n", command);
     if (sqlite3_exec((*i)->db, command, get_user_sock, wdb, 0) != SQLITE_OK) {
         printf("Kомната пуста\n");
         return ;
     }
-    fprintf(stderr, "user_sock : ");
-    for(int j = 0; j < wdb->i; j++)
-        fprintf(stderr, "[%d] ", wdb->user_sock[j]);
-    fprintf(stderr, "\n");
+    // fprintf(stderr, "user_sock : ");
+    // for(int j = 0; j < wdb->i; j++)
+    //     fprintf(stderr, "[%d] ", (wdb->user_sock)[j]);
+    // fprintf(stderr, "\n");
     mx_strdel(&command);
 }
 

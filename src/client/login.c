@@ -2,6 +2,11 @@
 
 pthread_t login_msg_t;
 
+void choose_file_callback(GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    mx_send_file_from_client(info);
+}
+
 void sleep_ms (int milliseconds) {
     struct timespec ts;
     ts.tv_sec = milliseconds / 1000;
@@ -106,8 +111,16 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
         strncat(p->login, login, sizeof(p->login) - 1);
         strncat(p->password, password, sizeof(p->password) - 1);
         p->type = MX_REG_TYPE;
-        p->client_sock = info->socket;
-        tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
+//        p->client_sock = info->socket;
+        //mx_send_message_from_client(info, p, " ");
+
+
+        json_object  *new_json = mx_package_to_json(p);
+        mx_print_json_object(new_json, "login send_data_callback");
+        const char *json_str = json_object_to_json_string(new_json);
+
+        tls_write(info->tls_client, json_str, strlen(json_str));
+//        tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
 
         //wait responce from server
 
@@ -221,7 +234,16 @@ void reg_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 void authentification(t_client_info *info, t_package *p) {
-    tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
+
+
+
+    ////****
+    json_object *new_json = mx_package_to_json(p);
+    mx_print_json_object(new_json, "login authentification");
+    const char *json_string = json_object_to_json_string(new_json);
+    tls_write(info->tls_client, json_string, strlen(json_string));
+    ////****
+//    tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
     while (info->responce == 0) {
 
     }
@@ -326,7 +348,7 @@ void init_general (t_client_info *info) {
     info->data->file_button = gtk_button_new();
     GtkWidget *image1 = gtk_image_new_from_file("img/c.png");
     gtk_button_set_image(GTK_BUTTON(info->data->file_button), image1);
-    //g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info->data);
+    g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->file_button, 600, 350);
     gtk_widget_set_name(info->data->file_button, "entry");
     gtk_widget_show(info->data->file_button);
