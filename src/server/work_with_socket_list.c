@@ -4,9 +4,11 @@ t_socket_list *mx_create_socket_elem(int socket, struct tls *tls_socket,
                                      t_socket_list *parent) {
     t_socket_list *new_elem = (t_socket_list *)malloc(sizeof(t_socket_list));
 
-    new_elem->left = new_elem->right = NULL;
     new_elem->socket = socket;
     new_elem->tls_socket = tls_socket;
+    new_elem->tok = json_tokener_new();
+    new_elem->obj = NULL;
+    new_elem->left = new_elem->right = NULL;
     new_elem->parent = parent;
     return new_elem;
 }

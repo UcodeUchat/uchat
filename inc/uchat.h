@@ -176,6 +176,8 @@ typedef struct  s_package {
 typedef struct  s_socket_list {
     int socket;
     struct tls *tls_socket;
+    struct json_object *obj;
+	struct json_tokener *tok;
     struct s_socket_list *left;
     struct s_socket_list *right;
     struct s_socket_list *parent;
@@ -201,9 +203,9 @@ int mx_find_sock_in_db(t_server_info *i, const char *login);
 int mx_drop_socket(t_server_info *i, int client_sock);
 int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js);
 int mx_check_client(t_server_info *info, json_object *js, int sock);
-int mx_run_function_type(t_server_info *info, t_socket_list *csl, t_package *package, json_object *js);
 int mx_process_message_in_server(t_server_info *info, json_object *js);
 //int mx_process_message_in_server(t_server_info *info, t_package *package);
+int mx_run_function_type(t_server_info *info, t_socket_list *csl);
 int mx_process_file_in_server(t_server_info *info, t_package *package);
 
 // (socket_list)

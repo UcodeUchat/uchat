@@ -20,17 +20,21 @@ void mx_send_package_to_all_in_room(t_server_info *info, json_object *js) {
     }
 }
 
-int mx_run_function_type(t_server_info *info, t_socket_list *csl, t_package *package, json_object *js) {
+int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
     int return_value = -1;
-    int type = json_object_get_int(json_object_object_get(js, "type"));
+    int type = json_object_get_int(json_object_object_get(csl->obj, "type"));
+
+// tmp
+    t_package *package = mx_json_to_package(csl->obj);
+//
 
     fprintf(stderr, "type = [%d]\n", type);
     if (type == MX_MSG_TYPE)
-        return_value = mx_process_message_in_server(info, js);
+        return_value = mx_process_message_in_server(info, csl->obj);
     else if (type == MX_FILE_SEND_TYPE)
         return_value = mx_process_file_in_server(info, package);
     else if (type == MX_AUTH_TYPE)
-    	return_value = mx_authorization(info, csl, js);
+    	return_value = mx_authorization(info, csl, csl->obj);
     else if (type == MX_REG_TYPE)
         return_value = mx_registration(info, package);
     return return_value;
