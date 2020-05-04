@@ -1,4 +1,4 @@
-#include "libmx.h"
+#include "../inc/libmx.h"
 
 void mx_foreach(int *arr, int size, void (*f)(int)) {
     if (arr && size > 0 && f)

@@ -10,7 +10,7 @@
  *
  */
 
-#include "config.h"
+#include "../json.h"
 
 #include <limits.h>
 #include <stdarg.h>
@@ -28,8 +28,8 @@
 #include <windows.h> /* Get InterlockedCompareExchange */
 #endif
 
-#include "linkhash.h"
-#include "random_seed.h"
+#include "../linkhash.h"
+#include "../random_seed.h"
 
 /* hash functions */
 static unsigned long lh_char_hash(const void *k);

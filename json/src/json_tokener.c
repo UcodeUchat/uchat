@@ -13,9 +13,9 @@
  * (http://www.opensource.org/licenses/mit-license.php)
  */
 
-#include "config.h"
+#include "../json.h"
 
-#include "math_compat.h"
+#include "../math_compat.h"
 #include <assert.h>
 #include <ctype.h>
 #include <limits.h>
@@ -25,15 +25,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "arraylist.h"
-#include "debug.h"
-#include "json_inttypes.h"
-#include "json_object.h"
-#include "json_object_private.h"
-#include "json_tokener.h"
-#include "json_util.h"
-#include "printbuf.h"
-#include "strdup_compat.h"
+#include "../json_inttypes.h"
+#include "../json_object_private.h"
+#include "../printbuf.h"
+#include "../strdup_compat.h"
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>

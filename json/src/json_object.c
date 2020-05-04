@@ -10,9 +10,9 @@
  *
  */
 
-#include "config.h"
+#include "../json.h"
 
-#include "strerror_override.h"
+#include "../strerror_override.h"
 
 #include <assert.h>
 #include <ctype.h>
@@ -22,17 +22,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "arraylist.h"
-#include "debug.h"
-#include "json_inttypes.h"
-#include "json_object.h"
-#include "json_object_private.h"
-#include "json_util.h"
-#include "linkhash.h"
-#include "math_compat.h"
-#include "printbuf.h"
-#include "snprintf_compat.h"
-#include "strdup_compat.h"
+
+#include "../json_inttypes.h"
+#include "../json_object_private.h"
+#include "../math_compat.h"
+#include "../printbuf.h"
+#include "../snprintf_compat.h"
+#include "../strdup_compat.h"
 
 #if SIZEOF_LONG_LONG != SIZEOF_INT64_T
 #error "The long long type isn't 64-bits"

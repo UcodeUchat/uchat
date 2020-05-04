@@ -18,9 +18,8 @@
 
 #endif
 
-#include "json_object.h"
+#include "../json.h"
 
 __warn_references(json_object_get, "Warning: please link against libjson-c instead of libjson");
 
-/*        __asm__(".section .gnu.warning." __STRING(sym)  \
-            " ; .ascii \"" msg "\" ; .text") */
+       // __asm__(".section .gnu.warning.", __STRING(sym)," ; .ascii \"", msg, "\" ; .text");

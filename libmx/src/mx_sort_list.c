@@ -1,4 +1,4 @@
-#include "libmx.h"
+#include "../inc/libmx.h"
 
 static void swap(void **s1, void **s2) {
     void *temp = *s1;

@@ -1,4 +1,4 @@
-#include "libmx.h"
+#include "../inc/libmx.h"
 #include <stdio.h>
 
 char *mx_strcat(char *restrict s1, const char *restrict s2) {

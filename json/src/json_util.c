@@ -9,10 +9,10 @@
  *
  */
 
-#include "config.h"
+#include "../json.h"
 #undef realloc
 
-#include "strerror_override.h"
+#include "../strerror_override.h"
 
 #include <ctype.h>
 #include <limits.h>
@@ -48,14 +48,11 @@
 #define open _open
 #endif
 
-#include "snprintf_compat.h"
+#include "../snprintf_compat.h"
 
-#include "debug.h"
-#include "json_inttypes.h"
-#include "json_object.h"
-#include "json_tokener.h"
-#include "json_util.h"
-#include "printbuf.h"
+
+#include "../json_inttypes.h"
+#include "../printbuf.h"
 
 static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const char *filename);
 

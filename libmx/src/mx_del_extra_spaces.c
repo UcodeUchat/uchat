@@ -1,4 +1,4 @@
-#include "libmx.h"
+#include "../inc/libmx.h"
 
 static int mx_size_without_extra_spaces(const char *str) {
     int size = 0;

@@ -12,10 +12,9 @@
 
 #include <stddef.h>
 
-#include "json.h"
-#include "json_object_private.h"
+#include "../json.h"
+#include "../json_object_private.h"
 
-#include "json_object_iterator.h"
 
 /**
  * How It Works

@@ -13,7 +13,7 @@
  * (http://www.opensource.org/licenses/mit-license.php)
  */
 
-#include "config.h"
+#include "../json.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,10 +25,10 @@
 #error Not enough var arg support!
 #endif /* HAVE_STDARG_H */
 
-#include "debug.h"
-#include "printbuf.h"
-#include "snprintf_compat.h"
-#include "vasprintf_compat.h"
+#include "../debug.h"
+#include "../printbuf.h"
+#include "../snprintf_compat.h"
+#include "../vasprintf_compat.h"
 
 static int printbuf_extend(struct printbuf *p, int min_size);
 
