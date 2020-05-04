@@ -9,13 +9,10 @@ void mx_send_package_to_all_in_room(t_server_info *info, json_object *js) {
     for (int i = 0; i < info->wdb->i; i++) {
         tls_socket = mx_find_tls_socket(info->socket_list, sockets_online[i]);
         if (tls_socket) {
-        ////******
 //            json_object *new_json = mx_package_to_json(package);
-            mx_print_json_object(js, "mx_send_package_to_all_in_room");
+//            mx_print_json_object(js, "mx_send_package_to_all_in_room");
             const char *json_string = json_object_to_json_string(js);
             tls_write(tls_socket, json_string, strlen(json_string));
-        ////******
-//            tls_write(tls_socket, package, MX_PACKAGE_SIZE);
         }
     }
 }

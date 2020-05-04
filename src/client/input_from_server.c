@@ -38,7 +38,7 @@ void *mx_process_input_from_server(void *taken_info) {
         if (rc != 0) {
 
             new_json = json_tokener_parse(buf);
-            mx_print_json_object(new_json, "mx_process_input_from_server");
+//            mx_print_json_object(new_json, "mx_process_input_from_server");
             input_package = mx_json_to_package(new_json);
             printf("New_package! Type:%d\n", input_package->type);
 

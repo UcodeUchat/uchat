@@ -11,7 +11,7 @@ int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js) {
         // mx_get_rooms(i, &p);
         // mx_print_json_object(js, "mx_authorization 1");
         json_string = json_object_to_json_string(js);
-        printf("To client:\n%s\n", json_string);
+//        printf("To client:\n%s\n", json_string);
         tls_write(csl->tls_socket, json_string, strlen(json_string));
 	}
 	else { //не вошел
@@ -19,7 +19,7 @@ int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js) {
         json_object_set_int(json_object_object_get(js, "add_info"), MX_AUTH_TYPE_NV);
         // mx_print_json_object(js, "mx_authorization 2");
         json_string = json_object_to_json_string(js);
-        printf("To client:\n%s\n", json_string);
+//        printf("To client:\n%s\n", json_string);
         tls_write(csl->tls_socket, json_string, strlen(json_string));
 	}
     //получаем массив сокетов, которые в сети
