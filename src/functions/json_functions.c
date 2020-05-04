@@ -38,8 +38,6 @@ t_package *mx_json_to_package(json_object *new_json) {
     strcpy(new_package->login, json_object_get_string(json_object_object_get(new_json, "login")));
     strcpy(new_package->password, json_object_get_string(json_object_object_get(new_json, "password")));
     strcpy(new_package->data, json_object_get_string(json_object_object_get(new_json, "data")));
-
-    printf("password pack %s\n", new_package->password);
     return new_package;
 }
 

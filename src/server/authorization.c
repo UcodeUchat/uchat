@@ -1,54 +1,32 @@
 #include "uchat.h"
 
-int mx_authorization(t_server_info *i, t_package *p) {
-
-    printf("function mx_authorization\n");
-
-	int valid = mx_check_client(i, p);
-    json_object *new_json = NULL;
+int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js) {
     const char *json_string = NULL;
-
-    mx_memset(p->data, 0, sizeof(p->data));
-	mx_memset(p->login, 0, sizeof(p->login));
-	mx_memset(p->password, 0, sizeof(p->password));
-	if (valid == 1) {
-        p->type = MX_AUTH_TYPE_V;
-		p->add_info = MX_AUTH_TYPE_V;
-        mx_get_rooms(i, &p);
-
-        printf("password!!!! - %s\n" , p->password);
-///******
-        new_json = mx_package_to_json(p);
-        mx_print_json_object(new_json, "mx_authorization 1");
-        json_string = json_object_to_json_string(new_json);
-        printf("json string %s\n", json_string);
-        tls_write(p->client_tls_sock, json_string, strlen(json_string));
-/////***
-
-//		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
-		//Vse kruto, chel in system
-		fprintf(stderr, "Your answer = 1\n");
+    int valid = mx_check_client(i, js, csl->socket);
+	
+    if (valid == 1) { // вошел
+        json_object_set_int(json_object_object_get(js, "type"), MX_AUTH_TYPE_V);
+        json_object_set_int(json_object_object_get(js, "add_info"), MX_AUTH_TYPE_V);
+        //получаем лист комнат для одного юзера
+        // mx_get_rooms(i, &p);
+        // mx_print_json_object(js, "mx_authorization 1");
+        json_string = json_object_to_json_string(js);
+        printf("To client:\n%s\n", json_string);
+        tls_write(csl->tls_socket, json_string, strlen(json_string));
 	}
-	else {
-        p->type = MX_AUTH_TYPE_NV;
-		p->add_info = MX_AUTH_TYPE_NV;
-
-/////***
-        new_json = mx_package_to_json(p);
-        mx_print_json_object(new_json, "mx_authorization 2");
-        json_string = json_object_to_json_string(new_json);
-        printf("json string %s\n", json_string);
-        tls_write(p->client_tls_sock, json_string, strlen(json_string));
-/////***
-//		tls_write(p->client_tls_sock, p, MX_PACKAGE_SIZE);
-		//Uvi, but go to dick :)
-		fprintf(stderr, "Your answer = 0\n");
+	else { //не вошел
+        json_object_set_int(json_object_object_get(js, "type"), MX_AUTH_TYPE_NV);
+        json_object_set_int(json_object_object_get(js, "add_info"), MX_AUTH_TYPE_NV);
+        // mx_print_json_object(js, "mx_authorization 2");
+        json_string = json_object_to_json_string(js);
+        printf("To client:\n%s\n", json_string);
+        tls_write(csl->tls_socket, json_string, strlen(json_string));
 	}
-
-    if (p->type == MX_AUTH_TYPE_V){
-        int *array = mx_get_users_sock_in_room(&i, 0);
-        (void)array;
-    }
+    //получаем массив сокетов, которые в сети
+    // if (p->type == MX_AUTH_TYPE_V){
+    //     int *array = mx_get_users_sock_in_room(&i, 0);
+    //     (void)array;
+    // }
 	return 1;
 }
 

@@ -20,19 +20,18 @@ void mx_send_package_to_all_in_room(t_server_info *info, t_package *package) {
     }
 }
 
-int mx_run_function_type(t_server_info *info, t_package *package) {
+int mx_run_function_type(t_server_info *info, t_socket_list *csl, t_package *package, json_object *js) {
     int return_value = -1;
-    int type = package->type;
+    int type = json_object_get_int(json_object_object_get(js, "type"));
 
-    // fprintf(stderr, "Я нахожусь здесь....\n");
     fprintf(stderr, "type = [%d]\n", type);
     if (type == MX_MSG_TYPE)
         return_value = mx_process_message_in_server(info, package);
     else if (type == MX_FILE_SEND_TYPE)
         return_value = mx_process_file_in_server(info, package);
     else if (type == MX_AUTH_TYPE)
-    	return_value = mx_authorization(info, package);
+    	return_value = mx_authorization(info, csl, js);
     else if (type == MX_REG_TYPE)
-        mx_registration(info, package);
+        return_value = mx_registration(info, package);
     return return_value;
 }
