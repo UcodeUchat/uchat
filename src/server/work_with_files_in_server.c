@@ -55,7 +55,8 @@ int mx_final_file_input_server(t_server_info *info, t_package *package) {
     fclose(our_file_list->file);
     if (our_file_list->file_size == our_file_list->package_size) // Sucess file sending
         // add to db and take, msg id
-        mx_send_package_to_all_in_room(info, our_file_list->package);
+        printf("mx_final_file_input_server\n");
+//        mx_send_package_to_all_in_room(info, our_file_list->package);
     else {
         char *full_name = mx_strjoin(MX_SAVE_FOLDER_IN_SERVER, our_file_list->package->data);
 

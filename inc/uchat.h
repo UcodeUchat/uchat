@@ -202,7 +202,8 @@ int mx_drop_socket(t_server_info *i, int client_sock);
 int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js);
 int mx_check_client(t_server_info *info, json_object *js, int sock);
 int mx_run_function_type(t_server_info *info, t_socket_list *csl, t_package *package, json_object *js);
-int mx_process_message_in_server(t_server_info *info, t_package *package);
+int mx_process_message_in_server(t_server_info *info, json_object *js);
+//int mx_process_message_in_server(t_server_info *info, t_package *package);
 int mx_process_file_in_server(t_server_info *info, t_package *package);
 
 // (socket_list)
@@ -218,8 +219,8 @@ void mx_delete_socket_elem(t_socket_list **head, int socket);
 void mx_print_socket_tree(t_socket_list *head, const char *dir, int level);
 
 int *mx_get_users_sock_in_room(t_server_info **i, int room);
-void mx_send_package_to_all_in_room(t_server_info *info, t_package *package);
-
+//void mx_send_package_to_all_in_room(t_server_info *info, t_package *package);
+void mx_send_package_to_all_in_room(t_server_info *info,  json_object *js);
 int mx_add_new_file_server(t_file_list **input_files, t_package *package);
 int mx_add_data_to_file_server(t_file_list **input_files, t_package *package);
 int mx_final_file_input_server(t_server_info *info, t_package *package);
