@@ -56,6 +56,8 @@ t_socket_list* deleteNode(t_socket_list *head, int socket) {
 
             head->socket = temp->socket;
             head->tls_socket = temp->tls_socket;
+            head->tok = temp->tok;
+            head->obj = temp->obj;
             head->right = deleteNode(head->right, temp->socket);
         }
     }
@@ -68,7 +70,9 @@ void mx_delete_socket_elem(t_socket_list **head, int socket) {
     if (elem_to_delete && elem_to_delete->tls_socket) {
         close(socket);
         tls_close(elem_to_delete->tls_socket);
-        tls_free(elem_to_delete->tls_socket);
+        tls_free(elem_to_delete->tls_socket);      
+        // json_object_put(elem_to_delete->obj); // test
+        json_tokener_free(elem_to_delete->tok); // test
     }
     *head = deleteNode(*head, socket);
 }
