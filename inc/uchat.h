@@ -149,6 +149,7 @@ typedef struct  s_server_info {  // struct server
 #define MX_REG_TYPE 6
 #define MX_REG_TYPE_V 7
 #define MX_REG_TYPE_NV 8
+#define MX_LOGOUT_TYPE 9
 #define MX_MAX_DATA_SIZE (int)(sizeof(((t_package *)0)->data) - 1)
 #define MX_PACKAGE_SIZE sizeof(t_package)
 // sizeof((type *)0)->member)
