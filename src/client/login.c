@@ -401,6 +401,9 @@ void authentification(t_client_info *info) {
     mx_print_json_object(js, "login authentification");
     const char *json_string = json_object_to_json_string(js);
     tls_write(info->tls_client, json_string, strlen(json_string));
+    while (info->responce == 0) {
+
+    }
     info->responce = 0;
 }
 
