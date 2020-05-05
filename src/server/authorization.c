@@ -6,15 +6,15 @@ int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js) {
 	
     if (valid == 1) { // вошел
         json_object_set_int(json_object_object_get(js, "type"), MX_AUTH_TYPE_V);
-        json_object_set_int(json_object_object_get(js, "add_info"), MX_AUTH_TYPE_V);
+        json_object_object_add(js, "room_id", json_object_new_int(0));
         //получаем лист комнат для одного юзера
         // mx_get_rooms(i, &p);
+        mx_print_json_object(js, "auth");
         json_string = json_object_to_json_string(js);
         tls_write(csl->tls_socket, json_string, strlen(json_string));
 	}
 	else { //не вошел
         json_object_set_int(json_object_object_get(js, "type"), MX_AUTH_TYPE_NV);
-        json_object_set_int(json_object_object_get(js, "add_info"), MX_AUTH_TYPE_NV);
         json_string = json_object_to_json_string(js);
         tls_write(csl->tls_socket, json_string, strlen(json_string));
 	}

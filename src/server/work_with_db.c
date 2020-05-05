@@ -4,9 +4,9 @@ static int check_data(void *js, int argc, char **argv, char **col_name) {
     (void)argc;
     (void)col_name;
     if (argv[0] && strcmp(argv[0], json_object_get_string(json_object_object_get(js, "password"))) == 0) {
-        json_object_set_int(json_object_object_get(js, "user_id"), atoi(argv[1]));
-        // struct json_object *t = json_object_new_int(atoi(argv[1]));
-        // json_object_object_add((struct json_object*) js, "user_id", t);
+        // json_object_set_int(json_object_object_get(js, "user_id"), atoi(argv[1]));
+        struct json_object *t = json_object_new_int(atoi(argv[1]));
+        json_object_object_add((struct json_object*) js, "user_id", t);
         return 0;
     }
     return 1;
