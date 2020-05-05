@@ -232,8 +232,9 @@ int mx_final_file_input_server(t_server_info *info, t_package *package);
 void mx_get_rooms(t_server_info *i, t_package **p);
 
 //reg
-int mx_registration(t_server_info *i, t_package *p);
-int mx_search_in_db(t_server_info *i, t_package *p, char *l, char *pa);
+int mx_registration(t_server_info *i, t_socket_list *csl, json_object *js);
+int mx_add_to_db(t_server_info *i, const char *l, const char *pa);
+int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
 
 // client
 int mx_start_client(t_client_info *info);

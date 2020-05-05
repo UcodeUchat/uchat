@@ -18,14 +18,6 @@ int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
     int return_value = -1;
     int type = json_object_get_int(json_object_object_get(csl->obj, "type"));
 
-// tmp
-    t_package *package;
-
-    if (type == MX_REG_TYPE)
-        package = mx_json_to_package(csl->obj);
-    printf("type = [%d]\n", type);
-//
-
     if (type == MX_MSG_TYPE)
         return_value = mx_process_message_in_server(info, csl->obj);
     else if (type == MX_FILE_SEND_TYPE) {
@@ -38,6 +30,6 @@ int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
     else if (type == MX_AUTH_TYPE)
     	return_value = mx_authorization(info, csl, csl->obj);
     else if (type == MX_REG_TYPE)
-        return_value = mx_registration(info, package);
+        return_value = mx_registration(info, csl, csl->obj);
     return return_value;
 }
