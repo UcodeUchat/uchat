@@ -138,7 +138,7 @@ typedef struct  s_server_info {  // struct server
     struct s_work *wdb;
 }               t_server_info;
 
-
+#define MX_MAX_FILE_SIZE 30000000
 #define MX_MAX_USERS_IN_ROOM 1024
 #define MX_MSG_TYPE 1
 #define MX_FILE_SEND_TYPE 2
