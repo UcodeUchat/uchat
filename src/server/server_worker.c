@@ -35,11 +35,14 @@ int mx_tls_worker(t_socket_list *csl, t_server_info *info) {
     size_t readed;
     char *input = malloc(1024);
 
-    readed = tls_read(csl->tls_socket, input, 1024);    // get json
+    while((readed = tls_read(csl->tls_socket, input, 1024)) > 0) {   // get json
+    printf("INSIDE\n");
     if (readed > 0) {
         mx_process_input_objects(info, csl, input, readed);
     }
     else
         printf("Readed 0 bytes\n");
+    }
+    printf("EXIT\n");
     return 0;
 }

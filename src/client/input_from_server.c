@@ -46,7 +46,7 @@ void *mx_process_input_from_server(void *taken_info) {
 //            mx_print_json_object(new_json, "process_input_from_server");
 
             if (input_package->type == MX_FILE_SEND_TYPE)
-                mx_process_file_in_client(info, input_package);
+                mx_process_file_in_client(info, new_json);
             //mx_print_curr_time();
             if (input_package->type == MX_AUTH_TYPE || input_package->type == MX_AUTH_TYPE_V ||
                 input_package->type == MX_AUTH_TYPE_NV) {

@@ -186,9 +186,8 @@ typedef struct  s_socket_list {
 typedef struct  s_file_list {
     int user_id;
     int file_size;
-    int package_size;
     FILE *file;
-    struct s_package *package;
+    char *file_name;
     struct s_file_list *next;
 }               t_file_list;
 
@@ -223,10 +222,12 @@ int *mx_get_users_sock_in_room(t_server_info **i, int room);
 void mx_send_json_to_all_in_room(t_server_info *info, json_object *json_obj);
 
 // work with file
+t_file_list *mx_new_file_list_elem(json_object *obj);
+void mx_push_file_elem_to_list(t_file_list **files_list, t_file_list *new);
 int mx_save_file_in_server(t_server_info *info, t_socket_list *csl);
-int mx_add_new_file_server(t_file_list **input_files, t_package *package);
-int mx_add_data_to_file_server(t_file_list **input_files, t_package *package);
-int mx_final_file_input_server(t_server_info *info, t_package *package);
+int mx_add_new_file_server(t_file_list **input_files, t_socket_list *csl);
+int mx_add_data_to_file_server(t_file_list **input_files, json_object *obj);
+int mx_final_file_input_server(t_server_info *info, t_socket_list *csl);
 
 //get_rooms
 void mx_get_rooms(t_server_info *i, t_package **p);
@@ -239,7 +240,7 @@ int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
 // client
 int mx_start_client(t_client_info *info);
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
-int mx_process_file_in_client(t_client_info *info, t_package *package);
+int mx_process_file_in_client(t_client_info *info, json_object *obj);
 int mx_add_data_to_file_client(t_file_list **input_files, t_package *package);
 int mx_add_new_file_client(t_file_list **input_files, t_package *package);
 int mx_final_file_input_client(t_client_info *info, t_package *package);

@@ -22,7 +22,6 @@ int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
         return_value = mx_process_message_in_server(info, csl->obj);
     else if (type == MX_FILE_SEND_TYPE) {
         return_value = mx_save_file_in_server(info, csl);
-        // return_value = mx_process_file_in_server(info, package);
     }
     else if (type == MX_FILE_DOWNLOAD_TYPE) {
         printf("MX_FILE_DOWNLOAD_TYPE\n");
