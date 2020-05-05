@@ -1,51 +1,67 @@
 #include "uchat.h"
 
-bool pick_file_to_send(FILE **file, t_client_info *info, t_package *package) {
+bool pick_file_to_send(t_client_info *info, FILE **file, json_object **obj) {
     (void)info;
-    (void)package;
-    // need to write a function for picking a file
-    struct stat file_stat;
-    char file_name[256] = {0};
+    printf("pick_file_to_send\n");
 
-    scanf("%s", file_name);
-    printf("pick_file_to_send 1\n");
-    if ((*file = fopen(file_name, "r")) != NULL) {
-        if (ftrylockfile(*file) == 0) {
-            printf("pick_file_to_send 2+\n");
-            stat(file_name, &file_stat);
-            package->add_info = file_stat.st_size;
-            strncat(package->data, file_name, MX_MAX_DATA_SIZE);
-            return 0;
-        }
-        else
-            fprintf(stderr, "Can't send this file, something using it!\n");
+    char file_path[256] = {0};
+    char file_name[256] = {0};
+    scanf("%s", file_path);
+    strcat(file_name, file_path);
+    //
+    if ((*file = fopen(file_path, "r")) != NULL) {
+        struct stat file_stat;
+
+        stat(file_path, &file_stat);
+        // if (file_stat.st_size > 0 && file_stat.st_size <= MX_MAX_FILE_SIZE)
+        // need to lock file editing
+        *obj = mx_create_basic_json_object(MX_FILE_SEND_TYPE);
+        json_object_object_add(*obj, "file_name", json_object_new_string(file_name));
+        json_object_object_add(*obj, "file_size", json_object_new_int(file_stat.st_size));
+        return 0;
+        //
+        //
     }
     return 1;
 }
 
 void mx_send_file_from_client(t_client_info *info) {
-    t_package *package = mx_create_new_package();
-    FILE *file_to_send;
+    FILE *file;
+    json_object *send_obj;
 
-    printf("mx_send_file \n");
-    package->piece = 1;
-    package->type = MX_FILE_SEND_TYPE;
-    package->room_id = 0; // take that from info
-    package->user_id = info->id; // take that from info
-    if (pick_file_to_send(&file_to_send, info, package) == 0) {
-        int num_bytes = 1;
+    if (pick_file_to_send(info, &file, &send_obj) == 0) {
+        printf("file picked\n");
+        int readed = 1;
+        const char *json_string;
+        char buffer[4096];
+        json_object *data;
 
-        tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
-        mx_memset(package->data, 0, MX_MAX_DATA_SIZE);
-        while(num_bytes > 0 && !feof(file_to_send)) {
-            sleep(1);
-            num_bytes = fread(package->data, 1, MX_MAX_DATA_SIZE, file_to_send);
-            package->piece = feof(file_to_send) ? 3 : 2;
-            package->add_info = num_bytes;
-            tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
-            mx_memset(package->data, 0, MX_MAX_DATA_SIZE);
+        json_object_object_add(send_obj, "piece", json_object_new_int(1));
+        json_object_object_add(send_obj, "user_id", json_object_new_int(info->id));
+        json_object_object_add(send_obj, "room_id", json_object_new_int(0)); // need to know
+        
+        json_string = json_object_to_json_string(send_obj);
+
+        tls_write(info->tls_client, json_string, strlen(json_string));
+
+        json_object_object_del(send_obj, "file_name");
+        json_object_object_del(send_obj, "file_size");
+        json_object_set_int(json_object_object_get(send_obj, "piece"), 2);
+        data = json_object_new_string("");
+        json_object_object_add(send_obj, "data", data);
+        printf("all prepared before while loop\n");
+        while(readed > 0 && !feof(file)) {
+            printf("while\n");
+            readed = fread(buffer, 1, sizeof(buffer), file);
+            printf("readed:%d\n", readed);
+            json_object_set_string_len(data, buffer, readed);
+            feof(file) ? json_object_set_int(json_object_object_get(send_obj, "piece"), 3) : 0;
+            json_string = json_object_to_json_string(send_obj);
+            tls_write(info->tls_client, json_string, strlen(json_string));
         }
-        funlockfile(file_to_send);
-        fclose(file_to_send);
+        json_object_put(send_obj);
+        // unlock file
+        fclose(file);
     }
+    printf("exit from function\n");
 }

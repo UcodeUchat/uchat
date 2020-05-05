@@ -11,6 +11,14 @@
 #define KEY9 "data"  // char[]
 //#define KEY5 "time"
 
+// new
+json_object *mx_create_basic_json_object(int type) {
+    json_object *new_object = json_object_new_object();
+
+    json_object_object_add(new_object, "type", json_object_new_int(type));
+    return new_object;
+}
+//
 
 json_object *mx_package_to_json(t_package *package) {
     json_object *new_json;
