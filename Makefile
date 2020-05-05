@@ -40,6 +40,7 @@ SRC_SERVER = main_server.c \
 	run_function_type.c \
 	process_message_in_server.c \
 	process_file_in_server.c \
+	save_file_in_server.c \
 	authorization.c \
 	work_with_socket_list.c \
 	work_with_socket_list_2.c \
