@@ -31,5 +31,7 @@ int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
     	return_value = mx_authorization(info, csl, csl->obj);
     else if (type == MX_REG_TYPE)
         return_value = mx_registration(info, csl, csl->obj);
+    else if (type == MX_LOGOUT_TYPE)
+        return_value = mx_logout(info, csl, csl->obj);
     return return_value;
 }

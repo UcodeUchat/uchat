@@ -1,7 +1,8 @@
 #include "uchat.h"
 
-#define KEY10 "rooms_user"
-#define KEY11 "rooms_name"
+#define KEY10 "rooms"
+#define KEY11 "rooms_user"
+#define KEY12 "rooms_name"
 
 static int get_rooms(void *, int argc, char **argv, char **col_name) {
 
@@ -16,6 +17,7 @@ void mx_get_rooms(t_server_info *i, json_object *js) {
 	char *req = mx_strnew(1024);
 	int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
 	json_object *array = json_object_new_array();
+	json_object *rooms = json_object_new_object();
 
 	json_object_object_add(js, KEY10, array);
 	// json_object_array_add(array, json_object_new_int(1));
