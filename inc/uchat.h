@@ -149,6 +149,7 @@ typedef struct  s_server_info {  // struct server
 #define MX_REG_TYPE 6
 #define MX_REG_TYPE_V 7
 #define MX_REG_TYPE_NV 8
+#define MX_LOGOUT_TYPE 9
 #define MX_MAX_DATA_SIZE (int)(sizeof(((t_package *)0)->data) - 1)
 #define MX_PACKAGE_SIZE sizeof(t_package)
 // sizeof((type *)0)->member)
@@ -206,6 +207,7 @@ int mx_check_client(t_server_info *info, json_object *js, int sock);
 int mx_process_message_in_server(t_server_info *info, json_object *js);
 int mx_run_function_type(t_server_info *info, t_socket_list *csl);
 int mx_process_file_in_server(t_server_info *info, t_package *package);
+int mx_logout(t_server_info *i, t_socket_list *csl, json_object *js);
 
 // socket_list
 t_socket_list *mx_create_socket_elem(int socket, struct tls *tls_socket,

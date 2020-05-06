@@ -233,6 +233,34 @@ void reg_callback (GtkWidget *widget, t_client_info *info) {
     gtk_widget_show (info->data->register_box);
 }
 
+void logout(t_client_info *info) {
+    json_object *new_json;
+
+    new_json = json_object_new_object();
+    json_object_object_add(new_json, "type", json_object_new_int(MX_LOGOUT_TYPE));
+    json_object_object_add(new_json, "login", json_object_new_string(info->login));
+    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
+    mx_print_json_object(new_json, "logout");
+    const char *json_string = json_object_to_json_string(new_json);
+    tls_write(info->tls_client, json_string, strlen(json_string));
+    // while (info->responce == 0) {
+
+    // }
+    // info->responce = 0;
+}
+
+
+void logout_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    info->auth_client = 0;
+    logout(info);
+    gtk_window_set_title(GTK_WINDOW(info->data->window), "Login");
+    gtk_entry_set_text(GTK_ENTRY(info->data->login_entry), "");
+    gtk_entry_set_text(GTK_ENTRY(info->data->password_entry), "");
+    gtk_widget_hide(info->data->general_box);
+    gtk_widget_show (info->data->login_box);
+}
+
 void close_menu_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info) {
     (void)widget;
     (void)event;
@@ -256,6 +284,7 @@ void init_menu (t_client_info *info) {
     gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
     gtk_orientable_set_orientation (GTK_ORIENTABLE(box), GTK_ORIENTATION_VERTICAL);
     gtk_fixed_put (GTK_FIXED (fixed), box, 0, 10);
+    //--buttons
     GtkWidget *box1 = gtk_box_new(FALSE, 0);
     gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
     gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
@@ -274,6 +303,44 @@ void init_menu (t_client_info *info) {
     gtk_widget_set_name(button, "entry");
     gtk_widget_show(button);
     gtk_widget_show(box1);
+    box1 = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
+    button = gtk_button_new_with_label("Logout");
+    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(logout_callback), info);
+    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_set_name(button, "entry");
+    gtk_widget_show(button);
+    gtk_widget_show(box1);
+    box1 = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
+    button = gtk_button_new_with_label("Settings");
+    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_set_name(button, "entry");
+    gtk_widget_show(button);
+    gtk_widget_show(box1);
+    box1 = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
+    button = gtk_button_new_with_label("Friends");
+    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_set_name(button, "entry");
+    gtk_widget_show(button);
+    gtk_widget_show(box1);
+    box1 = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
+    button = gtk_button_new_with_label("Blacklist");
+    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_set_name(button, "entry");
+    gtk_widget_show(button);
+    gtk_widget_show(box1);
+    //--
     gtk_widget_show (box);
     gtk_widget_show(fixed);
     gtk_widget_show(main_box);
@@ -329,7 +396,8 @@ void init_general (t_client_info *info) {
     //--
     //--File selection
     info->data->file_button = gtk_button_new();
-    GtkWidget *image1 = gtk_image_new_from_file("img/c.png");
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/file.png", 20, 20, TRUE, NULL);
+    GtkWidget *image1 = gtk_image_new_from_pixbuf(pixbuf);
     gtk_button_set_image(GTK_BUTTON(info->data->file_button), image1);
     g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->file_button, 600, 350);
@@ -429,6 +497,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         pthread_create(&login_msg_t, 0, login_msg_thread, info);
     }
     else if(info->auth_client == 1) {
+        init_general(info);
         gtk_widget_hide(info->data->login_box);
         gtk_window_set_title(GTK_WINDOW(info->data->window), "Uchat");
         gtk_widget_show(info->data->general_box);
@@ -547,7 +616,6 @@ void init_window(t_client_info *info) {
 int mx_login (t_client_info *info) {
     init_window(info);
     init_reg(info);
-    init_general(info);
     init_login(info);
 
     gtk_main();

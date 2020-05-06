@@ -95,7 +95,7 @@ void *mx_process_input_from_server(void *taken_info) {
             if (type == MX_FILE_SEND_TYPE) {
             //     mx_process_file_in_client(info, input_package);
             }
-            if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) {
+            else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) {
                 input_authentification(info, new_json);
             }
             else if (type == MX_REG_TYPE_V || type == MX_REG_TYPE_NV) {
