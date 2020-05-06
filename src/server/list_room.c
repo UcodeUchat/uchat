@@ -2,6 +2,7 @@
 
 #define KEY10 "rooms"
 
+
 static int get_rooms(void *array, int argc, char **argv, char **col_name) {
 	json_object *room = json_object_new_object();
 	json_object *name = json_object_new_string(argv[2]);
