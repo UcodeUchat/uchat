@@ -13,14 +13,14 @@ bool pick_file_to_send(t_client_info *info, FILE **file, json_object **obj) {
         struct stat file_stat;
 
         stat(file_path, &file_stat);
-        // if (file_stat.st_size > 0 && file_stat.st_size <= MX_MAX_FILE_SIZE)
+        if (file_stat.st_size > 0 && file_stat.st_size <= MX_MAX_FILE_SIZE) {
         // need to lock file editing
-        *obj = mx_create_basic_json_object(MX_FILE_SEND_TYPE);
-        json_object_object_add(*obj, "file_name", json_object_new_string(file_name));
-        json_object_object_add(*obj, "file_size", json_object_new_int(file_stat.st_size));
-        return 0;
+            *obj = mx_create_basic_json_object(MX_FILE_SEND_TYPE);
+            json_object_object_add(*obj, "file_name", json_object_new_string(file_name));
+            json_object_object_add(*obj, "file_size", json_object_new_int(file_stat.st_size));
+            return 0;
         //
-        //
+        }
     }
     return 1;
 }
