@@ -233,23 +233,6 @@ void reg_callback (GtkWidget *widget, t_client_info *info) {
     gtk_widget_show (info->data->register_box);
 }
 
-void authentification(t_client_info *info, t_package *p) {
-
-
-
-    ////****
-    json_object *new_json = mx_package_to_json(p);
-    mx_print_json_object(new_json, "login authentification");
-    const char *json_string = json_object_to_json_string(new_json);
-    tls_write(info->tls_client, json_string, strlen(json_string));
-    ////****
-//    tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
-    while (info->responce == 0) {
-
-    }
-    info->responce = 0;
-}
-
 void close_menu_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info) {
     (void)widget;
     (void)event;
@@ -408,17 +391,28 @@ void init_general (t_client_info *info) {
     gtk_widget_show(info->data->notebook);
 }
 
+void authentification(t_client_info *info) {
+    json_object *js;
+
+    js = json_object_new_object();
+    json_object_object_add(js, "type", json_object_new_int(MX_AUTH_TYPE));
+    json_object_object_add(js, "login", json_object_new_string(info->login));
+    json_object_object_add(js, "password", json_object_new_string(info->password));
+    mx_print_json_object(js, "login authentification");
+    const char *json_string = json_object_to_json_string(js);
+    tls_write(info->tls_client, json_string, strlen(json_string));
+    while (info->responce == 0) {
+
+    }
+    info->responce = 0;
+}
+
 void enter_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
     //--auth
-    t_package *p = mx_create_new_package();
     info->login = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->login_entry));
     info->password = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->password_entry));
-    strncat(p->login, info->login, sizeof(p->login) - 1);
-    strncat(p->password, info->password, sizeof(p->password) - 1);
-    p->type = MX_AUTH_TYPE;
-    p->client_sock = info->socket;
-    authentification(info, p);
+    authentification(info);
     //--
     if (info->auth_client == 0) {
         pthread_cancel(login_msg_t);

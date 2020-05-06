@@ -71,7 +71,6 @@ void mx_delete_socket_elem(t_socket_list **head, int socket) {
         close(socket);
         tls_close(elem_to_delete->tls_socket);
         tls_free(elem_to_delete->tls_socket);      
-        // json_object_put(elem_to_delete->obj); // test
         json_tokener_free(elem_to_delete->tok); // test
     }
     *head = deleteNode(*head, socket);

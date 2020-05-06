@@ -139,13 +139,13 @@ int main(int argc, char *argv[]){
 		}
 		sprintf(req2, "\
 				insert into users (socket, login, password, access)\
-				values (100,'mmasniy', '123123', 1);\n\
+				values (0,'mmasniy', '123123', 1);\n\
 				insert into users (socket, login, password, access)\
-				values (110,'vkmetyk', '123123', 1);\n\
+				values (0,'vkmetyk', '123123', 1);\n\
 				insert into users (socket, login, password, access)\
-				values (120,'snikolayen', '123123', 1);\n\
+				values (0,'snikolayen', '123123', 1);\n\
 				insert into users (socket, login, password, access)\
-				values (130,'mlibovych', '123123', 1);\n\
+				values (0,'mlibovych', '123123', 1);\n\
 				insert into users (socket, login, password, access)\
                 values (0,'neo', '1', 1);\n\
 				insert into rooms (name, access) values ('First', 1);\
