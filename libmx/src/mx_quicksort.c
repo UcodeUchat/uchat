@@ -1,4 +1,4 @@
-#include "libmx.h"
+#include "../inc/libmx.h"
 
 static int sort(char **arr, int left, int right) {
     int l = left;

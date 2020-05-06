@@ -1,0 +1,33 @@
+{
+    "type": 3,
+    "piece": 0,
+    "user_id": 0,
+    "room_id": 0,
+    "add_info": 0,
+    "login": "neo",
+    "password": "1",
+    "data": "PACKAGE_1"
+}
+{
+    "test": {
+        "name":"Hello"
+    },
+    "type": 2,
+    "piece": 0,
+    "user_id": 0,
+    "room_id": 0,
+    "add_info": 0,
+    "login": "neo",
+    "password": "1",
+    "data": "PACKAGE_2"
+}
+{
+    "type": 1,
+    "piece": 0,
+    "user_id": 0,
+    "room_id": 0,
+    "add_info": 0,
+    "login": "neo",
+    "password": "1",
+    "data": "PACKAGE_3"
+}

@@ -1,4 +1,4 @@
-#include "libmx.h"
+#include "../inc/libmx.h"
 
 char *mx_itoa(int number) {
     char *num_to_str = mx_strnew(mx_digits_num(number));

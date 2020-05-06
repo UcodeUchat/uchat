@@ -1,4 +1,4 @@
-#include "libmx.h"
+#include "../inc/libmx.h"
 
 short mx_digits_num(long long num) {
     int sum = 0;

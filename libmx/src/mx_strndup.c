@@ -1,4 +1,4 @@
-#include "libmx.h"
+#include "../inc/libmx.h"
 
 static size_t mx_check_len(const char *s1, size_t n) {
 	size_t sz = 0;
