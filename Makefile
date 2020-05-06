@@ -47,6 +47,7 @@ SRC_SERVER = main_server.c \
 	work_with_files_list.c \
 	request_for_rooms.c \
 	list_room.c \
+	logout.c \
 
 SRC_CLIENT = main_client.c \
 	start_client.c \
