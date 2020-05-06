@@ -6,20 +6,20 @@ int mx_process_input_objects(t_server_info *info, t_socket_list *csl, char *buff
     csl->obj = json_tokener_parse_ex(csl->tok, buffer, rd);
     jerr = json_tokener_get_error(csl->tok);
 
+    printf("parse:%zu, rd:%zu\n", json_tokener_get_parse_end(csl->tok), rd);
     if (jerr == json_tokener_success) {
         mx_run_function_type(info, csl);
-        json_tokener_reset(csl->tok);
-        json_object_put(csl->obj);
+        // json_tokener_reset(csl->tok);
+        printf("json_tokener_success: %s\n", json_tokener_error_desc(jerr));
     }
     else if (jerr == json_tokener_continue) {
-        // printf("json_tokener_continue\n");
+        printf("json_tokener_continue: %s\n", json_tokener_error_desc(jerr));
     }
     else {
-        json_tokener_reset(csl->tok);
-        json_object_put(csl->obj);
+        // json_tokener_reset(csl->tok);
         fprintf(stderr, "Error: %s\n", json_tokener_error_desc(jerr));
-        return 1;
     }
+    json_object_put(csl->obj);
     return 0;
 }
 

@@ -252,6 +252,7 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
 void sleep_ms (int milliseconds);
 
 // functions
+int tls_send(struct tls *tls_socket, const char *content, int size);
 void mx_print_curr_time(void);
 char *mx_curr_time(void);
 void mx_print_tid(const char *s);
