@@ -118,7 +118,8 @@ int main(int argc, char *argv[]){
 					FOREIGN KEY (user_id) REFERENCES users (id)\
 					FOREIGN KEY (room_id) REFERENCES rooms (id));\n\
 				\
-				create table msg_history (id integer PRIMERY KEY,\
+				create table msg_history (\
+					id INTEGER PRIMARY KEY AUTOINCREMENT,\
 					user_id integer, room_id integer, message text,\
 					addition_cont text, time data,\
 					FOREIGN KEY (user_id) REFERENCES users (id),\

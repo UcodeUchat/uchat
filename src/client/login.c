@@ -239,6 +239,7 @@ void logout(t_client_info *info) {
     new_json = json_object_new_object();
     json_object_object_add(new_json, "type", json_object_new_int(MX_LOGOUT_TYPE));
     json_object_object_add(new_json, "login", json_object_new_string(info->login));
+    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
     mx_print_json_object(new_json, "logout");
     const char *json_string = json_object_to_json_string(new_json);
     tls_write(info->tls_client, json_string, strlen(json_string));
@@ -385,11 +386,6 @@ void init_general (t_client_info *info) {
     gtk_widget_set_name(info->data->menu_button, "entry");
     gtk_widget_show(info->data->menu_button);
     //--
-    //--Font
-    // GtkWidget *font = gtk_font_button_new ();
-    // gtk_fixed_put(GTK_FIXED(info->data->general_box), font, 520, 400);
-    // gtk_widget_show(font);
-    //--
     //--Send button
     info->data->send_button = gtk_button_new_with_label("Send");
     g_signal_connect(G_OBJECT(info->data->send_button), "clicked", G_CALLBACK(send_callback), info);
@@ -400,7 +396,8 @@ void init_general (t_client_info *info) {
     //--
     //--File selection
     info->data->file_button = gtk_button_new();
-    GtkWidget *image1 = gtk_image_new_from_file("img/c.png");
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/file.png", 20, 20, TRUE, NULL);
+    GtkWidget *image1 = gtk_image_new_from_pixbuf(pixbuf);
     gtk_button_set_image(GTK_BUTTON(info->data->file_button), image1);
     g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->file_button, 600, 350);

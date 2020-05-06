@@ -207,6 +207,7 @@ int mx_check_client(t_server_info *info, json_object *js, int sock);
 int mx_process_message_in_server(t_server_info *info, json_object *js);
 int mx_run_function_type(t_server_info *info, t_socket_list *csl);
 int mx_process_file_in_server(t_server_info *info, t_package *package);
+int mx_logout(t_server_info *i, t_socket_list *csl, json_object *js);
 
 // socket_list
 t_socket_list *mx_create_socket_elem(int socket, struct tls *tls_socket,
