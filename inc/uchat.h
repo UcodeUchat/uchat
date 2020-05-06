@@ -229,7 +229,7 @@ int mx_add_data_to_file_server(t_file_list **input_files, t_package *package);
 int mx_final_file_input_server(t_server_info *info, t_package *package);
 
 //get_rooms
-void mx_get_rooms(t_server_info *i, t_package **p);
+void mx_get_rooms(t_server_info *i, json_object *js);
 
 //reg
 int mx_registration(t_server_info *i, t_socket_list *csl, json_object *js);
