@@ -119,8 +119,8 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
         mx_print_json_object(new_json, "login send_data_callback");
         const char *json_str = json_object_to_json_string(new_json);
 
-        tls_write(info->tls_client, json_str, strlen(json_str));
-//        tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
+        tls_send(info->tls_client, json_str, strlen(json_str));
+//        tls_send(info->tls_client, p, MX_PACKAGE_SIZE);
 
         //wait responce from server
 
@@ -242,7 +242,7 @@ void logout(t_client_info *info) {
     json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
     mx_print_json_object(new_json, "logout");
     const char *json_string = json_object_to_json_string(new_json);
-    tls_write(info->tls_client, json_string, strlen(json_string));
+    tls_send(info->tls_client, json_string, strlen(json_string));
     // while (info->responce == 0) {
 
     // }
@@ -468,7 +468,7 @@ void authentification(t_client_info *info) {
     json_object_object_add(js, "password", json_object_new_string(info->password));
     mx_print_json_object(js, "login authentification");
     const char *json_string = json_object_to_json_string(js);
-    tls_write(info->tls_client, json_string, strlen(json_string));
+    tls_send(info->tls_client, json_string, strlen(json_string));
     while (info->responce == 0) {
 
     }

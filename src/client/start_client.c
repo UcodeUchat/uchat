@@ -75,7 +75,7 @@ static void make_tls_connect(t_client_info *info) {
     }
     mx_report_tls(info->tls_client, "client");
     printf("\n");
-//    tls_write(info->tls_client, "TLS connect", strlen("TLS connect"));
+//    tls_send(info->tls_client, "TLS connect", strlen("TLS connect"));
 }
 
 int mx_start_client(t_client_info *info) {

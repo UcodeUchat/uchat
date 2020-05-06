@@ -1,6 +1,10 @@
 # Prerequisites
 .DS_Store
-
+.Uchat_downloads
+.idea
+.vscode
+cmake-build-debug
+.files
 o*.d
 
 # Object files

@@ -9,7 +9,7 @@ void mx_send_json_to_all_in_room(t_server_info *info, json_object *json_obj) {
     for (int i = 0; i < info->wdb->i; i++) {
         tls_socket = mx_find_tls_socket(info->socket_list, sockets_online[i]);
         if (tls_socket) {
-            tls_write(tls_socket, json_string, strlen(json_string));
+            tls_send(tls_socket, json_string, strlen(json_string));
         }
     }
 }
