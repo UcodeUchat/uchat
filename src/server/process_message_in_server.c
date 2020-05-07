@@ -5,9 +5,10 @@ int save_message(t_server_info *info, json_object *js) {
     int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
     int room_id = json_object_get_int(json_object_object_get(js, "room_id"));
     const char *message = json_object_get_string(json_object_object_get(js, "data"));
-
-    sprintf(command, "INSERT INTO msg_history (user_id, room_id, message, addition_cont)\
-     		VALUES ('%d', '%d', '%s', 'mes') ", user_id, room_id, message);
+    time_t lt= time(NULL);
+    
+    sprintf(command, "INSERT INTO msg_history (user_id, room_id, message, addition_cont, time)\
+     		VALUES ('%d', '%d', '%s', 'mes', '%s') ", user_id, room_id, message, ctime(&lt));
     if (sqlite3_exec(info->db, command, NULL, NULL, NULL) != SQLITE_OK) {
 		return -1;
     }

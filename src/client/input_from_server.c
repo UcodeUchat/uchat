@@ -1,5 +1,65 @@
 #include "uchat.h"
 
+t_message *create_message(t_client_info *info, t_room *room, int id, json_object *new_json) {
+    t_message *node =  (t_message *)malloc(sizeof(t_message));
+    node->id = id;
+    int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
+    const char *login = json_object_get_string(json_object_object_get(new_json, "login"));
+    const char *message = json_object_get_string(json_object_object_get(new_json, "data"));
+    node->h_box = gtk_box_new(FALSE, 0);
+
+    gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
+    gtk_widget_show(node->h_box);
+    char *data = mx_strjoin(login, "\n");
+    char *tmp = strdup(data);
+    free(data);
+    data = mx_strjoin(tmp, message);
+    free(tmp);
+    GtkWidget *button = gtk_label_new(data);
+    free(data);
+    sleep_ms(100);
+    if (user_id == info->id) {
+        gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_RIGHT);
+        gtk_box_pack_end (GTK_BOX (node->h_box), button, FALSE, FALSE, 0);
+        gtk_widget_show(button);
+        sleep_ms(100);
+        gtk_adjustment_set_value(room->Adjust, 
+                                gtk_adjustment_get_upper(room->Adjust) - 
+                                gtk_adjustment_get_page_size(room->Adjust));
+    }
+    else {
+        gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_LEFT);
+        gtk_box_pack_start (GTK_BOX (node->h_box), button, FALSE, FALSE, 0);
+        gtk_widget_show(button);
+    }
+    gtk_widget_set_name(button, "message");
+    
+    node->next = NULL;
+    return node;
+}
+
+void push_message(t_client_info *info, t_room *room, int id, json_object *new_json) {
+    t_message *tmp;
+    t_message *p;
+    t_message **list = &room->messages;
+
+    if (!list)
+        return;
+    tmp = create_message(info, room, id, new_json);  // Create new
+    if (!tmp)
+        return;
+    p = *list;
+    if (*list == NULL) {  // Find Null-node
+        *list = tmp;
+        return;
+    }
+    else {
+        while (p->next != NULL)  // Find Null-node
+            p = p->next;
+        p->next = tmp;
+    }
+}
+
 t_room *mx_find_room(t_room *rooms, int id) {
    t_room *head = rooms;
    t_room *node = NULL;
@@ -15,39 +75,10 @@ t_room *mx_find_room(t_room *rooms, int id) {
 }
 
 void input_message(t_client_info *info, json_object *new_json) {
-    int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
-    const char *login = json_object_get_string(json_object_object_get(new_json, "login"));
-    const char *message = json_object_get_string(json_object_object_get(new_json, "data"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
-    GtkWidget *h_box = gtk_box_new(FALSE, 0);
 
-    gtk_box_pack_start (GTK_BOX (room->message_box), h_box, FALSE, FALSE, 0);
-    gtk_widget_show(h_box);
-    char *data = mx_strjoin(login, "\n");
-    char *tmp = strdup(data);
-    free(data);
-    data = mx_strjoin(tmp, message);
-    free(tmp);
-    GtkWidget *button = gtk_label_new(data);
-    free(data);
-    sleep_ms(100);
-    if (user_id == info->id) {
-        gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_RIGHT);
-        gtk_box_pack_end (GTK_BOX (h_box), button, FALSE, FALSE, 0);
-        gtk_widget_show(button);
-        sleep_ms(100);
-        gtk_adjustment_set_value(room->Adjust, 
-                                gtk_adjustment_get_upper(room->Adjust) - 
-                                gtk_adjustment_get_page_size(room->Adjust));
-    }
-    else {
-        gtk_label_set_justify (GTK_LABEL (button), GTK_JUSTIFY_LEFT);
-        gtk_box_pack_start (GTK_BOX (h_box), button, FALSE, FALSE, 0);
-        gtk_widget_show(button);
-    }
-    gtk_widget_set_name(button, "message");
-                
+    push_message(info, room, 0, new_json);           
     t_room *head = info->data->rooms;
     while (head != NULL) {
         if (head && head->position < room->position)

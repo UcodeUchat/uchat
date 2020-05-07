@@ -45,10 +45,11 @@ void *login_msg_thread (void *data) {
 
 t_room *create_room(void *name, int id, int position) {
     t_room *node =  (t_room *)malloc(sizeof(t_room));
+
     node->name = strdup(name);
     node->position = position;
-    node->id = id; //tmp
-    
+    node->id = id;
+    node->messages = NULL;
     node->next = NULL;
     return node;
 }
