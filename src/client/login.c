@@ -43,23 +43,23 @@ void *login_msg_thread (void *data) {
 }
 
 
-t_room *create_room(void *name, int position) {
+t_room *create_room(void *name, int id, int position) {
     t_room *node =  (t_room *)malloc(sizeof(t_room));
     node->name = strdup(name);
     node->position = position;
-    node->id = position; //tmp
+    node->id = id; //tmp
     
     node->next = NULL;
     return node;
 }
 
-void push_room(t_room **list, void *name, int id) {
+void push_room(t_room **list, void *name, int id, int position) {
     t_room *tmp;
     t_room *p;
 
     if (!list)
         return;
-    tmp = create_room(name, id);  // Create new
+    tmp = create_room(name, id, position);  // Create new
     if (!tmp)
         return;
     p = *list;
@@ -119,8 +119,8 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
         mx_print_json_object(new_json, "login send_data_callback");
         const char *json_str = json_object_to_json_string(new_json);
 
-        tls_write(info->tls_client, json_str, strlen(json_str));
-//        tls_write(info->tls_client, p, MX_PACKAGE_SIZE);
+        tls_send(info->tls_client, json_str, strlen(json_str));
+//        tls_send(info->tls_client, p, MX_PACKAGE_SIZE);
 
         //wait responce from server
 
@@ -242,7 +242,7 @@ void logout(t_client_info *info) {
     json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
     mx_print_json_object(new_json, "logout");
     const char *json_string = json_object_to_json_string(new_json);
-    tls_write(info->tls_client, json_string, strlen(json_string));
+    tls_send(info->tls_client, json_string, strlen(json_string));
     // while (info->responce == 0) {
 
     // }
@@ -409,15 +409,13 @@ void init_general (t_client_info *info) {
     gtk_notebook_set_tab_pos(GTK_NOTEBOOK (info->data->notebook), GTK_POS_LEFT);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->notebook, 10, 20);
     gtk_widget_set_size_request(info->data->notebook, 630, 320);
-    for (int i = 0; i < 4; i++) {
-        char *str;
-        if (i == 0) 
-            str = strdup("General123456789123456");
-        else {
-            str = strdup("Room  ");
-            str[5] = i + 48;
-        }
-        push_room(&info->data->rooms, str, i);
+    int n_rooms = json_object_array_length(info->rooms);
+    for (int i = 0; i < n_rooms; i++) {
+        json_object *room_data = json_object_array_get_idx(info->rooms, i);
+        char *str = strdup(json_object_get_string(json_object_object_get(room_data, "name")));
+        int id = json_object_get_int(json_object_object_get(room_data, "room_id"));
+
+        push_room(&info->data->rooms, str, id, i);
         t_room *room = find_room(info->data->rooms, i);
         room->room_box = gtk_box_new(FALSE, 0);
         GtkWidget *fixed = gtk_fixed_new();
@@ -468,7 +466,7 @@ void authentification(t_client_info *info) {
     json_object_object_add(js, "password", json_object_new_string(info->password));
     mx_print_json_object(js, "login authentification");
     const char *json_string = json_object_to_json_string(js);
-    tls_write(info->tls_client, json_string, strlen(json_string));
+    tls_send(info->tls_client, json_string, strlen(json_string));
     while (info->responce == 0) {
 
     }

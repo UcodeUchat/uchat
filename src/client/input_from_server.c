@@ -67,9 +67,11 @@ void input_authentification(t_client_info *info, json_object *new_json) {
         if (type == 4) {
             info->id = user_id;
             (*info).auth_client = 1;
+            json_object_object_get_ex(new_json, "rooms", &info->rooms);
         }
-        else
+        else{
             (*info).auth_client = 0;
+        }
         fprintf(stderr, "(*info).auth_client = [%d]\n", (*info).auth_client);
         (*info).responce = 1;
     }
@@ -78,7 +80,7 @@ void input_authentification(t_client_info *info, json_object *new_json) {
 void *mx_process_input_from_server(void *taken_info) {
     t_client_info *info = (t_client_info *)taken_info;
 
-    while(1) { // read all input from server
+    while (1) { // read all input from server
         int rc;
         char buf[2048];
         json_object *new_json;

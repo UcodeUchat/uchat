@@ -29,9 +29,9 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
         json_object *new_json = mx_package_to_json(package);
 //        mx_print_json_object(new_json, "mx_send_message_from_client");
         const char *json_string = json_object_to_json_string(new_json);
-        tls_write(info->tls_client, json_string, strlen(json_string));
+        tls_send(info->tls_client, json_string, strlen(json_string));
     ////****
-//        tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
+//        tls_send(info->tls_client, package, MX_PACKAGE_SIZE);
     }
     return 0;
 }
