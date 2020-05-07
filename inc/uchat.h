@@ -158,6 +158,7 @@ typedef struct  s_package {
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
 void mx_set_daemon2(const char *log_file);
+int mx_lockfile(int fd);
 int mx_worker(int client_sock, t_server_info *info);
 int mx_tls_worker(int client_sock, struct tls *tls_accept, t_server_info *info);
 int mx_sign_in(t_server_info *i, t_package *p);
@@ -201,6 +202,8 @@ t_package *mx_create_new_package();
 
 // krivoy dizayn
 int mx_login (t_client_info *info);
+
+int mx_set_lock_to_file(int fd);
 
 //
 #endif

@@ -1,20 +1,3 @@
 Configuring demon ++...
 Configuring local address...
 listen fd = 4
-server new client socket 6
-New connection from `xаю
-
-Client connected successfully
-			work with client 6
-Client msg: TLS connect
-			work with client 6
-Client 6 disconnected
-start set socket to 0
-UPDATE users SET socket=0 WHERE socket=6
-SELECT * FROM users
-user_id	socket	login		password	access
-0	0	mmasniy		123123		1		
-1	0	vkmetyk		123123		1		
-2	0	snikolayen	123123		1		
-3	0	mlibovych	123123		1		
-4	0	neo		1		1		

@@ -29,7 +29,7 @@ static void create_client_socket(t_client_info *info) {
 //        return -1;
         exit(1);
     }
-    setsockopt(sock, IPPROTO_TCP, SO_KEEPALIVE, &enable, sizeof(int));
+    setsockopt(sock, IPPROTO_TCP, SO_KEEPALIVE | SO_REUSEADDR | SO_REUSEPORT, &enable, sizeof(int));
     if (connect(sock, peer_address->ai_addr, peer_address->ai_addrlen)) {
         printf("connect error = %s\n", strerror(errno));
 //        return -1;

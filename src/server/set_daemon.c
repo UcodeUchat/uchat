@@ -1,5 +1,15 @@
 #include "uchat.h"
 
+int mx_lockfile(int fd) {
+    struct flock fl;
+    fl.l_type = F_WRLCK;
+    fl.l_start = 0;
+    fl.l_whence = SEEK_SET;
+    fl.l_len = 0;
+    return(fcntl(fd, F_SETLK, &fl));
+}
+
+
 void mx_set_daemon2(const char *log_file) {
     int fd;
     pid_t pid;
@@ -41,9 +51,10 @@ void mx_set_daemon2(const char *log_file) {
 
     if ((fd = open(log_file, O_CREAT | O_WRONLY | O_TRUNC | O_APPEND, S_IRWXU)) == -1)
         mx_err_exit("open error\n");
-
-    printf("log_file fd  %d\n", fd);
-//    openlog("uchat", LOG_CONS, LOG_DAEMON);
+//    mx_lockfile(fd);
+//
+//    printf("log_file fd  %d\n", fd);
+    openlog("uchat_server", LOG_CONS, LOG_DAEMON);
 
     if (dup2(fd, STDOUT_FILENO) == -1
         || dup2(fd, STDERR_FILENO) == -1) {
@@ -54,10 +65,13 @@ void mx_set_daemon2(const char *log_file) {
     }
     close(STDIN_FILENO);
     close(STDERR_FILENO);
+
+//    syslog(LOG_ERR, "ошибочные файловые дескрипторы %d %d %d", fd0, fd1, fd2);
+
 //    return setsid();
 }
 
-/*
+
 int mx_set_daemon(t_server_info *info) {
     int fd;
     pid_t pid;
@@ -104,4 +118,4 @@ int mx_set_daemon(t_server_info *info) {
     close(STDERR_FILENO);
     return setsid();
 }
-*/
+
