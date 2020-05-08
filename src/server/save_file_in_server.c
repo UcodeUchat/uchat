@@ -37,7 +37,7 @@ int mx_add_data_to_file_server(t_file_list **input_files, json_object *obj) {
     t_file_list *tmp = *input_files;
     int user_id = json_object_get_int(json_object_object_get(obj, "user_id"));
 
-    while(tmp && tmp->user_id != user_id)
+    while(tmp && tmp->id != user_id)
         tmp = tmp->next;
     if (tmp) {
         fwrite(json_object_get_string(json_object_object_get(obj, "data")), 1,
@@ -53,7 +53,7 @@ int mx_final_file_input_server(t_server_info *info, t_socket_list *csl) {
     t_file_list *prev_elem = NULL;
     int user_id = json_object_get_int(json_object_object_get(csl->obj, "user_id"));
 
-    while(file_list && file_list->user_id != user_id) {
+    while(file_list && file_list->id != user_id) {
         prev_elem = file_list;
         file_list = file_list->next;
     }

@@ -20,7 +20,7 @@ int mx_tls_worker(t_socket_list *csl, t_server_info *info) {
     size_t readed;
     char input[1024];
 
-    readed = tls_read(csl->tls_socket, input, 1024);   // get json
+    readed = tls_read(csl->tls_socket, input, sizeof(input));   // get json
     if (readed > 0)
         mx_process_input_objects(info, csl, input, readed);
     else

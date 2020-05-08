@@ -1,9 +1,26 @@
 #include "uchat.h"
 
+typedef struct  s_file_tmp {
+    pthread_mutex_t *mutex;
+    struct tls *tls;
+    char *file_name;
+    int size;
+    int file_id;
+}               t_file_tmp;
+
+t_file_tmp *set_variables(t_socket_list *csl) {
+    t_file_tmp *new = malloc(sizeof(t_file_tmp));
+
+    new->tls = csl->tls_socket;
+    new->mutex = &csl->mutex;
+    new->file_id = json_object_get_int(json_object_object_get(csl->obj, "file_id"));
+    return new;
+}
+
 int check_is_object_valid(json_object *obj) {
     if (json_object_object_get(obj, "room_id")
         && json_object_object_get(obj, "user_id")
-        && json_object_object_get(obj, "msg_id"))
+        && json_object_object_get(obj, "file_id"))
         return MX_OK;
     else
         return 1;
@@ -14,54 +31,48 @@ char *check_file_in_db_and_user_access(json_object *obj) {
     return strdup("1.pdf");
 }
 
-void file_is_not_exist(t_socket_list *csl) {
+void file_is_not_exist(t_file_tmp *vars) {
     const char *json_string;
     json_object *obj_for_sending = mx_create_basic_json_object(MX_FILE_DOWNLOAD_TYPE);
 
-    json_object_object_add(obj_for_sending, "msg_id",
-        json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "msg_id"))));
+    json_object_object_add(obj_for_sending, "file_id",
+        json_object_new_int(vars->file_id));
     json_object_object_add(obj_for_sending, "piece", json_object_new_int(-1));
     json_string = json_object_to_json_string(obj_for_sending);
-    tls_send(csl->tls_socket, json_string, strlen(json_string));
+    mx_save_send(vars->mutex, vars->tls, json_string, strlen(json_string));
     json_object_put(obj_for_sending);
 }
 
-int is_file_exist(char *file_name, t_socket_list *csl) {
+int is_file_exist(char *file_name, t_file_tmp *vars) {
     struct stat buffer;
-    int exist = stat(file_name, &buffer);
+    char *full_file_name = mx_strjoin(MX_SAVE_FOLDER_IN_SERVER, file_name);
+    int exist = stat(full_file_name, &buffer);
 
     if (exist == MX_OK) {
-        char *full_file_name = mx_strjoin(MX_SAVE_FOLDER_IN_SERVER, file_name);
-        json_object *file_name_obj = json_object_new_string(full_file_name);
-
-        json_object_object_add(csl->obj, "file_name", file_name_obj);
-        json_object_object_add(csl->obj, "file_size",
-                               json_object_new_int(buffer.st_size));
-        mx_strdel(&full_file_name);
+        vars->file_name = full_file_name;
+        vars->size = buffer.st_size;
         return MX_OK;
     }
     else {
-        file_is_not_exist(csl);
+        file_is_not_exist(vars);
+        mx_strdel(&full_file_name);
         return 0;
     }
 }
 
-void start_sending(FILE *file, t_socket_list *csl) {
+void start_sending(FILE *file, t_file_tmp *vars) {
     json_object *send_obj = mx_create_basic_json_object(MX_FILE_DOWNLOAD_TYPE);
-    json_object *data = json_object_new_null();
+    json_object *data = json_object_new_string("");
     const char *json_string;
     int readed = 1;
     char buffer[2048];
 
     json_object_object_add(send_obj, "piece", json_object_new_int(1));
-    json_object_object_add(send_obj, "file_size",
-        json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "file_size"))));
-    // json_object_object_add(send_obj, "room_id", json_object_new_int(0));
-    json_object_object_add(send_obj, "msg_id",
-        json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "msg_id"))));
+    json_object_object_add(send_obj, "file_size", json_object_new_int(vars->size));
+    json_object_object_add(send_obj, "file_id", json_object_new_int(vars->file_id));
 
     json_string = json_object_to_json_string(send_obj);
-    tls_send(csl->tls_socket, json_string, strlen(json_string));
+    mx_save_send(vars->mutex, vars->tls, json_string, strlen(json_string));
     json_object_object_del(send_obj, "file_size");
     json_object_set_int(json_object_object_get(send_obj, "piece"), 2);
     json_object_object_add(send_obj, "data", data);
@@ -71,22 +82,21 @@ void start_sending(FILE *file, t_socket_list *csl) {
         json_object_set_string_len(data, buffer, readed);
         feof(file) ? json_object_set_int(json_object_object_get(send_obj, "piece"), 3) : 0;
         json_string = json_object_to_json_string(send_obj);
-        tls_send(csl->tls_socket, json_string, strlen(json_string));
+        mx_save_send(vars->mutex, vars->tls, json_string, strlen(json_string));
     }
     json_object_put(send_obj);
 }
 
 void *send_file(void *arg) {
-    t_socket_list *csl = (t_socket_list *)arg;
-    
-    if (json_object_get_string(json_object_object_get(csl->obj, "file_name"))) {
-        FILE *file;
+    t_file_tmp *vars = (t_file_tmp *)arg;
+    FILE *file;
         
-        if ((file = fopen(json_object_get_string(json_object_object_get(csl->obj, "file_name")), "r")) != NULL) {
-            start_sending(file, csl);
-            fclose(file);
-        }
+    if ((file = fopen(vars->file_name, "r")) != NULL) {
+        start_sending(file, vars);
+        fclose(file);
     }
+    mx_strdel(&vars->file_name);
+    free(vars);
     return NULL;
 }
 
@@ -97,16 +107,20 @@ int mx_send_file_from_server(t_server_info *info, t_socket_list *csl) {
         char *file = check_file_in_db_and_user_access(csl->obj);
 
         if (file != NULL) {
-            if (is_file_exist(file, csl) == MX_OK) {
+            t_file_tmp *vars = set_variables(csl);
+
+            if (is_file_exist(file, vars) == MX_OK) {
+                
                 pthread_t thread_input;
                 pthread_attr_t attr;
 
                 pthread_attr_init(&attr);
                 pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-                if (pthread_create(&thread_input, &attr, send_file, csl) == 0)
+                if (pthread_create(&thread_input, &attr, send_file, vars) == 0)
                     return 0;
-                else
-                    printf("pthread_create for file failed\n");
+                mx_strdel(&vars->file_name);
+                free(vars);
+                fprintf(stderr, "pthread_create for file failed\n");
             }
         }
     }

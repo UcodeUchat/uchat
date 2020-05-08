@@ -109,37 +109,51 @@ void input_authentification(t_client_info *info, json_object *new_json) {
     }
 }
 
+int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
+    int type = json_object_get_int(json_object_object_get(obj, "type"));
+// tmp
+    if (type != MX_FILE_DOWNLOAD_TYPE)
+        mx_print_json_object(obj, "mx_process_input_from_server");
+    printf("New_package! Type:%d\n", type);
+//
+    if (type == MX_FILE_DOWNLOAD_TYPE) {
+        mx_save_file_in_client(info, obj);
+    }
+    else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) {
+        input_authentification(info, obj);
+    }
+    else if (type == MX_REG_TYPE_V || type == MX_REG_TYPE_NV) {
+        //input_registration(info, obj);
+    }
+    else if (type == MX_MSG_TYPE) {
+        input_message(info, obj);
+    }
+    return 0;
+}
+
 void *mx_process_input_from_server(void *taken_info) {
     t_client_info *info = (t_client_info *)taken_info;
+    int rc;
+    char buffer[2048];
+    json_tokener *tok = json_tokener_new();
+    enum json_tokener_error jerr;
+    json_object *new_json;
 
     while (1) { // read all input from server
-        int rc;
-        char buf[2048];
-        json_object *new_json;
-        int type;
-
-        rc = tls_read(info->tls_client, buf, 2048);    // get json
+        rc = tls_read(info->tls_client, buffer, sizeof(buffer));    // get json
         if (rc == -1)
-            mx_err_exit("error recv\n");
+            mx_err_exit("tls connection error\n");
         if (rc != 0) {
-            new_json = json_tokener_parse(buf);
-            type = json_object_get_int(json_object_object_get(new_json, "type"));
-            mx_print_json_object(new_json, "mx_process_input_from_server");
-            printf("New_package! Type:%d\n", type);
-            if (type == MX_FILE_DOWNLOAD_TYPE) {
-                mx_save_file_in_client(info, new_json);
+            new_json = json_tokener_parse_ex(tok, buffer, rc);
+            jerr = json_tokener_get_error(tok);
+            if (jerr == json_tokener_success) {
+                mx_run_function_type_in_client(info, new_json);
             }
-            else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) {
-                input_authentification(info, new_json);
+            else if (jerr != json_tokener_continue) {
+                fprintf(stderr, "Error: %s\n", json_tokener_error_desc(jerr));
             }
-            else if (type == MX_REG_TYPE_V || type == MX_REG_TYPE_NV) {
-                //input_registration(info, new_json);
-            }
-            else if (type == MX_MSG_TYPE) {
-                input_message(info, new_json);
-            }         
+            // json_object_put(new_json);
         }
     }
-
     return NULL;
 }
