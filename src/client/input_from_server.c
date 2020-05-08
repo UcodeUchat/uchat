@@ -1,13 +1,14 @@
 #include "uchat.h"
 
-t_message *create_message(t_client_info *info, t_room *room, int id, json_object *new_json) {
+t_message *create_message(t_client_info *info, t_room *room, json_object *new_json) {
     t_message *node =  (t_message *)malloc(sizeof(t_message));
-    node->id = id;
+    int id = json_object_get_int(json_object_object_get(new_json, "id"));
     int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
     const char *login = json_object_get_string(json_object_object_get(new_json, "login"));
     const char *message = json_object_get_string(json_object_object_get(new_json, "data"));
-    node->h_box = gtk_box_new(FALSE, 0);
 
+    node->id = id;
+    node->h_box = gtk_box_new(FALSE, 0);
     gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
     gtk_widget_show(node->h_box);
     char *data = mx_strjoin(login, "\n");
@@ -38,14 +39,14 @@ t_message *create_message(t_client_info *info, t_room *room, int id, json_object
     return node;
 }
 
-void push_message(t_client_info *info, t_room *room, int id, json_object *new_json) {
+void push_message(t_client_info *info, t_room *room, json_object *new_json) {
     t_message *tmp;
     t_message *p;
     t_message **list = &room->messages;
 
     if (!list)
         return;
-    tmp = create_message(info, room, id, new_json);  // Create new
+    tmp = create_message(info, room, new_json);  // Create new
     if (!tmp)
         return;
     p = *list;
@@ -78,7 +79,7 @@ void input_message(t_client_info *info, json_object *new_json) {
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
-    push_message(info, room, 0, new_json);           
+    push_message(info, room, new_json);           
     t_room *head = info->data->rooms;
     while (head != NULL) {
         if (head && head->position < room->position)

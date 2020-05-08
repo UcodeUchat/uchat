@@ -11,16 +11,24 @@ static int get_data(void *js, int argc, char **argv, char **col_name) {
     return 1;
 }
 
+// static int print_time(void *point, int argc, char **argv, char **col_name) {
+//     (void)point;
+//     (void)argc;
+//     (void)col_name;
+//     printf("Time: %s\n", argv[0]);
+//     return 0;
+// }
+
+
 int save_message(t_server_info *info, json_object *js) {
 	char *command = malloc(1024);
     int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
     int room_id = json_object_get_int(json_object_object_get(js, "room_id"));
     const char *message = json_object_get_string(json_object_object_get(js, "data"));
-    time_t lt= time(NULL);
     
-    sprintf(command, "INSERT INTO msg_history (user_id, room_id, message, addition_cont, time)\
-     		VALUES ('%d', '%d', '%s', 'mes', '%s'); SELECT last_insert_rowid()", 
-            user_id, room_id, message, ctime(&lt));
+    sprintf(command, "INSERT INTO msg_history (user_id, room_id, message, addition_cont)\
+     		VALUES ('%d', '%d', '%s', 'mes'); SELECT last_insert_rowid()", 
+            user_id, room_id, message);
     if (sqlite3_exec(info->db, command, get_data, js, NULL) != SQLITE_OK) {
 		return -1;
     }
