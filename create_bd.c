@@ -106,10 +106,10 @@ int main(int argc, char *argv[]){
 		sprintf(req, "\
 				create table users (\
 					id INTEGER PRIMARY KEY AUTOINCREMENT, socket integer,\
-					login text, password text, access integer);\n\
+					login VARCHAR(128), password VARCHAR(128), access integer);\
 				\
 				create table rooms (\
-					id INTEGER PRIMARY KEY AUTOINCREMENT, name text,\
+					id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(128),\
 					access integer);\n\
 				\
 				create table room_user (\
@@ -120,8 +120,8 @@ int main(int argc, char *argv[]){
 				\
 				create table msg_history (\
 					id INTEGER PRIMARY KEY AUTOINCREMENT,\
-					user_id integer, room_id integer, message text,\
-					addition_cont text, time data,\
+					user_id integer, room_id integer, message VARCHAR(1024),\
+					addition_cont text, time DATETIME DEFAULT CURRENT_TIMESTAMP,\
 					FOREIGN KEY (user_id) REFERENCES users (id),\
 					FOREIGN KEY (room_id) REFERENCES rooms (id));\n");
 		sql = sqlite3_exec(db, req, 0, 0, &err);
