@@ -103,6 +103,7 @@ typedef struct  s_client_info {  //struct client
     t_data *data;
     int responce;
     struct s_file_list *input_files;
+    struct json_object *rooms;
 }               t_client_info;
 
 #define MX_PATH_TO_DB "./server_db.bin"
@@ -138,7 +139,7 @@ typedef struct  s_server_info {  // struct server
     struct s_work *wdb;
 }               t_server_info;
 
-
+#define MX_MAX_FILE_SIZE 300000000
 #define MX_MAX_USERS_IN_ROOM 1024
 #define MX_MSG_TYPE 1
 #define MX_FILE_SEND_TYPE 2
@@ -187,9 +188,8 @@ typedef struct  s_socket_list {
 typedef struct  s_file_list {
     int user_id;
     int file_size;
-    int package_size;
     FILE *file;
-    struct s_package *package;
+    char *file_name;
     struct s_file_list *next;
 }               t_file_list;
 
@@ -225,10 +225,12 @@ int *mx_get_users_sock_in_room(t_server_info **i, int room);
 void mx_send_json_to_all_in_room(t_server_info *info, json_object *json_obj);
 
 // work with file
+t_file_list *mx_new_file_list_elem(json_object *obj);
+void mx_push_file_elem_to_list(t_file_list **files_list, t_file_list *new);
 int mx_save_file_in_server(t_server_info *info, t_socket_list *csl);
-int mx_add_new_file_server(t_file_list **input_files, t_package *package);
-int mx_add_data_to_file_server(t_file_list **input_files, t_package *package);
-int mx_final_file_input_server(t_server_info *info, t_package *package);
+int mx_add_new_file_server(t_file_list **input_files, t_socket_list *csl);
+int mx_add_data_to_file_server(t_file_list **input_files, json_object *obj);
+int mx_final_file_input_server(t_server_info *info, t_socket_list *csl);
 
 //get_rooms
 void mx_get_rooms(t_server_info *i, json_object *js);
@@ -241,7 +243,7 @@ int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
 // client
 int mx_start_client(t_client_info *info);
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
-int mx_process_file_in_client(t_client_info *info, t_package *package);
+int mx_process_file_in_client(t_client_info *info, json_object *obj);
 int mx_add_data_to_file_client(t_file_list **input_files, t_package *package);
 int mx_add_new_file_client(t_file_list **input_files, t_package *package);
 int mx_final_file_input_client(t_client_info *info, t_package *package);
@@ -253,6 +255,7 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
 void sleep_ms (int milliseconds);
 
 // functions
+int tls_send(struct tls *tls_socket, const char *content, int size);
 void mx_print_curr_time(void);
 char *mx_curr_time(void);
 void mx_print_tid(const char *s);

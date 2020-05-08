@@ -13,14 +13,14 @@ bool pick_file_to_send(t_client_info *info, FILE **file, json_object **obj) {
         struct stat file_stat;
 
         stat(file_path, &file_stat);
-        // if (file_stat.st_size > 0 && file_stat.st_size <= MX_MAX_FILE_SIZE)
+        if (file_stat.st_size > 0 && file_stat.st_size <= MX_MAX_FILE_SIZE) {
         // need to lock file editing
-        *obj = mx_create_basic_json_object(MX_FILE_SEND_TYPE);
-        json_object_object_add(*obj, "file_name", json_object_new_string(file_name));
-        json_object_object_add(*obj, "file_size", json_object_new_int(file_stat.st_size));
-        return 0;
+            *obj = mx_create_basic_json_object(MX_FILE_SEND_TYPE);
+            json_object_object_add(*obj, "file_name", json_object_new_string(file_name));
+            json_object_object_add(*obj, "file_size", json_object_new_int(file_stat.st_size));
+            return 0;
         //
-        //
+        }
     }
     return 1;
 }
@@ -33,7 +33,7 @@ void mx_send_file_from_client(t_client_info *info) {
         printf("file picked\n");
         int readed = 1;
         const char *json_string;
-        char buffer[4096];
+        char buffer[1024];
         json_object *data;
 
         json_object_object_add(send_obj, "piece", json_object_new_int(1));
@@ -42,22 +42,19 @@ void mx_send_file_from_client(t_client_info *info) {
 
         json_string = json_object_to_json_string(send_obj);
 
-        tls_write(info->tls_client, json_string, strlen(json_string));
+        tls_send(info->tls_client, json_string, strlen(json_string));
 
         json_object_object_del(send_obj, "file_name");
         json_object_object_del(send_obj, "file_size");
         json_object_set_int(json_object_object_get(send_obj, "piece"), 2);
         data = json_object_new_string("");
         json_object_object_add(send_obj, "data", data);
-        printf("all prepared before while loop\n");
         while(readed > 0 && !feof(file)) {
-            printf("while\n");
             readed = fread(buffer, 1, sizeof(buffer), file);
-            printf("readed:%d\n", readed);
             json_object_set_string_len(data, buffer, readed);
             feof(file) ? json_object_set_int(json_object_object_get(send_obj, "piece"), 3) : 0;
             json_string = json_object_to_json_string(send_obj);
-            tls_write(info->tls_client, json_string, strlen(json_string));
+            tls_send(info->tls_client, json_string, strlen(json_string));
         }
         json_object_put(send_obj);
         // unlock file

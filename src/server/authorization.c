@@ -11,12 +11,12 @@ int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js) {
         mx_get_rooms(i, js);
         mx_print_json_object(js, "auth");
         json_string = json_object_to_json_string(js);
-        tls_write(csl->tls_socket, json_string, strlen(json_string));
+        tls_send(csl->tls_socket, json_string, strlen(json_string));
 	}
 	else { //не вошел
         json_object_set_int(json_object_object_get(js, "type"), MX_AUTH_TYPE_NV);
         json_string = json_object_to_json_string(js);
-        tls_write(csl->tls_socket, json_string, strlen(json_string));
+        tls_send(csl->tls_socket, json_string, strlen(json_string));
 	}
     //получаем массив сокетов, которые в сети
     // if (p->type == MX_AUTH_TYPE_V){
@@ -88,6 +88,6 @@ int mx_registration(t_server_info *i, t_socket_list *csl, json_object *js) {
     	json_object_set_int(json_object_object_get(js, "add_info"), MX_AUTH_TYPE_V);
     }
     json_string = json_object_to_json_string(js);
-    tls_write(csl->tls_socket, json_string, strlen(json_string));
+    tls_send(csl->tls_socket, json_string, strlen(json_string));
     return 1;
 }

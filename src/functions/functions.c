@@ -1,5 +1,18 @@
 #include "uchat.h"
 
+int tls_send(struct tls *tls_socket, const char *content, int size) {
+    int sended = 0;
+
+    if (size > 16384) {
+        for (int i = 0; size > sended && i >= 0; sended += i) {
+            i = tls_write(tls_socket, content + sended, size - sended);
+        }
+    }
+    else
+        sended = tls_write(tls_socket, content, size);
+    return size > sended ? -1 : sended;
+}
+
 void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len) {
     // print info about new accepted client
     char host[100];
