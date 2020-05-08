@@ -52,7 +52,8 @@ SRC_SERVER = main_server.c \
 SRC_CLIENT = main_client.c \
 	start_client.c \
 	send_message.c \
-	send_file.c \
+	save_file_in_client.c \
+	send_file_from_client.c \
 	input_from_server.c \
 	login.c \
 	process_file_in_client.c \

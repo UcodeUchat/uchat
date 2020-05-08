@@ -70,7 +70,7 @@ int mx_final_file_input_server(t_server_info *info, t_socket_list *csl) {
         }
         else {
             printf("ALL OK\n");
-            // print notification to all
+            // save file in db messages history and print notification to all
         }
         if (prev_elem == NULL)
             info->input_files = file_list->next;

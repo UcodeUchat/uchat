@@ -92,8 +92,8 @@ void *mx_process_input_from_server(void *taken_info) {
             type = json_object_get_int(json_object_object_get(new_json, "type"));
             mx_print_json_object(new_json, "mx_process_input_from_server");
             printf("New_package! Type:%d\n", type);
-            if (type == MX_FILE_SEND_TYPE) {
-            //     mx_process_file_in_client(info, input_package);
+            if (type == MX_FILE_DOWNLOAD_TYPE) {
+                mx_save_file_in_client(info, new_json);
             }
             else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) {
                 input_authentification(info, new_json);
