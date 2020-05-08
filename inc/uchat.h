@@ -50,6 +50,12 @@
 #define MX_SAVE_FOLDER_IN_CLIENT "./Uchat_downloads/"
 #define MX_SAVE_FOLDER_IN_SERVER "./files/"
 
+typedef struct s_message {
+    int id;
+    GtkWidget *h_box;
+    struct s_message *next;
+}              t_message;
+
 typedef struct s_room {
     int id;
     int position;
@@ -58,6 +64,7 @@ typedef struct s_room {
     GtkWidget *message_box;
     GtkWidget *scrolled_window;
     GtkAdjustment *Adjust;
+    t_message *messages;
     struct s_room *next;
 }              t_room;
 
@@ -105,6 +112,7 @@ typedef struct  s_client_info {  //struct client
     t_data *data;
     int responce;
     struct s_file_list_in_client *input_files;
+    struct json_object *rooms;
 }               t_client_info;
 
 #define MX_PATH_TO_DB "./server_db.bin"

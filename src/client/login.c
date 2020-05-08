@@ -43,23 +43,24 @@ void *login_msg_thread (void *data) {
 }
 
 
-t_room *create_room(void *name, int position) {
+t_room *create_room(void *name, int id, int position) {
     t_room *node =  (t_room *)malloc(sizeof(t_room));
+
     node->name = strdup(name);
     node->position = position;
-    node->id = position; //tmp
-    
+    node->id = id;
+    node->messages = NULL;
     node->next = NULL;
     return node;
 }
 
-void push_room(t_room **list, void *name, int id) {
+void push_room(t_room **list, void *name, int id, int position) {
     t_room *tmp;
     t_room *p;
 
     if (!list)
         return;
-    tmp = create_room(name, id);  // Create new
+    tmp = create_room(name, id, position);  // Create new
     if (!tmp)
         return;
     p = *list;
@@ -409,15 +410,13 @@ void init_general (t_client_info *info) {
     gtk_notebook_set_tab_pos(GTK_NOTEBOOK (info->data->notebook), GTK_POS_LEFT);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->notebook, 10, 20);
     gtk_widget_set_size_request(info->data->notebook, 630, 320);
-    for (int i = 0; i < 4; i++) {
-        char *str;
-        if (i == 0) 
-            str = strdup("General123456789123456");
-        else {
-            str = strdup("Room  ");
-            str[5] = i + 48;
-        }
-        push_room(&info->data->rooms, str, i);
+    int n_rooms = json_object_array_length(info->rooms);
+    for (int i = 0; i < n_rooms; i++) {
+        json_object *room_data = json_object_array_get_idx(info->rooms, i);
+        char *str = strdup(json_object_get_string(json_object_object_get(room_data, "name")));
+        int id = json_object_get_int(json_object_object_get(room_data, "room_id"));
+
+        push_room(&info->data->rooms, str, id, i);
         t_room *room = find_room(info->data->rooms, i);
         room->room_box = gtk_box_new(FALSE, 0);
         GtkWidget *fixed = gtk_fixed_new();

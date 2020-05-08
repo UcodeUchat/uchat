@@ -95,6 +95,7 @@ int mx_start_client(t_client_info *info) {
     //-- В этом месте начинается вечный цикл вплоть до закрытия окна чата
     mx_login(info);
     //--
+    pthread_cancel(thread_input);
     tls_close(info->tls_client);
     tls_free(info->tls_client);
     printf("exit client\n");

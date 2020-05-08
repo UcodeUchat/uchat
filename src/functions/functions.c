@@ -88,6 +88,7 @@ void mx_print_curr_time(void) {
     time_str[strlen(time_str) - 1] = '\0';
     printf("%s\t", time_str);
 }
+
 char *mx_curr_time(void) {
     time_t now;
     char *time_str;
