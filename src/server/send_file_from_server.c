@@ -55,8 +55,9 @@ int is_file_exist(char *file_name, t_file_tmp *vars) {
     }
     else {
         file_is_not_exist(vars);
+        free(vars);
         mx_strdel(&full_file_name);
-        return 0;
+        return 1;
     }
 }
 
