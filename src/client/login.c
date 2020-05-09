@@ -4,7 +4,17 @@ pthread_t login_msg_t;
 
 void choose_file_callback(GtkWidget *widget, t_client_info *info) {
     (void)widget;
-    mx_send_file_from_client(info);
+    int func_picked = -1;
+
+    printf("1 - send file, 2 - download file\n");
+    scanf("%d", &func_picked);
+
+    if (func_picked == 1)
+        mx_send_file_from_client(info);
+    else if (func_picked == 2)
+        mx_download_file_from_server(info);
+    else
+        fprintf(stderr, "You picked shit: %d\n", func_picked);
 }
 
 void sleep_ms (int milliseconds) {

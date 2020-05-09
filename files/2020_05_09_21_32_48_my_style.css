@@ -89,23 +89,16 @@ entry#entry:focus {
 
 #message {
 	border-radius: 5px;
-	color: black;
+	
 	background-color: DarkOrange;
 }
 
 #file {
-	color: #900C3F;
+	color: #CA9264;
 	font-weight: bold;
 }
 
-#file_pressed {
-	color: #581845;
-	font-weight: bold;
-}
-
-#file_hover {
-	color: #900C3F;
-	border-bottom: 1px solid currentColor;
-    font-weight: bold;
+#file:hover {
+	color: white;
 }
 

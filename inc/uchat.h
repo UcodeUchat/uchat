@@ -45,6 +45,8 @@
 #define QLEN 10
 #define HOST_NAME_MAX 256
 
+#define MX_OK 0
+
 #define MX_SAVE_FOLDER_IN_CLIENT "./Uchat_downloads/"
 #define MX_SAVE_FOLDER_IN_SERVER "./files/"
 
@@ -112,6 +114,7 @@ typedef struct  s_client_info {  //struct client
     int responce;
     struct s_file_list *input_files;
     struct json_object *rooms;
+    int input;
 }               t_client_info;
 
 #define MX_PATH_TO_DB "./server_db.bin"
@@ -159,8 +162,9 @@ typedef struct  s_server_info {  // struct server
 #define MX_REG_TYPE_V 7
 #define MX_REG_TYPE_NV 8
 #define MX_LOGOUT_TYPE 9
-#define MX_MAX_DATA_SIZE (int)(sizeof(((t_package *)0)->data) - 1)
 #define MX_PACKAGE_SIZE sizeof(t_package)
+
+#define MX_MAX_MSG_SIZE 200
 // sizeof((type *)0)->member)
 
 typedef struct  s_server_room {
@@ -188,13 +192,14 @@ typedef struct  s_socket_list {
     struct tls *tls_socket;
     struct json_object *obj;
 	struct json_tokener *tok;
+    pthread_mutex_t mutex;
     struct s_socket_list *left;
     struct s_socket_list *right;
     struct s_socket_list *parent;
 }               t_socket_list;
 
 typedef struct  s_file_list {
-    int user_id;
+    int id; // user_id in server and msg_id in client
     int file_size;
     FILE *file;
     char *file_name;
@@ -204,7 +209,6 @@ typedef struct  s_file_list {
 // server
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
-int mx_worker(int client_sock, t_server_info *info);
 int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info);
 int mx_sign_in(t_server_info *i, json_object *js, int sock);
 int mx_update_socket(t_server_info *i, int client_sock, const char *login);
@@ -214,8 +218,11 @@ int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js);
 int mx_check_client(t_server_info *info, json_object *js, int sock);
 int mx_process_message_in_server(t_server_info *info, json_object *js);
 int mx_run_function_type(t_server_info *info, t_socket_list *csl);
-int mx_process_file_in_server(t_server_info *info, t_package *package);
 int mx_logout(t_server_info *i, t_socket_list *csl, json_object *js);
+int mx_get_data(void *js, int argc, char **argv, char **col_name);
+
+int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
+                 const char *content, int size);
 
 // socket_list
 t_socket_list *mx_create_socket_elem(int socket, struct tls *tls_socket,
@@ -235,6 +242,7 @@ void mx_send_json_to_all_in_room(t_server_info *info, json_object *json_obj);
 // work with file
 t_file_list *mx_new_file_list_elem(json_object *obj);
 void mx_push_file_elem_to_list(t_file_list **files_list, t_file_list *new);
+int mx_send_file_from_server(t_server_info *info, t_socket_list *csl);
 int mx_save_file_in_server(t_server_info *info, t_socket_list *csl);
 int mx_add_new_file_server(t_file_list **input_files, t_socket_list *csl);
 int mx_add_data_to_file_server(t_file_list **input_files, json_object *obj);
@@ -251,16 +259,19 @@ int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
 // client
 int mx_start_client(t_client_info *info);
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
-int mx_process_file_in_client(t_client_info *info, json_object *obj);
-int mx_add_data_to_file_client(t_file_list **input_files, t_package *package);
-int mx_add_new_file_client(t_file_list **input_files, t_package *package);
-int mx_final_file_input_client(t_client_info *info, t_package *package);
 void mx_process_message_in_client(t_client_info *info);
-void mx_send_file_from_client(t_client_info *info);
 void authentification(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);
 int mx_send_message_from_client(t_client_info *info, t_package *package, char *message);
 void sleep_ms (int milliseconds);
+
+void mx_send_file_from_client(t_client_info *info);
+int mx_download_file_from_server(t_client_info *info);
+int mx_save_file_in_client(t_client_info *info, json_object *obj);
+
+t_file_list *mx_find_file_in_list(t_file_list *list, int id);
+int mx_add_file_to_list_in_client(t_file_list **list, char *name, int id);
+void mx_pop_file_list_in_client(t_file_list **list, int id);
 
 // functions
 int tls_send(struct tls *tls_socket, const char *content, int size);

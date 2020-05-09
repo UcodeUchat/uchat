@@ -34,10 +34,39 @@ void focus1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     gtk_widget_hide(message->menu);
 }
 
+void file_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+    (void)widget;
+    (void)event;
+    (void)mes;
+    gtk_widget_set_name(widget, "file_pressed");
+}
+
+void file1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+    (void)widget;
+    (void)event;
+    (void)mes;
+    gtk_widget_set_name(widget, "file_hover");
+}
+
+void file_notify_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+    (void)widget;
+    (void)event;
+    (void)mes;
+    gtk_widget_set_name(widget, "file_hover");
+}
+
+void file_notify1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+    (void)widget;
+    (void)event;
+    (void)mes;
+    gtk_widget_set_name(widget, "file");
+}
+
 t_message *create_message(t_client_info *info, t_room *room, json_object *new_json) {
     t_message *node =  (t_message *)malloc(sizeof(t_message));
     int id = json_object_get_int(json_object_object_get(new_json, "id"));
     int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
+    int add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
     const char *login = json_object_get_string(json_object_object_get(new_json, "login"));
     const char *message = json_object_get_string(json_object_object_get(new_json, "data"));
 
@@ -79,11 +108,29 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     GtkWidget *label1 = gtk_label_new(login);
     gtk_box_pack_start(GTK_BOX (main_box), box1, FALSE, FALSE, 0);
     gtk_widget_show(label1);
-    GtkWidget *box2 = gtk_box_new(FALSE, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(box2), 1);
-    GtkWidget *label2 = gtk_label_new(message);
-    gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
-    gtk_box_pack_start (GTK_BOX (box2), label2, FALSE, FALSE, 0);
+    GtkWidget *box2;
+    GtkWidget *label2;
+    if (add_info == 0) {
+        box2 = gtk_box_new(FALSE, 0);
+        gtk_container_set_border_width(GTK_CONTAINER(box2), 1);
+        label2 = gtk_label_new(message);
+        gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
+        gtk_box_pack_start (GTK_BOX (box2), label2, FALSE, FALSE, 0);
+    }
+    else {
+        box2 = gtk_event_box_new();
+        gtk_widget_set_name(box2, "file");
+        gtk_widget_add_events (box2, GDK_BUTTON_PRESS_MASK);
+        g_signal_connect (G_OBJECT (box2), "button_press_event", G_CALLBACK (file_callback), mes);
+        g_signal_connect (G_OBJECT (box2), "button_release_event", G_CALLBACK (file1_callback), mes);
+        gtk_widget_add_events (box2, GDK_ENTER_NOTIFY_MASK);
+        g_signal_connect (G_OBJECT (box2), "enter_notify_event", G_CALLBACK (file_notify_callback), mes);
+        g_signal_connect (G_OBJECT (box2), "leave_notify_event", G_CALLBACK (file_notify1_callback), mes);
+        gtk_container_set_border_width(GTK_CONTAINER(box2), 1);
+        label2 = gtk_label_new(message);
+        gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
+        gtk_container_add (GTK_CONTAINER (box2), label2);
+    }
     gtk_widget_show(label2);
     gtk_widget_show(right_box);
     gtk_widget_show(main_box);
@@ -178,7 +225,7 @@ void input_authentification(t_client_info *info, json_object *new_json) {
         if (type == 4) {
             info->id = user_id;
             (*info).auth_client = 1;
-            json_object_object_get_ex(new_json, "rooms", &info->rooms);
+            json_object_deep_copy(json_object_object_get(new_json, "rooms"), &info->rooms, NULL);
         }
         else{
             (*info).auth_client = 0;
@@ -188,37 +235,51 @@ void input_authentification(t_client_info *info, json_object *new_json) {
     }
 }
 
+int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
+    int type = json_object_get_int(json_object_object_get(obj, "type"));
+// tmp
+    if (type != MX_FILE_DOWNLOAD_TYPE)
+        mx_print_json_object(obj, "mx_process_input_from_server");
+    printf("New_package! Type:%d\n", type);
+//
+    if (type == MX_FILE_DOWNLOAD_TYPE) {
+        mx_save_file_in_client(info, obj);
+    }
+    else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) {
+        input_authentification(info, obj);
+    }
+    else if (type == MX_REG_TYPE_V || type == MX_REG_TYPE_NV) {
+        //input_registration(info, obj);
+    }
+    else if (type == MX_MSG_TYPE) {
+        input_message(info, obj);
+    }
+    return 0;
+}
+
 void *mx_process_input_from_server(void *taken_info) {
     t_client_info *info = (t_client_info *)taken_info;
+    int rc;
+    char buffer[2048];
+    json_tokener *tok = json_tokener_new();
+    enum json_tokener_error jerr;
+    json_object *new_json;
 
     while (1) { // read all input from server
-        int rc;
-        char buf[2048];
-        json_object *new_json;
-        int type;
-
-        rc = tls_read(info->tls_client, buf, 2048);    // get json
+        rc = tls_read(info->tls_client, buffer, sizeof(buffer));    // get json
         if (rc == -1)
-            mx_err_exit("error recv\n");
+            mx_err_exit("tls connection error\n");
         if (rc != 0) {
-            new_json = json_tokener_parse(buf);
-            type = json_object_get_int(json_object_object_get(new_json, "type"));
-            mx_print_json_object(new_json, "mx_process_input_from_server");
-            printf("New_package! Type:%d\n", type);
-            if (type == MX_FILE_SEND_TYPE) {
-            //     mx_process_file_in_client(info, input_package);
+            new_json = json_tokener_parse_ex(tok, buffer, rc);
+            jerr = json_tokener_get_error(tok);
+            if (jerr == json_tokener_success) {
+                mx_run_function_type_in_client(info, new_json);
             }
-            else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) {
-                input_authentification(info, new_json);
+            else if (jerr != json_tokener_continue) {
+                fprintf(stderr, "Error: %s\n", json_tokener_error_desc(jerr));
             }
-            else if (type == MX_REG_TYPE_V || type == MX_REG_TYPE_NV) {
-                //input_registration(info, new_json);
-            }
-            else if (type == MX_MSG_TYPE) {
-                input_message(info, new_json);
-            }         
+            json_object_put(new_json);
         }
     }
-
     return NULL;
 }

@@ -8,6 +8,7 @@ t_socket_list *mx_create_socket_elem(int socket, struct tls *tls_socket,
     new_elem->tls_socket = tls_socket;
     new_elem->tok = json_tokener_new();
     new_elem->obj = NULL;
+    pthread_mutex_init(&new_elem->mutex, NULL);
     new_elem->left = new_elem->right = NULL;
     new_elem->parent = parent;
     return new_elem;

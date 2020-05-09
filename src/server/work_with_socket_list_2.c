@@ -58,6 +58,7 @@ t_socket_list* deleteNode(t_socket_list *head, int socket) {
             head->tls_socket = temp->tls_socket;
             head->tok = temp->tok;
             head->obj = temp->obj;
+            head->mutex = temp->mutex;
             head->right = deleteNode(head->right, temp->socket);
         }
     }

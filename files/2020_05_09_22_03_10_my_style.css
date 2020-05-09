@@ -98,14 +98,13 @@ entry#entry:focus {
 	font-weight: bold;
 }
 
-#file_pressed {
-	color: #581845;
+#file_hover {
+	color: white;
 	font-weight: bold;
 }
 
-#file_hover {
-	color: #900C3F;
-	border-bottom: 1px solid currentColor;
-    font-weight: bold;
+#file_pressed {
+	color: #581845;
+	font-weight: bold;
 }
 

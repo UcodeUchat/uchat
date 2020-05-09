@@ -45,7 +45,6 @@ static void make_tls_connect(struct tls *tls, struct tls **tls_sock, int client_
         exit(1);
     }
     mx_report_tls(*tls_sock, "new client ");
-//    tls_send(tls_sock, "TLS send server", strlen("TLS send server"));
     printf("\nClient connected successfully\n");
 }
 

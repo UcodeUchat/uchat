@@ -64,7 +64,6 @@ button#entry:hover {
 	color: white;
 	background-color : DarkOrange;
 }
-
 button#entry:active {
 	color: white;
 	background-color : #C0732F;
@@ -94,18 +93,8 @@ entry#entry:focus {
 }
 
 #file {
-	color: #900C3F;
+	color: #827972;
 	font-weight: bold;
 }
 
-#file_pressed {
-	color: #581845;
-	font-weight: bold;
-}
-
-#file_hover {
-	color: #900C3F;
-	border-bottom: 1px solid currentColor;
-    font-weight: bold;
-}
 

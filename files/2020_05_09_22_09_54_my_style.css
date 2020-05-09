@@ -99,13 +99,12 @@ entry#entry:focus {
 }
 
 #file_pressed {
-	color: #581845;
+	color: #E769B9;
 	font-weight: bold;
 }
 
 #file_hover {
-	color: #900C3F;
-	border-bottom: 1px solid currentColor;
+	color: #C11281;
     font-weight: bold;
 }
 

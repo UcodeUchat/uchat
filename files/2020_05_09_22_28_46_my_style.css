@@ -105,7 +105,9 @@ entry#entry:focus {
 
 #file_hover {
 	color: #900C3F;
-	border-bottom: 1px solid currentColor;
+	box-shadow:
+    	inset 0 -0.175em white,
+    	inset 0 -0.2em #000;
     font-weight: bold;
 }
 
