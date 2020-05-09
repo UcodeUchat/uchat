@@ -52,7 +52,10 @@ void mx_send_file_from_client(t_client_info *info) {
         while(readed > 0 && !feof(file)) {
             readed = fread(buffer, 1, sizeof(buffer), file);
             json_object_set_string_len(data, buffer, readed);
-            feof(file) ? json_object_set_int(json_object_object_get(send_obj, "piece"), 3) : 0;
+            if (feof(file)) {
+                json_object_set_int(json_object_object_get(send_obj, "piece"), 3);
+                json_object_object_add(send_obj, "login", json_object_new_string(info->login));
+            }
             json_string = json_object_to_json_string(send_obj);
             tls_send(info->tls_client, json_string, strlen(json_string));
         }

@@ -1,38 +1,16 @@
 #include "uchat.h"
 
 int mx_send_message_from_client(t_client_info *info, t_package *package, char *message) {
-    int msg_size = strlen(message);
-
-    if (msg_size > MX_MAX_DATA_SIZE) {
-        printf("send more than 1 piece\n"); // #
-        int pos_in_data = 0;
-
-        package->piece = 1;
-        strncat(package->data, message, MX_MAX_DATA_SIZE);
-        json_object *new_json = mx_package_to_json(package);
-        mx_print_json_object(new_json, "mx_send_message_from_client");
-
-        tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
-        while ((pos_in_data += MX_MAX_DATA_SIZE) < msg_size) {
-            package->piece = pos_in_data + MX_MAX_DATA_SIZE < msg_size ? 2 : 3;
-            mx_memset(package->data, 0, MX_MAX_DATA_SIZE);
-            strncat(package->data, message + pos_in_data, MX_MAX_DATA_SIZE);
-            tls_write(info->tls_client, package, MX_PACKAGE_SIZE);
-        }
-    }
-    else {
-        printf("send 1 piece\n"); // #
-        package->piece = 0;
-        strncat(package->data, message, MX_MAX_DATA_SIZE);
+    package->piece = 0;
+    strncat(package->data, message, MX_MAX_MSG_SIZE);
 
     ////****
-        json_object *new_json = mx_package_to_json(package);
+    json_object *new_json = mx_package_to_json(package);
 //        mx_print_json_object(new_json, "mx_send_message_from_client");
-        const char *json_string = json_object_to_json_string(new_json);
-        tls_send(info->tls_client, json_string, strlen(json_string));
+    const char *json_string = json_object_to_json_string(new_json);
+    tls_send(info->tls_client, json_string, strlen(json_string));
     ////****
 //        tls_send(info->tls_client, package, MX_PACKAGE_SIZE);
-    }
     return 0;
 }
 

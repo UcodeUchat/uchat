@@ -99,7 +99,7 @@ void input_authentification(t_client_info *info, json_object *new_json) {
         if (type == 4) {
             info->id = user_id;
             (*info).auth_client = 1;
-            json_object_object_get_ex(new_json, "rooms", &info->rooms);
+            json_object_deep_copy(json_object_object_get(new_json, "rooms"), &info->rooms, NULL);
         }
         else{
             (*info).auth_client = 0;
@@ -152,7 +152,7 @@ void *mx_process_input_from_server(void *taken_info) {
             else if (jerr != json_tokener_continue) {
                 fprintf(stderr, "Error: %s\n", json_tokener_error_desc(jerr));
             }
-            // json_object_put(new_json);
+            json_object_put(new_json);
         }
     }
     return NULL;
