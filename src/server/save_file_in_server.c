@@ -24,7 +24,7 @@ void mx_send_notification(t_socket_list *csl, t_file_list *file_list) {
     json_object_object_add(send_obj, "login", json_object_new_string(json_object_get_string(json_object_object_get(csl->obj, "login"))));
     json_object_object_add(send_obj, "add_info", json_object_new_int(1));
     json_object_object_add(send_obj, "data", json_object_new_string(file_list->file_name + 20));
-    json_object_object_add(send_obj, "id", json_object_new_int(file_list->id));
+    json_object_object_add(send_obj, "id", json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "id"))));
     json_str = json_object_to_json_string(send_obj);
     mx_save_send(&csl->mutex, csl->tls_socket, json_str, strlen(json_str));
     json_object_put(send_obj);
