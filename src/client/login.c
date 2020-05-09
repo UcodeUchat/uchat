@@ -436,7 +436,7 @@ void init_general (t_client_info *info) {
         gtk_widget_set_size_request(full_name, 515, -1);
         gtk_widget_show(full_name);
         room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-        gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 5);
+        gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 1);
         gtk_grid_attach (GTK_GRID (table), room->scrolled_window, 0, 2, 1, 10);
             
         gtk_widget_set_size_request(room->scrolled_window, 515, 295);
@@ -450,6 +450,7 @@ void init_general (t_client_info *info) {
         gtk_notebook_append_page(GTK_NOTEBOOK(info->data->notebook), room->room_box, label);
         //--
         room->message_box = gtk_box_new(FALSE, 5);
+        gtk_container_set_border_width(GTK_CONTAINER(room->message_box), 5);
         gtk_container_add(GTK_CONTAINER(room->scrolled_window), room->message_box);
         gtk_widget_show(room->message_box);
         gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);

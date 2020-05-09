@@ -65,19 +65,32 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
     GtkWidget *box = gtk_box_new(FALSE, 0);
     gtk_widget_set_name(box, "message");
-    gtk_orientable_set_orientation (GTK_ORIENTABLE(box), GTK_ORIENTATION_VERTICAL);
     gtk_container_set_border_width(GTK_CONTAINER(box), 1);
+
+    GtkWidget *left_box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(left_box, 10, -1);
+    gtk_box_pack_start(GTK_BOX (box), left_box, FALSE, FALSE, 0);
+    GtkWidget *main_box = gtk_box_new(FALSE, 0);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(main_box), GTK_ORIENTATION_VERTICAL);
+    gtk_box_pack_start(GTK_BOX (box), main_box, FALSE, FALSE, 0);
+    GtkWidget *right_box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(right_box, 15, -1);
+    gtk_box_pack_start(GTK_BOX (box), right_box, FALSE, FALSE, 0);
+
     GtkWidget *box1 = gtk_box_new(FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(box1), 1);
     GtkWidget *label1 = gtk_label_new(login);
-    gtk_box_pack_start(GTK_BOX (box), box1, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX (main_box), box1, FALSE, FALSE, 0);
     gtk_widget_show(label1);
     GtkWidget *box2 = gtk_box_new(FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(box2), 3);
     GtkWidget *label2 = gtk_label_new(message);
-    gtk_box_pack_start (GTK_BOX (box), box2, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
     gtk_box_pack_start (GTK_BOX (box2), label2, FALSE, FALSE, 0);
     gtk_widget_show(label2);
+    gtk_widget_show(right_box);
+    gtk_widget_show(main_box);
+    gtk_widget_show(left_box);
     if (user_id == info->id) {
         gtk_box_pack_end(GTK_BOX (box1), label1, FALSE, FALSE, 0);
         gtk_box_pack_end (GTK_BOX (node->h_box), box, FALSE, FALSE, 0);
