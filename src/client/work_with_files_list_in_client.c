@@ -53,20 +53,20 @@ int mx_add_file_to_list_in_client(t_file_list **list, char *name, int id) {
 }
 
 void mx_pop_file_list_in_client(t_file_list **list, int id) {
+    t_file_list *tmp = *list;
+
     if ((*list)->id == id) {
-        mx_strdel(&((*list)->file_name));
-        free(*list);
-        *list = NULL;
+        *list = (*list)->next;
+        mx_strdel(&(tmp->file_name));
+        free(tmp);
     }
     else {
-        t_file_list *tmp = *list;
-
         while(tmp->next) {
             if (tmp->next->id == id) {
                 t_file_list *tmp_del = tmp->next;
 
                 tmp->next = tmp->next->next;
-                mx_strdel(&(tmp_del->file_name));
+                mx_strdel(&tmp_del->file_name);
                 free(tmp_del);
                 break;
             }

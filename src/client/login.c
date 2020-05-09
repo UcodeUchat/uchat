@@ -6,6 +6,7 @@ void choose_file_callback(GtkWidget *widget, t_client_info *info) {
     (void)widget;
     int func_picked = -1;
 
+    printf("1 - send file, 2 - download file\n");
     scanf("%d", &func_picked);
 
     if (func_picked == 1)

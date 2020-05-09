@@ -3,13 +3,13 @@
 void mx_send_json_to_all_in_room(t_server_info *info, json_object *json_obj) {
     int *sockets_online = mx_get_users_sock_in_room(&info,
         json_object_get_int(json_object_object_get(json_obj, "room_id")));
-    struct tls *tls_socket = NULL;
+    t_socket_list *tls_list = NULL;
     const char *json_string = json_object_to_json_string(json_obj);
 
     for (int i = 0; i < info->wdb->i; i++) {
-        tls_socket = mx_find_tls_socket(info->socket_list, sockets_online[i]);
-        if (tls_socket) {
-            tls_send(tls_socket, json_string, strlen(json_string));
+        tls_list = mx_find_socket_elem(info->socket_list, sockets_online[i]);
+        if (tls_list) {
+            mx_save_send(&tls_list->mutex, tls_list->tls_socket, json_string, strlen(json_string));
         }
     }
 }
