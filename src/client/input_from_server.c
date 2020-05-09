@@ -1,10 +1,10 @@
 #include "uchat.h"
 
-// typedef struct s_mes {
-//     t_client_info *info;
-//     t_room *room;
-//     int id;
-// }               t_mes;
+typedef struct s_mes {
+    t_client_info *info;
+    t_room *room;
+    int id;
+}               t_mes;
 
 t_message *mx_find_message(t_message *messages, int id) {
    t_message *head = messages;
@@ -20,21 +20,19 @@ t_message *mx_find_message(t_message *messages, int id) {
     return node;
 }
 
-// void focus_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
-//     (void)widget;
-//     (void)event;
-//     t_message *message = mx_find_message(mes->room->messages, mes->id);
-//     gtk_widget_show(message->menu_button);
-//     //printf("aaaaAAAAAAAA!!%d\n", mes->id);
-// }
+void focus_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+    (void)widget;
+    (void)event;
+    t_message *message = mx_find_message(mes->room->messages, mes->id);
+    gtk_widget_show(message->menu);
+}
 
-// void focus1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
-//     (void)widget;
-//     (void)event;
-//     t_message *message = mx_find_message(mes->room->messages, mes->id);
-//     gtk_widget_hide(message->menu_button);
-//     //printf("aaaaAAAAAAAA!!%d\n", mes->id);
-// }
+void focus1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+    (void)widget;
+    (void)event;
+    t_message *message = mx_find_message(mes->room->messages, mes->id);
+    gtk_widget_hide(message->menu);
+}
 
 t_message *create_message(t_client_info *info, t_room *room, json_object *new_json) {
     t_message *node =  (t_message *)malloc(sizeof(t_message));
@@ -44,27 +42,24 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     const char *message = json_object_get_string(json_object_object_get(new_json, "data"));
 
     node->id = id;
-    //-event
-    // t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
-    // mes->info = info;
-    // mes->room = room;
-    // mes->id = id;
-    //GtkWidget *main_box = gtk_event_box_new();
-    //gtk_box_pack_start (GTK_BOX (room->message_box), main_box, FALSE, FALSE, 0);
-    // gtk_widget_add_events (main_box, GDK_ENTER_NOTIFY_MASK);
-    // g_signal_connect (G_OBJECT (main_box), "enter_notify_event", G_CALLBACK (focus_callback), mes);
-    // g_signal_connect (G_OBJECT (main_box), "leave_notify_event", G_CALLBACK (focus1_callback), mes);
-    //gtk_widget_show(main_box);
-    //--
-    // node->menu_button = gtk_button_new();
-    // GtkWidget *image0 = gtk_image_new_from_file("img/a.png");
-    // gtk_button_set_image(GTK_BUTTON(node->menu_button), image0);
-    // gtk_widget_set_name(node->menu_button, "entry");
-    //--
+
+    t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
+    mes->info = info;
+    mes->room = room;
+    mes->id = id;
     node->h_box = gtk_box_new(FALSE, 0);
     gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
+    GtkWidget *general_box = gtk_box_new(FALSE, 0);
+    //-events
+    GtkWidget *event = gtk_event_box_new();
+    gtk_widget_add_events (event, GDK_ENTER_NOTIFY_MASK);
+    g_signal_connect (G_OBJECT (event), "enter_notify_event", G_CALLBACK (focus_callback), mes);
+    g_signal_connect (G_OBJECT (event), "leave_notify_event", G_CALLBACK (focus1_callback), mes);
+    gtk_box_pack_start (GTK_BOX (general_box), event, FALSE, FALSE, 0);
+    //--
     GtkWidget *box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_name(box, "message");
+    gtk_container_add (GTK_CONTAINER (event), box);
+    gtk_widget_set_name(general_box, "message");
     gtk_container_set_border_width(GTK_CONTAINER(box), 1);
 
     GtkWidget *left_box = gtk_box_new(FALSE, 0);
@@ -76,6 +71,8 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     GtkWidget *right_box = gtk_box_new(FALSE, 0);
     gtk_widget_set_size_request(right_box, 15, -1);
     gtk_box_pack_start(GTK_BOX (box), right_box, FALSE, FALSE, 0);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/options.png", 20, 40, TRUE, NULL);
+    node->menu = gtk_image_new_from_pixbuf(pixbuf);
 
     GtkWidget *box1 = gtk_box_new(FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(box1), 1);
@@ -83,7 +80,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     gtk_box_pack_start(GTK_BOX (main_box), box1, FALSE, FALSE, 0);
     gtk_widget_show(label1);
     GtkWidget *box2 = gtk_box_new(FALSE, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(box2), 3);
+    gtk_container_set_border_width(GTK_CONTAINER(box2), 1);
     GtkWidget *label2 = gtk_label_new(message);
     gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
     gtk_box_pack_start (GTK_BOX (box2), label2, FALSE, FALSE, 0);
@@ -92,11 +89,14 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     gtk_widget_show(main_box);
     gtk_widget_show(left_box);
     if (user_id == info->id) {
+        gtk_box_pack_end(GTK_BOX (right_box), node->menu, FALSE, FALSE, 0);
         gtk_box_pack_end(GTK_BOX (box1), label1, FALSE, FALSE, 0);
-        gtk_box_pack_end (GTK_BOX (node->h_box), box, FALSE, FALSE, 0);
         gtk_widget_show(box1);
+        gtk_box_pack_end (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
         gtk_widget_show(box2);
         gtk_widget_show(box);
+        gtk_widget_show(event);
+        gtk_widget_show(general_box);
         gtk_widget_show(node->h_box);
         sleep_ms(100);
         gtk_adjustment_set_value(room->Adjust, 
@@ -105,10 +105,12 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     }
     else {
         gtk_box_pack_start(GTK_BOX (box1), label1, FALSE, FALSE, 0);
-        gtk_box_pack_start (GTK_BOX (node->h_box), box, FALSE, FALSE, 0);
         gtk_widget_show(box1);
+        gtk_box_pack_start (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
         gtk_widget_show(box2);
         gtk_widget_show(box);
+        gtk_widget_show(event);
+        gtk_widget_show(general_box);
         gtk_widget_show(node->h_box);
     }
     

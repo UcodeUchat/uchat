@@ -51,7 +51,7 @@
 typedef struct s_message {
     int id;
     GtkWidget *h_box;
-    GtkWidget *menu_button;
+    GtkWidget *menu;
     struct s_message *next;
 }              t_message;
 
