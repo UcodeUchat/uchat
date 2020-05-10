@@ -76,6 +76,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     mes->room = room;
     mes->id = id;
     node->h_box = gtk_box_new(FALSE, 0);
+    // gtk_widget_set_size_request(node->h_box, 30, 40);
     gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
     GtkWidget *general_box = gtk_box_new(FALSE, 0);
     //-events
@@ -159,7 +160,6 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         gtk_widget_show(general_box);
         gtk_widget_show(node->h_box);
     }
-    
     node->next = NULL;
     return node;
 }

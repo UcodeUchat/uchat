@@ -1,34 +1,51 @@
 #include "uchat.h"
 
 bool pick_file_to_send(t_client_info *info, FILE **file, json_object **obj) {
-    (void)info;
-    printf("pick_file_to_send\n");
-
     struct stat file_stat;
-// tmp
-    char file_path[256] = {0};
-    char file_name[256] = {0};
-    scanf("%s", file_path);
-    strcat(file_name, file_path);
-    if (stat(file_path, &file_stat) != MX_OK)
-        return 1;
-//
-    if (file_stat.st_size > 0 && file_stat.st_size <= MX_MAX_FILE_SIZE) {
-        if (!(file_stat.st_mode & S_IFDIR) && (file_stat.st_mode & S_IFREG)) {
-            if ((*file = fopen(file_path, "r")) != NULL) {
-                *obj = mx_create_basic_json_object(MX_FILE_SEND_TYPE);
-                json_object_object_add(*obj, "file_name", json_object_new_string(file_name));
-                json_object_object_add(*obj, "file_size", json_object_new_int(file_stat.st_size));
-                return 0;
+    char *file_path;
+    char *file_name;
+    GtkWidget *dialog = gtk_file_chooser_dialog_new ("Save File",
+                                      GTK_WINDOW(info->data->window),
+                                      GTK_FILE_CHOOSER_ACTION_OPEN,
+                                      ("_Cancel"),
+                                      GTK_RESPONSE_CANCEL,
+                                      ("_OK"),
+                                      GTK_RESPONSE_ACCEPT,
+                                      NULL);
+    gtk_widget_show_all(dialog);
+    gint resp = gtk_dialog_run(GTK_DIALOG(dialog));
+    if (resp ==  GTK_RESPONSE_ACCEPT) {
+        file_path = strdup(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)));
+        file_name = strdup(file_path);
+        while (mx_get_char_index(file_name, '/') >= 0) {
+            char *tmp = strdup(file_name + mx_get_char_index(file_name, '/') + 1);
+            free(file_name);
+            file_name = strdup(tmp);
+            free(tmp); 
+        }
+        gtk_widget_destroy(dialog);
+        if (stat(file_path, &file_stat) != MX_OK)
+            return 1;
+        if (file_stat.st_size > 0 && file_stat.st_size <= MX_MAX_FILE_SIZE) {
+            if (!(file_stat.st_mode & S_IFDIR) && (file_stat.st_mode & S_IFREG)) {
+                if ((*file = fopen(file_path, "r")) != NULL) {
+                    *obj = mx_create_basic_json_object(MX_FILE_SEND_TYPE);
+                    json_object_object_add(*obj, "file_name", json_object_new_string(file_name));
+                    json_object_object_add(*obj, "file_size", json_object_new_int(file_stat.st_size));
+                    return 0;
+                }
+                else
+                    fprintf(stderr, "Хм, під час відкривання файлу щось пішло не так\n");
             }
             else
-                fprintf(stderr, "Хм, під час відкривання файлу щось пішло не так\n");
+                fprintf(stderr, "Йой, непідтримуваний тип файлу\n");
         }
         else
-            fprintf(stderr, "Йой, непідтримуваний тип файлу\n");
+            fprintf(stderr, "Схоже, що твій файл надто великий\nМаксимальний розмір файлу %d\n", MX_MAX_FILE_SIZE);
     }
-    else
-        fprintf(stderr, "Схоже, що твій файл надто великий\nМаксимальний розмір файлу %d\n", MX_MAX_FILE_SIZE);
+    else {
+        gtk_widget_destroy(dialog);
+    }
     return 1;
 }
 // struct stat file_stat;
