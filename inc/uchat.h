@@ -207,9 +207,11 @@ typedef struct  s_file_list {
     struct s_file_list *next;
 }               t_file_list;
 
+
 typedef struct s_mes {
     t_client_info *info;
     t_room *room;
+    t_message *message;
     int id;
 }               t_mes;
 

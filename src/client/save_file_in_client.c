@@ -65,11 +65,11 @@ int mx_save_file_in_client(t_client_info *info, json_object *obj) {
 int mx_download_file_from_server(t_mes *msg) {
 // need to know msg_id (file), user_id, room_id, file_name
     printf("msg->id = %d\n", msg->id);
-    if (mx_add_file_to_list_in_client(&(msg->info->input_files), "test", msg->id) == 0) {
+    if (mx_add_file_to_list_in_client(&(msg->info->input_files), msg->message->data, msg->message->id) == 0) {
         json_object *send_obj = mx_create_basic_json_object(MX_FILE_DOWNLOAD_TYPE);
         const char *send_str;
 
-        json_object_object_add(send_obj, "file_id", json_object_new_int(msg->id));
+        json_object_object_add(send_obj, "file_id", json_object_new_int(msg->message->id));
         json_object_object_add(send_obj, "user_id", json_object_new_int(msg->info->id));
         json_object_object_add(send_obj, "room_id", json_object_new_int(msg->room->id));
         send_str = json_object_to_json_string(send_obj);

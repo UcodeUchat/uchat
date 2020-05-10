@@ -1,6 +1,5 @@
 #include "uchat.h"
 
-
 t_message *mx_find_message(t_message *messages, int id) {
    t_message *head = messages;
    t_message *node = NULL;
@@ -34,6 +33,7 @@ void file_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     (void)event;
     (void)mes;
     gtk_widget_set_name(widget, "file_pressed");
+    mes->message = mx_find_message(mes->room->messages, mes->id);
     mx_download_file_from_server(mes);
 }
 
@@ -48,6 +48,8 @@ void file_notify_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) 
     (void)widget;
     (void)event;
     (void)mes;
+    t_message *message = mx_find_message(mes->room->messages, mes->id);
+    gtk_widget_show(message->menu);
     gtk_widget_set_name(widget, "file_hover");
 }
 
@@ -67,6 +69,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     const char *message = json_object_get_string(json_object_object_get(new_json, "data"));
 
     node->id = id;
+    node->data = strdup(message);
 
     t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
     mes->info = info;
