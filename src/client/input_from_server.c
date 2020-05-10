@@ -1,10 +1,5 @@
 #include "uchat.h"
 
-typedef struct s_mes {
-    t_client_info *info;
-    t_room *room;
-    int id;
-}               t_mes;
 
 t_message *mx_find_message(t_message *messages, int id) {
    t_message *head = messages;
@@ -39,6 +34,7 @@ void file_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     (void)event;
     (void)mes;
     gtk_widget_set_name(widget, "file_pressed");
+    mx_download_file_from_server(mes);
 }
 
 void file1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {

@@ -52,6 +52,7 @@
 
 typedef struct s_message {
     int id;
+    char *data;
     GtkWidget *h_box;
     GtkWidget *menu;
     struct s_message *next;
@@ -206,6 +207,12 @@ typedef struct  s_file_list {
     struct s_file_list *next;
 }               t_file_list;
 
+typedef struct s_mes {
+    t_client_info *info;
+    t_room *room;
+    int id;
+}               t_mes;
+
 // server
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
@@ -266,7 +273,7 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
 void sleep_ms (int milliseconds);
 
 void mx_send_file_from_client(t_client_info *info);
-int mx_download_file_from_server(t_client_info *info);
+int mx_download_file_from_server(t_mes *msg);
 int mx_save_file_in_client(t_client_info *info, json_object *obj);
 
 t_file_list *mx_find_file_in_list(t_file_list *list, int id);
