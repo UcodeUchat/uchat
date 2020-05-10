@@ -19,20 +19,19 @@ int mx_get_data(void *js, int argc, char **argv, char **col_name) {
 //     return 0;
 // }
 
-
 int save_message(t_server_info *info, json_object *js) {
-	char *command = malloc(1024);
+	char command[1024];
     int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
     int room_id = json_object_get_int(json_object_object_get(js, "room_id"));
-    const char *message = json_object_get_string(json_object_object_get(js, "data"));
-    
-    sprintf(command, "INSERT INTO msg_history (user_id, room_id, message, addition_cont)\
+    char *message = mx_replace_substr(json_object_get_string(json_object_object_get(js, "data")), "'", "''");
+
+    command[sprintf(command, "INSERT INTO msg_history (user_id, room_id, message, addition_cont)\
      		VALUES ('%d', '%d', '%s', 'mes'); SELECT last_insert_rowid()", 
-            user_id, room_id, message);
+            user_id, room_id, message)] = '\0';
+    mx_strdel(&message);
     if (sqlite3_exec(info->db, command, mx_get_data, js, NULL) != SQLITE_OK) {
 		return -1;
     }
-    mx_strdel(&command);
 	return 1;
 }
 
