@@ -71,7 +71,7 @@ int show_message(t_all *data) {
 }
 
 int move_bar(t_all *data) {
-    sleep_ms(100);
+    // sleep_ms(100);
     gtk_adjustment_set_value(data->room->Adjust, 
                             gtk_adjustment_get_upper(data->room->Adjust) - 
                             gtk_adjustment_get_page_size(data->room->Adjust) + 2.0);
