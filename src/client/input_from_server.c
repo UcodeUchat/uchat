@@ -14,6 +14,11 @@ t_message *mx_find_message(t_message *messages, int id) {
     return node;
 }
 
+typedef struct s_all {
+    t_room *room;
+    GtkWidget *widget;
+}               t_all;
+
 void focus_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     (void)widget;
     (void)event;
@@ -60,6 +65,19 @@ void file_notify1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes)
     gtk_widget_set_name(widget, "file");
 }
 
+int show_message(t_all *data) {
+    gtk_widget_show(data->widget);
+    return 0;
+}
+
+int move_bar(t_all *data) {
+    sleep_ms(100);
+    gtk_adjustment_set_value(data->room->Adjust, 
+                            gtk_adjustment_get_upper(data->room->Adjust) - 
+                            gtk_adjustment_get_page_size(data->room->Adjust) + 2.0);
+    return 0;
+}
+
 t_message *create_message(t_client_info *info, t_room *room, json_object *new_json) {
     t_message *node =  (t_message *)malloc(sizeof(t_message));
     int id = json_object_get_int(json_object_object_get(new_json, "id"));
@@ -76,7 +94,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     mes->room = room;
     mes->id = id;
     node->h_box = gtk_box_new(FALSE, 0);
-    gtk_widget_show(node->h_box);
+    // gtk_widget_show(node->h_box);
 
     gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
     GtkWidget *general_box = gtk_box_new(FALSE, 0);
@@ -144,16 +162,20 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         gtk_box_pack_end(GTK_BOX (right_box), node->menu, FALSE, FALSE, 0);
         gtk_box_pack_end(GTK_BOX (box1), label1, FALSE, FALSE, 0);
         gtk_box_pack_end (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
-        // gtk_widget_show(node->h_box);
-        sleep_ms(50);
-        gtk_adjustment_set_value(room->Adjust, 
-                                gtk_adjustment_get_upper(room->Adjust) - 
-                                gtk_adjustment_get_page_size(room->Adjust) + 2.0);
+        t_all *data = (t_all *)malloc(sizeof(t_all));
+        data->widget = node->h_box;
+        data->room = room;
+        gdk_threads_add_idle ((GSourceFunc)show_message, data);
+        sleep_ms(100);
+        gdk_threads_add_idle ((GSourceFunc)move_bar, data);
     }
     else {
         gtk_box_pack_start(GTK_BOX (box1), label1, FALSE, FALSE, 0);
         gtk_box_pack_start (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
-        // gtk_widget_show(node->h_box);
+        t_all *data = (t_all *)malloc(sizeof(t_all));
+        data->widget = node->h_box;
+        data->room = room;
+        gdk_threads_add_idle ((GSourceFunc)show_message, data);
     }
     node->next = NULL;
     return node;
