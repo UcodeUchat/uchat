@@ -76,49 +76,53 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     mes->room = room;
     mes->id = id;
     node->h_box = gtk_box_new(FALSE, 0);
+    gtk_widget_show(node->h_box);
     // gtk_widget_set_size_request(node->h_box, 30, 40);
     gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
     GtkWidget *general_box = gtk_box_new(FALSE, 0);
+    gtk_widget_show(general_box);
     //-events
     GtkWidget *event = gtk_event_box_new();
+    gtk_widget_show(event);
     gtk_widget_add_events (event, GDK_ENTER_NOTIFY_MASK);
     g_signal_connect (G_OBJECT (event), "enter_notify_event", G_CALLBACK (focus_callback), mes);
     g_signal_connect (G_OBJECT (event), "leave_notify_event", G_CALLBACK (focus1_callback), mes);
     gtk_box_pack_start (GTK_BOX (general_box), event, FALSE, FALSE, 0);
     //--
     GtkWidget *box = gtk_box_new(FALSE, 0);
+    gtk_widget_show(box);
     gtk_container_add (GTK_CONTAINER (event), box);
     gtk_widget_set_name(general_box, "message");
     gtk_container_set_border_width(GTK_CONTAINER(box), 1);
 
     GtkWidget *left_box = gtk_box_new(FALSE, 0);
+    gtk_widget_show(left_box);
     gtk_widget_set_size_request(left_box, 10, -1);
     gtk_box_pack_start(GTK_BOX (box), left_box, FALSE, FALSE, 0);
     GtkWidget *main_box = gtk_box_new(FALSE, 0);
+    gtk_widget_show(main_box);
     gtk_orientable_set_orientation (GTK_ORIENTABLE(main_box), GTK_ORIENTATION_VERTICAL);
     gtk_box_pack_start(GTK_BOX (box), main_box, FALSE, FALSE, 0);
     GtkWidget *right_box = gtk_box_new(FALSE, 0);
+    gtk_widget_show(right_box);
     gtk_widget_set_size_request(right_box, 15, -1);
     gtk_box_pack_start(GTK_BOX (box), right_box, FALSE, FALSE, 0);
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/options.png", 20, 40, TRUE, NULL);
     node->menu = gtk_image_new_from_pixbuf(pixbuf);
 
     GtkWidget *box1 = gtk_box_new(FALSE, 0);
+    gtk_widget_show(box1);
     gtk_container_set_border_width(GTK_CONTAINER(box1), 1);
     GtkWidget *label1 = gtk_label_new(login);
     gtk_box_pack_start(GTK_BOX (main_box), box1, FALSE, FALSE, 0);
     gtk_widget_show(label1);
-    GtkWidget *box2;
-    GtkWidget *label2;
-    if (add_info == 0) {
-        box2 = gtk_box_new(FALSE, 0);
-        gtk_container_set_border_width(GTK_CONTAINER(box2), 1);
-        label2 = gtk_label_new(message);
-        gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
-        gtk_box_pack_start (GTK_BOX (box2), label2, FALSE, FALSE, 0);
-    }
-    else {
-        box2 = gtk_event_box_new();
+    GtkWidget *box2 = gtk_event_box_new();
+    gtk_widget_show(box2);
+    gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
+    GtkWidget *label2 = gtk_label_new(message);
+    gtk_widget_show(label2);
+    gtk_container_add (GTK_CONTAINER (box2), label2);
+    if (add_info == 1) {
         gtk_widget_set_name(box2, "file");
         gtk_widget_add_events (box2, GDK_BUTTON_PRESS_MASK);
         g_signal_connect (G_OBJECT (box2), "button_press_event", G_CALLBACK (file_callback), mes);
@@ -126,25 +130,11 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         gtk_widget_add_events (box2, GDK_ENTER_NOTIFY_MASK);
         g_signal_connect (G_OBJECT (box2), "enter_notify_event", G_CALLBACK (file_notify_callback), mes);
         g_signal_connect (G_OBJECT (box2), "leave_notify_event", G_CALLBACK (file_notify1_callback), mes);
-        gtk_container_set_border_width(GTK_CONTAINER(box2), 1);
-        label2 = gtk_label_new(message);
-        gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
-        gtk_container_add (GTK_CONTAINER (box2), label2);
     }
-    gtk_widget_show(label2);
-    gtk_widget_show(right_box);
-    gtk_widget_show(main_box);
-    gtk_widget_show(left_box);
     if (user_id == info->id) {
         gtk_box_pack_end(GTK_BOX (right_box), node->menu, FALSE, FALSE, 0);
         gtk_box_pack_end(GTK_BOX (box1), label1, FALSE, FALSE, 0);
-        gtk_widget_show(box1);
         gtk_box_pack_end (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
-        gtk_widget_show(box2);
-        gtk_widget_show(box);
-        gtk_widget_show(event);
-        gtk_widget_show(general_box);
-        gtk_widget_show(node->h_box);
         sleep_ms(100);
         gtk_adjustment_set_value(room->Adjust, 
                                 gtk_adjustment_get_upper(room->Adjust) - 
@@ -152,13 +142,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     }
     else {
         gtk_box_pack_start(GTK_BOX (box1), label1, FALSE, FALSE, 0);
-        gtk_widget_show(box1);
         gtk_box_pack_start (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
-        gtk_widget_show(box2);
-        gtk_widget_show(box);
-        gtk_widget_show(event);
-        gtk_widget_show(general_box);
-        gtk_widget_show(node->h_box);
     }
     node->next = NULL;
     return node;
