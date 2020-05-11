@@ -412,6 +412,11 @@ void init_general (t_client_info *info) {
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->notebook, 10, 20);
     gtk_widget_set_size_request(info->data->notebook, 630, 320);
     int n_rooms = json_object_array_length(info->rooms);
+
+    gtk_widget_hide(info->data->login_box);
+    gtk_window_set_title(GTK_WINDOW(info->data->window), "Uchat");
+    gtk_widget_show(info->data->general_box);
+
     for (int i = 0; i < n_rooms; i++) {
         json_object *room_data = json_object_array_get_idx(info->rooms, i);
         char *str = strdup(json_object_get_string(json_object_object_get(room_data, "name")));
@@ -456,6 +461,16 @@ void init_general (t_client_info *info) {
         gtk_widget_show(room->message_box);
         gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);
         //--
+        //--msg history
+        struct json_object *messages;
+        json_object_object_get_ex(room_data, "messages", &messages);
+        int n_msg = json_object_array_length(messages);
+        for (int j = n_msg - 1; j >= 0; j--) {
+            printf("%d OK!!!!!!!!!!!!!!\n", j);
+            json_object *msg_data = json_object_array_get_idx(messages, j);
+            append_message(info, room, msg_data);
+        }
+        //--
     }
     gtk_widget_show(info->data->notebook);
 }
@@ -499,9 +514,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
     }
     else if(info->auth_client == 1) {
         init_general(info);
-        gtk_widget_hide(info->data->login_box);
-        gtk_window_set_title(GTK_WINDOW(info->data->window), "Uchat");
-        gtk_widget_show(info->data->general_box);
+        
         init_menu(info);
         //--
     }  

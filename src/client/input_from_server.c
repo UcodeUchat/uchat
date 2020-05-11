@@ -78,7 +78,7 @@ int move_bar(t_all *data) {
     return 0;
 }
 
-t_message *create_message(t_client_info *info, t_room *room, json_object *new_json) {
+t_message *create_message(t_client_info *info, t_room *room, json_object *new_json, int order) {
     t_message *node =  (t_message *)malloc(sizeof(t_message));
     int id = json_object_get_int(json_object_object_get(new_json, "id"));
     int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
@@ -94,9 +94,11 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     mes->room = room;
     mes->id = id;
     node->h_box = gtk_box_new(FALSE, 0);
-    // gtk_widget_show(node->h_box);
 
-    gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
+    if (order == 1)
+        gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
+    else
+        gtk_box_pack_end (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
     GtkWidget *general_box = gtk_box_new(FALSE, 0);
     gtk_widget_show(general_box);
     //-events
@@ -188,7 +190,7 @@ void push_message(t_client_info *info, t_room *room, json_object *new_json) {
 
     if (!list)
         return;
-    tmp = create_message(info, room, new_json);  // Create new
+    tmp = create_message(info, room, new_json, 1);  // Create new
     if (!tmp)
         return;
     p = *list;
@@ -200,6 +202,26 @@ void push_message(t_client_info *info, t_room *room, json_object *new_json) {
         while (p->next != NULL)  // Find Null-node
             p = p->next;
         p->next = tmp;
+    }
+}
+
+void append_message(t_client_info *info, t_room *room, json_object *new_json) {
+    t_message *tmp;
+    //t_message *p;
+    t_message **list = &room->messages;
+
+    if (!list)
+        return;
+    tmp = create_message(info, room, new_json, 1);  // Create new
+    if (!tmp)
+        return;
+    if (*list == NULL) {  // Find Null-node
+        *list = tmp;
+        return;
+    }
+    else {
+        tmp->next = *list;
+        *list = tmp;
     }
 }
 

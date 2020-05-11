@@ -301,6 +301,7 @@ t_package *mx_copy_package(t_package *package);
 
 // krivoy dizayn
 int mx_login (t_client_info *info);
+void append_message(t_client_info *info, t_room *room, json_object *new_json);
 
 //json
 json_object *mx_create_basic_json_object(int type);
