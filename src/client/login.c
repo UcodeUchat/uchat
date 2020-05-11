@@ -268,6 +268,12 @@ void close_menu_callback (GtkWidget *widget, GdkEventButton *event, t_client_inf
     gtk_widget_hide(info->data->menu);
 }
 
+void menu_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    gtk_widget_show(info->data->menu);
+
+}
+
 void init_menu (t_client_info *info) {
     info->data->menu = gtk_box_new(FALSE, 0);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->menu, 0, 0);
@@ -355,11 +361,6 @@ void init_menu (t_client_info *info) {
     gtk_widget_show(exit_box);
 }
 
-void menu_callback (GtkWidget *widget, t_client_info *info) {
-    (void)widget;
-    gtk_widget_show(info->data->menu);
-
-}
 
 void init_general (t_client_info *info) {
     info->data->rooms = NULL;
