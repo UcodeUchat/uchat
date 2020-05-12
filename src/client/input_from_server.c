@@ -95,10 +95,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     mes->id = id;
     node->h_box = gtk_box_new(FALSE, 0);
 
-    if (order == 1)
-        gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
-    else
-        gtk_box_pack_end (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
     GtkWidget *general_box = gtk_box_new(FALSE, 0);
     gtk_widget_show(general_box);
     //-events
@@ -168,7 +165,10 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         data->widget = node->h_box;
         data->room = room;
         gdk_threads_add_idle ((GSourceFunc)show_message, data);
-        sleep_ms(100);
+        if(order == 1)
+            sleep_ms(100);
+        else
+            sleep_ms(15);
         gdk_threads_add_idle ((GSourceFunc)move_bar, data);
     }
     else {
@@ -178,6 +178,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         data->widget = node->h_box;
         data->room = room;
         gdk_threads_add_idle ((GSourceFunc)show_message, data);
+        sleep_ms(15);
     }
     node->next = NULL;
     return node;
@@ -212,7 +213,7 @@ void append_message(t_client_info *info, t_room *room, json_object *new_json) {
 
     if (!list)
         return;
-    tmp = create_message(info, room, new_json, 1);  // Create new
+    tmp = create_message(info, room, new_json, 2);  // Create new
     if (!tmp)
         return;
     if (*list == NULL) {  // Find Null-node

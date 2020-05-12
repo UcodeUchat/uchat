@@ -20,15 +20,23 @@ static int get_rooms_data(void *messages, int argc, char **argv, char **col_name
 	json_object *message = json_object_new_object();
 	json_object *id = json_object_new_int(atoi(argv[0]));
 	json_object *user_id = json_object_new_int(atoi(argv[1]));
-	json_object *data = json_object_new_string(argv[3]);
+	json_object *data = NULL;
 	json_object *login = json_object_new_string(argv[8]);
-	json_object *add_info = json_object_new_int(0);
+	json_object *add_info = NULL;
 
 	if (argv[0] == NULL) {
 		return 1;
 	}
 	(void)argc;
 	(void)col_name;
+	if (strcmp(argv[4], "file") == 0){
+		data = json_object_new_string(argv[3] + 20);
+		add_info = json_object_new_int(1);
+	}
+	else {
+		data = json_object_new_string(argv[3]);
+		add_info = json_object_new_int(0);
+	}
 	json_object_object_add(message, "id", id);
 	json_object_object_add(message, "user_id", user_id);
 	json_object_object_add(message, "data", data);
@@ -59,7 +67,7 @@ void mx_get_rooms(t_server_info *info, json_object *js) {
 
         json_object_object_add(room_data, "messages", messages);
         sprintf(req1, "SELECT *  FROM msg_history, users \
-        		where room_id = %d and users.id = msg_history.user_id order by time desc limit 10;", room_id);
+        		where room_id = %d and users.id = msg_history.user_id order by time desc limit 50;", room_id);
         if (sqlite3_exec(info->db, req1, get_rooms_data, messages, 0) != SQLITE_OK) {
         	printf("Work rooms data\n");
     	}

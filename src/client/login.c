@@ -1,6 +1,10 @@
 #include "uchat.h"
 
-pthread_t login_msg_t;
+typedef struct s_all {
+    t_client_info *info;
+    t_room *room;
+    struct json_object *room_data;
+}               t_all;
 
 void choose_file_callback(GtkWidget *widget, t_client_info *info) {
     (void)widget;
@@ -26,6 +30,22 @@ t_room *find_room(t_room *rooms, int position) {
         head = head->next;
     }
     return node;
+}
+
+void *msg_history_thread (void *data) {
+    t_all *data1 = (t_all *)data;
+    struct json_object *messages;
+    json_object_object_get_ex(data1->room_data, "messages", &messages);
+    int n_msg = json_object_array_length(messages);
+    for (int j = n_msg - 1; j >= 0; j--) {
+        json_object *msg_data = json_object_array_get_idx(messages, j);
+        append_message(data1->info, data1->room, msg_data);
+    }
+    // sleep_ms(100);
+    // gtk_adjustment_set_value(data1->room->Adjust, 
+    //                         gtk_adjustment_get_upper(data1->room->Adjust) - 
+    //                         gtk_adjustment_get_page_size(data1->room->Adjust) + 2.0);
+    return 0;
 }
 
 void *login_msg_thread (void *data) {
@@ -415,6 +435,8 @@ void init_general (t_client_info *info) {
 
     gtk_widget_hide(info->data->login_box);
     gtk_window_set_title(GTK_WINDOW(info->data->window), "Uchat");
+
+    gtk_widget_show(info->data->notebook);
     gtk_widget_show(info->data->general_box);
 
     for (int i = 0; i < n_rooms; i++) {
@@ -462,17 +484,14 @@ void init_general (t_client_info *info) {
         gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);
         //--
         //--msg history
-        struct json_object *messages;
-        json_object_object_get_ex(room_data, "messages", &messages);
-        int n_msg = json_object_array_length(messages);
-        for (int j = n_msg - 1; j >= 0; j--) {
-            printf("%d OK!!!!!!!!!!!!!!\n", j);
-            json_object *msg_data = json_object_array_get_idx(messages, j);
-            append_message(info, room, msg_data);
-        }
+        t_all *data = (t_all *)malloc(sizeof(t_all));
+        data->info = info;
+        data->room = room;
+        data->room_data = room_data;
+        pthread_t msg_history_t = NULL;
+        pthread_create(&msg_history_t, 0, msg_history_thread, data);
         //--
     }
-    gtk_widget_show(info->data->notebook);
 }
 
 void authentification(t_client_info *info) {
@@ -493,6 +512,7 @@ void authentification(t_client_info *info) {
 
 void enter_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
+    pthread_t login_msg_t = NULL;
     //--auth
     info->login = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->login_entry));
     info->password = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->password_entry));
