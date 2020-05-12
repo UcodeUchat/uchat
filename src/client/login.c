@@ -37,14 +37,13 @@ void *msg_history_thread (void *data) {
     struct json_object *messages;
     json_object_object_get_ex(data1->room_data, "messages", &messages);
     int n_msg = json_object_array_length(messages);
-    for (int j = n_msg - 1; j >= 0; j--) {
+    for (int j = 0; j < n_msg; j++) {
         json_object *msg_data = json_object_array_get_idx(messages, j);
         append_message(data1->info, data1->room, msg_data);
     }
-    // sleep_ms(100);
-    // gtk_adjustment_set_value(data1->room->Adjust, 
-    //                         gtk_adjustment_get_upper(data1->room->Adjust) - 
-    //                         gtk_adjustment_get_page_size(data1->room->Adjust) + 2.0);
+    gtk_adjustment_set_value(data1->room->Adjust, 
+                            gtk_adjustment_get_upper(data1->room->Adjust) - 
+                            gtk_adjustment_get_page_size(data1->room->Adjust) + 2.0);
     return 0;
 }
 
@@ -132,8 +131,6 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
         strncat(p->login, login, sizeof(p->login) - 1);
         strncat(p->password, password, sizeof(p->password) - 1);
         p->type = MX_REG_TYPE;
-//        p->client_sock = info->socket;
-        //mx_send_message_from_client(info, p, " ");
 
 
         json_object  *new_json = mx_package_to_json(p);
@@ -141,9 +138,6 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
         const char *json_str = json_object_to_json_string(new_json);
 
         tls_send(info->tls_client, json_str, strlen(json_str));
-//        tls_send(info->tls_client, p, MX_PACKAGE_SIZE);
-
-        //wait responce from server
 
         gtk_widget_hide(info->data->register_box);
         gtk_entry_set_text(GTK_ENTRY(info->data->registration->login_entry), "");
@@ -264,12 +258,22 @@ void logout(t_client_info *info) {
     mx_print_json_object(new_json, "logout");
     const char *json_string = json_object_to_json_string(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
-    // while (info->responce == 0) {
-
-    // }
-    // info->responce = 0;
 }
 
+void scroll_callback (GtkWidget *widget, GdkEventButton *event, t_all *data) {
+    (void)widget;
+    (void)event;
+    if (gtk_adjustment_get_value(data->room->Adjust) == gtk_adjustment_get_lower(data->room->Adjust)) {
+        json_object  *new_json = json_object_new_object();
+
+        json_object_object_add(new_json, "type", json_object_new_int(MX_LOAD_MORE_TYPE));
+        json_object_object_add(new_json, "room_id", json_object_new_int(data->room->id));
+        json_object_object_add(new_json, "last_id", json_object_new_int(data->room->messages->id));
+        mx_print_json_object(new_json, "load 50 more");
+        const char *json_str = json_object_to_json_string(new_json);
+        tls_send(data->info->tls_client, json_str, strlen(json_str));
+    }   
+}
 
 void logout_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
@@ -446,6 +450,12 @@ void init_general (t_client_info *info) {
 
         push_room(&info->data->rooms, str, id, i);
         t_room *room = find_room(info->data->rooms, i);
+        //--
+        t_all *data = (t_all *)malloc(sizeof(t_all));
+        data->info = info;
+        data->room = room;
+        data->room_data = room_data;
+        //--
         room->room_box = gtk_box_new(FALSE, 0);
         GtkWidget *fixed = gtk_fixed_new();
         gtk_box_pack_start (GTK_BOX (room->room_box), fixed, TRUE, TRUE, 0);
@@ -457,9 +467,14 @@ void init_general (t_client_info *info) {
         gtk_fixed_put (GTK_FIXED(fixed), table, 0, 10);
         gtk_widget_show(table);
         //--
+        GtkWidget *event = gtk_event_box_new();
+        gtk_widget_add_events (event, GDK_BUTTON_PRESS_MASK);
+        g_signal_connect (G_OBJECT (event), "button_press_event", G_CALLBACK (scroll_callback), data);
         GtkWidget *full_name = gtk_label_new(str);
         gtk_widget_set_name (full_name, "title");
-        gtk_grid_attach (GTK_GRID (table), full_name, 0, 1, 1, 1);
+        gtk_container_add (GTK_CONTAINER (event), full_name);
+        gtk_widget_show(event);
+        gtk_grid_attach (GTK_GRID (table), event, 0, 1, 1, 1);
 
         gtk_widget_set_size_request(full_name, 515, -1);
         gtk_widget_show(full_name);
@@ -470,6 +485,7 @@ void init_general (t_client_info *info) {
         gtk_widget_set_size_request(room->scrolled_window, 515, 295);
         gtk_widget_show(room->scrolled_window);
         room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
+
         if (strlen(str) > 15) {
             str = strndup(str, 12);
             str = mx_strjoin(str, "...");
@@ -484,10 +500,6 @@ void init_general (t_client_info *info) {
         gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);
         //--
         //--msg history
-        t_all *data = (t_all *)malloc(sizeof(t_all));
-        data->info = info;
-        data->room = room;
-        data->room_data = room_data;
         pthread_t msg_history_t = NULL;
         pthread_create(&msg_history_t, 0, msg_history_thread, data);
         //--
@@ -534,7 +546,6 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
     }
     else if(info->auth_client == 1) {
         init_general(info);
-        
         init_menu(info);
         //--
     }  
@@ -595,7 +606,7 @@ void init_login(t_client_info *info) {
     gtk_widget_set_name(info->data->password_entry, "entry");
                                                                
     GtkWidget *button = gtk_button_new_with_label("Sign in");
-    g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (enter_callback),info);
+    g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (enter_callback),info);
     box = gtk_box_new(FALSE, 0);
     gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
     gtk_widget_set_halign (box, GTK_ALIGN_CENTER);

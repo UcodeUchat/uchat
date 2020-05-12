@@ -71,7 +71,6 @@ int show_message(t_all *data) {
 }
 
 int move_bar(t_all *data) {
-    // sleep_ms(100);
     gtk_adjustment_set_value(data->room->Adjust, 
                             gtk_adjustment_get_upper(data->room->Adjust) - 
                             gtk_adjustment_get_page_size(data->room->Adjust) + 2.0);
@@ -94,8 +93,9 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     mes->room = room;
     mes->id = id;
     node->h_box = gtk_box_new(FALSE, 0);
-
     gtk_box_pack_start (GTK_BOX (room->message_box), node->h_box, FALSE, FALSE, 0);
+    if(order == 2)
+        gtk_box_reorder_child (GTK_BOX (room->message_box), node->h_box, 0);
     GtkWidget *general_box = gtk_box_new(FALSE, 0);
     gtk_widget_show(general_box);
     //-events
@@ -165,11 +165,12 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         data->widget = node->h_box;
         data->room = room;
         gdk_threads_add_idle ((GSourceFunc)show_message, data);
-        if(order == 1)
+        if(order == 1){
             sleep_ms(100);
+            gdk_threads_add_idle ((GSourceFunc)move_bar, data);
+        }
         else
-            sleep_ms(15);
-        gdk_threads_add_idle ((GSourceFunc)move_bar, data);
+            sleep_ms(50);
     }
     else {
         gtk_box_pack_start(GTK_BOX (box1), label1, FALSE, FALSE, 0);
@@ -178,7 +179,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         data->widget = node->h_box;
         data->room = room;
         gdk_threads_add_idle ((GSourceFunc)show_message, data);
-        sleep_ms(15);
+        sleep_ms(50);
     }
     node->next = NULL;
     return node;
@@ -255,6 +256,19 @@ void input_message(t_client_info *info, json_object *new_json) {
     gtk_notebook_reorder_child(GTK_NOTEBOOK(info->data->notebook), room->room_box, 0);
 }
 
+void load_history(t_client_info *info, json_object *new_json) {
+    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+    t_room *room = mx_find_room(info->data->rooms, room_id);           
+    struct json_object *messages;
+
+    json_object_object_get_ex(new_json, "messages", &messages);
+    int n_msg = json_object_array_length(messages);
+    for (int i = 0; i < n_msg; i++) {
+        json_object *msg_data = json_object_array_get_idx(messages, i);
+        append_message(info, room, msg_data);
+    }
+}
+
 void input_authentification(t_client_info *info, json_object *new_json) {
     int type = json_object_get_int(json_object_object_get(new_json, "type"));
     int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
@@ -292,6 +306,9 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
     }
     else if (type == MX_MSG_TYPE) {
         input_message(info, obj);
+    }
+    else if (type == MX_LOAD_MORE_TYPE) {
+        load_history(info, obj);
     }
     return 0;
 }
