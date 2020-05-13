@@ -275,7 +275,7 @@ void scroll_callback (GtkWidget *widget, GdkEventButton *event, t_all *data) {
         const char *json_str = json_object_to_json_string(new_json);
         tls_send(data->info->tls_client, json_str, strlen(json_str));
         gtk_adjustment_set_value(data->room->Adjust, 
-                            gtk_adjustment_get_value(data->room->Adjust) + 30.0);
+                            gtk_adjustment_get_value(data->room->Adjust) * 1.2);
     }   
 }
 

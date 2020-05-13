@@ -136,10 +136,19 @@ notebook tab label {
 	opacity: .75;
 }
 
-#bar slider:active{
+#bar slider:active {
 	background-color: DarkOrange;
 }
 
+menu {
+	background-color: #595959;
+	color: DarkOrange;
+}
+
+menuitem:hover {
+	background-color: DarkOrange;
+	color: black;
+}
 
 
 
