@@ -67,6 +67,7 @@ void file_notify1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes)
 
 int show_message(t_all *data) {
     gtk_widget_show(data->widget);
+    sleep_ms(50);
     return 0;
 }
 
@@ -166,11 +167,9 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         data->room = room;
         gdk_threads_add_idle ((GSourceFunc)show_message, data);
         if(order == 1){
-            sleep_ms(100);
+            sleep_ms(25);
             gdk_threads_add_idle ((GSourceFunc)move_bar, data);
         }
-        else
-            sleep_ms(50);
     }
     else {
         gtk_box_pack_start(GTK_BOX (box1), label1, FALSE, FALSE, 0);
@@ -179,7 +178,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         data->widget = node->h_box;
         data->room = room;
         gdk_threads_add_idle ((GSourceFunc)show_message, data);
-        sleep_ms(50);
+        //sleep_ms(100);
     }
     node->next = NULL;
     return node;
@@ -267,6 +266,7 @@ void load_history(t_client_info *info, json_object *new_json) {
         json_object *msg_data = json_object_array_get_idx(messages, i);
         append_message(info, room, msg_data);
     }
+    info->can_load = 1;
 }
 
 void input_authentification(t_client_info *info, json_object *new_json) {

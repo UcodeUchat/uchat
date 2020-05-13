@@ -113,6 +113,7 @@ typedef struct  s_client_info {  //struct client
     pthread_mutex_t mutex;
     t_data *data;
     int responce;
+    int can_load;
     struct s_file_list *input_files;
     struct json_object *rooms;
     int input;

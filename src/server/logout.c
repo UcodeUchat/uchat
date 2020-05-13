@@ -40,7 +40,7 @@ int mx_load_history (t_server_info *info, t_socket_list *csl, json_object *js) {
     json_object_object_add(js, "messages", messages);
     sprintf(command, "SELECT *  FROM msg_history, users \
                 where room_id = %d and msg_history.id < %d and users.id = msg_history.user_id \
-                order by msg_history.id desc limit 50;", room_id, last_id);
+                order by msg_history.id desc limit 15;", room_id, last_id);
     if (sqlite3_exec(info->db, command, get_rooms_data, messages, NULL) == SQLITE_OK) {
         printf("succes\n");
     }

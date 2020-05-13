@@ -263,9 +263,11 @@ void logout(t_client_info *info) {
 void scroll_callback (GtkWidget *widget, GdkEventButton *event, t_all *data) {
     (void)widget;
     (void)event;
-    if (gtk_adjustment_get_value(data->room->Adjust) == gtk_adjustment_get_lower(data->room->Adjust)) {
+    if (gtk_adjustment_get_value(data->room->Adjust) == 
+        gtk_adjustment_get_lower(data->room->Adjust) && data->info->can_load == 1) {
         json_object  *new_json = json_object_new_object();
 
+        data->info->can_load = 0;
         json_object_object_add(new_json, "type", json_object_new_int(MX_LOAD_MORE_TYPE));
         json_object_object_add(new_json, "room_id", json_object_new_int(data->room->id));
         json_object_object_add(new_json, "last_id", json_object_new_int(data->room->messages->id));
@@ -387,6 +389,7 @@ void init_menu (t_client_info *info) {
 
 
 void init_general (t_client_info *info) {
+    info->can_load = 1;
     info->data->rooms = NULL;
     info->data->current_room = 0;
     info->data->general_box = gtk_fixed_new();
