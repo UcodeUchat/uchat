@@ -476,16 +476,16 @@ void init_general (t_client_info *info) {
         gtk_container_add (GTK_CONTAINER (event), full_name);
         gtk_widget_show(event);
         gtk_box_pack_start (GTK_BOX (room->room_box), event, FALSE, FALSE, 0);
-
-        gtk_widget_set_size_request(full_name, 515, -1);
         gtk_widget_show(full_name);
-        room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-        gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 1);
-        gtk_box_pack_start (GTK_BOX (room->room_box), room->scrolled_window, TRUE, TRUE, 0);
 
-        //gtk_widget_set_size_request(room->scrolled_window, -1, 295);
+        room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+        gtk_box_pack_start (GTK_BOX (room->room_box), room->scrolled_window, TRUE, TRUE, 0);
+        // gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 1);
         gtk_widget_show(room->scrolled_window);
+
         room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
+        GtkWidget *ptrVscrollBar = gtk_scrolled_window_get_vscrollbar(GTK_SCROLLED_WINDOW(room->scrolled_window));
+        gtk_widget_set_name (ptrVscrollBar, "bar");
 
         if (strlen(str) > 15) {
             str = strndup(str, 12);
