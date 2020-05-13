@@ -271,9 +271,11 @@ void scroll_callback (GtkWidget *widget, GdkEventButton *event, t_all *data) {
         json_object_object_add(new_json, "type", json_object_new_int(MX_LOAD_MORE_TYPE));
         json_object_object_add(new_json, "room_id", json_object_new_int(data->room->id));
         json_object_object_add(new_json, "last_id", json_object_new_int(data->room->messages->id));
-        mx_print_json_object(new_json, "load 50 more");
+        mx_print_json_object(new_json, "load 15 more");
         const char *json_str = json_object_to_json_string(new_json);
         tls_send(data->info->tls_client, json_str, strlen(json_str));
+        gtk_adjustment_set_value(data->room->Adjust, 
+                            gtk_adjustment_get_value(data->room->Adjust) + 30.0);
     }   
 }
 
@@ -443,6 +445,7 @@ void init_general (t_client_info *info) {
     gtk_widget_hide(info->data->login_box);
     gtk_window_set_title(GTK_WINDOW(info->data->window), "Uchat");
 
+    //gtk_widget_set_name(room->message_box, "mesage_box");
     gtk_widget_show(info->data->notebook);
     gtk_widget_show(info->data->general_box);
 
@@ -460,32 +463,27 @@ void init_general (t_client_info *info) {
         data->room_data = room_data;
         //--
         room->room_box = gtk_box_new(FALSE, 0);
-        GtkWidget *fixed = gtk_fixed_new();
-        gtk_box_pack_start (GTK_BOX (room->room_box), fixed, TRUE, TRUE, 0);
-        gtk_widget_show(fixed);
-        gtk_widget_set_name (room->room_box, "room_box");
+        gtk_widget_set_name(room->room_box, "mesage_box");
+        gtk_orientable_set_orientation (GTK_ORIENTABLE(room->room_box), GTK_ORIENTATION_VERTICAL);
         gtk_widget_show(room->room_box);
-        //--table
-        GtkWidget *table = gtk_grid_new();
-        gtk_fixed_put (GTK_FIXED(fixed), table, 0, 10);
-        gtk_widget_show(table);
         //--
         GtkWidget *event = gtk_event_box_new();
+        gtk_widget_set_size_request(event, -1, 40);
         gtk_widget_add_events (event, GDK_BUTTON_PRESS_MASK);
         g_signal_connect (G_OBJECT (event), "button_press_event", G_CALLBACK (scroll_callback), data);
         GtkWidget *full_name = gtk_label_new(str);
         gtk_widget_set_name (full_name, "title");
         gtk_container_add (GTK_CONTAINER (event), full_name);
         gtk_widget_show(event);
-        gtk_grid_attach (GTK_GRID (table), event, 0, 1, 1, 1);
+        gtk_box_pack_start (GTK_BOX (room->room_box), event, FALSE, FALSE, 0);
 
         gtk_widget_set_size_request(full_name, 515, -1);
         gtk_widget_show(full_name);
         room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
         gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 1);
-        gtk_grid_attach (GTK_GRID (table), room->scrolled_window, 0, 2, 1, 10);
-            
-        gtk_widget_set_size_request(room->scrolled_window, 515, 295);
+        gtk_box_pack_start (GTK_BOX (room->room_box), room->scrolled_window, TRUE, TRUE, 0);
+
+        //gtk_widget_set_size_request(room->scrolled_window, -1, 295);
         gtk_widget_show(room->scrolled_window);
         room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
 

@@ -15,6 +15,7 @@ label#auth_fail {
 }
 
 label#title {
+	background-color: grey;
 	color: DarkOrange;
 	font-weight: bold;
 	font-size: 140%;
@@ -107,5 +108,9 @@ entry#entry:focus {
 	color: #900C3F;
 	border-bottom: 1px solid currentColor;
     font-weight: bold;
+}
+
+#mesage_box {
+	background-color: #595959;
 }
 

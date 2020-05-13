@@ -67,7 +67,7 @@ void file_notify1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes)
 
 int show_message(t_all *data) {
     gtk_widget_show(data->widget);
-    sleep_ms(50);
+    sleep_ms(25);
     return 0;
 }
 
@@ -178,7 +178,6 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         data->widget = node->h_box;
         data->room = room;
         gdk_threads_add_idle ((GSourceFunc)show_message, data);
-        //sleep_ms(100);
     }
     node->next = NULL;
     return node;
