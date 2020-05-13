@@ -114,3 +114,42 @@ entry#entry:focus {
 	background-color: #595959;
 }
 
+notebook tab label {
+	font-weight: bold;
+	font-size: 110%;
+    text-shadow: Black 0px 0px 0, Black 0px 0px 0, 
+                 Black -1px 1px 1px, Black 0px 0px 0;
+	color: DarkOrange;
+}
+
+#bar {
+	min-width: 8px;
+}
+
+#bar slider{
+	border: 1px solid black;
+	background-color: white;
+}
+
+#bar:hover {
+	background: rgba(0, 0, 0, 0.5);
+	opacity: .75;
+}
+
+#bar slider:active {
+	background-color: DarkOrange;
+}
+
+menu {
+	background-color: #595959;
+	color: DarkOrange;
+}
+
+menuitem:hover {
+	background-color: DarkOrange;
+	color: black;
+}
+
+
+
+

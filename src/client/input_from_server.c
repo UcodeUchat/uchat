@@ -33,6 +33,32 @@ void focus1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     gtk_widget_hide(message->menu);
 }
 
+void focus_menu_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+    (void)widget;
+    (void)event;
+    t_message *message = mx_find_message(mes->room->messages, mes->id);
+    gtk_widget_show(message->menu);
+}
+
+void open_menu_callback(GtkWidget *widget, GdkEventButton *event, GtkWidget *menu) {
+    (void)widget;
+    (void)event;
+    gtk_menu_popup_at_pointer (GTK_MENU(menu), NULL);
+}
+
+void delete_callback (GtkWidget *widget, t_mes *mes) {
+    (void)widget;
+    t_message *message = mx_find_message(mes->room->messages, mes->id);
+    json_object  *new_json = json_object_new_object();
+
+    json_object_object_add(new_json, "type", json_object_new_int(MX_DELETE_MESSAGE_TYPE));
+    json_object_object_add(new_json, "message_id", json_object_new_int(message->id));
+    json_object_object_add(new_json, "room_id", json_object_new_int(mes->room->id));
+    mx_print_json_object(new_json, "delete message");
+    const char *json_str = json_object_to_json_string(new_json);
+    tls_send(mes->info->tls_client, json_str, strlen(json_str));
+}
+
 void file_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     (void)widget;
     (void)event;
@@ -125,12 +151,30 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     gtk_widget_show(right_box);
     gtk_widget_set_size_request(right_box, 15, -1);
     gtk_box_pack_start(GTK_BOX (box), right_box, FALSE, FALSE, 0);
+    //-menu
+    GtkWidget *menu_event = gtk_event_box_new();
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/options.png", 20, 40, TRUE, NULL);
     node->menu = gtk_image_new_from_pixbuf(pixbuf);
+    gtk_container_add (GTK_CONTAINER (menu_event), node->menu);
+    GtkWidget *menu  = gtk_menu_new ();
+    //--items
+    GtkWidget *delete = gtk_menu_item_new_with_label("Delete");
+    gtk_widget_show(delete);
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu), delete);
+    g_signal_connect (G_OBJECT (delete), "activate", G_CALLBACK (delete_callback), mes);
 
+    GtkWidget *edit = gtk_menu_item_new_with_label("Edit");
+    gtk_widget_show(edit);
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu), edit);
+    //--
+    gtk_widget_add_events (menu_event, GDK_ENTER_NOTIFY_MASK);
+    gtk_widget_add_events (menu_event, GDK_BUTTON_PRESS_MASK);
+    g_signal_connect (G_OBJECT (menu_event), "enter_notify_event", G_CALLBACK (focus_menu_callback), mes);
+    g_signal_connect (G_OBJECT (menu_event), "button_press_event", G_CALLBACK (open_menu_callback), G_OBJECT (menu));
+    gtk_widget_show(menu_event);
+    //--
     GtkWidget *box1 = gtk_box_new(FALSE, 0);
     gtk_widget_show(box1);
-    //gtk_container_set_border_width(GTK_CONTAINER(box1), 1);
     GtkWidget *label1 = gtk_label_new(login);
     gtk_box_pack_start(GTK_BOX (main_box), box1, FALSE, FALSE, 0);
     gtk_widget_show(label1);
@@ -159,7 +203,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         gtk_box_pack_start (GTK_BOX (box2), label2, FALSE, FALSE, 0);
     }
     if (user_id == info->id) {
-        gtk_box_pack_end(GTK_BOX (right_box), node->menu, FALSE, FALSE, 0);
+        gtk_box_pack_end(GTK_BOX (right_box), menu_event, FALSE, FALSE, 0);
         gtk_box_pack_end(GTK_BOX (box1), label1, FALSE, FALSE, 0);
         gtk_box_pack_end (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
         t_all *data = (t_all *)malloc(sizeof(t_all));
@@ -225,6 +269,18 @@ void append_message(t_client_info *info, t_room *room, json_object *new_json) {
     }
 }
 
+void pop_message_id(t_message *messages, int id) {
+    t_message *head = messages;
+
+    while (head->next != NULL) {
+        if (head->next->id == id) {
+            head->next = head->next->next;
+            break;
+        }
+        head = head->next;
+    }
+}
+
 t_room *mx_find_room(t_room *rooms, int id) {
    t_room *head = rooms;
    t_room *node = NULL;
@@ -268,6 +324,16 @@ void load_history(t_client_info *info, json_object *new_json) {
     info->can_load = 1;
 }
 
+void delete_message(t_client_info *info, json_object *new_json) { 
+    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+    int message_id = json_object_get_int(json_object_object_get(new_json, "message_id"));
+    t_room *room = mx_find_room(info->data->rooms, room_id);
+    t_message *message = mx_find_message(room->messages, message_id);
+    gtk_widget_destroy(message->h_box);
+    pop_message_id(room->messages, message_id);
+
+}
+
 void input_authentification(t_client_info *info, json_object *new_json) {
     int type = json_object_get_int(json_object_object_get(new_json, "type"));
     int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
@@ -292,23 +358,19 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
 // tmp
     if (type != MX_FILE_DOWNLOAD_TYPE)
         mx_print_json_object(obj, "mx_process_input_from_server");
-    printf("New_package! Type:%d\n", type);
-//
-    if (type == MX_FILE_DOWNLOAD_TYPE) {
+    if (type == MX_FILE_DOWNLOAD_TYPE) 
         mx_save_file_in_client(info, obj);
-    }
-    else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) {
+    else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) 
         input_authentification(info, obj);
-    }
     else if (type == MX_REG_TYPE_V || type == MX_REG_TYPE_NV) {
         //input_registration(info, obj);
     }
-    else if (type == MX_MSG_TYPE) {
+    else if (type == MX_MSG_TYPE)
         input_message(info, obj);
-    }
-    else if (type == MX_LOAD_MORE_TYPE) {
+    else if (type == MX_LOAD_MORE_TYPE)
         load_history(info, obj);
-    }
+    else if (type == MX_DELETE_MESSAGE_TYPE)
+        delete_message(info, obj);
     return 0;
 }
 
