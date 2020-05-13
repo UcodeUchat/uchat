@@ -33,7 +33,10 @@
 //#include <json.h>
 #include "../json/json.h"
 
-//#include <openssl/sha.h>
+// openssl
+#include <openssl/evp.h>
+#include <openssl/sha.h>
+#include <openssl/aes.h>
 
 #include <gtk/gtk.h>
 #include <tls.h>
@@ -297,6 +300,11 @@ void mx_get_input(char *buffer);
 int mx_get_input2(char *buffer);
 void mx_report_tls(struct tls * tls_ctx, char * host);
 void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
+
+// crypto funcs
+char *mx_strhash(const char *to_hash);
+char *mx_encrypt(char *str);
+char *mx_decrypt(char *str);
 
 // funcs for package
 t_package *mx_create_new_package();

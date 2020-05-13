@@ -63,7 +63,7 @@ SRC_CLIENT = main_client.c \
 SRC_HELP = err_exit.c \
 	functions.c \
 	package.c \
-	cryptographic_hash_f.c \
+	crypto.c \
 	json_functions.c
 
 SRCS_SERVER = $(addprefix $(SRCD)/server/, $(SRC_SERVER))
