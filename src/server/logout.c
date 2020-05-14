@@ -31,14 +31,16 @@ static int get_rooms_data(void *messages, int argc, char **argv, char **col_name
 }
 
 int mx_delete_message (t_server_info *info, t_socket_list *csl, json_object *js) {
-    const char *json_string = NULL;
+    //const char *json_string = NULL;
+    (void)csl;
     int message_id = json_object_get_int(json_object_object_get(js, "message_id"));
     char *command = malloc(1024);
 
     sprintf(command, "DELETE FROM msg_history where id = %d ", message_id);
     if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) {
-        json_string = json_object_to_json_string(js);
-        mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
+        //json_string = json_object_to_json_string(js);
+        mx_send_json_to_all_in_room(info, js);
+        //mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
         mx_strdel(&command);
     }
     else {
