@@ -29,6 +29,10 @@
 #include <syslog.h>
 #include <sys/event.h>
 #include <sys/time.h>
+#include <time.h>
+#include <portaudio.h>
+#include <math.h>
+#include <sndfile.h>
 
 //#include <json.h>
 #include "../json/json.h"
@@ -52,6 +56,20 @@
 
 #define MX_SAVE_FOLDER_IN_CLIENT "./Uchat_downloads/"
 #define MX_SAVE_FOLDER_IN_SERVER "./files/"
+
+typedef struct s_audio{
+    uint16_t format_type;
+    uint8_t number_channels;
+    uint32_t sample_rate;
+    size_t size;
+    float *rec_samples;
+}               t_audio;
+
+typedef struct s_a_snippet{
+    float *snippet;
+    size_t size;
+}           t_a_snippet;
+
 
 typedef struct s_message {
     int id;
@@ -324,5 +342,18 @@ void mx_glitch_in_the_matrix(struct json_object *jobj);
 const char *mx_message_to_json_string(t_client_info *info, char *message);
 json_object *mx_package_to_json(t_package *package);
 t_package *mx_json_to_package(json_object *new_json);
+
+//audio
+int mx_record_audio(void);
+int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block);
+int mx_exit_stream(t_audio *data, PaError err);
+long mx_save_audio(t_audio *data);
+int mx_process_stream_ext(PaStream *stream, t_audio *data,
+                          t_a_snippet *sample_block, const char *fileName,
+                          bool *sample_complete);
+float mx_rms(float *data, size_t len);
+float mx_change_threshold(float talking_threshold, float talking_ntensity);
+
+
 
 #endif

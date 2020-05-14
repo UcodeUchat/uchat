@@ -58,6 +58,7 @@ SRC_CLIENT = main_client.c \
 	input_from_server.c \
 	login.c \
 	work_with_files_list_in_client.c \
+	record_audio.c
 
 # SRC_HELP = $(wildcard *.c)
 SRC_HELP = err_exit.c \
@@ -76,6 +77,7 @@ OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
 
+AUDIOFLAGS = -lportaudio -lsndfile
 TLSFLAGS =  -lcrypto -lssl -ltls
 SQLFLAGS = -lsqlite3
 
@@ -118,7 +120,7 @@ $(LJSONX): $(LJSONA)
 client: $(NAME_C) #$(LIBMX)
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA)  $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA)  $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(AUDIOFLAGS)
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/client/%.c $(INCS)
