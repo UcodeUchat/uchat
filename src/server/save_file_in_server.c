@@ -15,9 +15,9 @@ int save_file_in_db(t_server_info *info, json_object *obj, t_file_list *file_lis
 	return 1;
 }
 
-void mx_send_notification(t_socket_list *csl, t_file_list *file_list) {
+void mx_send_notification(t_server_info *info, t_socket_list *csl, t_file_list *file_list) {
     json_object *send_obj = mx_create_basic_json_object(MX_MSG_TYPE);
-    const char *json_str;
+    //const char *json_str;
 
     json_object_object_add(send_obj, "user_id", json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "user_id"))));
     json_object_object_add(send_obj, "room_id", json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "room_id"))));
@@ -25,8 +25,9 @@ void mx_send_notification(t_socket_list *csl, t_file_list *file_list) {
     json_object_object_add(send_obj, "add_info", json_object_new_int(1));
     json_object_object_add(send_obj, "data", json_object_new_string(file_list->file_name + 20));
     json_object_object_add(send_obj, "id", json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "id"))));
-    json_str = json_object_to_json_string(send_obj);
-    mx_save_send(&csl->mutex, csl->tls_socket, json_str, strlen(json_str));
+    //json_str = json_object_to_json_string(send_obj);
+    //mx_save_send(&csl->mutex, csl->tls_socket, json_str, strlen(json_str));
+    mx_send_json_to_all_in_room(info, send_obj);
     json_object_put(send_obj);
 }
 //
@@ -102,7 +103,7 @@ int mx_final_file_input_server(t_server_info *info, t_socket_list *csl) {
         else {
             printf("ALL OK\n");
             if (save_file_in_db(info, csl->obj, file_list) != -1)
-                mx_send_notification(csl, file_list);
+                mx_send_notification(info, csl, file_list);
             // save file in db messages history and print notification to all
         }
         if (prev_elem == NULL)
