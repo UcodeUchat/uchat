@@ -22,8 +22,11 @@ void mx_send_notification(t_server_info *info, t_socket_list *csl, t_file_list *
     json_object_object_add(send_obj, "user_id", json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "user_id"))));
     json_object_object_add(send_obj, "room_id", json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "room_id"))));
     json_object_object_add(send_obj, "login", json_object_new_string(json_object_get_string(json_object_object_get(csl->obj, "login"))));
-    json_object_object_add(send_obj, "add_info", json_object_new_int(1));
-    json_object_object_add(send_obj, "data", json_object_new_string(file_list->file_name + 20));
+    if (mx_detect_file_extention(file_list->file_name) == 1)
+        json_object_object_add(send_obj, "add_info", json_object_new_int(2));
+    else
+        json_object_object_add(send_obj, "add_info", json_object_new_int(1));
+    json_object_object_add(send_obj, "data", json_object_new_string(file_list->file_name));
     json_object_object_add(send_obj, "id", json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "id"))));
     //json_str = json_object_to_json_string(send_obj);
     //mx_save_send(&csl->mutex, csl->tls_socket, json_str, strlen(json_str));
@@ -54,7 +57,7 @@ int mx_add_new_file_server(t_file_list **input_files, t_socket_list *csl) {
 
     if (file_size > 0 && file_size <= MX_MAX_FILE_SIZE) {
         t_file_list *new_file_list = mx_new_file_list_elem(csl->obj);
-        
+
         if (new_file_list != NULL) {
             mx_push_file_elem_to_list(input_files, new_file_list);
             return 0;
@@ -102,9 +105,9 @@ int mx_final_file_input_server(t_server_info *info, t_socket_list *csl) {
         }
         else {
             printf("ALL OK\n");
-            if (save_file_in_db(info, csl->obj, file_list) != -1)
+            if (save_file_in_db(info, csl->obj, file_list) != -1) {
                 mx_send_notification(info, csl, file_list);
-            // save file in db messages history and print notification to all
+            }
         }
         if (prev_elem == NULL)
             info->input_files = file_list->next;

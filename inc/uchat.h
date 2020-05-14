@@ -283,14 +283,15 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
 void sleep_ms (int milliseconds);
 
 void mx_send_file_from_client(t_client_info *info);
-int mx_download_file_from_server(t_mes *msg);
+int mx_load_file(t_mes *msg);
 int mx_save_file_in_client(t_client_info *info, json_object *obj);
 
 t_file_list *mx_find_file_in_list(t_file_list *list, int id);
-int mx_add_file_to_list_in_client(t_file_list **list, char *name, int id);
+int mx_add_file_to_list_in_client(t_file_list **list, int id, char *name, int file_size);
 void mx_pop_file_list_in_client(t_file_list **list, int id);
 
 // functions
+int mx_detect_file_extention(char *filename);
 int tls_send(struct tls *tls_socket, const char *content, int size);
 void mx_print_curr_time(void);
 char *mx_curr_time(void);
@@ -304,6 +305,7 @@ void mx_report_tls(struct tls * tls_ctx, char * host);
 void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
 
 // crypto funcs
+// char *mx_encrypt_EVP(char *str);
 char *mx_strhash(const char *to_hash);
 char *mx_encrypt(char *str);
 char *mx_decrypt(char *str);

@@ -1,5 +1,25 @@
 #include "uchat.h"
 
+int mx_detect_file_extention(char *filename) {
+    char *dot = strrchr(filename, '.');
+
+    if (!dot || dot == filename)
+		return -1;
+    else {
+		while (mx_get_char_index(dot + 1, '.') >= 0) {
+            char *tmp = strdup(dot + mx_get_char_index(dot, '.'));
+            free(dot);
+            dot = strdup(tmp);
+            free(tmp); 
+        }
+		dot++;
+		if (!strcmp(dot, "jpg") || !strcmp(dot, "jpeg") || !strcmp(dot, "png"))
+			return 1; // image
+		else
+			return 0; // just file
+	}
+}
+
 int tls_send(struct tls *tls_socket, const char *content, int size) {
     int sended = 0;
 

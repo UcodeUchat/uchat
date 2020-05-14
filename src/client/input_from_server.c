@@ -65,7 +65,7 @@ void file_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     (void)mes;
     gtk_widget_set_name(widget, "file_pressed");
     mes->message = mx_find_message(mes->room->messages, mes->id);
-    mx_download_file_from_server(mes);
+    mx_load_file(mes);
 }
 
 void file1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
@@ -359,6 +359,7 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
 // tmp
     if (type != MX_FILE_DOWNLOAD_TYPE)
         mx_print_json_object(obj, "mx_process_input_from_server");
+
     if (type == MX_FILE_DOWNLOAD_TYPE) 
         mx_save_file_in_client(info, obj);
     else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) 

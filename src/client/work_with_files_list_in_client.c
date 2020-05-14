@@ -1,12 +1,13 @@
 #include "uchat.h"
 
-t_file_list *create_new_file_list(char *name, int id) {
+t_file_list *create_new_file_list(int id, char *name, int file_size) {
     t_file_list *new = malloc(sizeof(t_file_list));
     char *full_name = mx_strjoin(MX_SAVE_FOLDER_IN_CLIENT, name);
 
     if ((new->file = fopen(full_name, "w+")) != NULL) {
-        new->file_name = full_name;
         new->id = id;
+        new->file_name = full_name;
+        new->file_size = file_size;
         new->next = NULL;
     }
     else {
@@ -30,11 +31,11 @@ t_file_list *mx_find_file_in_list(t_file_list *list, int id) {
     return NULL;
 }
 
-int mx_add_file_to_list_in_client(t_file_list **list, char *name, int id) {
+int mx_add_file_to_list_in_client(t_file_list **list, int id, char *name, int file_size) {
     t_file_list *tmp = *list;
 
     if (mx_find_file_in_list(*list, id) == NULL) {
-        t_file_list *new = create_new_file_list(name, id);
+        t_file_list *new = create_new_file_list(id, name, file_size);
 
         if (new != NULL) {
             if (*list) {

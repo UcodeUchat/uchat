@@ -103,6 +103,7 @@ void start_sending(FILE *file, t_file_tmp *vars) {
     json_object_object_add(send_obj, "piece", json_object_new_int(1));
     json_object_object_add(send_obj, "file_size", json_object_new_int(vars->size));
     json_object_object_add(send_obj, "file_id", json_object_new_int(vars->file_id));
+    json_object_object_add(send_obj, "file_name", json_object_new_string(vars->file_name + strlen(MX_SAVE_FOLDER_IN_SERVER)));
 
     json_string = json_object_to_json_string(send_obj);
     mx_save_send(vars->mutex, vars->tls, json_string, strlen(json_string));
