@@ -1,13 +1,5 @@
 #include "uchat.h"
 
-#define MIN_TALKING_BUFFERS 8
-#define TALKING_THRESHOLD_WEIGHT 0.99
-#define TALKING_TRIGGER_RATIO 4.0
-#define SAMPLE_RATE       (44100)  // в 1 секунде записи содержится 44100 семплов.
-#define FRAMES_PER_BUFFER   (1024)
-#define SAMPLE_SILENCE  (0.0f)
-#define NUM_SECONDS          (4)
-
 static t_audio * init_audio_data() {
     t_audio *data = malloc(sizeof(t_audio));
     data->format_type = paFloat32;  //r
@@ -26,17 +18,13 @@ static int process_stream(PaStream *stream, t_audio *data,
     i++;
 //    printf("process_stream   1\n");
         Pa_ReadStream(stream, sample_block->snippet, FRAMES_PER_BUFFER);
-//    printf("process_stream   2\n");
         data->rec_samples = realloc(data->rec_samples, sample_block->size * i);
         data->size = sample_block->size * i;
-//    printf("process_stream   3\n");
         if (data->rec_samples) {
-            size_t skipIndex = (i- 1) * sample_block->size;
-            char *destination = (char*)data->rec_samples + skipIndex;
+            size_t next_ndex = (i- 1) * sample_block->size;
+            char *destination = (char*)data->rec_samples + next_ndex;
             memcpy(destination, sample_block->snippet, sample_block->size);
-//            printf("process_stream   4\n");
         }
-
         else{
             free(data->rec_samples);
             data->rec_samples = NULL;
@@ -50,14 +38,11 @@ static int record(PaStream *stream, t_audio *data, t_a_snippet *sample_block) {
 //    size_t *j = 0;
 
     printf("Wire on. Will run %d seconds.\n", NUM_SECONDS); fflush(stdout);
-
     for (int i = 0; i < (NUM_SECONDS * SAMPLE_RATE) / FRAMES_PER_BUFFER; ++i) {
-        err = process_stream(stream, data, sample_block
-        );
+        err = process_stream(stream, data, sample_block);
     }
     mx_save_audio(data);
     printf("Wire off.\n"); fflush(stdout);
-//    *sample_complete = true;
     err = Pa_StopStream(stream);
     if (err != paNoError)
         mx_exit_stream(data, err);
@@ -67,12 +52,12 @@ static int record(PaStream *stream, t_audio *data, t_a_snippet *sample_block) {
 int mx_record_audio(void) {
     t_audio *data = init_audio_data();
     t_a_snippet *sample_block = malloc(sizeof(t_a_snippet));
+    PaError err = paNoError;
+
     sample_block->snippet = NULL;
     sample_block->size = 0;
     PaStream *stream = NULL;
-    PaError err = paNoError;
 //    bool sample_complete = false;
-
     printf(" start record\n");
     err = mx_init_stream(&stream, data, sample_block);
     if (err){
@@ -150,7 +135,7 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
         printf("Could not allocate record array.\n");
         return mx_exit_stream(data, err);
     }
-    memset( sample_block->snippet, SAMPLE_SILENCE, sample_block->size);
+    memset(sample_block->snippet, SAMPLE_SILENCE, sample_block->size);
 
     return Pa_StartStream(*stream);
 }
@@ -242,8 +227,8 @@ int mx_process_stream_ext(PaStream *stream, t_audio *data,
         data->rec_samples = realloc(data->rec_samples, sample_block->size * i);
         data->size = sample_block->size * i;
         if (data->rec_samples){
-            size_t skipIndex = (i - 1) * sample_block->size;
-            char *destination = (char*)data->rec_samples + skipIndex;
+            size_t next_ndex = (i - 1) * sample_block->size;
+            char *destination = (char*)data->rec_samples + next_ndex;
             memcpy(destination, sample_block->snippet, sample_block->size);
         }
         else{

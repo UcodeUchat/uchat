@@ -58,7 +58,8 @@ SRC_CLIENT = main_client.c \
 	input_from_server.c \
 	login.c \
 	work_with_files_list_in_client.c \
-	record_audio.c
+	record_audio.c \
+	play_audio.c
 
 # SRC_HELP = $(wildcard *.c)
 SRC_HELP = err_exit.c \
