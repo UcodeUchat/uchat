@@ -6,6 +6,7 @@ typedef struct  s_file_tmp {
     char *file_name;
     int size;
     int file_id;
+    int room_id;
 }               t_file_tmp;
 
 t_file_tmp *set_variables(t_socket_list *csl) {
@@ -14,6 +15,7 @@ t_file_tmp *set_variables(t_socket_list *csl) {
     new->tls = csl->tls_socket;
     new->mutex = &csl->mutex;
     new->file_id = json_object_get_int(json_object_object_get(csl->obj, "file_id"));
+    new->room_id = json_object_get_int(json_object_object_get(csl->obj, "room_id"));
     return new;
 }
 
@@ -99,11 +101,24 @@ void start_sending(FILE *file, t_file_tmp *vars) {
     const char *json_string;
     int readed = 1;
     char buffer[2048];
+    char *extention = strdup(vars->file_name);
+
+    while (mx_get_char_index(extention, '.') >= 0) {
+        char *tmp = strdup(extention + mx_get_char_index(extention, '.') + 1);
+        free(extention);
+        extention = strdup(tmp);
+        free(tmp); 
+    }
+    if (strcmp(extention, "jpg") == 0 || strcmp(extention, "png") == 0)
+        json_object_object_add(send_obj, "add_info", json_object_new_int(2));
+    else
+        json_object_object_add(send_obj, "add_info", json_object_new_int(1));
 
     json_object_object_add(send_obj, "piece", json_object_new_int(1));
     json_object_object_add(send_obj, "file_size", json_object_new_int(vars->size));
     json_object_object_add(send_obj, "file_id", json_object_new_int(vars->file_id));
     json_object_object_add(send_obj, "file_name", json_object_new_string(vars->file_name + strlen(MX_SAVE_FOLDER_IN_SERVER)));
+    json_object_object_add(send_obj, "room_id", json_object_new_int(vars->room_id));
 
     json_string = json_object_to_json_string(send_obj);
     mx_save_send(vars->mutex, vars->tls, json_string, strlen(json_string));
@@ -142,6 +157,7 @@ int mx_send_file_from_server(t_server_info *info, t_socket_list *csl) {
 
         if (file != NULL) {
             t_file_tmp *vars = set_variables(csl);
+            mx_print_json_object(csl->obj, "data");
 
             if (is_file_exist(file, vars) == MX_OK) {
                 

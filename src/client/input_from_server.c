@@ -104,6 +104,12 @@ int move_bar(t_all *data) {
     return 0;
 }
 
+void *load_thread (void *data) {
+    t_mes *mes = (t_mes *)data;
+    mx_load_file(mes);
+    return 0;
+}
+
 t_message *create_message(t_client_info *info, t_room *room, json_object *new_json, int order) {
     t_message *node =  (t_message *)malloc(sizeof(t_message));
     int id = json_object_get_int(json_object_object_get(new_json, "id"));
@@ -183,7 +189,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         GtkWidget *box2 = gtk_event_box_new();
         gtk_widget_show(box2);
         gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
-        GtkWidget *label2 = gtk_label_new(message);
+        GtkWidget *label2 = gtk_label_new(message /*+ 20*/);
         gtk_widget_show(label2);
         gtk_container_add (GTK_CONTAINER (box2), label2);
         gtk_widget_set_name(box2, "file");
@@ -194,7 +200,15 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         g_signal_connect (G_OBJECT (box2), "enter_notify_event", G_CALLBACK (file_notify_callback), mes);
         g_signal_connect (G_OBJECT (box2), "leave_notify_event", G_CALLBACK (file_notify1_callback), mes);
     }
-    else {
+    else if (add_info == 2) {
+        GtkWidget *box2 = gtk_box_new(FALSE, 0);
+        gtk_widget_show(box2);
+        gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
+        node->image_box = gtk_box_new(FALSE, 0);
+        gtk_widget_show(node->image_box);
+        gtk_box_pack_start (GTK_BOX (box2), node->image_box, FALSE, FALSE, 0);
+    }
+    else if (add_info == 0) {
         GtkWidget *box2 =  gtk_box_new(FALSE, 0);
         gtk_widget_show(box2);
         gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
@@ -210,7 +224,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         data->widget = node->h_box;
         data->room = room;
         gdk_threads_add_idle ((GSourceFunc)show_message, data);
-        if(order == 1){
+        if (order == 1) {
             sleep_ms(25);
             gdk_threads_add_idle ((GSourceFunc)move_bar, data);
         }
@@ -240,13 +254,19 @@ void push_message(t_client_info *info, t_room *room, json_object *new_json) {
     p = *list;
     if (*list == NULL) {  // Find Null-node
         *list = tmp;
-        return;
     }
     else {
         while (p->next != NULL)  // Find Null-node
             p = p->next;
         p->next = tmp;
     }
+    int id = json_object_get_int(json_object_object_get(new_json, "id"));
+    t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
+    mes->info = info;
+    mes->room = room;
+    mes->id = id;
+    pthread_t load_t = NULL;
+    pthread_create(&load_t, 0, load_thread, mes);
 }
 
 void append_message(t_client_info *info, t_room *room, json_object *new_json) {
@@ -267,6 +287,13 @@ void append_message(t_client_info *info, t_room *room, json_object *new_json) {
         tmp->next = *list;
         *list = tmp;
     }
+    int id = json_object_get_int(json_object_object_get(new_json, "id"));
+    t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
+    mes->info = info;
+    mes->room = room;
+    mes->id = id;
+    pthread_t load_t = NULL;
+    pthread_create(&load_t, 0, load_thread, mes);
 }
 
 void pop_message_id(t_message *messages, int id) {

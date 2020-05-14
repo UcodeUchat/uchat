@@ -25,7 +25,7 @@ int add_data_to_file_client(t_file_list *list, json_object *obj) {
     return 1;
 }
 
-int final_file_input_client(t_file_list **list, json_object *obj) {
+int final_file_input_client(t_file_list **list, json_object *obj, t_client_info *info) {
     t_file_list *add_to = mx_find_file_in_list(*list, json_object_get_int(json_object_object_get(obj, "file_id")));
     const char *data = json_object_get_string(json_object_object_get(obj, "data"));
 
@@ -38,8 +38,19 @@ int final_file_input_client(t_file_list **list, json_object *obj) {
         
         if (file_size == add_to->file_size) {
             printf("FILE SIZE IS OK\n");
-            // sygnal that file downloaded
             mx_pop_file_list_in_client(list, add_to->id);
+            if (json_object_get_int(json_object_object_get(obj, "add_info")) == 2) {
+                const char *file_name = json_object_get_string(json_object_object_get(obj, "file_name"));
+                char *file_path = mx_strjoin("Uchat_downloads/", file_name);
+                int file_id = json_object_get_int(json_object_object_get(obj, "file_id"));
+                int room_id = json_object_get_int(json_object_object_get(obj, "room_id"));
+                t_room *room = mx_find_room(info->data->rooms, room_id);
+                t_message *message = mx_find_message(room->messages, file_id);
+                GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale (file_path, 300, 250, TRUE, NULL);
+                GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
+                gtk_box_pack_start (GTK_BOX (message->image_box), image, FALSE, FALSE, 0);
+                gtk_widget_show(image);
+            }
             return 0;
         }
         else {
@@ -63,7 +74,7 @@ int mx_save_file_in_client(t_client_info *info, json_object *obj) {
         return add_data_to_file_client(info->input_files, obj);
     }
     else if (piece == 3) {
-        return final_file_input_client(&(info->input_files), obj);
+        return final_file_input_client(&(info->input_files), obj, info);
     }
     else if (piece == -1) {
         fprintf(stderr, "file now is not exist. id:%d\n", json_object_get_int(json_object_object_get(obj, "file_id")));
@@ -87,23 +98,23 @@ int mx_load_file(t_mes *msg) {
 // need to know msg_id (file), user_id, room_id, file_name
     printf("msg->id = %d\n", msg->id);
 
-    if (is_file_exist(msg->message->data) != MX_OK) {
-        if (mx_find_file_in_list(msg->info->input_files, msg->message->id) == NULL) {
+    //if (is_file_exist(msg->message->data) != MX_OK) {
+        //if (mx_find_file_in_list(msg->info->input_files, msg->message->id) == NULL) {
             json_object *send_obj = mx_create_basic_json_object(MX_FILE_DOWNLOAD_TYPE);
             const char *send_str;
 
-            json_object_object_add(send_obj, "file_id", json_object_new_int(msg->message->id));
+            json_object_object_add(send_obj, "file_id", json_object_new_int(msg->id));
             json_object_object_add(send_obj, "user_id", json_object_new_int(msg->info->id));
             json_object_object_add(send_obj, "room_id", json_object_new_int(msg->room->id));
             send_str = json_object_to_json_string(send_obj);
             tls_send(msg->info->tls_client, send_str, strlen(send_str));
             json_object_put(send_obj);
             printf("Sended\n");
-        }
-        else
-            fprintf(stderr, "File %s in progress...\n", msg->message->data);
-    }
-    else
-        printf("Open file...\n");
+        // }
+        // else
+        //     fprintf(stderr, "File %s in progress...\n", msg->message->data);
+    // }
+    // else
+    //     printf("Open file...\n");
     return 0;
 }

@@ -58,6 +58,7 @@ typedef struct s_message {
     char *data;
     GtkWidget *h_box;
     GtkWidget *menu;
+    GtkWidget *image_box;
     struct s_message *next;
 }              t_message;
 
@@ -281,6 +282,8 @@ void authentification(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);
 int mx_send_message_from_client(t_client_info *info, t_package *package, char *message);
 void sleep_ms (int milliseconds);
+t_message *mx_find_message(t_message *messages, int id);
+t_room *mx_find_room(t_room *rooms, int id);
 
 void mx_send_file_from_client(t_client_info *info);
 int mx_load_file(t_mes *msg);
