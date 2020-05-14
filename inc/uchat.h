@@ -63,7 +63,7 @@
 #define SAMPLE_RATE       (44100)  // в 1 секунде записи содержится 44100 семплов.
 #define FRAMES_PER_BUFFER   (1024)
 #define SAMPLE_SILENCE  (0.0f)
-#define NUM_SECONDS     (4)
+#define NUM_SECONDS     (5)
 #define BUFFER_LEN      1024
 
 typedef struct s_audio{

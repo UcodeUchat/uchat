@@ -26,8 +26,8 @@ void mx_process_message_in_client(t_client_info *info) {
     package->type = MX_MSG_TYPE;
     message = strdup((char *)gtk_entry_get_text(GTK_ENTRY(info->data->message_entry)));
     mx_send_message_from_client(info, package, message);
-//    mx_record_audio();
-    mx_play_sound_file("moby.aif");
+    mx_record_audio();
+//    mx_play_sound_file("./audio/moby.aif");
     mx_strdel(&message);
     mx_memset(package->data, 0, sizeof(package->data));
     // tmp
