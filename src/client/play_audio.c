@@ -40,12 +40,14 @@ int mx_play_sound_file(char *file_name) {
         Pa_Terminate();
         return 1;
     }
+
+
     if (s_info.channels > 1)
         return 1;
-
     err = init_stream(&stream, s_info);
     if (err != paNoError)
         return exit_program(err, "init_stream", a_file);
+
 
     float data[BUFFER_LEN];
     memset(data, 0, sizeof(data));

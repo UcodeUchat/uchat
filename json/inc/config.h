@@ -184,7 +184,8 @@
 #define SIZEOF_INT64_T 8
 
 /* The number of bytes in type long */
-#define SIZEOF_LONG 8
+//#define SIZEOF_LONG 8
+#define SIZEOF_LONG 4
 
 /* The number of bytes in type long long */
 #define SIZEOF_LONG_LONG 8

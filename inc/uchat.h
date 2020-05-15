@@ -30,12 +30,15 @@
 #include <sys/event.h>
 #include <sys/time.h>
 #include <time.h>
-#include <portaudio.h>
 #include <math.h>
-#include <sndfile.h>
-
+//#include <portaudio.h>
+//#include <sndfile.h>
 //#include <json.h>
+
+#include "../portaudio/inc/portaudio.h"
+
 #include "../json/json.h"
+#include "../libsndfile/src/sndfile.h"
 
 // openssl
 #include <openssl/evp.h>

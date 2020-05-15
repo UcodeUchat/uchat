@@ -29,6 +29,10 @@ LJSOND	= json
 LJSONX  = libjsonc.a
 LJSONA := $(addprefix $(LJSOND)/, $(LJSONX))
 
+LIBSNDFD  = libsndfile
+LIBSNDFX  = libsndfile.a
+LIBSNDFA := $(addprefix $(LIBSNDFD)/, $(LIBSNDFX))
+
 INCS = inc/uchat.h
 
 SRC_SERVER = main_server.c \
@@ -78,7 +82,7 @@ OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
 
-AUDIOFLAGS = -lportaudio -lsndfile
+AUDIOFLAGS = -lportaudio
 TLSFLAGS =  -lcrypto -lssl -ltls
 SQLFLAGS = -lsqlite3
 
@@ -88,7 +92,7 @@ server: $(NAME_S) #$(LIBMX) $(LJSONX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
 	@make -sC $(LJSOND)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA)  $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/server/%.c $(INCS)
@@ -118,10 +122,10 @@ $(LJSONX): $(LJSONA)
 	@make -sC $(LJSOND)
 
 
-client: $(NAME_C) #$(LIBMX)
+client: $(NAME_C) $(LIBSNDFX) #$(LIBMX)
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA)  $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(AUDIOFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) ./libsndfile/libsndfile.a ./portaudio/portaudio.a $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/client/%.c $(INCS)
@@ -134,6 +138,12 @@ $(OBJD)/%.o: src/functions/%.c $(INCS)
 	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
 
 $(OBJS_CLIENT): | $(OBJD)
+
+$(LIBSNDFA):
+	@make -sC $(LIBSNDFD)
+
+$(LIBSNDFX): $(LIBSNDFA)
+	@make -sC $(LIBSNDFD)
 
 install: server client
 

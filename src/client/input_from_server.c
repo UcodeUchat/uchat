@@ -299,7 +299,7 @@ void input_message(t_client_info *info, json_object *new_json) {
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
-//    mx_play_sound_file("./audio/message_send.aiff");
+    mx_play_sound_file("./audio/message_send.aiff");
     push_message(info, room, new_json);
     t_room *head = info->data->rooms;
     while (head != NULL) {
