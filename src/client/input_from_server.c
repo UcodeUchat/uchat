@@ -104,11 +104,17 @@ int move_bar(t_all *data) {
     return 0;
 }
 
-void *load_thread (void *data) {
-    t_mes *mes = (t_mes *)data;
+int load_thread(t_mes *mes) {
     mx_load_file(mes);
+    sleep_ms(25);
     return 0;
 }
+
+// void *load_thread (void *data) {
+//     t_mes *mes = (t_mes *)data;
+//     mx_load_file(mes);
+//     return 0;
+// }
 
 t_message *create_message(t_client_info *info, t_room *room, json_object *new_json, int order) {
     t_message *node =  (t_message *)malloc(sizeof(t_message));
@@ -189,7 +195,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         GtkWidget *box2 = gtk_event_box_new();
         gtk_widget_show(box2);
         gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
-        GtkWidget *label2 = gtk_label_new(message /*+ 20*/);
+        GtkWidget *label2 = gtk_label_new(message + 20);
         gtk_widget_show(label2);
         gtk_container_add (GTK_CONTAINER (box2), label2);
         gtk_widget_set_name(box2, "file");
@@ -261,12 +267,14 @@ void push_message(t_client_info *info, t_room *room, json_object *new_json) {
         p->next = tmp;
     }
     int id = json_object_get_int(json_object_object_get(new_json, "id"));
-    t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
-    mes->info = info;
-    mes->room = room;
-    mes->id = id;
-    pthread_t load_t = NULL;
-    pthread_create(&load_t, 0, load_thread, mes);
+    int add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
+    if (add_info == 2) {
+        t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
+        mes->info = info;
+        mes->room = room;
+        mes->id = id;
+        gdk_threads_add_idle ((GSourceFunc)load_thread, mes);
+    }
 }
 
 void append_message(t_client_info *info, t_room *room, json_object *new_json) {
@@ -288,12 +296,14 @@ void append_message(t_client_info *info, t_room *room, json_object *new_json) {
         *list = tmp;
     }
     int id = json_object_get_int(json_object_object_get(new_json, "id"));
-    t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
-    mes->info = info;
-    mes->room = room;
-    mes->id = id;
-    pthread_t load_t = NULL;
-    pthread_create(&load_t, 0, load_thread, mes);
+    int add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
+    if (add_info == 2) {
+        t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
+        mes->info = info;
+        mes->room = room;
+        mes->id = id;
+        gdk_threads_add_idle ((GSourceFunc)load_thread, mes);
+    }
 }
 
 void pop_message_id(t_message *messages, int id) {

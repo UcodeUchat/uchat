@@ -13,9 +13,23 @@ static int get_rooms_data(void *messages, int argc, char **argv, char **col_name
     }
     (void)argc;
     (void)col_name;
-    if (strcmp(argv[4], "file") == 0){
-        data = json_object_new_string(argv[3] + 20);
-        add_info = json_object_new_int(1);
+    if (strcmp(argv[4], "file") == 0) {
+        char *extention = strdup(argv[3]);
+
+        while (mx_get_char_index(extention, '.') >= 0) {
+            char *tmp = strdup(extention + mx_get_char_index(extention, '.') + 1);
+            free(extention);
+            extention = strdup(tmp);
+            free(tmp); 
+        }
+        if (strcmp(extention, "jpg") == 0 || strcmp(extention, "png") == 0) {
+            data = json_object_new_string(argv[3]);
+            add_info = json_object_new_int(2);
+        }
+        else {
+            data = json_object_new_string(argv[3] /*+ 20*/);
+            add_info = json_object_new_int(1);
+        }
     }
     else {
         data = json_object_new_string(argv[3]);

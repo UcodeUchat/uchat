@@ -43,7 +43,7 @@ static int get_rooms_data(void *messages, int argc, char **argv, char **col_name
 			add_info = json_object_new_int(2);
 	    }
 	    else {
-			data = json_object_new_string(argv[3] + 20);
+			data = json_object_new_string(argv[3] /*+ 20*/);
 			add_info = json_object_new_int(1);
 		}
 	}
