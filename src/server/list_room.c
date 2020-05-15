@@ -48,8 +48,11 @@ static int get_rooms_data(void *messages, int argc, char **argv, char **col_name
 		}
 	}
 	else {
+		if (strcmp(argv[4], "mes") == 0)
+			add_info = json_object_new_int(0);
+		else if (strcmp(argv[4], "stik") == 0)
+			add_info = json_object_new_int(3);
 		data = json_object_new_string(argv[3]);
-		add_info = json_object_new_int(0);
 	}
 	json_object_object_add(message, "id", id);
 	json_object_object_add(message, "user_id", user_id);

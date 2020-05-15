@@ -92,6 +92,7 @@ void file_notify1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes)
 }
 
 int show_message(t_all *data) {
+    sleep_ms(25);
     gtk_widget_show(data->widget);
     sleep_ms(25);
     return 0;
@@ -109,12 +110,6 @@ int load_thread(t_mes *mes) {
     sleep_ms(25);
     return 0;
 }
-
-// void *load_thread (void *data) {
-//     t_mes *mes = (t_mes *)data;
-//     mx_load_file(mes);
-//     return 0;
-// }
 
 t_message *create_message(t_client_info *info, t_room *room, json_object *new_json, int order) {
     t_message *node =  (t_message *)malloc(sizeof(t_message));
@@ -191,7 +186,15 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     gtk_box_pack_start(GTK_BOX (main_box), box1, FALSE, FALSE, 0);
     gtk_widget_show(label1);
     
-    if (add_info == 1) {
+    if (add_info == 0) {
+        GtkWidget *box2 =  gtk_box_new(FALSE, 0);
+        gtk_widget_show(box2);
+        gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
+        GtkWidget *label2 = gtk_label_new(message);
+        gtk_widget_show(label2);
+        gtk_box_pack_start (GTK_BOX (box2), label2, FALSE, FALSE, 0);
+    }
+    else if (add_info == 1) {
         GtkWidget *box2 = gtk_event_box_new();
         gtk_widget_show(box2);
         gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
@@ -214,14 +217,17 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         gtk_widget_show(node->image_box);
         gtk_box_pack_start (GTK_BOX (box2), node->image_box, FALSE, FALSE, 0);
     }
-    else if (add_info == 0) {
+    else if (add_info == 3) {
         GtkWidget *box2 =  gtk_box_new(FALSE, 0);
         gtk_widget_show(box2);
         gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
-        GtkWidget *label2 = gtk_label_new(message);
-        gtk_widget_show(label2);
-        gtk_box_pack_start (GTK_BOX (box2), label2, FALSE, FALSE, 0);
+        char *path = mx_strjoin("stickers/", message);
+        GdkPixbuf *item_pixbuf = gdk_pixbuf_new_from_file_at_scale (path, 80, 80, TRUE, NULL);
+        GtkWidget *item_image = gtk_image_new_from_pixbuf(item_pixbuf);;
+        gtk_widget_show(item_image);
+        gtk_box_pack_start (GTK_BOX (box2), item_image, FALSE, FALSE, 0);
     }
+
     if (user_id == info->id) {
         gtk_box_pack_end(GTK_BOX (right_box), menu_event, FALSE, FALSE, 0);
         gtk_box_pack_end(GTK_BOX (box1), label1, FALSE, FALSE, 0);
@@ -236,11 +242,11 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         }
     }
     else {
-        gtk_box_pack_start(GTK_BOX (box1), label1, FALSE, FALSE, 0);
-        gtk_box_pack_start (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
         t_all *data = (t_all *)malloc(sizeof(t_all));
         data->widget = node->h_box;
         data->room = room;
+        gtk_box_pack_start (GTK_BOX (box1), label1, FALSE, FALSE, 0);
+        gtk_box_pack_start (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
         gdk_threads_add_idle ((GSourceFunc)show_message, data);
     }
     node->next = NULL;

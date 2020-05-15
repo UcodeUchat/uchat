@@ -6,9 +6,19 @@ typedef struct s_all {
     struct json_object *room_data;
 }               t_all;
 
+typedef struct s_stik {
+    t_client_info *info;
+    char *name;
+}               t_stik;
+
 void choose_file_callback(GtkWidget *widget, t_client_info *info) {
     (void)widget;
     mx_send_file_from_client(info);
+}
+
+void choose_sticker_callback(GtkWidget *widget, GtkWidget *menu) {
+    (void)widget;
+    gtk_menu_popup_at_pointer (GTK_MENU(menu), NULL);
 }
 
 void sleep_ms (int milliseconds) {
@@ -389,6 +399,23 @@ void init_menu (t_client_info *info) {
     gtk_widget_show(exit_box);
 }
 
+void item_callback (GtkWidget *widget, t_stik *stik) {
+    (void)widget;
+    json_object *new_json;
+
+    int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(stik->info->data->notebook));
+    t_room *room = find_room(stik->info->data->rooms, position);
+    stik->info->data->current_room = room->id;
+    new_json = json_object_new_object();
+    json_object_object_add(new_json, "type", json_object_new_int(MX_MSG_TYPE));
+    json_object_object_add(new_json, "login", json_object_new_string(stik->info->login));
+    json_object_object_add(new_json, "data", json_object_new_string(stik->name));
+    json_object_object_add(new_json, "user_id", json_object_new_int(stik->info->id));
+    json_object_object_add(new_json, "room_id", json_object_new_int(stik->info->data->current_room));
+    json_object_object_add(new_json, "add_info", json_object_new_int(3));
+    const char *json_string = json_object_to_json_string(new_json);
+    tls_send(stik->info->tls_client, json_string, strlen(json_string));
+}
 
 void init_general (t_client_info *info) {
     info->can_load = 1;
@@ -435,11 +462,55 @@ void init_general (t_client_info *info) {
     gtk_widget_set_name(info->data->file_button, "entry");
     gtk_widget_show(info->data->file_button);
     //--
+    //--sticker selection
+    GtkWidget *menu  = gtk_menu_new ();
+    //--items
+    DIR *dptr  = opendir("stickers");
+
+    if (dptr != NULL) {
+        struct dirent  *ds;
+        while((ds = readdir(dptr)) != 0) {//cчитываем хуйню из директории
+            char *extention = strdup(ds->d_name);
+
+            while (mx_get_char_index(extention, '.') >= 0) {
+                char *tmp = strdup(extention + mx_get_char_index(extention, '.') + 1);
+                free(extention);
+                extention = strdup(tmp);
+                free(tmp); 
+            }
+            if(strcmp(extention, "png") == 0) {
+                GtkWidget *item = gtk_menu_item_new();
+                char *path = mx_strjoin("stickers/", ds->d_name);
+                GdkPixbuf *item_pixbuf = gdk_pixbuf_new_from_file_at_scale (path, 80, 80, TRUE, NULL);
+                GtkWidget *item_image = gtk_image_new_from_pixbuf(item_pixbuf);
+                gtk_container_add (GTK_CONTAINER (item), item_image);
+                gtk_widget_show(item_image);
+                gtk_widget_show(item);
+                gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+                t_stik *stik = (t_stik *)(malloc)(sizeof(t_stik));
+                stik->info = info;
+                stik->name = strdup(ds->d_name);
+                g_signal_connect (G_OBJECT (item), "activate", G_CALLBACK (item_callback), stik);
+            }
+            //free(ds);
+        }
+        closedir(dptr);
+    }
+    //--
+    GtkWidget *s_button = gtk_button_new();
+    GdkPixbuf *pixbuf2 = gdk_pixbuf_new_from_file_at_scale ("img/smile.png", 20, 20, TRUE, NULL);
+    GtkWidget *image2 = gtk_image_new_from_pixbuf(pixbuf2);
+    gtk_button_set_image(GTK_BUTTON(s_button), image2);
+    g_signal_connect(G_OBJECT(s_button), "clicked", G_CALLBACK(choose_sticker_callback), menu);
+    gtk_fixed_put(GTK_FIXED(info->data->general_box), s_button, 640, 350);
+    gtk_widget_set_name(s_button, "entry");
+    gtk_widget_show(s_button);
+    //--
     //--notebook
     info->data->notebook = gtk_notebook_new();
     gtk_notebook_set_tab_pos(GTK_NOTEBOOK (info->data->notebook), GTK_POS_LEFT);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->notebook, 10, 20);
-    gtk_widget_set_size_request(info->data->notebook, 630, 320);
+    gtk_widget_set_size_request(info->data->notebook, 670, 320);
     int n_rooms = json_object_array_length(info->rooms);
 
     gtk_widget_hide(info->data->login_box);

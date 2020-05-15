@@ -6,6 +6,7 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
 
     ////****
     json_object *new_json = mx_package_to_json(package);
+    json_object_object_add(new_json, "add_info", json_object_new_int(0));
 //        mx_print_json_object(new_json, "mx_send_message_from_client");
     const char *json_string = json_object_to_json_string(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
