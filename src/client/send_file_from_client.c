@@ -71,7 +71,7 @@ void mx_send_file_from_client(t_client_info *info) {
 
         json_object_object_add(send_obj, "piece", json_object_new_int(1));
         json_object_object_add(send_obj, "user_id", json_object_new_int(info->id));
-        json_object_object_add(send_obj, "room_id", json_object_new_int(0)); // need to know
+        json_object_object_add(send_obj, "room_id", json_object_new_int(info->data->current_room)); // need to know
 
         json_string = json_object_to_json_string(send_obj);
 

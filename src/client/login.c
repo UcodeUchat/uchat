@@ -11,8 +11,25 @@ typedef struct s_stik {
     char *name;
 }               t_stik;
 
+t_room *find_room(t_room *rooms, int position) {
+   t_room *head = rooms;
+   t_room *node = NULL;
+
+    while (head != NULL) {
+        if (head->position == position) {
+            node = head;
+            break;
+        }
+        head = head->next;
+    }
+    return node;
+}
+
 void choose_file_callback(GtkWidget *widget, t_client_info *info) {
     (void)widget;
+    int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
+    t_room *room = find_room(info->data->rooms, position);
+    info->data->current_room = room->id;
     mx_send_file_from_client(info);
 }
 
@@ -26,20 +43,6 @@ void sleep_ms (int milliseconds) {
     ts.tv_sec = milliseconds / 1000;
     ts.tv_nsec = (milliseconds % 1000) * 1000000;
     nanosleep(&ts, NULL);
-}
-
-t_room *find_room(t_room *rooms, int position) {
-   t_room *head = rooms;
-   t_room *node = NULL;
-
-    while (head != NULL) {
-        if (head->position == position) {
-            node = head;
-            break;
-        }
-        head = head->next;
-    }
-    return node;
 }
 
 void *msg_history_thread (void *data) {

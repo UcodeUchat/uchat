@@ -59,6 +59,21 @@ void delete_callback (GtkWidget *widget, t_mes *mes) {
     tls_send(mes->info->tls_client, json_str, strlen(json_str));
 }
 
+void edit_callback (GtkWidget *widget, t_mes *mes) {
+    (void)widget;
+    (void)mes;
+    //t_message *message = mx_find_message(mes->room->messages, mes->id);
+
+    // json_object  *new_json = json_object_new_object();
+
+    // json_object_object_add(new_json, "type", json_object_new_int(MX_DELETE_MESSAGE_TYPE));
+    // json_object_object_add(new_json, "message_id", json_object_new_int(message->id));
+    // json_object_object_add(new_json, "room_id", json_object_new_int(mes->room->id));
+    // mx_print_json_object(new_json, "delete message");
+    // const char *json_str = json_object_to_json_string(new_json);
+    // tls_send(mes->info->tls_client, json_str, strlen(json_str));
+}
+
 void file_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     (void)widget;
     (void)event;
@@ -173,6 +188,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     GtkWidget *edit = gtk_menu_item_new_with_label("Edit");
     gtk_widget_show(edit);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), edit);
+    g_signal_connect (G_OBJECT (edit), "activate", G_CALLBACK (edit_callback), mes);
     //--
     gtk_widget_add_events (menu_event, GDK_ENTER_NOTIFY_MASK);
     gtk_widget_add_events (menu_event, GDK_BUTTON_PRESS_MASK);
