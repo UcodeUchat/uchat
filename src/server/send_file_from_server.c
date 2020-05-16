@@ -109,7 +109,7 @@ void start_sending(FILE *file, t_file_tmp *vars) {
         extention = strdup(tmp);
         free(tmp); 
     }
-    if (strcmp(extention, "jpg") == 0 || strcmp(extention, "png") == 0)
+    if (strcmp(extention, "jpg") == 0 || strcmp(extention, "png") == 0 || strcmp(extention, "gif") == 0)
         json_object_object_add(send_obj, "add_info", json_object_new_int(2));
     else
         json_object_object_add(send_obj, "add_info", json_object_new_int(1));

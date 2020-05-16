@@ -38,7 +38,7 @@ static int get_rooms_data(void *messages, int argc, char **argv, char **col_name
 	        extention = strdup(tmp);
 	        free(tmp); 
 	    }
-	    if (strcmp(extention, "jpg") == 0 || strcmp(extention, "png") == 0) {
+	    if (strcmp(extention, "jpg") == 0 || strcmp(extention, "png") == 0 || strcmp(extention, "gif") == 0) {
 	    	data = json_object_new_string(argv[3]);
 			add_info = json_object_new_int(2);
 	    }

@@ -13,7 +13,7 @@ int mx_detect_file_extention(char *filename) {
             free(tmp); 
         }
 		dot++;
-		if (!strcmp(dot, "jpg") || !strcmp(dot, "jpeg") || !strcmp(dot, "png"))
+		if (!strcmp(dot, "jpg") || !strcmp(dot, "jpeg") || !strcmp(dot, "png") || !strcmp(dot, "gif"))
 			return 1; // image
 		else
 			return 0; // just file

@@ -41,13 +41,26 @@ int final_file_input_client(t_file_list **list, json_object *obj, t_client_info 
             mx_pop_file_list_in_client(list, add_to->id);
             if (json_object_get_int(json_object_object_get(obj, "add_info")) == 2) {
                 const char *file_name = json_object_get_string(json_object_object_get(obj, "file_name"));
+                char *extention = strdup(file_name);
+
+                while (mx_get_char_index(extention, '.') >= 0) {
+                    char *tmp = strdup(extention + mx_get_char_index(extention, '.') + 1);
+                    free(extention);
+                    extention = strdup(tmp);
+                    free(tmp); 
+                }
+
                 char *file_path = mx_strjoin("Uchat_downloads/", file_name);
                 int file_id = json_object_get_int(json_object_object_get(obj, "file_id"));
                 int room_id = json_object_get_int(json_object_object_get(obj, "room_id"));
                 t_room *room = mx_find_room(info->data->rooms, room_id);
                 t_message *message = mx_find_message(room->messages, file_id);
                 GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale (file_path, 300, 250, TRUE, NULL);
-                GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
+                GtkWidget *image = NULL;
+                if (strcmp(extention, "gif") == 0)
+                    image = gtk_image_new_from_file(file_path);
+                else
+                    image = gtk_image_new_from_pixbuf(pixbuf);
                 gtk_box_pack_start (GTK_BOX (message->image_box), image, FALSE, FALSE, 0);
                 gtk_widget_show(image);
             }

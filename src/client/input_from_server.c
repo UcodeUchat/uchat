@@ -372,8 +372,9 @@ void delete_message(t_client_info *info, json_object *new_json) {
     int message_id = json_object_get_int(json_object_object_get(new_json, "message_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
     if (message_id >= room->messages->id) {
+        sleep_ms(50);
         t_message *message = mx_find_message(room->messages, message_id);
-        gtk_widget_destroy(message->h_box);
+        gtk_widget_hide(message->h_box);
         pop_message_id(room->messages, message_id);
     }
 }

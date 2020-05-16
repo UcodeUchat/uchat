@@ -705,6 +705,19 @@ void init_login(t_client_info *info) {
 }
 
 void init_window(t_client_info *info) {
+    // GtkIconTheme *theme = gtk_icon_theme_get_default ();
+    // // const gchar **my_path = (const gchar **)malloc(sizeof(gchar **));// = {"aaa", NULL};
+    // // my_path[0] = "aaa";
+    // // gtk_icon_theme_set_search_path (theme, my_path, 1);
+    // //gtk_icon_theme_append_search_path (theme, my_path);
+    // gint n = 0;
+    // gchar **path = NULL;
+    // gtk_icon_theme_get_search_path (theme, &path, &n);
+    // for (int i = 0; i < n; i++)
+    //     printf("%s\n", path[i]);
+
+
+
     GtkCssProvider *provider = gtk_css_provider_new ();
     gtk_css_provider_load_from_path (provider,"my_style.css", NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
