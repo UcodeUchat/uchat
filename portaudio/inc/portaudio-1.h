@@ -2,11 +2,7 @@
 #define PORTAUDIO_H
 
 
-typedef unsigned long PaSampleFormat;
-
-
-
-
+//typedef unsigned long PaSampleFormat;
 
 #include <stdio.h>
 #include <math.h>

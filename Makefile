@@ -125,7 +125,7 @@ $(LJSONX): $(LJSONA)
 client: $(NAME_C) $(LIBSNDFX) #$(LIBMX)
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) ./libsndfile/libsndfile.a ./portaudio/portaudio.a $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) ./libsndfile/libsndfile.a  -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon ./portaudio/libportaudio.a $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/client/%.c $(INCS)
