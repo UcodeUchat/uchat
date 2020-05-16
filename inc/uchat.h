@@ -59,6 +59,8 @@ typedef struct s_message {
     GtkWidget *h_box;
     GtkWidget *menu;
     GtkWidget *image_box;
+    GtkWidget *message_label;
+    GtkWidget *message_box;
     struct s_message *next;
 }              t_message;
 
@@ -97,6 +99,7 @@ typedef struct s_data {
     GtkWidget *notebook;
     GtkWidget *stop;
     GtkWidget *menu;
+    GtkWidget *edit_button;
     t_room *rooms;
     t_reg *registration;
     gint current_room;
@@ -118,6 +121,8 @@ typedef struct  s_client_info {  //struct client
     t_data *data;
     int responce;
     int can_load;
+    int editing;
+    int editing_room;
     struct s_file_list *input_files;
     struct json_object *rooms;
     int input;
@@ -170,6 +175,7 @@ typedef struct  s_server_info {  // struct server
 #define MX_LOGOUT_TYPE 9
 #define MX_LOAD_MORE_TYPE 10
 #define MX_DELETE_MESSAGE_TYPE 11
+#define MX_EDIT_MESSAGE_TYPE 13
 #define MX_PACKAGE_SIZE sizeof(t_package)
 
 #define MX_MAX_MSG_SIZE 200
@@ -238,6 +244,7 @@ int mx_logout(t_server_info *i, t_socket_list *csl, json_object *js);
 int mx_get_data(void *js, int argc, char **argv, char **col_name);
 int mx_load_history (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_delete_message (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_edit_message (t_server_info *info, t_socket_list *csl, json_object *js);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);

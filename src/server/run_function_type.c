@@ -34,5 +34,7 @@ int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
         return_value = mx_load_history(info, csl, csl->obj);
     else if (type == MX_DELETE_MESSAGE_TYPE)
         return_value = mx_delete_message(info, csl, csl->obj);
+    else if (type == MX_EDIT_MESSAGE_TYPE)
+        return_value = mx_edit_message(info, csl, csl->obj);
     return return_value;
 }

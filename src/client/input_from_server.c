@@ -61,17 +61,11 @@ void delete_callback (GtkWidget *widget, t_mes *mes) {
 
 void edit_callback (GtkWidget *widget, t_mes *mes) {
     (void)widget;
-    (void)mes;
-    //t_message *message = mx_find_message(mes->room->messages, mes->id);
-
-    // json_object  *new_json = json_object_new_object();
-
-    // json_object_object_add(new_json, "type", json_object_new_int(MX_DELETE_MESSAGE_TYPE));
-    // json_object_object_add(new_json, "message_id", json_object_new_int(message->id));
-    // json_object_object_add(new_json, "room_id", json_object_new_int(mes->room->id));
-    // mx_print_json_object(new_json, "delete message");
-    // const char *json_str = json_object_to_json_string(new_json);
-    // tls_send(mes->info->tls_client, json_str, strlen(json_str));
+    t_message *message = mx_find_message(mes->room->messages, mes->id);
+    gtk_entry_set_text(GTK_ENTRY(mes->info->data->message_entry), message->data);
+    gtk_widget_show(mes->info->data->edit_button);
+    mes->info->editing_room = mes->room->id;
+    mes->info->editing = message->id;
 }
 
 void file_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
@@ -185,10 +179,12 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), delete);
     g_signal_connect (G_OBJECT (delete), "activate", G_CALLBACK (delete_callback), mes);
 
-    GtkWidget *edit = gtk_menu_item_new_with_label("Edit");
-    gtk_widget_show(edit);
-    gtk_menu_shell_append (GTK_MENU_SHELL (menu), edit);
-    g_signal_connect (G_OBJECT (edit), "activate", G_CALLBACK (edit_callback), mes);
+    if (add_info == 0) {
+        GtkWidget *edit = gtk_menu_item_new_with_label("Edit");
+        gtk_widget_show(edit);
+        gtk_menu_shell_append (GTK_MENU_SHELL (menu), edit);
+        g_signal_connect (G_OBJECT (edit), "activate", G_CALLBACK (edit_callback), mes);
+    }
     //--
     gtk_widget_add_events (menu_event, GDK_ENTER_NOTIFY_MASK);
     gtk_widget_add_events (menu_event, GDK_BUTTON_PRESS_MASK);
@@ -203,35 +199,35 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
     gtk_widget_show(label1);
     
     if (add_info == 0) {
-        GtkWidget *box2 =  gtk_box_new(FALSE, 0);
-        gtk_widget_show(box2);
-        gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
-        GtkWidget *label2 = gtk_label_new(message);
-        gtk_widget_show(label2);
-        gtk_box_pack_start (GTK_BOX (box2), label2, FALSE, FALSE, 0);
+        node->message_box =  gtk_box_new(FALSE, 0);
+        gtk_widget_show(node->message_box);
+        gtk_box_pack_start (GTK_BOX (main_box), node->message_box, FALSE, FALSE, 0);
+        node->message_label = gtk_label_new(message);
+        gtk_widget_show(node->message_label);
+        gtk_box_pack_start (GTK_BOX (node->message_box), node->message_label, FALSE, FALSE, 0);
     }
     else if (add_info == 1) {
-        GtkWidget *box2 = gtk_event_box_new();
-        gtk_widget_show(box2);
-        gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
+        node->message_box = gtk_event_box_new();
+        gtk_widget_show(node->message_box);
+        gtk_box_pack_start (GTK_BOX (main_box), node->message_box, FALSE, FALSE, 0);
         GtkWidget *label2 = gtk_label_new(message + 20);
         gtk_widget_show(label2);
-        gtk_container_add (GTK_CONTAINER (box2), label2);
-        gtk_widget_set_name(box2, "file");
-        gtk_widget_add_events (box2, GDK_BUTTON_PRESS_MASK);
-        g_signal_connect (G_OBJECT (box2), "button_press_event", G_CALLBACK (file_callback), mes);
-        g_signal_connect (G_OBJECT (box2), "button_release_event", G_CALLBACK (file1_callback), mes);
-        gtk_widget_add_events (box2, GDK_ENTER_NOTIFY_MASK);
-        g_signal_connect (G_OBJECT (box2), "enter_notify_event", G_CALLBACK (file_notify_callback), mes);
-        g_signal_connect (G_OBJECT (box2), "leave_notify_event", G_CALLBACK (file_notify1_callback), mes);
+        gtk_container_add (GTK_CONTAINER (node->message_box), label2);
+        gtk_widget_set_name(node->message_box, "file");
+        gtk_widget_add_events (node->message_box, GDK_BUTTON_PRESS_MASK);
+        g_signal_connect (G_OBJECT (node->message_box), "button_press_event", G_CALLBACK (file_callback), mes);
+        g_signal_connect (G_OBJECT (node->message_box), "button_release_event", G_CALLBACK (file1_callback), mes);
+        gtk_widget_add_events (node->message_box, GDK_ENTER_NOTIFY_MASK);
+        g_signal_connect (G_OBJECT (node->message_box), "enter_notify_event", G_CALLBACK (file_notify_callback), mes);
+        g_signal_connect (G_OBJECT (node->message_box), "leave_notify_event", G_CALLBACK (file_notify1_callback), mes);
     }
     else if (add_info == 2) {
-        GtkWidget *box2 = gtk_box_new(FALSE, 0);
-        gtk_widget_show(box2);
-        gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
+        node->message_box = gtk_box_new(FALSE, 0);
+        gtk_widget_show(node->message_box);
+        gtk_box_pack_start (GTK_BOX (main_box), node->message_box, FALSE, FALSE, 0);
         node->image_box = gtk_box_new(FALSE, 0);
         gtk_widget_show(node->image_box);
-        gtk_box_pack_start (GTK_BOX (box2), node->image_box, FALSE, FALSE, 0);
+        gtk_box_pack_start (GTK_BOX (node->message_box), node->image_box, FALSE, FALSE, 0);
     }
     else if (add_info == 3) {
         GtkWidget *box2 =  gtk_box_new(FALSE, 0);
@@ -379,6 +375,7 @@ void load_history(t_client_info *info, json_object *new_json) {
     for (int i = 0; i < n_msg; i++) {
         json_object *msg_data = json_object_array_get_idx(messages, i);
         append_message(info, room, msg_data);
+        sleep_ms(10);
     }
     info->can_load = 1;
 }
@@ -392,6 +389,23 @@ void delete_message(t_client_info *info, json_object *new_json) {
         t_message *message = mx_find_message(room->messages, message_id);
         gtk_widget_hide(message->h_box);
         pop_message_id(room->messages, message_id);
+    }
+}
+
+void edit_message(t_client_info *info, json_object *new_json) { 
+    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+    int message_id = json_object_get_int(json_object_object_get(new_json, "message_id"));
+    const char *data = json_object_get_string(json_object_object_get(new_json, "data"));
+    t_room *room = mx_find_room(info->data->rooms, room_id);
+    if (message_id >= room->messages->id) {
+        sleep_ms(50);
+        t_message *node = mx_find_message(room->messages, message_id);
+        free(node->data);
+        node->data = strdup(data);
+        gtk_widget_destroy(node->message_label);
+        node->message_label = gtk_label_new(data);
+        gtk_widget_show(node->message_label);
+        gtk_box_pack_start (GTK_BOX (node->message_box), node->message_label, FALSE, FALSE, 0);
     }
 }
 
@@ -433,6 +447,8 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
         load_history(info, obj);
     else if (type == MX_DELETE_MESSAGE_TYPE)
         delete_message(info, obj);
+    else if (type == MX_EDIT_MESSAGE_TYPE)
+        edit_message(info, obj);
     return 0;
 }
 

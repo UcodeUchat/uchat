@@ -62,6 +62,7 @@ int final_file_input_client(t_file_list **list, json_object *obj, t_client_info 
                 else
                     image = gtk_image_new_from_pixbuf(pixbuf);
                 gtk_box_pack_start (GTK_BOX (message->image_box), image, FALSE, FALSE, 0);
+                sleep_ms(25);
                 gtk_widget_show(image);
             }
             return 0;

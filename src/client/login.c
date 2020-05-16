@@ -53,6 +53,7 @@ void *msg_history_thread (void *data) {
     for (int j = 0; j < n_msg; j++) {
         json_object *msg_data = json_object_array_get_idx(messages, j);
         append_message(data1->info, data1->room, msg_data);
+        sleep_ms(10);
     }
     gtk_adjustment_set_value(data1->room->Adjust, 
                             gtk_adjustment_get_upper(data1->room->Adjust) - 
@@ -110,10 +111,30 @@ void push_room(t_room **list, void *name, int id, int position) {
 void send_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
     if (strcmp(gtk_entry_get_text(GTK_ENTRY(info->data->message_entry)),"") != 0) {
-        int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
-        t_room *room = find_room(info->data->rooms, position);
-        info->data->current_room = room->id;
-        mx_process_message_in_client(info);
+        if (info->editing < 0) {
+            int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
+            t_room *room = find_room(info->data->rooms, position);
+            info->data->current_room = room->id;
+            mx_process_message_in_client(info);
+        }
+        else {
+            json_object *new_json;
+            char *message = strdup(gtk_entry_get_text(GTK_ENTRY(info->data->message_entry)));
+
+            new_json = json_object_new_object();
+            json_object_object_add(new_json, "type", json_object_new_int(MX_EDIT_MESSAGE_TYPE));
+            json_object_object_add(new_json, "login", json_object_new_string(info->login));
+            json_object_object_add(new_json, "data", json_object_new_string (message));
+            json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
+            json_object_object_add(new_json, "room_id", json_object_new_int(info->editing_room));
+            json_object_object_add(new_json, "message_id", json_object_new_int(info->editing));
+            json_object_object_add(new_json, "add_info", json_object_new_int(0));
+            mx_print_json_object(new_json, "edit");
+            const char *json_string = json_object_to_json_string(new_json);
+            tls_send(info->tls_client, json_string, strlen(json_string));
+            gtk_widget_hide(info->data->edit_button);
+            info->editing = -1;
+        }
         gtk_entry_set_text(GTK_ENTRY(info->data->message_entry), "");
     }
 }
@@ -287,8 +308,6 @@ void scroll_callback (GtkWidget *widget, GdkEventButton *event, t_all *data) {
         mx_print_json_object(new_json, "load 15 more");
         const char *json_str = json_object_to_json_string(new_json);
         tls_send(data->info->tls_client, json_str, strlen(json_str));
-        gtk_adjustment_set_value(data->room->Adjust, 
-                            gtk_adjustment_get_value(data->room->Adjust) + 20.0);
     }   
 }
 
@@ -313,6 +332,14 @@ void menu_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
     gtk_widget_show(info->data->menu);
 
+}
+
+void edit_cancel_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info) {
+    (void)widget;
+    (void)event;
+    info->editing = -1;
+    gtk_entry_set_text(GTK_ENTRY(info->data->message_entry), "");
+    gtk_widget_hide(info->data->edit_button);
 }
 
 void init_menu (t_client_info *info) {
@@ -437,6 +464,16 @@ void init_general (t_client_info *info) {
     gtk_widget_set_size_request(info->data->message_entry, 445, -1);
     gtk_widget_set_name(info->data->message_entry, "entry");
     gtk_widget_show(info->data->message_entry);
+    //--
+    //--Edit button
+    info->data->edit_button = gtk_event_box_new ();
+    gtk_widget_add_events (info->data->edit_button, GDK_BUTTON_PRESS_MASK);
+    GdkPixbuf *pixbuf0 = gdk_pixbuf_new_from_file_at_scale ("img/cancel.png", 20, 20, TRUE, NULL);
+    GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf0);
+    gtk_container_add (GTK_CONTAINER (info->data->edit_button), image);
+    gtk_widget_show(image);
+    g_signal_connect(G_OBJECT(info->data->edit_button), "button_press_event", G_CALLBACK(edit_cancel_callback), info);
+    gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->edit_button, 485, 358);
     //--
     //--Menu button
     info->data->menu_button = gtk_button_new();
@@ -629,6 +666,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
 void init_login(t_client_info *info) {
     //-login box
     info->data->login_msg_flag = 0;
+    info->editing = -1;
     info->data->login_box = gtk_fixed_new ();
     gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->login_box, 0, 0);
     //--

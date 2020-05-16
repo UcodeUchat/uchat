@@ -48,16 +48,13 @@ static int get_rooms_data(void *messages, int argc, char **argv, char **col_name
 }
 
 int mx_delete_message (t_server_info *info, t_socket_list *csl, json_object *js) {
-    //const char *json_string = NULL;
     (void)csl;
     int message_id = json_object_get_int(json_object_object_get(js, "message_id"));
     char *command = malloc(1024);
 
-    sprintf(command, "DELETE FROM msg_history where id = %d ", message_id);
+    sprintf(command, "DELETE FROM msg_history where id = %d;", message_id);
     if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) {
-        //json_string = json_object_to_json_string(js);
         mx_send_json_to_all_in_room(info, js);
-        //mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
         mx_strdel(&command);
     }
     else {
@@ -65,6 +62,24 @@ int mx_delete_message (t_server_info *info, t_socket_list *csl, json_object *js)
     }
     return 1;
 }
+
+int mx_edit_message (t_server_info *info, t_socket_list *csl, json_object *js) {
+    (void)csl;
+    int message_id = json_object_get_int(json_object_object_get(js, "message_id"));
+    const char *data = json_object_get_string(json_object_object_get(js, "data"));
+    char *command = malloc(1024);
+
+    sprintf(command, "UPDATE msg_history SET message='%s' where id='%d';", data, message_id);
+    if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) {
+        mx_send_json_to_all_in_room(info, js);
+        mx_strdel(&command);
+    }
+    else {
+        printf("fail\n");
+    }
+    return 1;
+}
+
 
 int mx_load_history (t_server_info *info, t_socket_list *csl, json_object *js) {
     const char *json_string = NULL;
