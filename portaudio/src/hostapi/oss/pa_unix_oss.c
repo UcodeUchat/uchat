@@ -80,15 +80,15 @@
 # error No sound card header file
 #endif
 
-#include "portaudio.h"
-#include "pa_util.h"
-#include "pa_allocation.h"
-#include "pa_hostapi.h"
-#include "pa_stream.h"
-#include "pa_cpuload.h"
-#include "pa_process.h"
-#include "pa_unix_util.h"
-#include "pa_debugprint.h"
+#include "../../../inc/portaudio.h"
+#include "../../../inc/pa_util.h"
+#include "../../../inc/pa_allocation.h"
+#include "../../../inc/pa_hostapi.h"
+#include "../../../inc/pa_stream.h"
+#include "../../../inc/pa_cpuload.h"
+#include "../../../inc/pa_process.h"
+#include "../../../inc/pa_unix_util.h"
+#include "../../../inc/pa_debugprint.h"
 
 static int sysErr_;
 static pthread_t mainThread_;

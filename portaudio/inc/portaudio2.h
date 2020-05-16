@@ -1,5 +1,21 @@
 #ifndef PORTAUDIO_H
 #define PORTAUDIO_H
+
+
+typedef unsigned long PaSampleFormat;
+
+
+
+
+
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <stdarg.h>
+#include <memory.h>
+#include <string.h>
+
 /*
  * $Id$
  * PortAudio Portable Real-Time Audio Library
@@ -111,7 +127,7 @@ typedef struct PaVersionInfo {
  @see PaVersionInfo, paMakeVersionNumber
  @version Available as of 19.5.0.
 */
-const PaVersionInfo* Pa_GetVersionInfo();
+const PaVersionInfo* Pa_GetVersionInfo( void );
 
 
 /** Error codes returned by PortAudio functions.
@@ -1222,4 +1238,31 @@ void Pa_Sleep( long msec );
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#include "pa_endianness.h"
+#include "pa_allocation.h"
+#include "pa_asio.h"
+#include "pa_converters.h"
+#include "pa_cpuload.h"
+#include "pa_debugprint.h"
+#include "pa_dither.h"
+#include "pa_gitrevision.h"
+#include "pa_hostapi.h"
+#include "pa_jack.h"
+#include "pa_linux_alsa.h"
+#include "pa_mac_core.h"
+#include "pa_memorybarrier.h"
+#include "pa_process.h"
+#include "pa_ringbuffer.h"
+#include "pa_stream.h"
+#include "pa_trace.h"
+#include "pa_types.h"
+#include "pa_util.h"
+#include "pa_win_ds.h"
+// #include "pa_win_wasapi.h"
+// #include "pa_win_waveformat.h"
+// #include "pa_win_wdmks.h"
+// #include "pa_win_wmme.h"
+
+
 #endif /* PORTAUDIO_H */
