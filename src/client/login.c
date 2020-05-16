@@ -129,7 +129,7 @@ void send_callback (GtkWidget *widget, t_client_info *info) {
             json_object_object_add(new_json, "room_id", json_object_new_int(info->editing_room));
             json_object_object_add(new_json, "message_id", json_object_new_int(info->editing));
             json_object_object_add(new_json, "add_info", json_object_new_int(0));
-            mx_print_json_object(new_json, "edit");
+            //mx_print_json_object(new_json, "edit");
             const char *json_string = json_object_to_json_string(new_json);
             tls_send(info->tls_client, json_string, strlen(json_string));
             gtk_widget_hide(info->data->edit_button);
