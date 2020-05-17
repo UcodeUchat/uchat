@@ -27,12 +27,12 @@ static void do_cpuid(int regs[], int h)
 {
 	/* clang-format off */
     __asm__ __volatile__(
-#if defined __x86_64__
-                         "pushq %%rbx;\n"
-#else
-                         "pushl %%ebx;\n"
-#endif
-                         "cpuid;\n"
+//#if defined __x86_64__
+//                         "pushq %%rbx;\n"
+//#else
+//                         "pushl %%ebx;\n"
+//#endif
+//                         "cpuid;\n"
 #if defined __x86_64__
                          "popq %%rbx;\n"
 #else

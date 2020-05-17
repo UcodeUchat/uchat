@@ -33,6 +33,11 @@ LIBSNDFD  = libsndfile
 LIBSNDFX  = libsndfile.a
 LIBSNDFA := $(addprefix $(LIBSNDFD)/, $(LIBSNDFX))
 
+LIBPORTAUDIOD  = libportaudio
+LIBPORTAUDIOX  = lib/.libs/libportaudio.a
+LIBPORTAUDIOA := $(addprefix $(LIBPORTAUDIOD)/, $(LIBPORTAUDIOX))
+
+
 INCS = inc/uchat.h
 
 SRC_SERVER = main_server.c \
@@ -82,13 +87,13 @@ OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
 
-AUDIOFLAGS = -lportaudio
+#AUDIOFLAGS = -lportaudio
 TLSFLAGS =  -lcrypto -lssl -ltls
 SQLFLAGS = -lsqlite3
 
 all: install
 
-server: $(NAME_S) #$(LIBMX) $(LJSONX)
+server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
 	@make -sC $(LJSOND)
@@ -121,12 +126,25 @@ $(LJSONA):
 $(LJSONX): $(LJSONA)
 	@make -sC $(LJSOND)
 
+$(LIBSNDFA):
+	@make -sC $(LIBSNDFD)
 
-client: $(NAME_C) $(LIBSNDFX) #$(LIBMX)
+$(LIBSNDFX): $(LIBSNDFA)
+	@make -sC $(LIBSNDFD)
+
+$(LIBPORTAUDIOA):
+	@make -sC $(LIBPORTAUDIOD)
+
+$(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
+	@make -sC $(LIBPORTAUDIOD)
+
+
+client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) ./libsndfile/libsndfile.a  -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon ./portaudio/libportaudio.a $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(LIBSNDFA)  -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
+
 
 $(OBJD)/%.o: src/client/%.c $(INCS)
 	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
@@ -139,6 +157,12 @@ $(OBJD)/%.o: src/functions/%.c $(INCS)
 
 $(OBJS_CLIENT): | $(OBJD)
 
+$(LIBPORTAUDIOA):
+	@make -sC $(LIBPORTAUDIOD)
+
+$(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
+	@make -sC $(LIBPORTAUDIOD)
+
 $(LIBSNDFA):
 	@make -sC $(LIBSNDFD)
 
@@ -149,12 +173,14 @@ install: server client
 
 clean:
 # 	@make -sC ./json clean
+# 	@make -sC ./libsndfile clean
 # 	@make -sC $(LBMXD) clean
 	@rm -rf $(OBJD)
 	@printf "$(OBJD)\t\t   \033[31;1mdeleted\033[0m\n"
 
 uninstall: clean
 # 	@make -sC ./json uninstall
+# 	@make -sC ./libsndfile uninstall
 # 	@make -sC $(LBMXD) uninstall
 	@rm -rf $(NAME_S) $(NAME_C)
 	@printf "$(NAME_S)\t   \033[31;1muninstalled\033[0m\n"
