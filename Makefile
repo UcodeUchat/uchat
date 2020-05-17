@@ -157,17 +157,7 @@ $(OBJD)/%.o: src/functions/%.c $(INCS)
 
 $(OBJS_CLIENT): | $(OBJD)
 
-$(LIBPORTAUDIOA):
-	@make -sC $(LIBPORTAUDIOD)
 
-$(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
-	@make -sC $(LIBPORTAUDIOD)
-
-$(LIBSNDFA):
-	@make -sC $(LIBSNDFD)
-
-$(LIBSNDFX): $(LIBSNDFA)
-	@make -sC $(LIBSNDFD)
 
 install: server client
 
@@ -180,7 +170,7 @@ clean:
 
 uninstall: clean
 # 	@make -sC ./json uninstall
-# 	@make -sC ./libsndfile uninstall
+# 	@make -sC ./libsndfile clean
 # 	@make -sC $(LBMXD) uninstall
 	@rm -rf $(NAME_S) $(NAME_C)
 	@printf "$(NAME_S)\t   \033[31;1muninstalled\033[0m\n"
