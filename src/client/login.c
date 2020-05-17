@@ -308,7 +308,7 @@ void scroll_callback (GtkWidget *widget, GdkEventButton *event, t_all *data) {
         mx_print_json_object(new_json, "load 15 more");
         const char *json_str = json_object_to_json_string(new_json);
         tls_send(data->info->tls_client, json_str, strlen(json_str));
-    }   
+    }
 }
 
 void logout_callback (GtkWidget *widget, t_client_info *info) {

@@ -25,6 +25,11 @@ int add_data_to_file_client(t_file_list *list, json_object *obj) {
     return 1;
 }
 
+int show_image(GtkWidget *image) {
+    gtk_widget_show(image);
+    return 0;
+}
+
 int final_file_input_client(t_file_list **list, json_object *obj, t_client_info *info) {
     t_file_list *add_to = mx_find_file_in_list(*list, json_object_get_int(json_object_object_get(obj, "file_id")));
     const char *data = json_object_get_string(json_object_object_get(obj, "data"));
@@ -63,7 +68,7 @@ int final_file_input_client(t_file_list **list, json_object *obj, t_client_info 
                     image = gtk_image_new_from_pixbuf(pixbuf);
                 gtk_box_pack_start (GTK_BOX (message->image_box), image, FALSE, FALSE, 0);
                 //sleep_ms(25);
-                gtk_widget_show(image);
+                g_idle_add ((GSourceFunc)show_image, image);
             }
             return 0;
         }
