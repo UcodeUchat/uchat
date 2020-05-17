@@ -19,13 +19,11 @@ OBJD = obj
 LMXD =	libmx
 LBMX = libmx.a
 LMXA:=	$(addprefix $(LMXD)/, $(LBMX))
-
 LMXI:=	$(LMXD)/inc
-
 LBMXD = libmx
 LIBMX = libmx
 
-LJSOND	= json
+LJSOND	= libjson
 LJSONX  = libjsonc.a
 LJSONA := $(addprefix $(LJSOND)/, $(LJSONX))
 
@@ -37,6 +35,13 @@ LIBPORTAUDIOD  = libportaudio
 LIBPORTAUDIOX  = lib/.libs/libportaudio.a
 LIBPORTAUDIOA := $(addprefix $(LIBPORTAUDIOD)/, $(LIBPORTAUDIOX))
 
+LIBRESSLD  = libressl
+LIBRESSL_TLSX= lib/.libs/libtls.a
+LIBRESSLD_TLSA := $(addprefix $(LIBRESSLD)/, $(LIBRESSL_TLSX))
+
+LIBRESSL_TLS = libressl/tls/.libs/libtls.a
+LIBRESSL_CRYPTO = libressl/crypto/.libs/libcrypto.a
+LIBRESSL_SSL = libressl/ssl/.libs/libssl.a
 
 INCS = inc/uchat.h
 
@@ -88,16 +93,17 @@ OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
 
 #AUDIOFLAGS = -lportaudio
-TLSFLAGS =  -lcrypto -lssl -ltls
+#TLSFLAGS =  -lcrypto -lssl -ltls
 SQLFLAGS = -lsqlite3
 
 all: install
 
-server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
+server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBRESSL_TLSX) #$(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
+
 	@make -sC $(LJSOND)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(OBJS_SERVER) $(OBJS_HELP) -o $@ $(TLSFLAGS) $(SQLFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) libressl/ssl/.libs/libssl.a libressl/tls/.libs/libtls.a  libressl/crypto/.libs/libcrypto.a  $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/server/%.c $(INCS)
@@ -133,16 +139,25 @@ $(LIBSNDFX): $(LIBSNDFA)
 	@make -sC $(LIBSNDFD)
 
 $(LIBPORTAUDIOA):
+	#(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
 	@make -sC $(LIBPORTAUDIOD)
 
 $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 	@make -sC $(LIBPORTAUDIOD)
 
 
-client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
+$(LIBRESSLD_TLSA):
+	#(cd ./$(LIBRESSLD) && ./configure BUILD_SHARED_LIBS=ON)
+	@make -sC $(LIBRESSLD)
+
+$(LIBRESSL_TLSX): $(LIBRESSLD_TLSA)
+	@make -sC $(LIBRESSLD)
+
+client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBRESSL_TLSX)#$(LIBMX)
+
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(LIBSNDFA)  -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA) $(LIBSNDFA)  libressl/ssl/.libs/libssl.a libressl/tls/.libs/libtls.a  libressl/crypto/.libs/libcrypto.a  -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(OBJS_CLIENT) $(OBJS_HELP) -o $@
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
 
 
@@ -158,18 +173,17 @@ $(OBJD)/%.o: src/functions/%.c $(INCS)
 $(OBJS_CLIENT): | $(OBJD)
 
 
-
 install: server client
 
 clean:
-# 	@make -sC ./json clean
+# 	@make -sC ./libjson clean
 # 	@make -sC ./libsndfile clean
 # 	@make -sC $(LBMXD) clean
 	@rm -rf $(OBJD)
 	@printf "$(OBJD)\t\t   \033[31;1mdeleted\033[0m\n"
 
 uninstall: clean
-# 	@make -sC ./json uninstall
+# 	@make -sC ./libjson uninstall
 # 	@make -sC ./libsndfile clean
 # 	@make -sC $(LBMXD) uninstall
 	@rm -rf $(NAME_S) $(NAME_C)

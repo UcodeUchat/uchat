@@ -35,9 +35,88 @@
 //#include <sndfile.h>
 //#include <json.h>
 
-#include "../portaudio/inc/portaudio.h"
+#include "../libportaudio/include/portaudio.h"
+#include "../libressl/include/tls.h"
+//#include "../libressl/include/pqueue.h"
 
-#include "../json/json.h"
+#include "../libressl/include/openssl/aes.h"
+#include "../libressl/include/openssl/asn1.h"
+#include "../libressl/include/openssl/asn1t.h"
+#include "../libressl/include/openssl/bio.h"
+#include "../libressl/include/openssl/blowfish.h"
+#include "../libressl/include/openssl/bn.h"
+#include "../libressl/include/openssl/buffer.h"
+#include "../libressl/include/openssl/camellia.h"
+#include "../libressl/include/openssl/cast.h"
+#include "../libressl/include/openssl/chacha.h"
+#include "../libressl/include/openssl/cmac.h"
+#include "../libressl/include/openssl/cms.h"
+#include "../libressl/include/openssl/comp.h"
+#include "../libressl/include/openssl/conf.h"
+#include "../libressl/include/openssl/conf_api.h"
+#include "../libressl/include/openssl/crypto.h"
+
+#include "../libressl/include/openssl/curve25519.h"
+#include "../libressl/include/openssl/des.h"
+#include "../libressl/include/openssl/dh.h"
+#include "../libressl/include/openssl/dsa.h"
+#include "../libressl/include/openssl/dso.h"
+//#include "../libressl/include/openssl/dtls1.h"
+#include "../libressl/include/openssl/ec.h"
+#include "../libressl/include/openssl/ecdh.h"
+#include "../libressl/include/openssl/ecdsa.h"
+#include "../libressl/include/openssl/engine.h"
+#include "../libressl/include/openssl/err.h"
+#include "../libressl/include/openssl/evp.h"
+#include "../libressl/include/openssl/gost.h"
+#include "../libressl/include/openssl/hkdf.h"
+#include "../libressl/include/openssl/hmac.h"
+#include "../libressl/include/openssl/idea.h"
+#include "../libressl/include/openssl/lhash.h"
+#include "../libressl/include/openssl/md4.h"
+#include "../libressl/include/openssl/md5.h"
+#include "../libressl/include/openssl/modes.h"
+#include "../libressl/include/openssl/obj_mac.h"
+#include "../libressl/include/openssl/objects.h"
+#include "../libressl/include/openssl/ocsp.h"
+#include "../libressl/include/openssl/opensslconf.h"
+#include "../libressl/include/openssl/opensslfeatures.h"
+#include "../libressl/include/openssl/opensslv.h"
+#include "../libressl/include/openssl/ossl_typ.h"
+#include "../libressl/include/openssl/pem.h"
+#include "../libressl/include/openssl/pem2.h"
+#include "../libressl/include/openssl/pkcs12.h"
+#include "../libressl/include/openssl/pkcs7.h"
+#include "../libressl/include/openssl/poly1305.h"
+#include "../libressl/include/openssl/rand.h"
+#include "../libressl/include/openssl/rc2.h"
+#include "../libressl/include/openssl/rc4.h"
+#include "../libressl/include/openssl/ripemd.h"
+#include "../libressl/include/openssl/rsa.h"
+#include "../libressl/include/openssl/safestack.h"
+#include "../libressl/include/openssl/sha.h"
+#include "../libressl/include/openssl/sm3.h"
+#include "../libressl/include/openssl/sm4.h"
+//#include "../libressl/include/openssl/srtp.h"
+#include "../libressl/include/openssl/ssl.h"
+#include "../libressl/include/openssl/ssl2.h"
+#include "../libressl/include/openssl/ssl23.h"
+#include "../libressl/include/openssl/ssl3.h"
+#include "../libressl/include/openssl/stack.h"
+#include "../libressl/include/openssl/tls1.h"
+#include "../libressl/include/openssl/ts.h"
+#include "../libressl/include/openssl/txt_db.h"
+#include "../libressl/include/openssl/ui.h"
+#include "../libressl/include/openssl/ui_compat.h"
+#include "../libressl/include/openssl/whrlpool.h"
+#include "../libressl/include/openssl/x509.h"
+#include "../libressl/include/openssl/x509_vfy.h"
+#include "../libressl/include/openssl/x509v3.h"
+
+//#include "../libressl/include/openssl/
+
+
+#include "../libjson/json.h"
 #include "../libsndfile/src/sndfile.h"
 
 // openssl
@@ -46,7 +125,7 @@
 #include <openssl/aes.h>
 
 #include <gtk/gtk.h>
-#include <tls.h>
+//#include <tls.h>
 #include "../../libmx/inc/libmx.h"
 
 #define MAX_CLIENT_INPUT 1024
