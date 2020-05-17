@@ -101,9 +101,9 @@ void file_notify1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes)
 }
 
 int show_message(t_all *data) {
-    sleep_ms(25);
+    //sleep_ms(25);
     gtk_widget_show(data->widget);
-    sleep_ms(25);
+    //sleep_ms(25);
     return 0;
 }
 
@@ -116,7 +116,7 @@ int move_bar(t_all *data) {
 
 int load_thread(t_mes *mes) {
     mx_load_file(mes);
-    sleep_ms(25);
+    //sleep_ms(25);
     return 0;
 }
 
@@ -247,10 +247,10 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         t_all *data = (t_all *)malloc(sizeof(t_all));
         data->widget = node->h_box;
         data->room = room;
-        gdk_threads_add_idle ((GSourceFunc)show_message, data);
+        g_idle_add ((GSourceFunc)show_message, data);
         if (order == 1) {
             sleep_ms(25);
-            gdk_threads_add_idle ((GSourceFunc)move_bar, data);
+            g_idle_add ((GSourceFunc)move_bar, data);
         }
     }
     else {
@@ -259,7 +259,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         data->room = room;
         gtk_box_pack_start (GTK_BOX (box1), label1, FALSE, FALSE, 0);
         gtk_box_pack_start (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
-        gdk_threads_add_idle ((GSourceFunc)show_message, data);
+        g_idle_add ((GSourceFunc)show_message, data);
     }
     node->next = NULL;
     return node;
@@ -291,7 +291,7 @@ void push_message(t_client_info *info, t_room *room, json_object *new_json) {
         mes->info = info;
         mes->room = room;
         mes->id = id;
-        gdk_threads_add_idle ((GSourceFunc)load_thread, mes);
+        g_idle_add ((GSourceFunc)load_thread, mes);
     }
 }
 
@@ -320,7 +320,7 @@ void append_message(t_client_info *info, t_room *room, json_object *new_json) {
         mes->info = info;
         mes->room = room;
         mes->id = id;
-        gdk_threads_add_idle ((GSourceFunc)load_thread, mes);
+        g_idle_add ((GSourceFunc)load_thread, mes);
     }
 }
 

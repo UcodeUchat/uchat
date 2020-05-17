@@ -53,7 +53,7 @@ void *msg_history_thread (void *data) {
     for (int j = 0; j < n_msg; j++) {
         json_object *msg_data = json_object_array_get_idx(messages, j);
         append_message(data1->info, data1->room, msg_data);
-        sleep_ms(10);
+        //sleep_ms(10);
     }
     gtk_adjustment_set_value(data1->room->Adjust, 
                             gtk_adjustment_get_upper(data1->room->Adjust) - 
