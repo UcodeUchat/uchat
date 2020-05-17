@@ -60,15 +60,15 @@ int final_file_input_client(t_file_list **list, json_object *obj, t_client_info 
                 int room_id = json_object_get_int(json_object_object_get(obj, "room_id"));
                 t_room *room = mx_find_room(info->data->rooms, room_id);
                 t_message *message = mx_find_message(room->messages, file_id);
-                GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale (file_path, 300, 250, TRUE, NULL);
+                GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale (file_path, 350, 290, TRUE, NULL);
                 GtkWidget *image = NULL;
                 if (strcmp(extention, "gif") == 0)
                     image = gtk_image_new_from_file(file_path);
                 else
                     image = gtk_image_new_from_pixbuf(pixbuf);
                 gtk_box_pack_start (GTK_BOX (message->image_box), image, FALSE, FALSE, 0);
-                //sleep_ms(25);
-                g_idle_add ((GSourceFunc)show_image, image);
+                gtk_widget_show(image);
+                g_idle_add ((GSourceFunc)show_image, message->h_box);
             }
             return 0;
         }

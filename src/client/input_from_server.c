@@ -240,7 +240,7 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         gtk_widget_show(box2);
         gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
         char *path = mx_strjoin("stickers/", message);
-        GdkPixbuf *item_pixbuf = gdk_pixbuf_new_from_file_at_scale (path, 80, 80, TRUE, NULL);
+        GdkPixbuf *item_pixbuf = gdk_pixbuf_new_from_file_at_scale (path, 200, 200, TRUE, NULL);
         GtkWidget *item_image = gtk_image_new_from_pixbuf(item_pixbuf);;
         gtk_widget_show(item_image);
         gtk_box_pack_start (GTK_BOX (box2), item_image, FALSE, FALSE, 0);
@@ -250,22 +250,19 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         gtk_box_pack_end(GTK_BOX (right_box), menu_event, FALSE, FALSE, 0);
         gtk_box_pack_end(GTK_BOX (box1), label1, FALSE, FALSE, 0);
         gtk_box_pack_end (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
-        // t_all *data = (t_all *)malloc(sizeof(t_all));
-        // data->widget = node->h_box;
-        // data->room = room;
-        g_idle_add ((GSourceFunc)show_message, node->h_box);
-        if (order == 1) {
-            sleep_ms(25);
-            g_idle_add ((GSourceFunc)move_bar, room);
+        if (add_info != 2) {
+            g_idle_add ((GSourceFunc)show_message, node->h_box);
+            if (order == 1) {
+                sleep_ms(25);
+                g_idle_add ((GSourceFunc)move_bar, room);
+            }
         }
     }
     else {
-        // t_all *data = (t_all *)malloc(sizeof(t_all));
-        // data->widget = node->h_box;
-        // data->room = room;
         gtk_box_pack_start (GTK_BOX (box1), label1, FALSE, FALSE, 0);
         gtk_box_pack_start (GTK_BOX (node->h_box), general_box, FALSE, FALSE, 0);
-        g_idle_add ((GSourceFunc)show_message, node->h_box);
+        if (add_info != 2)
+            g_idle_add ((GSourceFunc)show_message, node->h_box);
     }
     node->next = NULL;
     return node;
