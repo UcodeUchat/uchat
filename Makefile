@@ -93,17 +93,17 @@ OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
 
 #AUDIOFLAGS = -lportaudio
-#TLSFLAGS =  -lcrypto -lssl -ltls
+TLSFLAGS =  -lcrypto -lssl -ltls
 SQLFLAGS = -lsqlite3
 
 all: install
 
-server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBRESSL_TLSX) #$(LIBMX)
+server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX)  #$(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
 
 	@make -sC $(LJSOND)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) libressl/ssl/.libs/libssl.a libressl/tls/.libs/libtls.a  libressl/crypto/.libs/libcrypto.a  $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS) $(TLSFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/server/%.c $(INCS)
@@ -139,25 +139,25 @@ $(LIBSNDFX): $(LIBSNDFA)
 	@make -sC $(LIBSNDFD)
 
 $(LIBPORTAUDIOA):
-	#(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
+	(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
 	@make -sC $(LIBPORTAUDIOD)
 
 $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 	@make -sC $(LIBPORTAUDIOD)
 
 
-$(LIBRESSLD_TLSA):
+#$(LIBRESSLD_TLSA):
 	#(cd ./$(LIBRESSLD) && ./configure BUILD_SHARED_LIBS=ON)
-	@make -sC $(LIBRESSLD)
+#	@make -sC $(LIBRESSLD)
 
-$(LIBRESSL_TLSX): $(LIBRESSLD_TLSA)
-	@make -sC $(LIBRESSLD)
+#$(LIBRESSL_TLSX): $(LIBRESSLD_TLSA)
+#	@make -sC $(LIBRESSLD)
 
-client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBRESSL_TLSX)#$(LIBMX)
+client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA) $(LIBSNDFA)  libressl/ssl/.libs/libssl.a libressl/tls/.libs/libtls.a  libressl/crypto/.libs/libcrypto.a  -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(OBJS_CLIENT) $(OBJS_HELP) -o $@
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA) $(LIBSNDFA) -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
 
 
@@ -171,7 +171,6 @@ $(OBJD)/%.o: src/functions/%.c $(INCS)
 	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
 
 $(OBJS_CLIENT): | $(OBJD)
-
 
 install: server client
 

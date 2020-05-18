@@ -34,11 +34,17 @@
 //#include <portaudio.h>
 //#include <sndfile.h>
 //#include <json.h>
+// openssl
+#include <openssl/evp.h>
+#include <openssl/sha.h>
+#include <openssl/aes.h>
+#include <tls.h>
 
 #include "../libportaudio/include/portaudio.h"
+
+/*
 #include "../libressl/include/tls.h"
 //#include "../libressl/include/pqueue.h"
-
 #include "../libressl/include/openssl/aes.h"
 #include "../libressl/include/openssl/asn1.h"
 #include "../libressl/include/openssl/asn1t.h"
@@ -55,7 +61,6 @@
 #include "../libressl/include/openssl/conf.h"
 #include "../libressl/include/openssl/conf_api.h"
 #include "../libressl/include/openssl/crypto.h"
-
 #include "../libressl/include/openssl/curve25519.h"
 #include "../libressl/include/openssl/des.h"
 #include "../libressl/include/openssl/dh.h"
@@ -115,17 +120,12 @@
 
 //#include "../libressl/include/openssl/
 
+*/
 
 #include "../libjson/json.h"
 #include "../libsndfile/src/sndfile.h"
 
-// openssl
-#include <openssl/evp.h>
-#include <openssl/sha.h>
-#include <openssl/aes.h>
-
 #include <gtk/gtk.h>
-//#include <tls.h>
 #include "../../libmx/inc/libmx.h"
 
 #define MAX_CLIENT_INPUT 1024
