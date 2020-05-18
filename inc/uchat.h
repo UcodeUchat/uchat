@@ -411,6 +411,7 @@ void mx_print_curr_time(void);
 char *mx_curr_time(void);
 void mx_print_tid(const char *s);
 void mx_err_exit(const char *err_msg);  // вивести помилку
+int mx_err_return(const char *err_msg);
 void mx_sha_hash_password(char *password);
 int addr_socet_info(int argc, char *argv[]);  // test adress
 void mx_get_input(char *buffer);
@@ -418,7 +419,7 @@ int mx_get_input2(char *buffer);
 void mx_report_tls(struct tls * tls_ctx, char * host);
 void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
 char *mx_date_to_char(void);
-void *mx_send_mail(void *message1);
+void *mx_send_mail(char *receiver, void *mess);
 // crypto funcs
 // char *mx_encrypt_EVP(char *str);
 char *mx_strhash(const char *to_hash);
