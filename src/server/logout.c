@@ -63,6 +63,32 @@ int mx_delete_message (t_server_info *info, t_socket_list *csl, json_object *js)
     return 1;
 }
 
+static int load_user_data(void *js, int argc, char **argv, char **col_name) {
+    (void)argc;
+    (void)col_name;
+    json_object *login = json_object_new_string(argv[2]);
+
+    json_object_object_add((struct json_object *)js, "login", login);
+    return 0;
+}
+
+int mx_load_profile (t_server_info *info, t_socket_list *csl, json_object *js) {
+    int id = json_object_get_int(json_object_object_get(js, "id"));
+    char *command = malloc(1024);
+    const char *json_string = NULL;
+
+    sprintf(command, "SELECT * FROM users where id='%d';", id);
+    if (sqlite3_exec(info->db, command, load_user_data, js, NULL) == SQLITE_OK) {
+        json_string = json_object_to_json_string(js);
+        mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
+        mx_strdel(&command);
+    }
+    else {
+        printf("fail\n");
+    }
+    return 1;
+}
+
 int mx_edit_message (t_server_info *info, t_socket_list *csl, json_object *js) {
     (void)csl;
     int message_id = json_object_get_int(json_object_object_get(js, "message_id"));

@@ -294,9 +294,8 @@ void logout(t_client_info *info) {
     tls_send(info->tls_client, json_string, strlen(json_string));
 }
 
-void scroll_callback (GtkWidget *widget, GdkEventButton *event, t_all *data) {
+void scroll_callback (GtkWidget *widget, t_all *data) {
     (void)widget;
-    (void)event;
     if (gtk_adjustment_get_value(data->room->Adjust) == 
         gtk_adjustment_get_lower(data->room->Adjust) && data->info->can_load == 1) {
         json_object  *new_json = json_object_new_object();
@@ -309,6 +308,12 @@ void scroll_callback (GtkWidget *widget, GdkEventButton *event, t_all *data) {
         const char *json_str = json_object_to_json_string(new_json);
         tls_send(data->info->tls_client, json_str, strlen(json_str));
     }
+}
+
+void room_menu_callback(GtkWidget *widget, GdkEventButton *event, GtkWidget *menu) {
+    (void)widget;
+    (void)event;
+    gtk_menu_popup_at_pointer (GTK_MENU(menu), NULL);
 }
 
 void logout_callback (GtkWidget *widget, t_client_info *info) {
@@ -342,6 +347,21 @@ void edit_cancel_callback (GtkWidget *widget, GdkEventButton *event, t_client_in
     gtk_widget_hide(info->data->edit_button);
 }
 
+void load_profile(t_client_info *info, int id) {
+    json_object *new_json;
+
+    new_json = json_object_new_object();
+    json_object_object_add(new_json, "type", json_object_new_int(MX_LOAD_PROFILE_TYPE));
+    json_object_object_add(new_json, "id", json_object_new_int(id));
+    const char *json_string = json_object_to_json_string(new_json);
+    tls_send(info->tls_client, json_string, strlen(json_string));
+}
+
+void profile_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    load_profile(info, info->id);
+}
+
 void init_menu (t_client_info *info) {
     info->data->menu = gtk_box_new(FALSE, 0);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->menu, 0, 0);
@@ -373,6 +393,7 @@ void init_menu (t_client_info *info) {
     gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
     gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
     button = gtk_button_new_with_label("Profile");
+    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(profile_callback), info);
     gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
     gtk_widget_set_size_request(button, 100, -1);
     gtk_widget_set_name(button, "entry");
@@ -587,10 +608,22 @@ void init_general (t_client_info *info) {
         gtk_orientable_set_orientation (GTK_ORIENTABLE(room->room_box), GTK_ORIENTATION_VERTICAL);
         gtk_widget_show(room->room_box);
         //--
+        //--room menu
+        GtkWidget *room_menu  = gtk_menu_new ();
+        //--items
+        GtkWidget *leave = gtk_menu_item_new_with_label("Leave room");
+        gtk_widget_show(leave);
+        gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), leave);
+
+        GtkWidget *history = gtk_menu_item_new_with_label("Load history");
+        gtk_widget_show(history);
+        gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), history);
+        g_signal_connect (G_OBJECT (history), "activate", G_CALLBACK (scroll_callback), data);
+        //--
         GtkWidget *event = gtk_event_box_new();
         gtk_widget_set_size_request(event, -1, 40);
         gtk_widget_add_events (event, GDK_BUTTON_PRESS_MASK);
-        g_signal_connect (G_OBJECT (event), "button_press_event", G_CALLBACK (scroll_callback), data);
+        g_signal_connect (G_OBJECT (event), "button_press_event", G_CALLBACK (room_menu_callback), room_menu);
         GtkWidget *full_name = gtk_label_new(str);
         gtk_widget_set_name (full_name, "title");
         gtk_container_add (GTK_CONTAINER (event), full_name);
@@ -646,6 +679,11 @@ void authentification(t_client_info *info) {
     info->responce = 0;
 }
 
+void close_widget_callback (GtkWidget *widget, GtkWidget *widget_ptr) {
+    (void)widget;
+    gtk_widget_hide(widget_ptr);
+}
+
 void enter_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
     pthread_t login_msg_t = NULL;
@@ -668,6 +706,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
     else if(info->auth_client == 1) {
         init_general(info);
         init_menu(info);
+        //init_profile(info);
         //--
     }  
 }

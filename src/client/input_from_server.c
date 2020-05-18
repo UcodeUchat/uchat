@@ -378,7 +378,7 @@ void load_history(t_client_info *info, json_object *new_json) {
     for (int i = 0; i < n_msg; i++) {
         json_object *msg_data = json_object_array_get_idx(messages, i);
         append_message(info, room, msg_data);
-        sleep_ms(10);
+        //sleep_ms(10);
     }
     info->can_load = 1;
 }
@@ -406,10 +406,8 @@ void edit_message(t_client_info *info, json_object *new_json) {
         free(node->data);
         node->data = strdup(data);
         g_idle_add ((GSourceFunc)destroy_message, node->message_label);
-        //gtk_widget_destroy(node->message_label);
         node->message_label = gtk_label_new(data);
         gtk_box_pack_start (GTK_BOX (node->message_box), node->message_label, FALSE, FALSE, 0);
-        //gtk_widget_show(node->message_label);
         g_idle_add ((GSourceFunc)show_message, node->message_label);
     }
 }
@@ -433,6 +431,50 @@ void input_authentification(t_client_info *info, json_object *new_json) {
     }
 }
 
+void close_widget (GtkWidget *widget, GtkWidget *widget_ptr) {
+    (void)widget;
+    gtk_widget_hide(widget_ptr);
+}
+
+void load_user_profile(t_client_info *info, json_object *new_json) {
+    const char *login = json_object_get_string(json_object_object_get(new_json, "login"));
+    //int id = json_object_get_int(json_object_object_get(new_json, "id"));
+
+    GtkWidget *event = gtk_event_box_new();
+    GtkWidget *profile = gtk_box_new(FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(event), profile);
+    gtk_widget_set_name(profile, "profile");
+    gtk_fixed_put(GTK_FIXED(info->data->general_box), event, 0, 0);
+    gtk_widget_set_size_request(profile, gtk_widget_get_allocated_width (info->data->window), 
+                                gtk_widget_get_allocated_height (info->data->window));
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(profile), GTK_ORIENTATION_VERTICAL);
+    //--
+    GtkWidget *close_box = gtk_box_new(FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (profile), close_box, FALSE, FALSE, 0);
+    GtkWidget *exit_button = gtk_button_new();
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/cancel.png", 22, 22, TRUE, NULL);
+    GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
+    gtk_button_set_image(GTK_BUTTON(exit_button), image);
+    g_signal_connect(G_OBJECT(exit_button), "clicked", G_CALLBACK(close_widget), event);
+    gtk_box_pack_end (GTK_BOX (close_box),exit_button, FALSE, FALSE, 0);
+    gtk_widget_show(exit_button);
+    gtk_widget_show(close_box);
+    //--
+    GtkWidget *main_box = gtk_box_new(FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (profile), main_box, FALSE, FALSE, 0);
+    GtkWidget *login_entry = gtk_entry_new ();
+    gtk_editable_set_editable (GTK_EDITABLE (login_entry), FALSE);
+    gtk_entry_set_max_length (GTK_ENTRY (login_entry), 50);
+    gtk_entry_set_text(GTK_ENTRY(login_entry), login);
+    gtk_box_pack_start (GTK_BOX (main_box), login_entry, FALSE, FALSE, 0);
+    gtk_widget_show(login_entry);
+    gtk_widget_show(main_box);
+    //--
+    gtk_widget_show(profile);
+    g_idle_add ((GSourceFunc)show_message, event);
+    //gtk_widget_show(profile);
+}
+
 int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
     int type = json_object_get_int(json_object_object_get(obj, "type"));
 // tmp
@@ -443,9 +485,6 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
         mx_save_file_in_client(info, obj);
     else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) 
         input_authentification(info, obj);
-    else if (type == MX_REG_TYPE_V || type == MX_REG_TYPE_NV) {
-        //input_registration(info, obj);
-    }
     else if (type == MX_MSG_TYPE)
         input_message(info, obj);
     else if (type == MX_LOAD_MORE_TYPE)
@@ -454,6 +493,8 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
         delete_message(info, obj);
     else if (type == MX_EDIT_MESSAGE_TYPE)
         edit_message(info, obj);
+    else if (type == MX_LOAD_PROFILE_TYPE)
+        load_user_profile(info, obj);
     return 0;
 }
 
