@@ -29,17 +29,103 @@
 #include <syslog.h>
 #include <sys/event.h>
 #include <sys/time.h>
-
+#include <time.h>
+#include <math.h>
+//#include <portaudio.h>
+//#include <sndfile.h>
 //#include <json.h>
-#include "../json/json.h"
-
 // openssl
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 #include <openssl/aes.h>
+#include <tls.h>
+
+#include "../libportaudio/include/portaudio.h"
+
+/*
+#include "../libressl/include/tls.h"
+//#include "../libressl/include/pqueue.h"
+#include "../libressl/include/openssl/aes.h"
+#include "../libressl/include/openssl/asn1.h"
+#include "../libressl/include/openssl/asn1t.h"
+#include "../libressl/include/openssl/bio.h"
+#include "../libressl/include/openssl/blowfish.h"
+#include "../libressl/include/openssl/bn.h"
+#include "../libressl/include/openssl/buffer.h"
+#include "../libressl/include/openssl/camellia.h"
+#include "../libressl/include/openssl/cast.h"
+#include "../libressl/include/openssl/chacha.h"
+#include "../libressl/include/openssl/cmac.h"
+#include "../libressl/include/openssl/cms.h"
+#include "../libressl/include/openssl/comp.h"
+#include "../libressl/include/openssl/conf.h"
+#include "../libressl/include/openssl/conf_api.h"
+#include "../libressl/include/openssl/crypto.h"
+#include "../libressl/include/openssl/curve25519.h"
+#include "../libressl/include/openssl/des.h"
+#include "../libressl/include/openssl/dh.h"
+#include "../libressl/include/openssl/dsa.h"
+#include "../libressl/include/openssl/dso.h"
+//#include "../libressl/include/openssl/dtls1.h"
+#include "../libressl/include/openssl/ec.h"
+#include "../libressl/include/openssl/ecdh.h"
+#include "../libressl/include/openssl/ecdsa.h"
+#include "../libressl/include/openssl/engine.h"
+#include "../libressl/include/openssl/err.h"
+#include "../libressl/include/openssl/evp.h"
+#include "../libressl/include/openssl/gost.h"
+#include "../libressl/include/openssl/hkdf.h"
+#include "../libressl/include/openssl/hmac.h"
+#include "../libressl/include/openssl/idea.h"
+#include "../libressl/include/openssl/lhash.h"
+#include "../libressl/include/openssl/md4.h"
+#include "../libressl/include/openssl/md5.h"
+#include "../libressl/include/openssl/modes.h"
+#include "../libressl/include/openssl/obj_mac.h"
+#include "../libressl/include/openssl/objects.h"
+#include "../libressl/include/openssl/ocsp.h"
+#include "../libressl/include/openssl/opensslconf.h"
+#include "../libressl/include/openssl/opensslfeatures.h"
+#include "../libressl/include/openssl/opensslv.h"
+#include "../libressl/include/openssl/ossl_typ.h"
+#include "../libressl/include/openssl/pem.h"
+#include "../libressl/include/openssl/pem2.h"
+#include "../libressl/include/openssl/pkcs12.h"
+#include "../libressl/include/openssl/pkcs7.h"
+#include "../libressl/include/openssl/poly1305.h"
+#include "../libressl/include/openssl/rand.h"
+#include "../libressl/include/openssl/rc2.h"
+#include "../libressl/include/openssl/rc4.h"
+#include "../libressl/include/openssl/ripemd.h"
+#include "../libressl/include/openssl/rsa.h"
+#include "../libressl/include/openssl/safestack.h"
+#include "../libressl/include/openssl/sha.h"
+#include "../libressl/include/openssl/sm3.h"
+#include "../libressl/include/openssl/sm4.h"
+//#include "../libressl/include/openssl/srtp.h"
+#include "../libressl/include/openssl/ssl.h"
+#include "../libressl/include/openssl/ssl2.h"
+#include "../libressl/include/openssl/ssl23.h"
+#include "../libressl/include/openssl/ssl3.h"
+#include "../libressl/include/openssl/stack.h"
+#include "../libressl/include/openssl/tls1.h"
+#include "../libressl/include/openssl/ts.h"
+#include "../libressl/include/openssl/txt_db.h"
+#include "../libressl/include/openssl/ui.h"
+#include "../libressl/include/openssl/ui_compat.h"
+#include "../libressl/include/openssl/whrlpool.h"
+#include "../libressl/include/openssl/x509.h"
+#include "../libressl/include/openssl/x509_vfy.h"
+#include "../libressl/include/openssl/x509v3.h"
+
+//#include "../libressl/include/openssl/
+
+*/
+
+#include "../libjson/json.h"
+#include "../libsndfile/src/sndfile.h"
 
 #include <gtk/gtk.h>
-#include <tls.h>
 #include "../../libmx/inc/libmx.h"
 
 #define MAX_CLIENT_INPUT 1024
@@ -52,6 +138,29 @@
 
 #define MX_SAVE_FOLDER_IN_CLIENT "./Uchat_downloads/"
 #define MX_SAVE_FOLDER_IN_SERVER "./files/"
+
+#define MIN_TALKING_BUFFERS 8
+#define TALKING_THRESHOLD_WEIGHT 0.99
+#define TALKING_TRIGGER_RATIO 4.0
+#define SAMPLE_RATE       (44100)  // в 1 секунде записи содержится 44100 семплов.
+#define FRAMES_PER_BUFFER   (1024)
+#define SAMPLE_SILENCE  (0.0f)
+#define NUM_SECONDS     (5)
+#define BUFFER_LEN      1024
+
+typedef struct s_audio{
+    uint16_t format_type;
+    uint8_t number_channels;
+    uint32_t sample_rate;
+    size_t size;
+    float *rec_samples;
+}               t_audio;
+
+typedef struct s_a_snippet{
+    float *snippet;
+    size_t size;
+}           t_a_snippet;
+
 
 typedef struct s_message {
     int id;
@@ -329,5 +438,19 @@ void mx_glitch_in_the_matrix(struct json_object *jobj);
 const char *mx_message_to_json_string(t_client_info *info, char *message);
 json_object *mx_package_to_json(t_package *package);
 t_package *mx_json_to_package(json_object *new_json);
+
+//audio
+int mx_record_audio(void);
+int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block);
+int mx_exit_stream(t_audio *data, PaError err);
+long mx_save_audio(t_audio *data);
+int mx_process_stream_ext(PaStream *stream, t_audio *data,
+                          t_a_snippet *sample_block, const char *fileName,
+                          bool *sample_complete);
+float mx_rms(float *data, size_t len);
+float mx_change_threshold(float talking_threshold, float talking_ntensity);
+int mx_play_sound_file(char *file_name);
+
+
 
 #endif
