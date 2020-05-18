@@ -431,20 +431,34 @@ void input_authentification(t_client_info *info, json_object *new_json) {
     }
 }
 
-void close_widget (GtkWidget *widget, GtkWidget *widget_ptr) {
+void close_profile_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
-    gtk_widget_hide(widget_ptr);
+    gtk_widget_hide(info->data->profile->main_box);
+    free(info->data->profile);
+}
+
+void edit_login_callback (GtkWidget *widget, t_client_info *info) {
+    gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->login_entry), TRUE);
+    gtk_widget_hide(widget);
+    gtk_widget_show(info->data->profile->login_button2);
+}
+
+void save_login_callback (GtkWidget *widget, t_client_info *info) {
+    gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->login_entry), FALSE);
+    gtk_widget_hide(widget);
+    gtk_widget_show(info->data->profile->login_button1);
 }
 
 void load_user_profile(t_client_info *info, json_object *new_json) {
+    info->data->profile = (t_prof *)malloc(sizeof(t_prof));
     const char *login = json_object_get_string(json_object_object_get(new_json, "login"));
-    //int id = json_object_get_int(json_object_object_get(new_json, "id"));
+    int id = json_object_get_int(json_object_object_get(new_json, "id"));
 
-    GtkWidget *event = gtk_event_box_new();
-    GtkWidget *profile = gtk_box_new(FALSE, 0);
-    gtk_container_add(GTK_CONTAINER(event), profile);
+    info->data->profile->main_box = gtk_event_box_new();
+    GtkWidget *profile = gtk_box_new(FALSE, 5);
+    gtk_container_add(GTK_CONTAINER(info->data->profile->main_box), profile);
     gtk_widget_set_name(profile, "profile");
-    gtk_fixed_put(GTK_FIXED(info->data->general_box), event, 0, 0);
+    gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->profile->main_box, 0, 0);
     gtk_widget_set_size_request(profile, gtk_widget_get_allocated_width (info->data->window), 
                                 gtk_widget_get_allocated_height (info->data->window));
     gtk_orientable_set_orientation (GTK_ORIENTABLE(profile), GTK_ORIENTATION_VERTICAL);
@@ -455,24 +469,53 @@ void load_user_profile(t_client_info *info, json_object *new_json) {
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/cancel.png", 22, 22, TRUE, NULL);
     GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
     gtk_button_set_image(GTK_BUTTON(exit_button), image);
-    g_signal_connect(G_OBJECT(exit_button), "clicked", G_CALLBACK(close_widget), event);
+    g_signal_connect(G_OBJECT(exit_button), "clicked", G_CALLBACK(close_profile_callback), info);
     gtk_box_pack_end (GTK_BOX (close_box),exit_button, FALSE, FALSE, 0);
     gtk_widget_show(exit_button);
     gtk_widget_show(close_box);
     //--
-    GtkWidget *main_box = gtk_box_new(FALSE, 0);
-    gtk_box_pack_start (GTK_BOX (profile), main_box, FALSE, FALSE, 0);
-    GtkWidget *login_entry = gtk_entry_new ();
-    gtk_editable_set_editable (GTK_EDITABLE (login_entry), FALSE);
-    gtk_entry_set_max_length (GTK_ENTRY (login_entry), 50);
-    gtk_entry_set_text(GTK_ENTRY(login_entry), login);
-    gtk_box_pack_start (GTK_BOX (main_box), login_entry, FALSE, FALSE, 0);
-    gtk_widget_show(login_entry);
-    gtk_widget_show(main_box);
+    //--login
+    GtkWidget *login_box = gtk_box_new(FALSE, 5);
+    gtk_box_pack_start (GTK_BOX (profile), login_box, FALSE, FALSE, 0);
+    info->data->profile->login_entry = gtk_entry_new ();
+    gtk_entry_set_max_length (GTK_ENTRY (info->data->profile->login_entry), 50);
+    gtk_entry_set_text(GTK_ENTRY(info->data->profile->login_entry), login);
+    gtk_box_pack_start (GTK_BOX (login_box), info->data->profile->login_entry, FALSE, FALSE, 0);
+    gtk_widget_show(info->data->profile->login_entry);
+    gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->login_entry), FALSE);
+    if (id == info->id) {
+        info->data->profile->login_button1 = gtk_button_new();
+        GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/config.png", 22, 22, TRUE, NULL);
+        GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
+        gtk_button_set_image(GTK_BUTTON(info->data->profile->login_button1), image);
+        gtk_box_pack_start (GTK_BOX (login_box), info->data->profile->login_button1, FALSE, FALSE, 0);
+        gtk_widget_show(info->data->profile->login_button1);
+
+        info->data->profile->login_button2 = gtk_button_new();
+        pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/save.png", 22, 22, TRUE, NULL);
+        image = gtk_image_new_from_pixbuf(pixbuf);
+        gtk_button_set_image(GTK_BUTTON(info->data->profile->login_button2), image);
+        gtk_box_pack_start (GTK_BOX (login_box), info->data->profile->login_button2, FALSE, FALSE, 0);
+
+        g_signal_connect(G_OBJECT(info->data->profile->login_button2), 
+            "clicked", G_CALLBACK(save_login_callback), info);
+        g_signal_connect(G_OBJECT(info->data->profile->login_button1), 
+            "clicked", G_CALLBACK(edit_login_callback), info);
+    }
+    gtk_widget_show(login_box);
+    //--id
+    GtkWidget *id_box = gtk_box_new(FALSE, 5);
+    gtk_box_pack_start (GTK_BOX (profile), id_box, FALSE, FALSE, 0);
+    info->data->profile->id_entry = gtk_entry_new ();
+    gtk_entry_set_max_length (GTK_ENTRY (info->data->profile->id_entry), 50);
+    gtk_entry_set_text(GTK_ENTRY(info->data->profile->id_entry), mx_itoa(id));
+    gtk_box_pack_start (GTK_BOX (id_box), info->data->profile->id_entry, FALSE, FALSE, 0);
+    gtk_widget_show(info->data->profile->id_entry);
+    gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->id_entry), FALSE);
+    gtk_widget_show(id_box);
     //--
     gtk_widget_show(profile);
-    g_idle_add ((GSourceFunc)show_message, event);
-    //gtk_widget_show(profile);
+    g_idle_add ((GSourceFunc)show_message, info->data->profile->main_box);
 }
 
 int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {

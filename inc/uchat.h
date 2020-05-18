@@ -83,6 +83,14 @@ typedef struct s_reg {
     GtkWidget *stop;
 }              t_reg;
 
+typedef struct s_prof {
+    GtkWidget *main_box;
+    GtkWidget *login_entry;
+    GtkWidget *login_button1;
+    GtkWidget *login_button2;
+    GtkWidget *id_entry;
+}              t_prof;
+
 typedef struct s_data {
     GtkWidget *window;
     GtkWidget *main_box;
@@ -99,10 +107,10 @@ typedef struct s_data {
     GtkWidget *notebook;
     GtkWidget *stop;
     GtkWidget *menu;
-    GtkWidget *profile;
     GtkWidget *edit_button;
     t_room *rooms;
     t_reg *registration;
+    t_prof *profile;
     gint current_room;
     int login_msg_flag;
 }              t_data;
