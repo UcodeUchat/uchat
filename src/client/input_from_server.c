@@ -343,7 +343,6 @@ void input_message(t_client_info *info, json_object *new_json) {
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
     mx_play_sound_file("./audio/message_send.aiff");
-    mx_send_mail("new massage");
     push_message(info, room, new_json);
     t_room *head = info->data->rooms;
     while (head != NULL) {

@@ -31,6 +31,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
+#include <ctype.h>
 //#include <portaudio.h>
 //#include <sndfile.h>
 //#include <json.h>
@@ -129,6 +130,7 @@
 #include "../../libmx/inc/libmx.h"
 
 #define MAX_CLIENT_INPUT 1024
+#define MAXRESPONSE 1024
 #define REPORT_FILENAME "server_log.txt"
 #define BUFLEN 128
 #define QLEN 10
@@ -415,6 +417,7 @@ void mx_get_input(char *buffer);
 int mx_get_input2(char *buffer);
 void mx_report_tls(struct tls * tls_ctx, char * host);
 void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
+char *mx_date_to_char(void);
 void *mx_send_mail(void *message1);
 // crypto funcs
 // char *mx_encrypt_EVP(char *str);

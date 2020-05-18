@@ -63,6 +63,7 @@ SRC_SERVER = main_server.c \
 	list_room.c \
 	logout.c \
 	functions_for_server.c \
+	send_mail_notification.c
 
 SRC_CLIENT = main_client.c \
 	start_client.c \
