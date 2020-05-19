@@ -66,9 +66,27 @@ int mx_delete_message (t_server_info *info, t_socket_list *csl, json_object *js)
 static int load_user_data(void *js, int argc, char **argv, char **col_name) {
     (void)argc;
     (void)col_name;
+    json_object *name = NULL;
+    json_object *email = NULL;
     json_object *login = json_object_new_string(argv[2]);
+    if (argv[4])
+        name = json_object_new_string(argv[4]);
+    else
+        name = json_object_new_string("");
+    if (argv[5])
+        email = json_object_new_string(argv[5]);
+    else
+        email = json_object_new_string("");
+    json_object *visual_n = json_object_new_int(atoi(argv[9]));
+    json_object *audio_n = json_object_new_int(atoi(argv[10]));
+    json_object *email_n = json_object_new_int(atoi(argv[11]));
 
     json_object_object_add((struct json_object *)js, "login", login);
+    json_object_object_add((struct json_object *)js, "name", name);
+    json_object_object_add((struct json_object *)js, "email", email);
+    json_object_object_add((struct json_object *)js, "visual_n", visual_n);
+    json_object_object_add((struct json_object *)js, "audio_n", audio_n);
+    json_object_object_add((struct json_object *)js, "email_n", email_n);
     return 0;
 }
 
@@ -77,7 +95,7 @@ int mx_load_profile (t_server_info *info, t_socket_list *csl, json_object *js) {
     char *command = malloc(1024);
     const char *json_string = NULL;
 
-    sprintf(command, "SELECT * FROM users where id='%d';", id);
+    sprintf(command, "SELECT * FROM users, user_notifications where users.id='%d' and user_notifications.user_id='%d';", id, id);
     if (sqlite3_exec(info->db, command, load_user_data, js, NULL) == SQLITE_OK) {
         json_string = json_object_to_json_string(js);
         mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));

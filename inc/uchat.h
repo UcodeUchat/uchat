@@ -88,6 +88,9 @@ typedef struct s_prof {
     GtkWidget *login_entry;
     GtkWidget *login_button1;
     GtkWidget *login_button2;
+    GtkWidget *email_entry;
+    GtkWidget *email_button1;
+    GtkWidget *email_button2;
     GtkWidget *id_entry;
 }              t_prof;
 

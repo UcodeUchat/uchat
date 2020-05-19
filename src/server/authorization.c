@@ -58,11 +58,11 @@ static int get_user_id(void *p, int argc, char **argv, char **col_name) {
 int mx_add_to_db(t_server_info *i, const char *l, const char *pa) {
     char *command = malloc(1024);
     char *command1 = malloc(1024);
+    char *command2 = malloc(1024);
     int user_id = -1;
     
     sprintf(command, "insert into users (socket, login, password, access)\
-                values (0,'%s', '%s', 1);\nselect id from users where\
-                login='%s'", l, pa, l);
+                values (0,'%s', '%s', 1);\nSELECT last_insert_rowid()", l, pa);
     if (sqlite3_exec(i->db, command, get_user_id, &user_id, 0) != SQLITE_OK)
         return -1;
     mx_strdel(&command);
@@ -72,6 +72,12 @@ int mx_add_to_db(t_server_info *i, const char *l, const char *pa) {
     if (sqlite3_exec(i->db, command1, NULL, NULL, 0) != SQLITE_OK)
         return -1;
     mx_strdel(&command1);
+    // add notifications
+    sprintf(command2, "insert into user_notifications (user_id, visual, audio, email)\
+                values (%d, 0, 0, 0);", user_id);
+    if (sqlite3_exec(i->db, command2, NULL, NULL, 0) != SQLITE_OK)
+        return -1;
+    mx_strdel(&command2);
     return 1;
 }
 
