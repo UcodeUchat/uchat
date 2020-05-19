@@ -107,6 +107,25 @@ int mx_load_profile (t_server_info *info, t_socket_list *csl, json_object *js) {
     return 1;
 }
 
+int mx_edit_profile (t_server_info *info, t_socket_list *csl, json_object *js) {
+    int id = json_object_get_int(json_object_object_get(js, "user_id"));
+    const char *column = json_object_get_string(json_object_object_get(js, "column"));
+    const char *data = json_object_get_string(json_object_object_get(js, "data"));
+    char *command = malloc(1024);
+    const char *json_string = NULL;
+
+    sprintf(command, "UPDATE users SET %s='%s' where id='%d';", column, data, id);
+    if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) 
+        json_object_object_add(js, "confirmation", json_object_new_int(1));
+    else 
+        json_object_object_add(js, "confirmation", json_object_new_int(0));
+    json_string = json_object_to_json_string(js);
+    mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
+    mx_strdel(&command);
+    return 1;
+}
+
+
 int mx_edit_message (t_server_info *info, t_socket_list *csl, json_object *js) {
     (void)csl;
     int message_id = json_object_get_int(json_object_object_get(js, "message_id"));
