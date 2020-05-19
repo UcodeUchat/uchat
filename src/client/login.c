@@ -535,35 +535,56 @@ void init_general (t_client_info *info) {
     //--
     //--sticker selection
     GtkWidget *menu  = gtk_menu_new ();
-    //--items
     DIR *dptr  = opendir("stickers");
 
     if (dptr != NULL) {
         struct dirent  *ds;
-        while((ds = readdir(dptr)) != 0) {//cчитываем хуйню из директории
-            char *extention = strdup(ds->d_name);
 
-            while (mx_get_char_index(extention, '.') >= 0) {
-                char *tmp = strdup(extention + mx_get_char_index(extention, '.') + 1);
-                free(extention);
-                extention = strdup(tmp);
-                free(tmp); 
+        while((ds = readdir(dptr)) != 0) {//cчитываем хуйню из директории
+            char *path = mx_strjoin("stickers/", ds->d_name);
+
+            if (ds->d_name[0] != '.') {
+                DIR *sub_dir = opendir(path);
+
+                if (sub_dir != NULL) {
+                    GtkWidget *sub_menu  = gtk_menu_new ();
+                    struct dirent  *ds1;
+
+                    while((ds1 = readdir(sub_dir)) != 0) {//cчитываем хуйню из директории
+                        char *extention = strdup(ds1->d_name);
+
+                        while (mx_get_char_index(extention, '.') >= 0) {
+                            char *tmp = strdup(extention + mx_get_char_index(extention, '.') + 1);
+                            free(extention);
+                            extention = strdup(tmp);
+                            free(tmp); 
+                        }
+                        if(strcmp(extention, "png") == 0) {
+                            GtkWidget *item = gtk_menu_item_new();
+                            char *name = mx_strjoin(path, "/");
+                            char *tmp = mx_strjoin(name, ds1->d_name);
+                            free(name);
+                            name = strdup(tmp);
+                            free(tmp);
+                            GdkPixbuf *item_pixbuf = gdk_pixbuf_new_from_file_at_scale (name, 80, 80, TRUE, NULL);
+                            GtkWidget *item_image = gtk_image_new_from_pixbuf(item_pixbuf);
+                            gtk_container_add (GTK_CONTAINER (item), item_image);
+                            gtk_widget_show(item_image);
+                            gtk_widget_show(item);
+                            gtk_menu_shell_append (GTK_MENU_SHELL (sub_menu), item);
+                            t_stik *stik = (t_stik *)(malloc)(sizeof(t_stik));
+                            stik->info = info;
+                            stik->name = strdup(name);
+                            g_signal_connect (G_OBJECT (item), "activate", G_CALLBACK (item_callback), stik);
+                        }
+                    }
+                    GtkWidget *sub_item = gtk_menu_item_new_with_label(ds->d_name);
+                    gtk_widget_show(sub_item);
+                    gtk_menu_item_set_submenu (GTK_MENU_ITEM (sub_item), sub_menu);
+                    gtk_menu_shell_append (GTK_MENU_SHELL (menu), sub_item);
+                    closedir(sub_dir);
+                }
             }
-            if(strcmp(extention, "png") == 0) {
-                GtkWidget *item = gtk_menu_item_new();
-                char *path = mx_strjoin("stickers/", ds->d_name);
-                GdkPixbuf *item_pixbuf = gdk_pixbuf_new_from_file_at_scale (path, 80, 80, TRUE, NULL);
-                GtkWidget *item_image = gtk_image_new_from_pixbuf(item_pixbuf);
-                gtk_container_add (GTK_CONTAINER (item), item_image);
-                gtk_widget_show(item_image);
-                gtk_widget_show(item);
-                gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
-                t_stik *stik = (t_stik *)(malloc)(sizeof(t_stik));
-                stik->info = info;
-                stik->name = strdup(ds->d_name);
-                g_signal_connect (G_OBJECT (item), "activate", G_CALLBACK (item_callback), stik);
-            }
-            //free(ds);
         }
         closedir(dptr);
     }

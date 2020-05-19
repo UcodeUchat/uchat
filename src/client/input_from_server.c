@@ -239,8 +239,8 @@ t_message *create_message(t_client_info *info, t_room *room, json_object *new_js
         GtkWidget *box2 =  gtk_box_new(FALSE, 0);
         gtk_widget_show(box2);
         gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
-        char *path = mx_strjoin("stickers/", message);
-        GdkPixbuf *item_pixbuf = gdk_pixbuf_new_from_file_at_scale (path, 200, 200, TRUE, NULL);
+        //char *path = mx_strjoin("stickers/", message);
+        GdkPixbuf *item_pixbuf = gdk_pixbuf_new_from_file_at_scale (message, 200, 200, TRUE, NULL);
         GtkWidget *item_image = gtk_image_new_from_pixbuf(item_pixbuf);;
         gtk_widget_show(item_image);
         gtk_box_pack_start (GTK_BOX (box2), item_image, FALSE, FALSE, 0);
@@ -504,7 +504,7 @@ void show_exit (t_client_info *info,  GtkWidget *profile) {
 
 void show_name_settings(t_client_info *info, GtkWidget *name_box) {
     info->data->profile->name_button1 = gtk_button_new();
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/config.png", 22, 22, TRUE, NULL);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/edit.png", 22, 22, TRUE, NULL);
     GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
     gtk_button_set_image(GTK_BUTTON(info->data->profile->name_button1), image);
     gtk_box_pack_start (GTK_BOX (name_box), info->data->profile->name_button1, FALSE, FALSE, 0);
@@ -565,7 +565,7 @@ void show_login (t_client_info *info, json_object *new_json, GtkWidget *profile)
 
 void show_email_settings(t_client_info *info, GtkWidget *email_box) {
     info->data->profile->email_button1 = gtk_button_new();
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/config.png", 22, 22, TRUE, NULL);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/edit.png", 22, 22, TRUE, NULL);
     GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
     gtk_button_set_image(GTK_BUTTON(info->data->profile->email_button1), image);
     gtk_box_pack_start (GTK_BOX (email_box), info->data->profile->email_button1, FALSE, FALSE, 0);
