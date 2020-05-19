@@ -317,6 +317,7 @@ void leave_callback (GtkWidget *widget, t_all *data) {
     json_object_object_add(new_json, "type", json_object_new_int(MX_LEAVE_ROOM_TYPE));
     json_object_object_add(new_json, "room_id", json_object_new_int(data->room->id));
     json_object_object_add(new_json, "user_id", json_object_new_int(data->info->id));
+    json_object_object_add(new_json, "login", json_object_new_string(data->info->login));
     const char *json_str = json_object_to_json_string(new_json);
     tls_send(data->info->tls_client, json_str, strlen(json_str));
 }

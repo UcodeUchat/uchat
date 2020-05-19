@@ -663,12 +663,11 @@ void pop_room_id(t_room *rooms, int id) {
 void leave_room(t_client_info *info, json_object *new_json) {
     int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+    t_room *room = mx_find_room(info->data->rooms, room_id);
 
     if (user_id == info->id) {
-        t_room *room = mx_find_room(info->data->rooms, room_id);
-        // gtk_notebook_remove_page (GTK_NOTEBOOK(info->data->notebook), 
-        //      gtk_notebook_page_num (GTK_NOTEBOOK(info->data->notebook), room->room_box));
         t_room *head = info->data->rooms;
+
         while (head != NULL) {
             if (head && head->position > room->position)
                 head->position = head->position - 1;
@@ -676,6 +675,27 @@ void leave_room(t_client_info *info, json_object *new_json) {
         }
         pop_room_id(info->data->rooms, room_id);
         gtk_notebook_detach_tab (GTK_NOTEBOOK(info->data->notebook),room->room_box);
+    }
+    else {
+        GtkWidget *h_box = gtk_box_new(FALSE, 5);
+        gtk_orientable_set_orientation (GTK_ORIENTABLE(h_box), GTK_ORIENTATION_VERTICAL);
+        gtk_box_pack_start (GTK_BOX (room->message_box), h_box, FALSE, FALSE, 0);
+        GtkWidget *login_box = gtk_box_new(FALSE, 0);
+        gtk_widget_set_halign (login_box, GTK_ALIGN_CENTER);
+        gtk_box_pack_start (GTK_BOX (h_box), login_box, FALSE, FALSE, 0);
+        char *label = mx_strjoin(json_object_get_string(json_object_object_get(new_json, "login")), " left room");
+        GtkWidget *login = gtk_label_new(label);
+        gtk_box_pack_start (GTK_BOX (login_box), login, FALSE, FALSE, 0);
+        gtk_widget_show(login);
+        gtk_widget_show(login_box);
+        GtkWidget *image_box = gtk_box_new(FALSE, 0);
+        gtk_widget_set_halign (image_box, GTK_ALIGN_CENTER);
+        gtk_box_pack_start (GTK_BOX (h_box), image_box, FALSE, FALSE, 0);
+        GtkWidget *image = gtk_image_new_from_file("img/leave.gif");
+        gtk_box_pack_start (GTK_BOX (image_box), image, FALSE, FALSE, 0);
+        gtk_widget_show(image);
+        gtk_widget_show(image_box);
+        g_idle_add ((GSourceFunc)show_message, h_box);
     }
 }
 
