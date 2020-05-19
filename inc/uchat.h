@@ -191,6 +191,7 @@ typedef struct  s_server_info {  // struct server
 #define MX_EDIT_MESSAGE_TYPE 13
 #define MX_LOAD_PROFILE_TYPE 14
 #define MX_EDIT_PROFILE_TYPE 15
+#define MX_LEAVE_ROOM_TYPE 16
 #define MX_PACKAGE_SIZE sizeof(t_package)
 
 #define MX_MAX_MSG_SIZE 200
@@ -262,6 +263,7 @@ int mx_delete_message (t_server_info *info, t_socket_list *csl, json_object *js)
 int mx_edit_message (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_load_profile (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_edit_profile (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);

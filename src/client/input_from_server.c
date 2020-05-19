@@ -643,12 +643,47 @@ void load_user_profile(t_client_info *info, json_object *new_json) {
     g_idle_add ((GSourceFunc)show_message, info->data->profile->main_box);
 }
 
+void pop_room_id(t_room *rooms, int id) {
+    t_room *head = rooms;
+
+    if (head->id == id) {
+        rooms = head->next;
+    }
+    else {    
+        while (head->next != NULL) {
+            if (head->next->id == id) {
+                head->next = head->next->next;
+                break;
+            }
+            head = head->next;
+        }
+    }
+}
+
+void leave_room(t_client_info *info, json_object *new_json) {
+    int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
+    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+
+    if (user_id == info->id) {
+        t_room *room = mx_find_room(info->data->rooms, room_id);
+        // gtk_notebook_remove_page (GTK_NOTEBOOK(info->data->notebook), 
+        //      gtk_notebook_page_num (GTK_NOTEBOOK(info->data->notebook), room->room_box));
+        t_room *head = info->data->rooms;
+        while (head != NULL) {
+            if (head && head->position > room->position)
+                head->position = head->position - 1;
+            head = head->next;
+        }
+        pop_room_id(info->data->rooms, room_id);
+        gtk_notebook_detach_tab (GTK_NOTEBOOK(info->data->notebook),room->room_box);
+    }
+}
+
 int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
     int type = json_object_get_int(json_object_object_get(obj, "type"));
-// tmp
+
     if (type != MX_FILE_DOWNLOAD_TYPE)
         mx_print_json_object(obj, "mx_process_input_from_server");
-
     if (type == MX_FILE_DOWNLOAD_TYPE) 
         mx_save_file_in_client(info, obj);
     else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) 
@@ -663,6 +698,8 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
         edit_message(info, obj);
     else if (type == MX_LOAD_PROFILE_TYPE)
         load_user_profile(info, obj);
+    else if (type == MX_LEAVE_ROOM_TYPE)
+        leave_room(info, obj);
     return 0;
 }
 

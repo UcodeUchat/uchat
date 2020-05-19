@@ -310,6 +310,17 @@ void scroll_callback (GtkWidget *widget, t_all *data) {
     }
 }
 
+void leave_callback (GtkWidget *widget, t_all *data) {
+    (void)widget;
+    json_object  *new_json = json_object_new_object();
+
+    json_object_object_add(new_json, "type", json_object_new_int(MX_LEAVE_ROOM_TYPE));
+    json_object_object_add(new_json, "room_id", json_object_new_int(data->room->id));
+    json_object_object_add(new_json, "user_id", json_object_new_int(data->info->id));
+    const char *json_str = json_object_to_json_string(new_json);
+    tls_send(data->info->tls_client, json_str, strlen(json_str));
+}
+
 void room_menu_callback(GtkWidget *widget, GdkEventButton *event, GtkWidget *menu) {
     (void)widget;
     (void)event;
@@ -468,72 +479,7 @@ void item_callback (GtkWidget *widget, t_stik *stik) {
     tls_send(stik->info->tls_client, json_string, strlen(json_string));
 }
 
-void init_general (t_client_info *info) {
-    info->can_load = 1;
-    info->data->rooms = NULL;
-    info->data->current_room = 0;
-    info->data->general_box = gtk_fixed_new();
-    gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->general_box, 0, 0);
-    //--
-    GtkWidget *box = gtk_box_new(FALSE, 10);
-    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window) - 20, -1);
-    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
-    gtk_fixed_put (GTK_FIXED (info->data->general_box), box, 10, 570);
-    gtk_widget_show (box);
-    //--Menu button
-    info->data->menu_button = gtk_button_new();
-    GtkWidget *image0 = gtk_image_new_from_file("img/a.png");
-    gtk_button_set_image(GTK_BUTTON(info->data->menu_button), image0);
-    g_signal_connect(G_OBJECT(info->data->menu_button), "clicked", G_CALLBACK(menu_callback), info);
-    gtk_box_pack_start (GTK_BOX (box), info->data->menu_button, FALSE, FALSE, 0);
-    gtk_widget_set_name(info->data->menu_button, "entry");
-    gtk_widget_show(info->data->menu_button);
-    //--
-    //--message
-    GtkWidget *fixed_message = gtk_fixed_new();
-    info->data->message_entry = gtk_entry_new ();
-    gtk_entry_set_placeholder_text(GTK_ENTRY (info->data->message_entry), "Write something");
-    gtk_entry_set_max_length(GTK_ENTRY (info->data->message_entry), 100);
-    gtk_editable_select_region(GTK_EDITABLE (info->data->message_entry),
-                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->message_entry)));
-    g_signal_connect(G_OBJECT(info->data->message_entry),"activate", G_CALLBACK(send_callback), info);
-    gtk_box_pack_start (GTK_BOX (box), fixed_message, TRUE, TRUE, 0);
-    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->message_entry, 0, 0);
-    gtk_widget_set_size_request(info->data->message_entry, 600, -1);
-    gtk_widget_set_size_request(fixed_message, 600, -1);
-    gtk_widget_set_name(info->data->message_entry, "entry");
-    gtk_widget_show(info->data->message_entry);
-    gtk_widget_show(fixed_message);
-    //--
-    //--Edit button
-    info->data->edit_button = gtk_event_box_new ();
-    gtk_widget_add_events (info->data->edit_button, GDK_BUTTON_PRESS_MASK);
-    GdkPixbuf *pixbuf0 = gdk_pixbuf_new_from_file_at_scale ("img/cancel.png", 20, 20, TRUE, NULL);
-    GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf0);
-    gtk_container_add (GTK_CONTAINER (info->data->edit_button), image);
-    gtk_widget_show(image);
-    g_signal_connect(G_OBJECT(info->data->edit_button), "button_press_event", G_CALLBACK(edit_cancel_callback), info);
-    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->edit_button, 570, 7);
-    //--
-    //--Send button
-    info->data->send_button = gtk_button_new_with_label("Send");
-    g_signal_connect(G_OBJECT(info->data->send_button), "clicked", G_CALLBACK(send_callback), info);
-    gtk_box_pack_start (GTK_BOX (box), info->data->send_button, FALSE, FALSE, 0);
-    gtk_widget_set_size_request(info->data->send_button, 75, -1);
-    gtk_widget_set_name(info->data->send_button, "entry");
-    gtk_widget_show(info->data->send_button);
-    //--
-    //--File selection
-    info->data->file_button = gtk_button_new();
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/file.png", 20, 20, TRUE, NULL);
-    GtkWidget *image1 = gtk_image_new_from_pixbuf(pixbuf);
-    gtk_button_set_image(GTK_BUTTON(info->data->file_button), image1);
-    g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info);
-    gtk_box_pack_start (GTK_BOX (box), info->data->file_button, FALSE, FALSE, 0);
-    gtk_widget_set_name(info->data->file_button, "entry");
-    gtk_widget_show(info->data->file_button);
-    //--
-    //--sticker selection
+void init_stickers (t_client_info *info, GtkWidget *box) {
     GtkWidget *menu  = gtk_menu_new ();
     DIR *dptr  = opendir("stickers");
 
@@ -597,7 +543,71 @@ void init_general (t_client_info *info) {
     gtk_box_pack_start (GTK_BOX (box), s_button, FALSE, FALSE, 0);
     gtk_widget_set_name(s_button, "entry");
     gtk_widget_show(s_button);
+}
+
+void init_general (t_client_info *info) {
+    info->can_load = 1;
+    info->data->rooms = NULL;
+    info->data->current_room = 0;
+    info->data->general_box = gtk_fixed_new();
+    gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->general_box, 0, 0);
     //--
+    GtkWidget *box = gtk_box_new(FALSE, 10);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window) - 20, -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->general_box), box, 10, 570);
+    gtk_widget_show (box);
+    //--Menu button
+    info->data->menu_button = gtk_button_new();
+    GtkWidget *image0 = gtk_image_new_from_file("img/a.png");
+    gtk_button_set_image(GTK_BUTTON(info->data->menu_button), image0);
+    g_signal_connect(G_OBJECT(info->data->menu_button), "clicked", G_CALLBACK(menu_callback), info);
+    gtk_box_pack_start (GTK_BOX (box), info->data->menu_button, FALSE, FALSE, 0);
+    gtk_widget_set_name(info->data->menu_button, "entry");
+    gtk_widget_show(info->data->menu_button);
+    //--message
+    GtkWidget *fixed_message = gtk_fixed_new();
+    info->data->message_entry = gtk_entry_new ();
+    gtk_entry_set_placeholder_text(GTK_ENTRY (info->data->message_entry), "Write something");
+    gtk_entry_set_max_length(GTK_ENTRY (info->data->message_entry), 100);
+    gtk_editable_select_region(GTK_EDITABLE (info->data->message_entry),
+                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->message_entry)));
+    g_signal_connect(G_OBJECT(info->data->message_entry),"activate", G_CALLBACK(send_callback), info);
+    gtk_box_pack_start (GTK_BOX (box), fixed_message, TRUE, TRUE, 0);
+    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->message_entry, 0, 0);
+    gtk_widget_set_size_request(info->data->message_entry, 600, -1);
+    gtk_widget_set_size_request(fixed_message, 600, -1);
+    gtk_widget_set_name(info->data->message_entry, "entry");
+    gtk_widget_show(info->data->message_entry);
+    gtk_widget_show(fixed_message);
+    //--Edit button
+    info->data->edit_button = gtk_event_box_new ();
+    gtk_widget_add_events (info->data->edit_button, GDK_BUTTON_PRESS_MASK);
+    GdkPixbuf *pixbuf0 = gdk_pixbuf_new_from_file_at_scale ("img/cancel.png", 20, 20, TRUE, NULL);
+    GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf0);
+    gtk_container_add (GTK_CONTAINER (info->data->edit_button), image);
+    gtk_widget_show(image);
+    g_signal_connect(G_OBJECT(info->data->edit_button), "button_press_event", G_CALLBACK(edit_cancel_callback), info);
+    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->edit_button, 570, 7);
+
+    //--Send button
+    info->data->send_button = gtk_button_new_with_label("Send");
+    g_signal_connect(G_OBJECT(info->data->send_button), "clicked", G_CALLBACK(send_callback), info);
+    gtk_box_pack_start (GTK_BOX (box), info->data->send_button, FALSE, FALSE, 0);
+    gtk_widget_set_size_request(info->data->send_button, 75, -1);
+    gtk_widget_set_name(info->data->send_button, "entry");
+    gtk_widget_show(info->data->send_button);
+    //--File selection
+    info->data->file_button = gtk_button_new();
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/file.png", 20, 20, TRUE, NULL);
+    GtkWidget *image1 = gtk_image_new_from_pixbuf(pixbuf);
+    gtk_button_set_image(GTK_BUTTON(info->data->file_button), image1);
+    g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info);
+    gtk_box_pack_start (GTK_BOX (box), info->data->file_button, FALSE, FALSE, 0);
+    gtk_widget_set_name(info->data->file_button, "entry");
+    gtk_widget_show(info->data->file_button);
+    //--sticker selection
+    init_stickers(info, box);
     //--notebook
     info->data->notebook = gtk_notebook_new();
     gtk_notebook_set_tab_pos(GTK_NOTEBOOK (info->data->notebook), GTK_POS_LEFT);
@@ -632,9 +642,12 @@ void init_general (t_client_info *info) {
         //--room menu
         GtkWidget *room_menu  = gtk_menu_new ();
         //--items
-        GtkWidget *leave = gtk_menu_item_new_with_label("Leave room");
-        gtk_widget_show(leave);
-        gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), leave);
+        if (id != 0) {
+            GtkWidget *leave = gtk_menu_item_new_with_label("Leave room");
+            gtk_widget_show(leave);
+            gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), leave);
+            g_signal_connect (G_OBJECT (leave), "activate", G_CALLBACK (leave_callback), data);
+        }
 
         GtkWidget *history = gtk_menu_item_new_with_label("Load history");
         gtk_widget_show(history);

@@ -90,6 +90,26 @@ static int load_user_data(void *js, int argc, char **argv, char **col_name) {
     return 0;
 }
 
+int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js) {
+    int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
+    int room_id = json_object_get_int(json_object_object_get(js, "room_id"));
+    char *command = malloc(1024);
+    const char *json_string = NULL;
+
+    (void)csl;
+    sprintf(command, "DELETE FROM room_user where user_id='%d' and room_id='%d';", user_id, room_id);
+    if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) {
+        mx_send_json_to_all_in_room(info, js);
+        json_string = json_object_to_json_string(js);
+        mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
+        mx_strdel(&command);
+    }
+    else {
+        printf("fail\n");
+    }
+    return 1;
+}
+
 int mx_load_profile (t_server_info *info, t_socket_list *csl, json_object *js) {
     int id = json_object_get_int(json_object_object_get(js, "id"));
     char *command = malloc(1024);
