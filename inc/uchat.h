@@ -241,6 +241,7 @@ typedef struct s_mes {
     t_client_info *info;
     t_room *room;
     t_message *message;
+    int user_id;
     int id;
 }               t_mes;
 
@@ -264,6 +265,10 @@ int mx_edit_message (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_load_profile (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_edit_profile (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js);
+void mx_load_profile_client(t_client_info *info, int id);
+void mx_load_user_profile(t_client_info *info, json_object *new_json);
+int mx_show_widget(GtkWidget *widget);
+int mx_destroy_widget(GtkWidget *widget);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);

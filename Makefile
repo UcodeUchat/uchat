@@ -57,6 +57,7 @@ SRC_CLIENT = main_client.c \
 	send_file_from_client.c \
 	input_from_server.c \
 	login.c \
+	load_profile.c \
 	work_with_files_list_in_client.c \
 
 # SRC_HELP = $(wildcard *.c)

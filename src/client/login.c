@@ -359,7 +359,7 @@ void edit_cancel_callback (GtkWidget *widget, GdkEventButton *event, t_client_in
     gtk_widget_hide(info->data->edit_button);
 }
 
-void load_profile(t_client_info *info, int id) {
+void mx_load_profile_client(t_client_info *info, int id) {
     json_object *new_json;
 
     new_json = json_object_new_object();
@@ -367,11 +367,12 @@ void load_profile(t_client_info *info, int id) {
     json_object_object_add(new_json, "id", json_object_new_int(id));
     const char *json_string = json_object_to_json_string(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
+    gtk_widget_hide(info->data->menu);
 }
 
 void profile_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
-    load_profile(info, info->id);
+    mx_load_profile_client(info, info->id);
 }
 
 void init_menu (t_client_info *info) {
@@ -416,24 +417,6 @@ void init_menu (t_client_info *info) {
     gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
     button = gtk_button_new_with_label("Logout");
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(logout_callback), info);
-    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
-    gtk_widget_set_size_request(button, 100, -1);
-    gtk_widget_set_name(button, "entry");
-    gtk_widget_show(button);
-    gtk_widget_show(box1);
-    box1 = gtk_box_new(FALSE, 0);
-    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
-    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
-    button = gtk_button_new_with_label("Settings");
-    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
-    gtk_widget_set_size_request(button, 100, -1);
-    gtk_widget_set_name(button, "entry");
-    gtk_widget_show(button);
-    gtk_widget_show(box1);
-    box1 = gtk_box_new(FALSE, 0);
-    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
-    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
-    button = gtk_button_new_with_label("Friends");
     gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
     gtk_widget_set_size_request(button, 100, -1);
     gtk_widget_set_name(button, "entry");
@@ -547,6 +530,7 @@ void init_stickers (t_client_info *info, GtkWidget *box) {
 }
 
 void init_general (t_client_info *info) {
+    info->data->profile = NULL;
     info->can_load = 1;
     info->data->rooms = NULL;
     info->data->current_room = 0;
