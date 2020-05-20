@@ -119,6 +119,17 @@ char *mx_curr_time(void) {
     return time_str;
 }
 
+char *mx_date_to_char(void) {
+    time_t timer;
+    struct tm *timeinfo;
+    char date[128];
+
+    time(&timer);
+    timeinfo = gmtime(&timer);
+    strftime(date, 128, "%a, %d %b %Y %H:%M:%S +0000", timeinfo);
+    return strdup(date);
+}
+
 void mx_get_input(char *buffer) {
     int read;
 

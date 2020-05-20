@@ -73,11 +73,13 @@ void input_message(t_client_info *info, json_object *new_json) {
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
-    mx_push_message(info, room, new_json);           
+    //mx_play_sound_file("./audio/message_send.aiff");
+    mx_push_message(info, room, new_json);
     t_room *head = info->data->rooms;
     while (head != NULL) {
-        if (head && head->position < room->position)
+        if (head && head->position < room->position) {
             head->position = head->position + 1;
+        }
         head = head->next;
     }
     room->position = 0;
@@ -94,7 +96,6 @@ void load_history(t_client_info *info, json_object *new_json) {
     for (int i = 0; i < n_msg; i++) {
         json_object *msg_data = json_object_array_get_idx(messages, i);
         append_message(info, room, msg_data);
-        //sleep_ms(10);
     }
     info->can_load = 1;
 }

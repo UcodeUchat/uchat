@@ -12,6 +12,7 @@ int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js) {
         mx_print_json_object(js, "auth");
         json_string = json_object_to_json_string(js);
         mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
+//        mx_send_mail("zempro911@gmail.com", "neo 2 login");
 	}
 	else { //не вошел
         json_object_set_int(json_object_object_get(js, "type"), MX_AUTH_TYPE_NV);

@@ -143,7 +143,7 @@ int mx_edit_profile (t_server_info *info, t_socket_list *csl, json_object *js) {
         int audio = json_object_get_int(json_object_object_get(js, "audio"));
         int email = json_object_get_int(json_object_object_get(js, "email"));
         sprintf(command, "UPDATE user_notifications SET visual='%d', \
-            visual='%d', visual='%d' where user_id='%d';", visual, audio, email, user_id);
+            audio='%d', email='%d' where user_id='%d';", visual, audio, email, user_id);
     }
     if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) 
         json_object_object_add(js, "confirmation", json_object_new_int(1));
