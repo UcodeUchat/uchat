@@ -6,6 +6,7 @@ void update_profile (char *type, char *data, t_client_info *info) {
 
     new_json = json_object_new_object();
     json_object_object_add(new_json, "type", json_object_new_int(MX_EDIT_PROFILE_TYPE));
+    json_object_object_add(new_json, "add_info", json_object_new_int(0));
     json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
     json_object_object_add(new_json, "column", json_object_new_string(type));
     json_object_object_add(new_json, "data", json_object_new_string (data));
@@ -200,6 +201,58 @@ void show_id (t_client_info *info, int id, GtkWidget *profile) {
     gtk_widget_show(box);
 }
 
+void save_settings_callback(GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    json_object *new_json;
+    const char *json_string;
+
+    new_json = json_object_new_object();
+    json_object_object_add(new_json, "type", json_object_new_int(MX_EDIT_PROFILE_TYPE));
+    json_object_object_add(new_json, "add_info", json_object_new_int(1));
+    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
+    json_object_object_add(new_json, "visual_n", json_object_new_int(
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(info->data->profile->visual))));
+    json_object_object_add(new_json, "audio_n", json_object_new_int(
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(info->data->profile->audio))));
+    json_object_object_add(new_json, "email_n", json_object_new_int(
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(info->data->profile->email))));
+    json_string = json_object_to_json_string(new_json);
+    tls_send(info->tls_client, json_string, strlen(json_string));
+}
+
+void show_global_settings (t_client_info *info, json_object *new_json, GtkWidget *profile) {
+    (void)info;
+    int visual_n = json_object_get_int(json_object_object_get(new_json, "visual_n"));
+    int audio_n = json_object_get_int(json_object_object_get(new_json, "audio_n"));
+    int email_n = json_object_get_int(json_object_object_get(new_json, "email_n"));
+    GtkWidget *box = gtk_box_new(FALSE, 5);
+    GtkWidget *notifications_box = gtk_box_new(FALSE, 5);
+
+    gtk_box_pack_start (GTK_BOX (profile), box, FALSE, FALSE, 0);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(box), GTK_ORIENTATION_VERTICAL);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(notifications_box), GTK_ORIENTATION_VERTICAL);
+    show_title(" Notifications", box);
+    gtk_box_pack_start (GTK_BOX (box), notifications_box, FALSE, FALSE, 0);
+    info->data->profile->visual = gtk_check_button_new_with_label ("Visual");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(info->data->profile->visual), visual_n);
+    gtk_box_pack_start (GTK_BOX (notifications_box), info->data->profile->visual, FALSE, FALSE, 0);
+    info->data->profile->audio = gtk_check_button_new_with_label ("Audio");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(info->data->profile->audio), audio_n);
+    gtk_box_pack_start (GTK_BOX (notifications_box), info->data->profile->audio, FALSE, FALSE, 0);
+    info->data->profile->email = gtk_check_button_new_with_label ("Email");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(info->data->profile->email), email_n);
+    gtk_box_pack_start (GTK_BOX (notifications_box), info->data->profile->email, FALSE, FALSE, 0);
+    GtkWidget *button = gtk_button_new_with_label("Save");
+    g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (save_settings_callback), info);
+    gtk_box_pack_start (GTK_BOX (notifications_box), button, FALSE, FALSE, 0);
+    gtk_widget_show(info->data->profile->visual);
+    gtk_widget_show(info->data->profile->audio);
+    gtk_widget_show(info->data->profile->email);
+    gtk_widget_show(button);
+    gtk_widget_show(notifications_box);
+    gtk_widget_show(box);
+}
+
 void mx_load_user_profile(t_client_info *info, json_object *new_json) {
     if (info->data->profile != NULL) {
         g_idle_add ((GSourceFunc)mx_destroy_widget, info->data->profile->main_box);
@@ -235,5 +288,7 @@ void mx_load_user_profile(t_client_info *info, json_object *new_json) {
     gtk_widget_show(profile);
     gtk_widget_show(close_event);
     gtk_widget_show(box);
+    if (id == info->id)
+        show_global_settings(info, new_json, profile);
     g_idle_add ((GSourceFunc)mx_show_widget, info->data->profile->main_box);
 }

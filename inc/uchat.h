@@ -86,13 +86,16 @@ typedef struct s_reg {
 typedef struct s_prof {
     GtkWidget *main_box;
     GtkWidget *login_entry;
+    GtkWidget *id_entry;
     GtkWidget *email_entry;
     GtkWidget *email_button1;
     GtkWidget *email_button2;
     GtkWidget *name_entry;
     GtkWidget *name_button1;
     GtkWidget *name_button2;
-    GtkWidget *id_entry;
+    GtkWidget *visual;
+    GtkWidget *audio;
+    GtkWidget *email;
 }              t_prof;
 
 typedef struct s_data {

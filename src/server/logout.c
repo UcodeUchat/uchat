@@ -128,13 +128,23 @@ int mx_load_profile (t_server_info *info, t_socket_list *csl, json_object *js) {
 }
 
 int mx_edit_profile (t_server_info *info, t_socket_list *csl, json_object *js) {
-    int id = json_object_get_int(json_object_object_get(js, "user_id"));
-    const char *column = json_object_get_string(json_object_object_get(js, "column"));
-    const char *data = json_object_get_string(json_object_object_get(js, "data"));
+    int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
+    int add_info = json_object_get_int(json_object_object_get(js, "add_info"));
     char *command = malloc(1024);
     const char *json_string = NULL;
 
-    sprintf(command, "UPDATE users SET %s='%s' where id='%d';", column, data, id);
+    if (!add_info) {
+        const char *column = json_object_get_string(json_object_object_get(js, "column"));
+        const char *data = json_object_get_string(json_object_object_get(js, "data"));
+        sprintf(command, "UPDATE users SET %s='%s' where id='%d';", column, data, user_id);
+    }
+    else {
+        int visual = json_object_get_int(json_object_object_get(js, "visual"));
+        int audio = json_object_get_int(json_object_object_get(js, "audio"));
+        int email = json_object_get_int(json_object_object_get(js, "email"));
+        sprintf(command, "UPDATE user_notifications SET visual='%d', \
+            visual='%d', visual='%d' where user_id='%d';", visual, audio, email, user_id);
+    }
     if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) 
         json_object_object_add(js, "confirmation", json_object_new_int(1));
     else 
