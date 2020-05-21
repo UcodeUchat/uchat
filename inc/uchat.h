@@ -226,6 +226,7 @@ typedef struct s_data {
     GtkWidget *stop;
     GtkWidget *menu;
     GtkWidget *edit_button;
+    GtkWidget *search_entry;
     t_room *rooms;
     t_reg *registration;
     t_prof *profile;
