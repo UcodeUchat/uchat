@@ -15,6 +15,15 @@
 #define NUM_SECONDS     (4)
 #define BUFFER_LEN    512
 
+static void print_s_info(SF_INFO s_info) {
+    printf ("frames = %lld\n", s_info.frames);
+    printf ("samplerate = %d\n", s_info.samplerate);
+    printf ("channels = %d\n", s_info.channels);
+    printf ("format = %d\n", s_info.format);
+    printf ("sections = %d\n", s_info.sections);
+    printf ("seekable = %d\n", s_info.seekable);
+
+}
 
 
 static int init_stream(PaStream** stream, SF_INFO s_info) {
@@ -60,9 +69,11 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
     if (!a_file) {
         printf("error open =%d\n", sf_error(a_file));
 //        printf("error str open =%s\n", sf_error_number(a_file));
+        print_s_info(s_info);
         Pa_Terminate();
         return -1;
     }
+    print_s_info(s_info);
 //    if (s_info.channels > 1) {
 //        return -1;
 //    }

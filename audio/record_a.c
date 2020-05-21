@@ -12,7 +12,7 @@
 #define SAMPLE_RATE       (44100)  // в 1 секунде записи содержится 44100 семплов.
 #define FRAMES_PER_BUFFER   (1024)
 #define SAMPLE_SILENCE  (0.0f)
-#define NUM_SECONDS     (30)
+#define NUM_SECONDS     (2)
 #define BUFFER_LEN      1024
 
 typedef struct s_audio{
@@ -32,6 +32,7 @@ typedef struct s_a_snippet{
 static t_audio * init_audio_data() {
     t_audio *data = malloc(sizeof(t_audio));
     data->format_type = paFloat32;  //r
+//    data->format_type = paFloat32;  //r
     data->number_channels = 0;   //remove
     data->sample_rate = SAMPLE_RATE;
     data->size = 0;
@@ -57,16 +58,21 @@ int mx_exit_stream(t_audio *data, PaError err) {
 long mx_save_audio(t_audio *data) {
     uint8_t err = SF_ERR_NO_ERROR;
     SF_INFO sfinfo ={
-            .channels = data->number_channels,
+//            .channels = data->number_channels,
+            .channels = 1,
             .samplerate = data->sample_rate,
-            .format = SF_FORMAT_AIFF | SF_FORMAT_FLOAT
+//            .format = SF_FORMAT_AIFF | SF_FORMAT_FLOAT
+            .format = SF_FORMAT_FLAC | SF_FORMAT_PCM_16
+
     };
+    sfinfo.format = (sfinfo.format & ~SF_FORMAT_TYPEMASK) | SF_FORMAT_FLAC;
+
     char file_name[100];
-    snprintf(file_name, 100, "rec2_massage:%d.aif", rand());  //rand -> replace by message id
+    snprintf(file_name, 100, "rec3_massage:%d.flac", rand());  //rand -> replace by message id
     printf("start save audio\n");
     SNDFILE *outfile = sf_open(file_name, SFM_WRITE, &sfinfo);
     if (!outfile) {
-        printf("error outfile =%d\n", sf_error(outfile));
+        printf("error open outfile =%d\n", sf_error(outfile));
         return -1;
     }
     long wr = sf_writef_float(outfile, data->rec_samples, data->size / sizeof(float));
@@ -172,7 +178,8 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
     printf( "Num channels = %d.\n", numChannels );
 
     data->number_channels = numChannels;
-    input_parameters.channelCount = numChannels;
+//    input_parameters.channelCount = numChannels;
+    input_parameters.channelCount = 1;
     input_parameters.sampleFormat = paFloat32;
     input_parameters.suggestedLatency = inputInfo->defaultLowInputLatency;
 //            Pa_GetDeviceInfo(input_parameters.device)->defaultLowInputLatency;
