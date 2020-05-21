@@ -226,6 +226,7 @@ typedef struct s_data {
     GtkWidget *stop;
     GtkWidget *menu;
     GtkWidget *edit_button;
+    GtkWidget *search_box;
     GtkWidget *search_entry;
     t_room *rooms;
     t_reg *registration;
@@ -238,6 +239,8 @@ typedef struct  s_client_info {  //struct client
     char *login;
     char *password;
     int id;
+    int visual;
+    int audio;
     int argc;
     char **argv;
     char *ip;
@@ -293,7 +296,6 @@ typedef struct  s_server_info {  // struct server
 #define MX_MAX_USERS_IN_ROOM 1024
 #define MX_MSG_TYPE 1
 #define MX_FILE_SEND_TYPE 2
-#define MX_FILE_DOWNLOAD_TYPE 12
 #define MX_AUTH_TYPE 3
 #define MX_AUTH_TYPE_V 4
 #define MX_AUTH_TYPE_NV 5
@@ -303,10 +305,12 @@ typedef struct  s_server_info {  // struct server
 #define MX_LOGOUT_TYPE 9
 #define MX_LOAD_MORE_TYPE 10
 #define MX_DELETE_MESSAGE_TYPE 11
+#define MX_FILE_DOWNLOAD_TYPE 12
 #define MX_EDIT_MESSAGE_TYPE 13
 #define MX_LOAD_PROFILE_TYPE 14
 #define MX_EDIT_PROFILE_TYPE 15
 #define MX_LEAVE_ROOM_TYPE 16
+#define MX_SEARCH_ALL_TYPE 17
 #define MX_PACKAGE_SIZE sizeof(t_package)
 
 #define MX_MAX_MSG_SIZE 200
@@ -380,12 +384,7 @@ int mx_edit_message (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_load_profile (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_edit_profile (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js);
-void mx_load_profile_client(t_client_info *info, int id);
-void mx_load_user_profile(t_client_info *info, json_object *new_json);
-int mx_show_widget(GtkWidget *widget);
-int mx_destroy_widget(GtkWidget *widget);
-void mx_push_message(t_client_info *info, t_room *room, json_object *new_json);
-t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new_json, int order);
+int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);
@@ -432,6 +431,12 @@ int mx_send_message_from_client(t_client_info *info, t_package *package, char *m
 void sleep_ms (int milliseconds);
 t_message *mx_find_message(t_message *messages, int id);
 t_room *mx_find_room(t_room *rooms, int id);
+void mx_load_profile_client(t_client_info *info, int id);
+void mx_load_user_profile(t_client_info *info, json_object *new_json);
+int mx_show_widget(GtkWidget *widget);
+int mx_destroy_widget(GtkWidget *widget);
+void mx_push_message(t_client_info *info, t_room *room, json_object *new_json);
+t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new_json, int order);
 
 void mx_send_file_from_client(t_client_info *info);
 int mx_load_file(t_mes *msg);

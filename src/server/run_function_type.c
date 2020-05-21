@@ -5,15 +5,10 @@ void mx_send_json_to_all_in_room(t_server_info *info, json_object *json_obj) {
         json_object_get_int(json_object_object_get(json_obj, "room_id")));
     t_socket_list *tls_list = NULL;
     const char *json_string = json_object_to_json_string(json_obj);
-    // int type = json_object_get_int(json_object_object_get(json_obj, "type"));
 
     for (int i = 0; i < info->wdb->i; i++) {
         tls_list = mx_find_socket_elem(info->socket_list, sockets_online[i]);
         if (tls_list) {
-            //info->wdb->user_id[i];
-            // if (type == MX_MSG_TYPE) {
-            //     mx_send_mail("maksimlibovich@ukr.net", "You have new message in UcodeChat.");
-            // }
             mx_save_send(&tls_list->mutex, tls_list->tls_socket, json_string, strlen(json_string));
         }
     }
@@ -47,5 +42,7 @@ int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
         return_value = mx_edit_profile(info, csl, csl->obj);
     else if (type == MX_LEAVE_ROOM_TYPE)
         return_value = mx_leave_room(info, csl, csl->obj);
+    else if (type == MX_SEARCH_ALL_TYPE)
+        return_value = mx_search_all(info, csl, csl->obj);
     return return_value;
 }

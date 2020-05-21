@@ -164,4 +164,7 @@ menuitem:hover {
 	background-color: LightSalmon;
 }
 
+#search_exit {
+	background: rgba(0, 0, 0, 0.5);
+}
 

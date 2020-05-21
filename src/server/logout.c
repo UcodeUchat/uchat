@@ -96,7 +96,6 @@ int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js) {
     char *command = malloc(1024);
     const char *json_string = NULL;
 
-    (void)csl;
     sprintf(command, "DELETE FROM room_user where user_id='%d' and room_id='%d';", user_id, room_id);
     if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) {
         mx_send_json_to_all_in_room(info, js);
@@ -107,6 +106,45 @@ int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js) {
     else {
         printf("fail\n");
     }
+    return 1;
+}
+
+static int search(void *array, int argc, char **argv, char **col_name) {
+    (void)argc;
+    (void)col_name;
+    if (argv[0]) {
+        json_object *room = json_object_new_object();
+        json_object *id = json_object_new_int(atoi(argv[0]));
+        json_object *name = json_object_new_string(argv[1]);
+        json_object *acces = json_object_new_int(atoi(argv[2]));
+
+        json_object_object_add(room, "id", id);
+        json_object_object_add(room, "name", name);
+        json_object_object_add(room, "acces", acces);
+        json_object_array_add((struct json_object *)array, room);
+    }
+    return 0;
+}
+
+int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js) {
+    //int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
+    const char *query = json_object_get_string(json_object_object_get(js, "query"));
+    char *command = malloc(1024);
+    const char *json_string = NULL;
+    json_object *array = json_object_new_array();
+
+    json_object_object_add(js, "rooms", array);
+    if (strcmp(query, "") == 0)
+        sprintf(command, "SELECT * FROM rooms;");
+    else
+        sprintf(command, "SELECT * FROM rooms WHERE name LIKE '%%%s%%';", query);
+    if (sqlite3_exec(info->db, command, search, array, NULL) == SQLITE_OK) {
+        json_string = json_object_to_json_string(js);
+        mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
+    }
+    else
+        printf("fail\n");
+    mx_strdel(&command);
     return 1;
 }
 
@@ -139,9 +177,9 @@ int mx_edit_profile (t_server_info *info, t_socket_list *csl, json_object *js) {
         sprintf(command, "UPDATE users SET %s='%s' where id='%d';", column, data, user_id);
     }
     else {
-        int visual = json_object_get_int(json_object_object_get(js, "visual"));
-        int audio = json_object_get_int(json_object_object_get(js, "audio"));
-        int email = json_object_get_int(json_object_object_get(js, "email"));
+        int visual = json_object_get_int(json_object_object_get(js, "visual_n"));
+        int audio = json_object_get_int(json_object_object_get(js, "audio_n"));
+        int email = json_object_get_int(json_object_object_get(js, "email_n"));
         sprintf(command, "UPDATE user_notifications SET visual='%d', \
             audio='%d', email='%d' where user_id='%d';", visual, audio, email, user_id);
     }

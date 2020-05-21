@@ -209,7 +209,7 @@ void init_reg(t_client_info *info) {
     gtk_widget_show(info->data->registration->stop);
     //--
     gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->login_entry), 50);
-    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->login_entry), "Write your login");
+    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->login_entry), "Write your login(6+ chars)");
     gtk_editable_select_region (GTK_EDITABLE (info->data->registration->login_entry),
                                 0, gtk_entry_get_text_length (GTK_ENTRY (info->data->registration->login_entry)));
     GtkWidget *box = gtk_box_new(FALSE, 0);
@@ -223,7 +223,7 @@ void init_reg(t_client_info *info) {
 
     info->data->registration->password_entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->password_entry), 50);
-    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->password_entry), "Write your password");
+    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->password_entry), "Write your password(6+ chars)");
     gtk_editable_select_region (GTK_EDITABLE (info->data->registration->password_entry),
                                 0, gtk_entry_get_text_length (GTK_ENTRY (info->data->registration->password_entry)));
     box = gtk_box_new(FALSE, 0);
@@ -297,7 +297,7 @@ void logout(t_client_info *info) {
 void scroll_callback (GtkWidget *widget, t_all *data) {
     (void)widget;
     if (gtk_adjustment_get_value(data->room->Adjust) == 
-        gtk_adjustment_get_lower(data->room->Adjust) && data->info->can_load == 1) {
+        gtk_adjustment_get_lower(data->room->Adjust) && data->info->can_load == 1 && data->room->messages != NULL) {
         json_object  *new_json = json_object_new_object();
 
         data->info->can_load = 0;
@@ -377,17 +377,56 @@ void profile_callback (GtkWidget *widget, t_client_info *info) {
 
 void search_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
-    printf("%s\n", (char *)gtk_entry_get_text(GTK_ENTRY(info->data->search_entry)));
-    // json_object *new_json;
+    json_object *new_json;
 
-    // new_json = json_object_new_object();
-    // json_object_object_add(new_json, "type", json_object_new_int(MX_LOAD_PROFILE_TYPE));
-    // json_object_object_add(new_json, "id", json_object_new_int(id));
-    // const char *json_string = json_object_to_json_string(new_json);
-    // tls_send(info->tls_client, json_string, strlen(json_string));
-    gtk_widget_hide(info->data->menu);
+    gtk_widget_hide(info->data->search_box);
+    new_json = json_object_new_object();
+    json_object_object_add(new_json, "type", json_object_new_int(MX_SEARCH_ALL_TYPE));
+    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
+    json_object_object_add(new_json, "query", json_object_new_string 
+                            (gtk_entry_get_text(GTK_ENTRY(info->data->search_entry))));
+    const char *json_string = json_object_to_json_string(new_json);
+    tls_send(info->tls_client, json_string, strlen(json_string));
+    gtk_entry_set_text(GTK_ENTRY(info->data->search_entry), "");
 }
 
+void show_search_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    gtk_widget_show_all(info->data->search_box);
+}
+
+void close_search_callback (GtkWidget *widget, t_client_info *info) {
+    (void)info;
+    gtk_widget_hide(widget);
+}
+
+void init_search (t_client_info *info) { 
+    info->data->search_box = gtk_event_box_new();
+    gtk_widget_add_events (info->data->search_box, GDK_BUTTON_PRESS_MASK);
+    g_signal_connect (G_OBJECT (info->data->search_box), "button_press_event", G_CALLBACK (close_search_callback), info);
+    gtk_widget_set_name (info->data->search_box, "search_exit");
+    gtk_widget_set_size_request(info->data->search_box, 
+                            gtk_widget_get_allocated_width (info->data->window), 
+                            gtk_widget_get_allocated_height (info->data->window));
+    gtk_fixed_put(GTK_FIXED(info->data->general_box),
+                    info->data->search_box, 0, 0);
+    GtkWidget *v_box = gtk_box_new(FALSE, 0);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(v_box), GTK_ORIENTATION_VERTICAL);
+    gtk_widget_set_valign (v_box, GTK_ALIGN_CENTER);
+    gtk_container_add(GTK_CONTAINER(info->data->search_box), v_box);
+    GtkWidget *h_box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (h_box, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (v_box), h_box, FALSE, FALSE, 0);  
+    info->data->search_entry = gtk_entry_new ();
+    gtk_widget_set_size_request(info->data->search_entry, 300, 45);
+    gtk_entry_set_max_length (GTK_ENTRY (info->data->search_entry), 50);
+    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->search_entry), "Usearch");
+    gtk_editable_select_region (GTK_EDITABLE (info->data->search_entry),
+                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->search_entry)));
+    gtk_box_pack_start (GTK_BOX (h_box), info->data->search_entry, FALSE, FALSE, 0);
+    gtk_widget_set_name(info->data->search_entry, "entry");
+    g_signal_connect(G_OBJECT(info->data->search_entry),"activate", G_CALLBACK(search_callback), info);
+}
 
 void init_menu (t_client_info *info) {
     info->data->menu = gtk_box_new(FALSE, 0);
@@ -396,7 +435,7 @@ void init_menu (t_client_info *info) {
                                 gtk_widget_get_allocated_height (info->data->window));
     GtkWidget *main_box = gtk_event_box_new();
     gtk_box_pack_start (GTK_BOX (info->data->menu), main_box, FALSE, FALSE, 0);
-    gtk_widget_set_size_request(main_box, 235, -1);
+    gtk_widget_set_size_request(main_box, 150, -1);
     gtk_widget_set_name (main_box, "menu_main");
     
     GtkWidget *fixed = gtk_fixed_new();
@@ -442,26 +481,6 @@ void init_menu (t_client_info *info) {
     button = gtk_button_new_with_label("Blacklist");
     gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
     gtk_widget_set_size_request(button, 100, -1);
-    gtk_widget_set_name(button, "entry");
-    gtk_widget_show(button);
-    gtk_widget_show(box1);
-    box1 = gtk_box_new(FALSE, 5);
-    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
-    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
-    info->data->search_entry = gtk_entry_new ();
-    gtk_entry_set_max_length (GTK_ENTRY (info->data->search_entry), 50);
-    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->search_entry), "Anything you want");
-    gtk_editable_select_region (GTK_EDITABLE (info->data->search_entry),
-                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->search_entry)));
-    gtk_box_pack_start (GTK_BOX (box1), info->data->search_entry, TRUE, FALSE, 0);
-    gtk_widget_set_name(info->data->search_entry, "entry");
-    gtk_widget_show(info->data->search_entry);
-    button = gtk_button_new();
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/search.png", 20, 20, TRUE, NULL);
-    GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
-    gtk_button_set_image(GTK_BUTTON(button), image);
-    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(search_callback), info);
-    gtk_box_pack_start (GTK_BOX (box1), button, FALSE, FALSE, 0);
     gtk_widget_set_name(button, "entry");
     gtk_widget_show(button);
     gtk_widget_show(box1);
@@ -578,8 +597,8 @@ void init_general (t_client_info *info) {
     gtk_widget_show (box);
     //--Menu button
     info->data->menu_button = gtk_button_new();
-    GtkWidget *image0 = gtk_image_new_from_file("img/a.png");
-    gtk_button_set_image(GTK_BUTTON(info->data->menu_button), image0);
+    GtkWidget *image = gtk_image_new_from_file("img/a.png");
+    gtk_button_set_image(GTK_BUTTON(info->data->menu_button), image);
     g_signal_connect(G_OBJECT(info->data->menu_button), "clicked", G_CALLBACK(menu_callback), info);
     gtk_box_pack_start (GTK_BOX (box), info->data->menu_button, FALSE, FALSE, 0);
     gtk_widget_set_name(info->data->menu_button, "entry");
@@ -594,20 +613,19 @@ void init_general (t_client_info *info) {
     g_signal_connect(G_OBJECT(info->data->message_entry),"activate", G_CALLBACK(send_callback), info);
     gtk_box_pack_start (GTK_BOX (box), fixed_message, TRUE, TRUE, 0);
     gtk_fixed_put(GTK_FIXED(fixed_message), info->data->message_entry, 0, 0);
-    gtk_widget_set_size_request(info->data->message_entry, 600, -1);
-    gtk_widget_set_size_request(fixed_message, 600, -1);
+    gtk_widget_set_size_request(info->data->message_entry, 700, -1);
     gtk_widget_set_name(info->data->message_entry, "entry");
     gtk_widget_show(info->data->message_entry);
     gtk_widget_show(fixed_message);
     //--Edit button
     info->data->edit_button = gtk_event_box_new ();
     gtk_widget_add_events (info->data->edit_button, GDK_BUTTON_PRESS_MASK);
-    GdkPixbuf *pixbuf0 = gdk_pixbuf_new_from_file_at_scale ("img/cancel.png", 20, 20, TRUE, NULL);
-    GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf0);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/cancel.png", 20, 20, TRUE, NULL);
+    image = gtk_image_new_from_pixbuf(pixbuf);
     gtk_container_add (GTK_CONTAINER (info->data->edit_button), image);
     gtk_widget_show(image);
     g_signal_connect(G_OBJECT(info->data->edit_button), "button_press_event", G_CALLBACK(edit_cancel_callback), info);
-    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->edit_button, 570, 7);
+    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->edit_button, 670, 7);
 
     //--Send button
     info->data->send_button = gtk_button_new_with_label("Send");
@@ -616,11 +634,20 @@ void init_general (t_client_info *info) {
     gtk_widget_set_size_request(info->data->send_button, 75, -1);
     gtk_widget_set_name(info->data->send_button, "entry");
     gtk_widget_show(info->data->send_button);
+    //--SEARCH
+    GtkWidget *search_button = gtk_button_new();
+    pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/search.png", 20, 20, TRUE, NULL);
+    image = gtk_image_new_from_pixbuf(pixbuf);
+    gtk_button_set_image(GTK_BUTTON(search_button), image);
+    g_signal_connect(G_OBJECT(search_button), "clicked", G_CALLBACK(show_search_callback), info);
+    gtk_box_pack_start (GTK_BOX (box), search_button, FALSE, FALSE, 0);
+    gtk_widget_set_name(search_button, "entry");
+    gtk_widget_show(search_button);
     //--File selection
     info->data->file_button = gtk_button_new();
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/file.png", 20, 20, TRUE, NULL);
-    GtkWidget *image1 = gtk_image_new_from_pixbuf(pixbuf);
-    gtk_button_set_image(GTK_BUTTON(info->data->file_button), image1);
+    pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/file.png", 20, 20, TRUE, NULL);
+    image = gtk_image_new_from_pixbuf(pixbuf);
+    gtk_button_set_image(GTK_BUTTON(info->data->file_button), image);
     g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info);
     gtk_box_pack_start (GTK_BOX (box), info->data->file_button, FALSE, FALSE, 0);
     gtk_widget_set_name(info->data->file_button, "entry");
@@ -686,7 +713,6 @@ void init_general (t_client_info *info) {
 
         room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
         gtk_box_pack_start (GTK_BOX (room->room_box), room->scrolled_window, TRUE, TRUE, 0);
-        // gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 1);
         gtk_widget_show(room->scrolled_window);
 
         room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
@@ -759,6 +785,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
     else if(info->auth_client == 1) {
         init_general(info);
         init_menu(info);
+        init_search (info);
         //--
     }  
 }

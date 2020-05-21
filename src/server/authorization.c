@@ -1,5 +1,36 @@
 #include "uchat.h"
 
+
+static int search_email(void *data, int argc, char **argv, char **col_name) {
+    (void)col_name;
+    (void)argc;
+    char **email = (char **)data;
+    if (argv[0]) {
+        if (mx_atoi(argv[0]) == 1 && argv[1] != NULL) {
+            *email = strdup(argv[1]);
+            return 0;
+        } 
+    }
+    return 1;
+}
+
+void email_notify(t_server_info *i, json_object *js) {
+    int id = json_object_get_int(json_object_object_get(js, "user_id"));
+    char *command = malloc(1024);
+    char *email = NULL;
+    sprintf(command, "SELECT user_notifications.email, users.email FROM user_notifications, users \
+            WHERE  user_notifications.user_id='%d' and users.id='%d'", id, id);
+    if (sqlite3_exec(i->db, command, search_email, &email, 0) == SQLITE_OK) {
+        printf("%s\n", email);
+        mx_send_mail(email, "Someone logged in your account in UcodeChat");
+        mx_strdel(&email);
+    }
+    else {
+        printf("fail\n");
+    }
+    mx_strdel(&command); 
+}
+
 int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js) {
     const char *json_string = NULL;
     int valid = mx_check_client(i, js, csl->socket);
@@ -12,18 +43,13 @@ int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js) {
         mx_print_json_object(js, "auth");
         json_string = json_object_to_json_string(js);
         mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
-//        mx_send_mail("zempro911@gmail.com", "neo 2 login");
+        email_notify(i, js);        
 	}
 	else { //не вошел
         json_object_set_int(json_object_object_get(js, "type"), MX_AUTH_TYPE_NV);
         json_string = json_object_to_json_string(js);
         mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
 	}
-    //получаем массив сокетов, которые в сети
-    // if (p->type == MX_AUTH_TYPE_V){
-    //     int *array = mx_get_users_sock_in_room(&i, 0);
-    //     (void)array;
-    // }
 	return 1;
 }
 

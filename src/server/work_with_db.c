@@ -5,8 +5,11 @@ static int check_data(void *js, int argc, char **argv, char **col_name) {
     (void)col_name;
     if (argv[0] && strcmp(argv[0], json_object_get_string(json_object_object_get(js, "password"))) == 0) {
         // json_object_set_int(json_object_object_get(js, "user_id"), atoi(argv[1]));
-        struct json_object *t = json_object_new_int(atoi(argv[1]));
-        json_object_object_add((struct json_object*) js, "user_id", t);
+
+        //struct json_object *t = json_object_new_int(atoi(argv[1]));
+        json_object_object_add((struct json_object*) js, "user_id", json_object_new_int(atoi(argv[1])));
+        json_object_object_add((struct json_object*) js, "visual", json_object_new_int(atoi(argv[2])));
+        json_object_object_add((struct json_object*) js, "audio", json_object_new_int(atoi(argv[3])));
         return 0;
     }
     return 1;
@@ -25,7 +28,8 @@ static int check_socket(void *rep, int argc, char **argv, char **col_name) {
 int mx_sign_in(t_server_info *i, json_object *js, int sock) {
     char *command = malloc(1024);
 
-    sprintf(command, "SELECT password, id FROM users WHERE login='%s'", \
+    sprintf(command, "SELECT password, users.id, visual, audio FROM users, user_notifications WHERE users.login='%s' \
+        and user_notifications.user_id=users.id", \
         json_object_get_string(json_object_object_get(js, "login")));
     if (sqlite3_exec(i->db, command, check_data, js, 0) != SQLITE_OK)
         return -1;
