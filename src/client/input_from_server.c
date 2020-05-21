@@ -132,11 +132,15 @@ void edit_message(t_client_info *info, json_object *new_json) {
 void input_authentification(t_client_info *info, json_object *new_json) {
     int type = json_object_get_int(json_object_object_get(new_json, "type"));
     int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
+    int visual = json_object_get_int(json_object_object_get(new_json, "visual"));
+    int audio = json_object_get_int(json_object_object_get(new_json, "audio"));
 
     if ((*info).auth_client == 0){
         fprintf(stderr, "ANSWER = [%d]\n", type);
         if (type == 4) {
             info->id = user_id;
+            info->visual = visual;
+            info->audio = audio;
             (*info).auth_client = 1;
             json_object_deep_copy(json_object_object_get(new_json, "rooms"), &info->rooms, NULL);
         }
@@ -205,6 +209,16 @@ void leave_room(t_client_info *info, json_object *new_json) {
     }
 }
 
+void edit_profile(t_client_info *info, json_object *new_json) {
+    int confirmation = json_object_get_int(json_object_object_get(new_json, "confirmation"));
+
+    if (confirmation) {
+        info->audio = json_object_get_int(json_object_object_get(new_json, "audio"));
+        info->visual = json_object_get_int(json_object_object_get(new_json, "visual"));
+    }
+}
+
+
 int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
     int type = json_object_get_int(json_object_object_get(obj, "type"));
 
@@ -226,6 +240,8 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
         mx_load_user_profile(info, obj);
     else if (type == MX_LEAVE_ROOM_TYPE)
         leave_room(info, obj);
+    else if (type == MX_EDIT_PROFILE_TYPE)
+        edit_profile(info, obj);
     return 0;
 }
 

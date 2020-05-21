@@ -139,9 +139,9 @@ int mx_edit_profile (t_server_info *info, t_socket_list *csl, json_object *js) {
         sprintf(command, "UPDATE users SET %s='%s' where id='%d';", column, data, user_id);
     }
     else {
-        int visual = json_object_get_int(json_object_object_get(js, "visual"));
-        int audio = json_object_get_int(json_object_object_get(js, "audio"));
-        int email = json_object_get_int(json_object_object_get(js, "email"));
+        int visual = json_object_get_int(json_object_object_get(js, "visual_n"));
+        int audio = json_object_get_int(json_object_object_get(js, "audio_n"));
+        int email = json_object_get_int(json_object_object_get(js, "email_n"));
         sprintf(command, "UPDATE user_notifications SET visual='%d', \
             audio='%d', email='%d' where user_id='%d';", visual, audio, email, user_id);
     }

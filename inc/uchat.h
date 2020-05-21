@@ -237,6 +237,8 @@ typedef struct  s_client_info {  //struct client
     char *login;
     char *password;
     int id;
+    int visual;
+    int audio;
     int argc;
     char **argv;
     char *ip;

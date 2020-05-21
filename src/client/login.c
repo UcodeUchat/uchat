@@ -209,7 +209,7 @@ void init_reg(t_client_info *info) {
     gtk_widget_show(info->data->registration->stop);
     //--
     gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->login_entry), 50);
-    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->login_entry), "Write your login");
+    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->login_entry), "Write your login(6+ chars)");
     gtk_editable_select_region (GTK_EDITABLE (info->data->registration->login_entry),
                                 0, gtk_entry_get_text_length (GTK_ENTRY (info->data->registration->login_entry)));
     GtkWidget *box = gtk_box_new(FALSE, 0);
@@ -223,7 +223,7 @@ void init_reg(t_client_info *info) {
 
     info->data->registration->password_entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->password_entry), 50);
-    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->password_entry), "Write your password");
+    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->password_entry), "Write your password(6+ chars)");
     gtk_editable_select_region (GTK_EDITABLE (info->data->registration->password_entry),
                                 0, gtk_entry_get_text_length (GTK_ENTRY (info->data->registration->password_entry)));
     box = gtk_box_new(FALSE, 0);
@@ -297,7 +297,7 @@ void logout(t_client_info *info) {
 void scroll_callback (GtkWidget *widget, t_all *data) {
     (void)widget;
     if (gtk_adjustment_get_value(data->room->Adjust) == 
-        gtk_adjustment_get_lower(data->room->Adjust) && data->info->can_load == 1) {
+        gtk_adjustment_get_lower(data->room->Adjust) && data->info->can_load == 1 && data->room->messages != NULL) {
         json_object  *new_json = json_object_new_object();
 
         data->info->can_load = 0;
