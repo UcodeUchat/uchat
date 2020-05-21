@@ -22,7 +22,7 @@ void email_notify(t_server_info *i, json_object *js) {
             WHERE  user_notifications.user_id='%d' and users.id='%d'", id, id);
     if (sqlite3_exec(i->db, command, search_email, &email, 0) == SQLITE_OK) {
         printf("%s\n", email);
-        mx_send_mail(email, "Someone logged in your account in UcodeChat");
+        mx_send_mail(email, "Someone logged in your account in Uchat");
         mx_strdel(&email);
     }
     else {

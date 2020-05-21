@@ -150,7 +150,7 @@
 #define NUM_SECONDS     (5)
 #define BUFFER_LEN      1024
 
-typedef struct s_audio{
+typedef struct s_audio {
     uint16_t format_type;
     uint8_t number_channels;
     uint32_t sample_rate;
@@ -158,11 +158,18 @@ typedef struct s_audio{
     float *rec_samples;
 }               t_audio;
 
-typedef struct s_a_snippet{
+typedef struct s_a_snippet {
     float *snippet;
     size_t size;
 }           t_a_snippet;
 
+typedef struct s_mail {
+    char *hostname;
+    char *sender;
+    char *receiver;
+    char *subject;
+    char *message;
+}           t_mail;
 
 typedef struct s_message {
     int id;
@@ -457,7 +464,17 @@ int mx_get_input2(char *buffer);
 void mx_report_tls(struct tls * tls_ctx, char * host);
 void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
 char *mx_date_to_char(void);
-void *mx_send_mail(char *receiver, void *mess);
+
+// send mail
+void *mx_send_mail(char *receiver, char *message);
+void mx_send_format(int socket, const char *text);
+void mx_send_format_tls(struct tls *tls, const char *text, ...);
+void mx_init_struct_mail(t_mail *mail, char *receiver, char *message);
+int mx_connect_to_server(const char *hostname, const char *port);
+struct tls *mx_create_tls(void);
+int mx_check_response(const char *response);
+int mx_wait_on_response(int socket, struct tls *tls, int reply_code);
+
 // crypto funcs
 // char *mx_encrypt_EVP(char *str);
 char *mx_strhash(const char *to_hash);

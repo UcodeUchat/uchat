@@ -63,7 +63,9 @@ SRC_SERVER = main_server.c \
 	list_room.c \
 	logout.c \
 	functions_for_server.c \
-	send_mail_notification.c
+	send_mail_notification.c \
+	send_mail_notification2.c \
+	send_mail_notification3.c
 
 SRC_CLIENT = main_client.c \
 	start_client.c \
@@ -101,11 +103,11 @@ SQLFLAGS = -lsqlite3
 
 all: install
 
-server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX)  #$(LIBMX)
+server: $(NAME_S) #$(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX)  #$(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
 
-	@make -sC $(LJSOND)
+#	@make -sC $(LJSOND)
 	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS) $(TLSFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
@@ -156,7 +158,7 @@ $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 #$(LIBRESSL_TLSX): $(LIBRESSLD_TLSA)
 #	@make -sC $(LIBRESSLD)
 
-client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
+client: $(NAME_C) #$(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
