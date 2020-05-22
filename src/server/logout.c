@@ -144,7 +144,7 @@ int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js) {
     return 1;
 }
 
-static int search(void *array, int argc, char **argv, char **col_name) {
+static int search_rooms(void *array, int argc, char **argv, char **col_name) {
     (void)argc;
     (void)col_name;
     if (argv[0]) {
@@ -161,24 +161,54 @@ static int search(void *array, int argc, char **argv, char **col_name) {
     return 0;
 }
 
+static int search_users(void *array, int argc, char **argv, char **col_name) {
+    (void)argc;
+    (void)col_name;
+    if (argv[0]) {
+        json_object *user = json_object_new_object();
+        json_object *id = json_object_new_int(atoi(argv[0]));
+        json_object *login = json_object_new_string(argv[2]);
+        // json_object *email = json_object_new_string(argv[5]);
+        // json_object *name = json_object_new_string(argv[4]);
+
+        json_object_object_add(user, "id", id);
+        // json_object_object_add(user, "name", name);
+        json_object_object_add(user, "login", login);
+        // json_object_object_add(user, "email", email);
+        json_object_array_add((struct json_object *)array, user);
+    }
+    return 0;
+}
+
 int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js) {
-    //int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
     const char *query = json_object_get_string(json_object_object_get(js, "query"));
     char *command = malloc(1024);
+    char *command1 = malloc(1024);
     const char *json_string = NULL;
-    json_object *array = json_object_new_array();
+    json_object *array_rooms = json_object_new_array();
+    json_object *array_users = json_object_new_array();
 
-    json_object_object_add(js, "rooms", array);
-    if (strcmp(query, "All") == 0)
+    json_object_object_add(js, "rooms", array_rooms);
+    json_object_object_add(js, "users", array_users);
+    if (strcmp(query, "All") == 0) {
         sprintf(command, "SELECT * FROM rooms;");
-    else
-        sprintf(command, "SELECT * FROM rooms WHERE name LIKE '%%%s%%';", query);
-    if (sqlite3_exec(info->db, command, search, array, NULL) == SQLITE_OK) {
-        json_string = json_object_to_json_string(js);
-        mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
+        sprintf(command1, "SELECT * FROM users;");
     }
-    else
+    else {
+        sprintf(command, "SELECT * FROM rooms WHERE name LIKE '%%%s%%';", query);
+        sprintf(command1, "SELECT * FROM users WHERE login LIKE '%%%s%%';", query);
+    }
+    if (sqlite3_exec(info->db, command, search_rooms, array_rooms, NULL) != SQLITE_OK) {
         printf("fail\n");
+        return 0;
+    }
+    if (sqlite3_exec(info->db, command1, search_users, array_users, NULL) != SQLITE_OK) {
+        printf("fail\n");
+        return 0;
+    }
+
+    json_string = json_object_to_json_string(js);
+    mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
     mx_strdel(&command);
     return 1;
 }

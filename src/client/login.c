@@ -539,11 +539,6 @@ void init_stickers (t_client_info *info, GtkWidget *box) {
     gtk_widget_show(s_button);
 }
 
-typedef struct s_note {
-    GtkWidget *notebook;
-    GtkWidget *label;
-    GtkWidget *box;
-}               t_note;
 
 int mx_notebook_prepend(t_note *note) {
     gtk_notebook_prepend_page(GTK_NOTEBOOK(note->notebook), note->box, note->label);
@@ -574,17 +569,17 @@ t_room *mx_create_room(t_client_info *info, json_object *room_data, int position
         //--room menu
         GtkWidget *room_menu  = gtk_menu_new ();
         //--items
+        GtkWidget *history = gtk_menu_item_new_with_label("Load history");
+        gtk_widget_show(history);
+        gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), history);
+        g_signal_connect (G_OBJECT (history), "activate", G_CALLBACK (scroll_callback), data);
+        
         if (id != 0) {
             GtkWidget *leave = gtk_menu_item_new_with_label("Leave room");
             gtk_widget_show(leave);
             gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), leave);
             g_signal_connect (G_OBJECT (leave), "activate", G_CALLBACK (leave_callback), data);
         }
-
-        GtkWidget *history = gtk_menu_item_new_with_label("Load history");
-        gtk_widget_show(history);
-        gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), history);
-        g_signal_connect (G_OBJECT (history), "activate", G_CALLBACK (scroll_callback), data);
         //--
         GtkWidget *event = gtk_event_box_new();
         gtk_widget_set_size_request(event, -1, 40);
@@ -600,6 +595,9 @@ t_room *mx_create_room(t_client_info *info, json_object *room_data, int position
         room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
         gtk_box_pack_start (GTK_BOX (room->room_box), room->scrolled_window, TRUE, TRUE, 0);
         gtk_widget_show(room->scrolled_window);
+        gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(room->scrolled_window),
+                                GTK_POLICY_NEVER,
+                                GTK_POLICY_AUTOMATIC);
 
         room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
         GtkWidget *ptrVscrollBar = gtk_scrolled_window_get_vscrollbar(GTK_SCROLLED_WINDOW(room->scrolled_window));
@@ -626,7 +624,6 @@ t_room *mx_create_room(t_client_info *info, json_object *room_data, int position
         note->box = room->room_box;
         note->label = label;
         g_idle_add ((GSourceFunc)mx_notebook_prepend, note);
-        //gtk_notebook_prepend_page(GTK_NOTEBOOK(info->data->notebook), room->room_box, label);
         //--msg history
         pthread_t msg_history_t = NULL;
         pthread_create(&msg_history_t, 0, msg_history_thread, data);

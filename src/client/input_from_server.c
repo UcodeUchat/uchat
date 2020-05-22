@@ -189,7 +189,6 @@ void join_room(t_client_info *info, json_object *new_json) {
             }
             json_object *room_data = NULL;
             json_object_deep_copy(json_object_object_get(new_json, "room_data"), &room_data, NULL);
-            // mx_print_json_object(room_data, "maaa");
             mx_push_room(info, room_data, 0);
         }
     }
@@ -218,7 +217,10 @@ void join_room(t_client_info *info, json_object *new_json) {
     }
 }
 
-
+int mx_notebook_detach(t_note *note) {
+    gtk_notebook_detach_tab (GTK_NOTEBOOK(note->notebook), note->box);
+    return 0;
+}
 
 void leave_room(t_client_info *info, json_object *new_json) {
     int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
@@ -234,7 +236,10 @@ void leave_room(t_client_info *info, json_object *new_json) {
                     head->position = head->position - 1;
                 head = head->next;
             }
-            gtk_notebook_detach_tab (GTK_NOTEBOOK(info->data->notebook),room->room_box);
+            t_note *note = (t_note *)malloc(sizeof(t_note));
+            note->notebook = info->data->notebook;
+            note->box = room->room_box;
+            g_idle_add ((GSourceFunc)mx_notebook_detach, note);
             pop_room_id(&info->data->rooms, room_id);
         }
         else {

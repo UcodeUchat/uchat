@@ -55,6 +55,11 @@ label#title2 {
 	background-color: DarkOrange;
 }
 
+#rooms_w {
+	color: black;
+	background-color: Salmon;
+}
+
 button#entry {
 	color: #C0C0C0;
 	background: #595959;

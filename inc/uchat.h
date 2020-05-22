@@ -277,6 +277,12 @@ typedef struct s_stik {
     char *name;
 }               t_stik;
 
+typedef struct s_note {
+    GtkWidget *notebook;
+    GtkWidget *label;
+    GtkWidget *box;
+}               t_note;
+
 #define MX_PATH_TO_DB "./server_db.bin"
 
 typedef struct  s_clients {
