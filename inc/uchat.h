@@ -41,7 +41,10 @@
 #include <openssl/aes.h>
 #include <tls.h>
 
-#include "../libportaudio/include/portaudio.h"
+#include "mail.h"
+#include "audio.h"
+
+//#include "../libportaudio/include/portaudio.h"
 
 /*
 #include "../libressl/include/tls.h"
@@ -130,46 +133,13 @@
 #include "../../libmx/inc/libmx.h"
 
 #define MAX_CLIENT_INPUT 1024
-#define MAXRESPONSE 1024
 #define REPORT_FILENAME "server_log.txt"
 #define BUFLEN 128
 #define QLEN 10
 #define HOST_NAME_MAX 256
-
 #define MX_OK 0
-
 #define MX_SAVE_FOLDER_IN_CLIENT "./Uchat_downloads/"
 #define MX_SAVE_FOLDER_IN_SERVER "./files/"
-
-#define MIN_TALKING_BUFFERS 8
-#define TALKING_THRESHOLD_WEIGHT 0.99
-#define TALKING_TRIGGER_RATIO 4.0
-#define SAMPLE_RATE       (44100)  // в 1 секунде записи содержится 44100 семплов.
-#define FRAMES_PER_BUFFER   (1024)
-#define SAMPLE_SILENCE  (0.0f)
-#define NUM_SECONDS     (5)
-#define BUFFER_LEN      1024
-
-typedef struct s_audio {
-    uint16_t format_type;
-    uint8_t number_channels;
-    uint32_t sample_rate;
-    size_t size;
-    float *rec_samples;
-}               t_audio;
-
-typedef struct s_a_snippet {
-    float *snippet;
-    size_t size;
-}           t_a_snippet;
-
-typedef struct s_mail {
-    char *hostname;
-    char *sender;
-    char *receiver;
-    char *subject;
-    char *message;
-}           t_mail;
 
 typedef struct s_message {
     int id;
@@ -226,6 +196,7 @@ typedef struct s_data {
     GtkWidget *general_box;
     GtkWidget *message_entry;
     GtkWidget *send_button;
+    GtkWidget *record_button;
     GtkWidget *file_button;
     GtkWidget *menu_button;
     GtkWidget *login_msg;
@@ -465,15 +436,6 @@ void mx_report_tls(struct tls * tls_ctx, char * host);
 void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
 char *mx_date_to_char(void);
 
-// send mail
-void *mx_send_mail(char *receiver, char *message);
-void mx_send_format(int socket, const char *text);
-void mx_send_format_tls(struct tls *tls, const char *text, ...);
-void mx_init_struct_mail(t_mail *mail, char *receiver, char *message);
-int mx_connect_to_server(const char *hostname, const char *port);
-struct tls *mx_create_tls(void);
-int mx_check_response(const char *response);
-int mx_wait_on_response(int socket, struct tls *tls, int reply_code);
 
 // crypto funcs
 // char *mx_encrypt_EVP(char *str);
@@ -497,19 +459,6 @@ void mx_glitch_in_the_matrix(struct json_object *jobj);
 const char *mx_message_to_json_string(t_client_info *info, char *message);
 json_object *mx_package_to_json(t_package *package);
 t_package *mx_json_to_package(json_object *new_json);
-
-//audio
-int mx_record_audio(void);
-int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block);
-int mx_exit_stream(t_audio *data, PaError err);
-long mx_save_audio(t_audio *data);
-int mx_process_stream_ext(PaStream *stream, t_audio *data,
-                          t_a_snippet *sample_block, const char *fileName,
-                          bool *sample_complete);
-float mx_rms(float *data, size_t len);
-float mx_change_threshold(float talking_threshold, float talking_ntensity);
-int mx_play_sound_file(char *file_name);
-
 
 
 #endif

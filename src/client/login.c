@@ -139,6 +139,35 @@ void send_callback (GtkWidget *widget, t_client_info *info) {
     }
 }
 
+void record_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    (void)info;
+
+    char *audio_file = mx_record_audio();
+    printf("new racord %s\n", audio_file);
+
+//    mx_send_file_from_client(info);
+
+    /*
+    json_object *new_json;
+    new_json = json_object_new_object();
+    json_object_object_add(new_json, "type", json_object_new_int(MX_EDIT_MESSAGE_TYPE));
+    json_object_object_add(new_json, "login", json_object_new_string(info->login));
+    json_object_object_add(new_json, "data", json_object_new_string (message));
+    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
+    json_object_object_add(new_json, "room_id", json_object_new_int(info->editing_room));
+    json_object_object_add(new_json, "message_id", json_object_new_int(info->editing));
+    json_object_object_add(new_json, "add_info", json_object_new_int(0));
+    //mx_print_json_object(new_json, "edit");
+    const char *json_string = json_object_to_json_string(new_json);
+    tls_send(info->tls_client, json_string, strlen(json_string));
+    gtk_widget_hide(info->data->edit_button);
+    info->editing = -1;
+    gtk_entry_set_text(GTK_ENTRY(info->data->message_entry), "");
+     */
+}
+
+
 int validation (char *login, char *password, char *repeat_password) {
     if (!login || strlen(login) < 6) {
         printf("Твой логин хуйня\n");
@@ -582,6 +611,15 @@ void init_general (t_client_info *info) {
     gtk_widget_set_size_request(info->data->send_button, 75, -1);
     gtk_widget_set_name(info->data->send_button, "entry");
     gtk_widget_show(info->data->send_button);
+
+    //--record button
+    info->data->record_button = gtk_button_new_with_label("Record");
+    g_signal_connect(G_OBJECT(info->data->record_button), "clicked", G_CALLBACK(record_callback), info);
+    gtk_box_pack_start (GTK_BOX (box), info->data->record_button, FALSE, FALSE, 0);
+    gtk_widget_set_size_request(info->data->record_button, 75, -1);
+    gtk_widget_set_name(info->data->record_button, "entry");
+    gtk_widget_show(info->data->record_button);
+
     //--File selection
     info->data->file_button = gtk_button_new();
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/file.png", 20, 20, TRUE, NULL);
