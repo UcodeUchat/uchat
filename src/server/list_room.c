@@ -84,7 +84,7 @@ void mx_get_rooms(t_server_info *info, json_object *js) {
 
         json_object_object_add(room_data, "messages", messages);
         sprintf(req1, "SELECT *  FROM msg_history, users \
-        		where room_id = %d and users.id = msg_history.user_id order by msg_history.id desc limit 15;", room_id);
+        		where room_id = %d and users.id = msg_history.user_id order by msg_history.id desc limit 5;", room_id);
         if (sqlite3_exec(info->db, req1, get_rooms_data, messages, 0) != SQLITE_OK) {
         	printf("Work rooms data\n");
     	}

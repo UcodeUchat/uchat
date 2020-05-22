@@ -26,14 +26,14 @@ label#title {
 label#title1 {
 	color: #F6F4F3;
 	font-weight: bold;
-	font-size: 300%;
+	font-size: 450%;
 }
 
 label#title2 {
 	color: #1E1D1D;
 	background-color: DarkOrange;
 	font-weight: bold;
-	font-size: 300%;
+	font-size: 450%;
 	border-radius: 2px;
 }
 
@@ -133,7 +133,7 @@ notebook tab:checked {
 }
 
 #bar {
-	min-width: 8px;
+	min-width: 9px;
 }
 
 #bar slider{
@@ -160,6 +160,8 @@ menuitem:hover {
 	color: black;
 }
 
-
+#profile {
+	background-color: LightSalmon;
+}
 
 

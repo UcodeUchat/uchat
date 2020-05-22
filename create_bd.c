@@ -106,7 +106,8 @@ int main(int argc, char *argv[]){
 		sprintf(req, "\
 				create table users (\
 					id INTEGER PRIMARY KEY AUTOINCREMENT, socket integer,\
-					login VARCHAR(128), password VARCHAR(128), access integer);\
+					login VARCHAR(128), password VARCHAR(128),\
+					name VARCHAR(128), email VARCHAR(128), access integer);\
 				\
 				create table rooms (\
 					id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(128),\
@@ -114,16 +115,27 @@ int main(int argc, char *argv[]){
 				\
 				create table room_user (\
 					id INTEGER PRIMARY KEY AUTOINCREMENT, room_id integer,\
-					user_id integer,\
+					user_id integer, role integer,\
 					FOREIGN KEY (user_id) REFERENCES users (id)\
 					FOREIGN KEY (room_id) REFERENCES rooms (id));\n\
+				\
+				create table user_notifications (\
+					id INTEGER PRIMARY KEY AUTOINCREMENT, user_id integer,\
+					visual integer, audio integer, email integer,\
+					FOREIGN KEY (user_id) REFERENCES users (id));\n\
 				\
 				create table msg_history (\
 					id INTEGER PRIMARY KEY AUTOINCREMENT,\
 					user_id integer, room_id integer, message VARCHAR(1024),\
 					addition_cont text, time DATETIME DEFAULT CURRENT_TIMESTAMP,\
 					FOREIGN KEY (user_id) REFERENCES users (id),\
-					FOREIGN KEY (room_id) REFERENCES rooms (id));\n");
+					FOREIGN KEY (room_id) REFERENCES rooms (id));\n\
+				\
+				create table blacklist (\
+					id INTEGER PRIMARY KEY AUTOINCREMENT,\
+					blocker_id integer, blocked_id integer,\
+					FOREIGN KEY (blocker_id) REFERENCES users (id),\
+					FOREIGN KEY (blocked_id) REFERENCES users (id));\n");
 		sql = sqlite3_exec(db, req, 0, 0, &err);
 		if (err)
 			fprintf(stderr, "%s\n", err);
@@ -141,14 +153,24 @@ int main(int argc, char *argv[]){
 		sprintf(req2, "\
 				insert into users (socket, login, password, access)\
 				values (0,'mmasniy', '123123', 1);\n\
+				insert into user_notifications (user_id, visual, audio, email)\
+				values (1, 0, 0, 0);\n\
 				insert into users (socket, login, password, access)\
 				values (0,'vkmetyk', '123123', 1);\n\
+				insert into user_notifications (user_id, visual, audio, email)\
+				values (2, 0, 0, 0);\n\
 				insert into users (socket, login, password, access)\
 				values (0,'snikolayen', '123123', 1);\n\
+				insert into user_notifications (user_id, visual, audio, email)\
+				values (3, 0, 0, 0);\n\
 				insert into users (socket, login, password, access)\
 				values (0,'mlibovych', '123123', 1);\n\
+				insert into user_notifications (user_id, visual, audio, email)\
+				values (4, 0, 0, 0);\n\
 				insert into users (socket, login, password, access)\
                 values (0,'neo', '1', 1);\n\
+                insert into user_notifications (user_id, visual, audio, email)\
+				values (5, 0, 0, 0);\n\
 				insert into rooms (name, access) values ('First', 1);\
 				insert into rooms (name, access) values ('Second', 1);\
 				insert into rooms (id, name, access)\

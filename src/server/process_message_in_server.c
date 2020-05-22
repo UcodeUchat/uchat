@@ -11,14 +11,6 @@ int mx_get_data(void *js, int argc, char **argv, char **col_name) {
     return 1;
 }
 
-// static int print_time(void *point, int argc, char **argv, char **col_name) {
-//     (void)point;
-//     (void)argc;
-//     (void)col_name;
-//     printf("Time: %s\n", argv[0]);
-//     return 0;
-// }
-
 int save_message(t_server_info *info, json_object *js) {
 	char command[1024];
     int add_info = json_object_get_int(json_object_object_get(js, "add_info"));
@@ -50,5 +42,3 @@ int mx_process_message_in_server(t_server_info *info, json_object *js) {
     return 0;
 }
 
-// id|user_id|room_id|message|addition_cont|time
-// 0|0|0|hello|mes|

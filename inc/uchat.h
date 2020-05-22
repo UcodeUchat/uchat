@@ -150,7 +150,7 @@
 #define NUM_SECONDS     (5)
 #define BUFFER_LEN      1024
 
-typedef struct s_audio{
+typedef struct s_audio {
     uint16_t format_type;
     uint8_t number_channels;
     uint32_t sample_rate;
@@ -158,11 +158,18 @@ typedef struct s_audio{
     float *rec_samples;
 }               t_audio;
 
-typedef struct s_a_snippet{
+typedef struct s_a_snippet {
     float *snippet;
     size_t size;
 }           t_a_snippet;
 
+typedef struct s_mail {
+    char *hostname;
+    char *sender;
+    char *receiver;
+    char *subject;
+    char *message;
+}           t_mail;
 
 typedef struct s_message {
     int id;
@@ -170,6 +177,8 @@ typedef struct s_message {
     GtkWidget *h_box;
     GtkWidget *menu;
     GtkWidget *image_box;
+    GtkWidget *message_label;
+    GtkWidget *message_box;
     struct s_message *next;
 }              t_message;
 
@@ -192,6 +201,21 @@ typedef struct s_reg {
     GtkWidget *stop;
 }              t_reg;
 
+typedef struct s_prof {
+    GtkWidget *main_box;
+    GtkWidget *login_entry;
+    GtkWidget *id_entry;
+    GtkWidget *email_entry;
+    GtkWidget *email_button1;
+    GtkWidget *email_button2;
+    GtkWidget *name_entry;
+    GtkWidget *name_button1;
+    GtkWidget *name_button2;
+    GtkWidget *visual;
+    GtkWidget *audio;
+    GtkWidget *email;
+}              t_prof;
+
 typedef struct s_data {
     GtkWidget *window;
     GtkWidget *main_box;
@@ -208,8 +232,10 @@ typedef struct s_data {
     GtkWidget *notebook;
     GtkWidget *stop;
     GtkWidget *menu;
+    GtkWidget *edit_button;
     t_room *rooms;
     t_reg *registration;
+    t_prof *profile;
     gint current_room;
     int login_msg_flag;
 }              t_data;
@@ -218,6 +244,8 @@ typedef struct  s_client_info {  //struct client
     char *login;
     char *password;
     int id;
+    int visual;
+    int audio;
     int argc;
     char **argv;
     char *ip;
@@ -229,6 +257,8 @@ typedef struct  s_client_info {  //struct client
     t_data *data;
     int responce;
     int can_load;
+    int editing;
+    int editing_room;
     struct s_file_list *input_files;
     struct json_object *rooms;
     int input;
@@ -281,6 +311,10 @@ typedef struct  s_server_info {  // struct server
 #define MX_LOGOUT_TYPE 9
 #define MX_LOAD_MORE_TYPE 10
 #define MX_DELETE_MESSAGE_TYPE 11
+#define MX_EDIT_MESSAGE_TYPE 13
+#define MX_LOAD_PROFILE_TYPE 14
+#define MX_EDIT_PROFILE_TYPE 15
+#define MX_LEAVE_ROOM_TYPE 16
 #define MX_PACKAGE_SIZE sizeof(t_package)
 
 #define MX_MAX_MSG_SIZE 200
@@ -330,6 +364,7 @@ typedef struct s_mes {
     t_client_info *info;
     t_room *room;
     t_message *message;
+    int user_id;
     int id;
 }               t_mes;
 
@@ -349,6 +384,16 @@ int mx_logout(t_server_info *i, t_socket_list *csl, json_object *js);
 int mx_get_data(void *js, int argc, char **argv, char **col_name);
 int mx_load_history (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_delete_message (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_edit_message (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_load_profile (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_edit_profile (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js);
+void mx_load_profile_client(t_client_info *info, int id);
+void mx_load_user_profile(t_client_info *info, json_object *new_json);
+int mx_show_widget(GtkWidget *widget);
+int mx_destroy_widget(GtkWidget *widget);
+void mx_push_message(t_client_info *info, t_room *room, json_object *new_json);
+t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new_json, int order);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);
@@ -419,7 +464,17 @@ int mx_get_input2(char *buffer);
 void mx_report_tls(struct tls * tls_ctx, char * host);
 void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
 char *mx_date_to_char(void);
-void *mx_send_mail(char *receiver, void *mess);
+
+// send mail
+void *mx_send_mail(char *receiver, char *message);
+void mx_send_format(int socket, const char *text);
+void mx_send_format_tls(struct tls *tls, const char *text, ...);
+void mx_init_struct_mail(t_mail *mail, char *receiver, char *message);
+int mx_connect_to_server(const char *hostname, const char *port);
+struct tls *mx_create_tls(void);
+int mx_check_response(const char *response);
+int mx_wait_on_response(int socket, struct tls *tls, int reply_code);
+
 // crypto funcs
 // char *mx_encrypt_EVP(char *str);
 char *mx_strhash(const char *to_hash);
