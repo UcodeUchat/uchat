@@ -209,6 +209,10 @@ typedef struct s_prof {
     GtkWidget *email;
 }              t_prof;
 
+typedef struct s_search {
+    GtkWidget *main_box;
+}              t_search;
+
 typedef struct s_data {
     GtkWidget *window;
     GtkWidget *main_box;
@@ -231,6 +235,7 @@ typedef struct s_data {
     t_room *rooms;
     t_reg *registration;
     t_prof *profile;
+    t_search *search;
     gint current_room;
     int login_msg_flag;
 }              t_data;
@@ -258,6 +263,19 @@ typedef struct  s_client_info {  //struct client
     struct json_object *rooms;
     int input;
 }               t_client_info;
+
+typedef struct s_all {
+    t_client_info *info;
+    t_room *room;
+    int room_id;
+    char *room_name;
+    struct json_object *room_data;
+}               t_all;
+
+typedef struct s_stik {
+    t_client_info *info;
+    char *name;
+}               t_stik;
 
 #define MX_PATH_TO_DB "./server_db.bin"
 
@@ -311,6 +329,7 @@ typedef struct  s_server_info {  // struct server
 #define MX_EDIT_PROFILE_TYPE 15
 #define MX_LEAVE_ROOM_TYPE 16
 #define MX_SEARCH_ALL_TYPE 17
+#define MX_JOIN_ROOM_TYPE 18
 #define MX_PACKAGE_SIZE sizeof(t_package)
 
 #define MX_MAX_MSG_SIZE 200
@@ -385,6 +404,8 @@ int mx_load_profile (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_edit_profile (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_get_rooms_data(void *messages, int argc, char **argv, char **col_name);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);
@@ -433,10 +454,13 @@ t_message *mx_find_message(t_message *messages, int id);
 t_room *mx_find_room(t_room *rooms, int id);
 void mx_load_profile_client(t_client_info *info, int id);
 void mx_load_user_profile(t_client_info *info, json_object *new_json);
+void mx_search_all_client(t_client_info *info, json_object *new_json);
 int mx_show_widget(GtkWidget *widget);
 int mx_destroy_widget(GtkWidget *widget);
 void mx_push_message(t_client_info *info, t_room *room, json_object *new_json);
 t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new_json, int order);
+t_room *mx_create_room(t_client_info *info,  json_object *room_data, int position);
+void mx_push_room(t_client_info *info, json_object *room_data, int position);
 
 void mx_send_file_from_client(t_client_info *info);
 int mx_load_file(t_mes *msg);
