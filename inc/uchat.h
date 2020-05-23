@@ -149,6 +149,7 @@ typedef struct s_message {
     GtkWidget *image_box;
     GtkWidget *message_label;
     GtkWidget *message_box;
+    GtkWidget *player_box;
     struct s_message *next;
 }              t_message;
 
@@ -158,6 +159,7 @@ typedef struct s_room {
     char *name;
     GtkWidget *room_box;
     GtkWidget *message_box;
+    GtkWidget *player_box;
     GtkWidget *scrolled_window;
     GtkAdjustment *Adjust;
     t_message *messages;
@@ -197,6 +199,7 @@ typedef struct s_data {
     GtkWidget *message_entry;
     GtkWidget *send_button;
     GtkWidget *record_button;
+    GtkWidget *stop_button;
     GtkWidget *file_button;
     GtkWidget *menu_button;
     GtkWidget *login_msg;

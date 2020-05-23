@@ -42,6 +42,10 @@ static int get_rooms_data(void *messages, int argc, char **argv, char **col_name
 	    	data = json_object_new_string(argv[3]);
 			add_info = json_object_new_int(2);
 	    }
+	    else if (strcmp(extention, "aif") == 0) {
+            data = json_object_new_string(argv[3]);
+            add_info = json_object_new_int(4);
+        }
 	    else {
 			data = json_object_new_string(argv[3] /*+ 20*/);
 			add_info = json_object_new_int(1);

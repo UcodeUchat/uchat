@@ -145,7 +145,6 @@ void record_callback (GtkWidget *widget, t_client_info *info) {
 
     char *audio_file = mx_record_audio();
     printf("new racord %s\n", audio_file);
-
 //    mx_send_file_from_client(info);
 
     /*
@@ -613,12 +612,40 @@ void init_general (t_client_info *info) {
     gtk_widget_show(info->data->send_button);
 
     //--record button
-    info->data->record_button = gtk_button_new_with_label("Record");
+    info->data->record_button = gtk_button_new_with_label("Rec");
+//    GdkPixbuf *pixbuf3 = gdk_pixbuf_new_from_file_at_scale ("img/rec.png", 20, 20, TRUE, NULL);
+//    GtkWidget *image3 = gtk_image_new_from_pixbuf(pixbuf3);
+//    gtk_button_set_image(GTK_BUTTON(info->data->record_button), image3);
     g_signal_connect(G_OBJECT(info->data->record_button), "clicked", G_CALLBACK(record_callback), info);
     gtk_box_pack_start (GTK_BOX (box), info->data->record_button, FALSE, FALSE, 0);
-    gtk_widget_set_size_request(info->data->record_button, 75, -1);
-    gtk_widget_set_name(info->data->record_button, "entry");
+    gtk_widget_set_size_request(info->data->record_button, 40, -1);
     gtk_widget_show(info->data->record_button);
+
+    //--stop button
+//    info->data->stop_button = gtk_button_new_with_label("Stop");
+//    g_signal_connect(G_OBJECT(info->data->stop_button), "clicked", G_CALLBACK(record_callback), info);
+//    gtk_box_pack_start (GTK_BOX (box), info->data->stop_button, FALSE, FALSE, 0);
+//    gtk_widget_set_size_request(info->data->stop_button, 40, 20);
+//    gtk_widget_set_name(info->data->stop_button, "entry");
+//    gtk_widget_show(info->data->stop_button);
+
+/*
+    //--
+    status_label  // Play, Pause, Stop
+
+    time_label  // --:---
+    time_label = gtk_label_new("--:--.--");
+    gtk_misc_set_alignment(GTK_MISC(time_label), 1.0, 0.5);
+    gtk_box_pack_start(GTK_BOX(status_hbox), time_label, TRUE, TRUE, 0);
+
+    seek_scale  // ---0-------
+    seel_scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0, 100, 1)
+    gtk_scale_set_draw_value(GTK_SCALE(seek_scale), FALSE);
+    gtk_range_set_update_policy(GTK_RANGE(seek_scale),GTK_UPDATE_DISCONTINUOUS);
+    gtk_box_pack_start(GTK_BOX(main_vbox), seek_scale, FALSE, FALSE, 0);
+
+
+*/
 
     //--File selection
     info->data->file_button = gtk_button_new();

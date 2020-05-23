@@ -40,6 +40,16 @@ void load_profile_callback(GtkWidget *widget, t_mes *mes) {
     mx_load_profile_client(mes->info, mes->user_id);
 }
 
+void load_audio_callback(GtkWidget *widget, t_mes *mes) {
+    (void)widget;
+    (void)mes;
+    mx_play_sound_file("./audio/moby.aif");
+}
+
+
+
+
+
 void delete_callback (GtkWidget *widget, t_mes *mes) {
     (void)widget;
     t_message *message = mx_find_message(mes->room->messages, mes->id);
@@ -254,6 +264,17 @@ t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new
         gtk_box_pack_start (GTK_BOX (box2), item_image, FALSE, FALSE, 0);
     }
 
+    else if (add_info == 4) {  // for audio
+        node->message_box = gtk_event_box_new();
+        gtk_widget_show(node->message_box);
+        gtk_box_pack_start (GTK_BOX (main_box), node->message_box, FALSE, FALSE, 0);
+        GtkWidget *label2 = gtk_label_new(message + 20);
+        gtk_widget_show(label2);
+        gtk_container_add (GTK_CONTAINER (node->message_box), label2);
+        gtk_widget_set_name(node->message_box, "file");
+        gtk_widget_add_events (node->message_box, GDK_BUTTON_PRESS_MASK);
+        g_signal_connect (G_OBJECT (node->message_box), "button_press_event", G_CALLBACK (load_audio_callback), mes);
+    }
     if (user_id == info->id) {
         gtk_box_pack_end(GTK_BOX (right_box), menu_event, FALSE, FALSE, 0);
         gtk_box_pack_end(GTK_BOX (box1), login_event, FALSE, FALSE, 0);
