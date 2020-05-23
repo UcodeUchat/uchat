@@ -55,6 +55,11 @@ label#title2 {
 	background-color: DarkOrange;
 }
 
+#rooms_w {
+	color: black;
+	background-color: Salmon;
+}
+
 button#entry {
 	color: #C0C0C0;
 	background: #595959;
@@ -164,4 +169,7 @@ menuitem:hover {
 	background-color: LightSalmon;
 }
 
+#search_exit {
+	background: rgba(0, 0, 0, 0.5);
+}
 

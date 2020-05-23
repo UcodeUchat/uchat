@@ -1,16 +1,5 @@
 #include "uchat.h"
 
-typedef struct s_all {
-    t_client_info *info;
-    t_room *room;
-    struct json_object *room_data;
-}               t_all;
-
-typedef struct s_stik {
-    t_client_info *info;
-    char *name;
-}               t_stik;
-
 t_room *find_room(t_room *rooms, int position) {
    t_room *head = rooms;
    t_room *node = NULL;
@@ -30,7 +19,7 @@ void choose_file_callback(GtkWidget *widget, t_client_info *info) {
     int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
     t_room *room = find_room(info->data->rooms, position);
     info->data->current_room = room->id;
-    mx_send_file_from_client(info);
+    mx_send_file_from_client(info, NULL);
 }
 
 void choose_sticker_callback(GtkWidget *widget, GtkWidget *menu) {
@@ -53,7 +42,6 @@ void *msg_history_thread (void *data) {
     for (int j = 0; j < n_msg; j++) {
         json_object *msg_data = json_object_array_get_idx(messages, j);
         append_message(data1->info, data1->room, msg_data);
-        //sleep_ms(10);
     }
     gtk_adjustment_set_value(data1->room->Adjust, 
                             gtk_adjustment_get_upper(data1->room->Adjust) - 
@@ -75,38 +63,6 @@ void *login_msg_thread (void *data) {
     return 0;
 }
 
-
-t_room *create_room(void *name, int id, int position) {
-    t_room *node =  (t_room *)malloc(sizeof(t_room));
-
-    node->name = strdup(name);
-    node->position = position;
-    node->id = id;
-    node->messages = NULL;
-    node->next = NULL;
-    return node;
-}
-
-void push_room(t_room **list, void *name, int id, int position) {
-    t_room *tmp;
-    t_room *p;
-
-    if (!list)
-        return;
-    tmp = create_room(name, id, position);  // Create new
-    if (!tmp)
-        return;
-    p = *list;
-    if (*list == NULL) {  // Find Null-node
-        *list = tmp;
-        return;
-    }
-    else {
-        while (p->next != NULL)  // Find Null-node
-            p = p->next;
-        p->next = tmp;
-    }
-}
 
 void send_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
@@ -143,27 +99,13 @@ void record_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
     (void)info;
 
-    char *audio_file = mx_record_audio();
-    printf("new racord %s\n", audio_file);
-//    mx_send_file_from_client(info);
-
-    /*
-    json_object *new_json;
-    new_json = json_object_new_object();
-    json_object_object_add(new_json, "type", json_object_new_int(MX_EDIT_MESSAGE_TYPE));
-    json_object_object_add(new_json, "login", json_object_new_string(info->login));
-    json_object_object_add(new_json, "data", json_object_new_string (message));
-    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
-    json_object_object_add(new_json, "room_id", json_object_new_int(info->editing_room));
-    json_object_object_add(new_json, "message_id", json_object_new_int(info->editing));
-    json_object_object_add(new_json, "add_info", json_object_new_int(0));
-    //mx_print_json_object(new_json, "edit");
-    const char *json_string = json_object_to_json_string(new_json);
-    tls_send(info->tls_client, json_string, strlen(json_string));
-    gtk_widget_hide(info->data->edit_button);
-    info->editing = -1;
-    gtk_entry_set_text(GTK_ENTRY(info->data->message_entry), "");
-     */
+    gtk_widget_hide(info->data->record_button);
+//    char *audio_file = mx_record_audio();
+//    printf("new racord %s\n", audio_file);
+//    gtk_widget_show(info->data->stop_button);
+//    gtk_widget_hide(info->data->stop_button);
+    mx_send_file_from_client(info, "./record/17.aif");
+    gtk_widget_show(info->data->record_button);
 }
 
 
@@ -338,6 +280,7 @@ void scroll_callback (GtkWidget *widget, t_all *data) {
     }
 }
 
+
 void leave_callback (GtkWidget *widget, t_all *data) {
     (void)widget;
     json_object  *new_json = json_object_new_object();
@@ -401,6 +344,59 @@ void mx_load_profile_client(t_client_info *info, int id) {
 void profile_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
     mx_load_profile_client(info, info->id);
+}
+
+void search_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    json_object *new_json;
+
+    gtk_widget_hide(info->data->search_box);
+    new_json = json_object_new_object();
+    json_object_object_add(new_json, "type", json_object_new_int(MX_SEARCH_ALL_TYPE));
+    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
+    json_object_object_add(new_json, "query", json_object_new_string 
+                            (gtk_entry_get_text(GTK_ENTRY(info->data->search_entry))));
+    const char *json_string = json_object_to_json_string(new_json);
+    tls_send(info->tls_client, json_string, strlen(json_string));
+    gtk_entry_set_text(GTK_ENTRY(info->data->search_entry), "");
+}
+
+void show_search_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    gtk_widget_show_all(info->data->search_box);
+}
+
+void close_search_callback (GtkWidget *widget, t_client_info *info) {
+    (void)info;
+    gtk_widget_hide(widget);
+}
+
+void init_search (t_client_info *info) { 
+    info->data->search_box = gtk_event_box_new();
+    gtk_widget_add_events (info->data->search_box, GDK_BUTTON_PRESS_MASK);
+    g_signal_connect (G_OBJECT (info->data->search_box), "button_press_event", G_CALLBACK (close_search_callback), info);
+    gtk_widget_set_name (info->data->search_box, "search_exit");
+    gtk_widget_set_size_request(info->data->search_box, 
+                            gtk_widget_get_allocated_width (info->data->window), 
+                            gtk_widget_get_allocated_height (info->data->window));
+    gtk_fixed_put(GTK_FIXED(info->data->general_box),
+                    info->data->search_box, 0, 0);
+    GtkWidget *v_box = gtk_box_new(FALSE, 0);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(v_box), GTK_ORIENTATION_VERTICAL);
+    gtk_widget_set_valign (v_box, GTK_ALIGN_CENTER);
+    gtk_container_add(GTK_CONTAINER(info->data->search_box), v_box);
+    GtkWidget *h_box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (h_box, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (v_box), h_box, FALSE, FALSE, 0);  
+    info->data->search_entry = gtk_entry_new ();
+    gtk_widget_set_size_request(info->data->search_entry, 300, 45);
+    gtk_entry_set_max_length (GTK_ENTRY (info->data->search_entry), 50);
+    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->search_entry), "Anything you want or \"All\" for everything");
+    gtk_editable_select_region (GTK_EDITABLE (info->data->search_entry),
+                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->search_entry)));
+    gtk_box_pack_start (GTK_BOX (h_box), info->data->search_entry, FALSE, FALSE, 0);
+    gtk_widget_set_name(info->data->search_entry, "entry");
+    g_signal_connect(G_OBJECT(info->data->search_entry),"activate", G_CALLBACK(search_callback), info);
 }
 
 void init_menu (t_client_info *info) {
@@ -557,6 +553,120 @@ void init_stickers (t_client_info *info, GtkWidget *box) {
     gtk_widget_show(s_button);
 }
 
+
+int mx_notebook_prepend(t_note *note) {
+    gtk_notebook_prepend_page(GTK_NOTEBOOK(note->notebook), note->box, note->label);
+    return 0;
+}
+
+t_room *mx_create_room(t_client_info *info, json_object *room_data, int position) {
+    t_room *room =  (t_room *)malloc(sizeof(t_room));
+    const char *name = json_object_get_string(json_object_object_get(room_data, "name"));
+    int id = json_object_get_int(json_object_object_get(room_data, "room_id"));
+
+    room->name = strdup(name);
+    room->position = position;
+    room->id = id;
+    room->messages = NULL;
+    room->next = NULL;
+
+    //--
+        t_all *data = (t_all *)malloc(sizeof(t_all));
+        data->info = info;
+        data->room = room;
+        data->room_data = room_data;
+        //--
+        room->room_box = gtk_box_new(FALSE, 0);
+        gtk_widget_set_name(room->room_box, "mesage_box");
+        gtk_orientable_set_orientation (GTK_ORIENTABLE(room->room_box), GTK_ORIENTATION_VERTICAL);
+        //--
+        //--room menu
+        GtkWidget *room_menu  = gtk_menu_new ();
+        //--items
+        GtkWidget *history = gtk_menu_item_new_with_label("Load history");
+        gtk_widget_show(history);
+        gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), history);
+        g_signal_connect (G_OBJECT (history), "activate", G_CALLBACK (scroll_callback), data);
+        
+        if (id != 0) {
+            GtkWidget *leave = gtk_menu_item_new_with_label("Leave room");
+            gtk_widget_show(leave);
+            gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), leave);
+            g_signal_connect (G_OBJECT (leave), "activate", G_CALLBACK (leave_callback), data);
+        }
+        //--
+        GtkWidget *event = gtk_event_box_new();
+        gtk_widget_set_size_request(event, -1, 40);
+        gtk_widget_add_events (event, GDK_BUTTON_PRESS_MASK);
+        g_signal_connect (G_OBJECT (event), "button_press_event", G_CALLBACK (room_menu_callback), room_menu);
+        GtkWidget *full_name = gtk_label_new(room->name);
+        gtk_widget_set_name (full_name, "title");
+        gtk_container_add (GTK_CONTAINER (event), full_name);
+        gtk_widget_show(event);
+        gtk_box_pack_start (GTK_BOX (room->room_box), event, FALSE, FALSE, 0);
+        gtk_widget_show(full_name);
+
+        room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+        gtk_box_pack_start (GTK_BOX (room->room_box), room->scrolled_window, TRUE, TRUE, 0);
+        gtk_widget_show(room->scrolled_window);
+        gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(room->scrolled_window),
+                                GTK_POLICY_NEVER,
+                                GTK_POLICY_AUTOMATIC);
+
+        room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
+        GtkWidget *ptrVscrollBar = gtk_scrolled_window_get_vscrollbar(GTK_SCROLLED_WINDOW(room->scrolled_window));
+        gtk_widget_set_name (ptrVscrollBar, "bar");
+
+        char *str = NULL;
+        if (strlen(room->name) > 15) {
+            str = strndup(room->name, 12);
+            str = mx_strjoin(room->name, "...");
+        }
+        else {
+            str = strdup(room->name);
+        }
+        //--
+        room->message_box = gtk_box_new(FALSE, 5);
+        gtk_container_set_border_width(GTK_CONTAINER(room->message_box), 5);
+        gtk_container_add(GTK_CONTAINER(room->scrolled_window), room->message_box);
+        gtk_widget_show(room->message_box);
+        gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);
+        g_idle_add ((GSourceFunc)mx_show_widget, room->room_box);
+        GtkWidget *label = gtk_label_new(str);
+        t_note *note = (t_note *)malloc(sizeof(t_note));
+        note->notebook = info->data->notebook;
+        note->box = room->room_box;
+        note->label = label;
+        g_idle_add ((GSourceFunc)mx_notebook_prepend, note);
+        //--msg history
+        pthread_t msg_history_t = NULL;
+        pthread_create(&msg_history_t, 0, msg_history_thread, data);
+        //--
+    return room;
+}
+
+void mx_push_room(t_client_info *info, json_object *room_data, int position) {
+    t_room *tmp;
+    t_room *p;
+    t_room **list = &info->data->rooms;
+
+    if (!list)
+        return;
+    tmp = mx_create_room(info, room_data, position);  // Create new
+    if (!tmp)
+        return;
+    p = *list;
+    if (*list == NULL) {  // Find Null-node
+        *list = tmp;
+        return;
+    }
+    else {
+        while (p->next != NULL)  // Find Null-node
+            p = p->next;
+        p->next = tmp;
+    }
+}
+
 void init_general (t_client_info *info) {
     info->data->profile = NULL;
     info->can_load = 1;
@@ -572,8 +682,8 @@ void init_general (t_client_info *info) {
     gtk_widget_show (box);
     //--Menu button
     info->data->menu_button = gtk_button_new();
-    GtkWidget *image0 = gtk_image_new_from_file("img/a.png");
-    gtk_button_set_image(GTK_BUTTON(info->data->menu_button), image0);
+    GtkWidget *image = gtk_image_new_from_file("img/a.png");
+    gtk_button_set_image(GTK_BUTTON(info->data->menu_button), image);
     g_signal_connect(G_OBJECT(info->data->menu_button), "clicked", G_CALLBACK(menu_callback), info);
     gtk_box_pack_start (GTK_BOX (box), info->data->menu_button, FALSE, FALSE, 0);
     gtk_widget_set_name(info->data->menu_button, "entry");
@@ -588,20 +698,19 @@ void init_general (t_client_info *info) {
     g_signal_connect(G_OBJECT(info->data->message_entry),"activate", G_CALLBACK(send_callback), info);
     gtk_box_pack_start (GTK_BOX (box), fixed_message, TRUE, TRUE, 0);
     gtk_fixed_put(GTK_FIXED(fixed_message), info->data->message_entry, 0, 0);
-    gtk_widget_set_size_request(info->data->message_entry, 600, -1);
-    gtk_widget_set_size_request(fixed_message, 600, -1);
+    gtk_widget_set_size_request(info->data->message_entry, 650, -1);
     gtk_widget_set_name(info->data->message_entry, "entry");
     gtk_widget_show(info->data->message_entry);
     gtk_widget_show(fixed_message);
     //--Edit button
     info->data->edit_button = gtk_event_box_new ();
     gtk_widget_add_events (info->data->edit_button, GDK_BUTTON_PRESS_MASK);
-    GdkPixbuf *pixbuf0 = gdk_pixbuf_new_from_file_at_scale ("img/cancel.png", 20, 20, TRUE, NULL);
-    GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf0);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/cancel.png", 20, 20, TRUE, NULL);
+    image = gtk_image_new_from_pixbuf(pixbuf);
     gtk_container_add (GTK_CONTAINER (info->data->edit_button), image);
     gtk_widget_show(image);
     g_signal_connect(G_OBJECT(info->data->edit_button), "button_press_event", G_CALLBACK(edit_cancel_callback), info);
-    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->edit_button, 570, 7);
+    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->edit_button, 670, 7);
 
     //--Send button
     info->data->send_button = gtk_button_new_with_label("Send");
@@ -613,19 +722,19 @@ void init_general (t_client_info *info) {
 
     //--record button
     info->data->record_button = gtk_button_new_with_label("Rec");
-//    GdkPixbuf *pixbuf3 = gdk_pixbuf_new_from_file_at_scale ("img/rec.png", 20, 20, TRUE, NULL);
-//    GtkWidget *image3 = gtk_image_new_from_pixbuf(pixbuf3);
-//    gtk_button_set_image(GTK_BUTTON(info->data->record_button), image3);
+    GdkPixbuf *pixbuf3 = gdk_pixbuf_new_from_file_at_scale ("img/rec.png", 20, 20, TRUE, NULL);
+    GtkWidget *image3 = gtk_image_new_from_pixbuf(pixbuf3);
+    gtk_button_set_image(GTK_BUTTON(info->data->record_button), image3);
     g_signal_connect(G_OBJECT(info->data->record_button), "clicked", G_CALLBACK(record_callback), info);
     gtk_box_pack_start (GTK_BOX (box), info->data->record_button, FALSE, FALSE, 0);
-    gtk_widget_set_size_request(info->data->record_button, 40, -1);
+    gtk_widget_set_size_request(info->data->record_button, 40, 20);
     gtk_widget_show(info->data->record_button);
 
     //--stop button
-//    info->data->stop_button = gtk_button_new_with_label("Stop");
+    info->data->stop_button = gtk_button_new_with_label("Stop");
 //    g_signal_connect(G_OBJECT(info->data->stop_button), "clicked", G_CALLBACK(record_callback), info);
-//    gtk_box_pack_start (GTK_BOX (box), info->data->stop_button, FALSE, FALSE, 0);
-//    gtk_widget_set_size_request(info->data->stop_button, 40, 20);
+    gtk_box_pack_start (GTK_BOX (box), info->data->stop_button, FALSE, FALSE, 0);
+    gtk_widget_set_size_request(info->data->stop_button, 40, 20);
 //    gtk_widget_set_name(info->data->stop_button, "entry");
 //    gtk_widget_show(info->data->stop_button);
 
@@ -647,11 +756,20 @@ void init_general (t_client_info *info) {
 
 */
 
+    //--SEARCH
+    GtkWidget *search_button = gtk_button_new();
+    pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/search.png", 20, 20, TRUE, NULL);
+    image = gtk_image_new_from_pixbuf(pixbuf);
+    gtk_button_set_image(GTK_BUTTON(search_button), image);
+    g_signal_connect(G_OBJECT(search_button), "clicked", G_CALLBACK(show_search_callback), info);
+    gtk_box_pack_start (GTK_BOX (box), search_button, FALSE, FALSE, 0);
+    gtk_widget_set_name(search_button, "entry");
+    gtk_widget_show(search_button);
     //--File selection
     info->data->file_button = gtk_button_new();
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/file.png", 20, 20, TRUE, NULL);
-    GtkWidget *image1 = gtk_image_new_from_pixbuf(pixbuf);
-    gtk_button_set_image(GTK_BUTTON(info->data->file_button), image1);
+    pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/file.png", 20, 20, TRUE, NULL);
+    image = gtk_image_new_from_pixbuf(pixbuf);
+    gtk_button_set_image(GTK_BUTTON(info->data->file_button), image);
     g_signal_connect(G_OBJECT(info->data->file_button), "clicked", G_CALLBACK(choose_file_callback), info);
     gtk_box_pack_start (GTK_BOX (box), info->data->file_button, FALSE, FALSE, 0);
     gtk_widget_set_name(info->data->file_button, "entry");
@@ -671,76 +789,10 @@ void init_general (t_client_info *info) {
     gtk_widget_show (box);
 
     int n_rooms = json_object_array_length(info->rooms);
-    for (int i = 0; i < n_rooms; i++) {
+    for (int i = n_rooms - 1; i >= 0; i--) {
         json_object *room_data = json_object_array_get_idx(info->rooms, i);
-        char *str = strdup(json_object_get_string(json_object_object_get(room_data, "name")));
-        int id = json_object_get_int(json_object_object_get(room_data, "room_id"));
 
-        push_room(&info->data->rooms, str, id, i);
-        t_room *room = find_room(info->data->rooms, i);
-        //--
-        t_all *data = (t_all *)malloc(sizeof(t_all));
-        data->info = info;
-        data->room = room;
-        data->room_data = room_data;
-        //--
-        room->room_box = gtk_box_new(FALSE, 0);
-        gtk_widget_set_name(room->room_box, "mesage_box");
-        gtk_orientable_set_orientation (GTK_ORIENTABLE(room->room_box), GTK_ORIENTATION_VERTICAL);
-        gtk_widget_show(room->room_box);
-        //--
-        //--room menu
-        GtkWidget *room_menu  = gtk_menu_new ();
-        //--items
-        if (id != 0) {
-            GtkWidget *leave = gtk_menu_item_new_with_label("Leave room");
-            gtk_widget_show(leave);
-            gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), leave);
-            g_signal_connect (G_OBJECT (leave), "activate", G_CALLBACK (leave_callback), data);
-        }
-
-        GtkWidget *history = gtk_menu_item_new_with_label("Load history");
-        gtk_widget_show(history);
-        gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), history);
-        g_signal_connect (G_OBJECT (history), "activate", G_CALLBACK (scroll_callback), data);
-        //--
-        GtkWidget *event = gtk_event_box_new();
-        gtk_widget_set_size_request(event, -1, 40);
-        gtk_widget_add_events (event, GDK_BUTTON_PRESS_MASK);
-        g_signal_connect (G_OBJECT (event), "button_press_event", G_CALLBACK (room_menu_callback), room_menu);
-        GtkWidget *full_name = gtk_label_new(str);
-        gtk_widget_set_name (full_name, "title");
-        gtk_container_add (GTK_CONTAINER (event), full_name);
-        gtk_widget_show(event);
-        gtk_box_pack_start (GTK_BOX (room->room_box), event, FALSE, FALSE, 0);
-        gtk_widget_show(full_name);
-
-        room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-        gtk_box_pack_start (GTK_BOX (room->room_box), room->scrolled_window, TRUE, TRUE, 0);
-        // gtk_container_set_border_width(GTK_CONTAINER(room->scrolled_window), 1);
-        gtk_widget_show(room->scrolled_window);
-
-        room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
-        GtkWidget *ptrVscrollBar = gtk_scrolled_window_get_vscrollbar(GTK_SCROLLED_WINDOW(room->scrolled_window));
-        gtk_widget_set_name (ptrVscrollBar, "bar");
-
-        if (strlen(str) > 15) {
-            str = strndup(str, 12);
-            str = mx_strjoin(str, "...");
-        }
-        GtkWidget *label = gtk_label_new(str);
-        gtk_notebook_append_page(GTK_NOTEBOOK(info->data->notebook), room->room_box, label);
-        //--
-        room->message_box = gtk_box_new(FALSE, 5);
-        gtk_container_set_border_width(GTK_CONTAINER(room->message_box), 5);
-        gtk_container_add(GTK_CONTAINER(room->scrolled_window), room->message_box);
-        gtk_widget_show(room->message_box);
-        gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);
-        //--
-        //--msg history
-        pthread_t msg_history_t = NULL;
-        pthread_create(&msg_history_t, 0, msg_history_thread, data);
-        //--
+        mx_push_room(info, room_data, i);   
     }
     gtk_widget_hide(info->data->login_box);
     gtk_window_set_title(GTK_WINDOW(info->data->window), "Uchat");
@@ -790,7 +842,7 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
     else if(info->auth_client == 1) {
         init_general(info);
         init_menu(info);
-        //init_profile(info);
+        init_search (info);
         //--
     }  
 }

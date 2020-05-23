@@ -16,7 +16,7 @@ static int get_rooms(void *array, int argc, char **argv, char **col_name) {
 	return 0;
 }
 
-static int get_rooms_data(void *messages, int argc, char **argv, char **col_name) {
+int mx_get_rooms_data(void *messages, int argc, char **argv, char **col_name) {
 	json_object *message = json_object_new_object();
 	json_object *id = json_object_new_int(atoi(argv[0]));
 	json_object *user_id = json_object_new_int(atoi(argv[1]));
@@ -78,6 +78,7 @@ void mx_get_rooms(t_server_info *info, json_object *js) {
     printf("%s\n", req);
     if (sqlite3_exec(info->db, req, get_rooms, array, 0) != SQLITE_OK) {
         printf("Work rooms\n");
+        return;
     }
     int n_rooms = json_object_array_length(array);
     for (int i = 0; i < n_rooms; i++) {
@@ -89,7 +90,7 @@ void mx_get_rooms(t_server_info *info, json_object *js) {
         json_object_object_add(room_data, "messages", messages);
         sprintf(req1, "SELECT *  FROM msg_history, users \
         		where room_id = %d and users.id = msg_history.user_id order by msg_history.id desc limit 5;", room_id);
-        if (sqlite3_exec(info->db, req1, get_rooms_data, messages, 0) != SQLITE_OK) {
+        if (sqlite3_exec(info->db, req1, mx_get_rooms_data, messages, 0) != SQLITE_OK) {
         	printf("Work rooms data\n");
     	}
     	mx_strdel(&req1);

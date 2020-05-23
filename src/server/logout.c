@@ -96,7 +96,6 @@ int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js) {
     char *command = malloc(1024);
     const char *json_string = NULL;
 
-    (void)csl;
     sprintf(command, "DELETE FROM room_user where user_id='%d' and room_id='%d';", user_id, room_id);
     if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) {
         mx_send_json_to_all_in_room(info, js);
@@ -107,6 +106,110 @@ int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js) {
     else {
         printf("fail\n");
     }
+    return 1;
+}
+
+int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js) {
+    (void)csl;
+    int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
+    int room_id = json_object_get_int(json_object_object_get(js, "room_id"));
+    char *command = malloc(1024);
+    mx_print_json_object(js, "mx_process_input_from_server");
+
+    sprintf(command, "INSERT INTO room_user (user_id, room_id, role) VALUES ('%d', '%d', '%d');", user_id, room_id, 0);
+    if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) {
+        printf("1\n");
+        json_object *room_data = json_object_object_get(js, "room_data");
+        mx_print_json_object(room_data, "mx_process_input_from_server");
+        printf("2\n");
+        json_object *messages = json_object_new_array();
+        char *command1 = mx_strnew(1024);
+
+        json_object_object_add(room_data, "messages", messages);
+        printf("3\n");
+        sprintf(command1, "SELECT *  FROM msg_history, users \
+                where room_id = %d and users.id = msg_history.user_id order by msg_history.id desc limit 5;", room_id);
+        if (sqlite3_exec(info->db, command1, mx_get_rooms_data, messages, 0) == SQLITE_OK) {
+            mx_strdel(&command1);
+            mx_send_json_to_all_in_room(info, js);
+            mx_strdel(&command);
+        }
+        else {
+            printf("fail2\n");
+        }
+    }
+    else {
+        printf("fail\n");
+    }
+    return 1;
+}
+
+static int search_rooms(void *array, int argc, char **argv, char **col_name) {
+    (void)argc;
+    (void)col_name;
+    if (argv[0]) {
+        json_object *room = json_object_new_object();
+        json_object *id = json_object_new_int(atoi(argv[0]));
+        json_object *name = json_object_new_string(argv[1]);
+        json_object *acces = json_object_new_int(atoi(argv[2]));
+
+        json_object_object_add(room, "id", id);
+        json_object_object_add(room, "name", name);
+        json_object_object_add(room, "acces", acces);
+        json_object_array_add((struct json_object *)array, room);
+    }
+    return 0;
+}
+
+static int search_users(void *array, int argc, char **argv, char **col_name) {
+    (void)argc;
+    (void)col_name;
+    if (argv[0]) {
+        json_object *user = json_object_new_object();
+        json_object *id = json_object_new_int(atoi(argv[0]));
+        json_object *login = json_object_new_string(argv[2]);
+        // json_object *email = json_object_new_string(argv[5]);
+        // json_object *name = json_object_new_string(argv[4]);
+
+        json_object_object_add(user, "id", id);
+        // json_object_object_add(user, "name", name);
+        json_object_object_add(user, "login", login);
+        // json_object_object_add(user, "email", email);
+        json_object_array_add((struct json_object *)array, user);
+    }
+    return 0;
+}
+
+int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js) {
+    const char *query = json_object_get_string(json_object_object_get(js, "query"));
+    char *command = malloc(1024);
+    char *command1 = malloc(1024);
+    const char *json_string = NULL;
+    json_object *array_rooms = json_object_new_array();
+    json_object *array_users = json_object_new_array();
+
+    json_object_object_add(js, "rooms", array_rooms);
+    json_object_object_add(js, "users", array_users);
+    if (strcmp(query, "All") == 0) {
+        sprintf(command, "SELECT * FROM rooms;");
+        sprintf(command1, "SELECT * FROM users;");
+    }
+    else {
+        sprintf(command, "SELECT * FROM rooms WHERE name LIKE '%%%s%%';", query);
+        sprintf(command1, "SELECT * FROM users WHERE login LIKE '%%%s%%';", query);
+    }
+    if (sqlite3_exec(info->db, command, search_rooms, array_rooms, NULL) != SQLITE_OK) {
+        printf("fail\n");
+        return 0;
+    }
+    if (sqlite3_exec(info->db, command1, search_users, array_users, NULL) != SQLITE_OK) {
+        printf("fail\n");
+        return 0;
+    }
+
+    json_string = json_object_to_json_string(js);
+    mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
+    mx_strdel(&command);
     return 1;
 }
 
