@@ -43,6 +43,8 @@
 
 #include "../libportaudio/include/portaudio.h"
 
+#include <gst/gst.h>
+
 /*
 #include "../libressl/include/tls.h"
 //#include "../libressl/include/pqueue.h"

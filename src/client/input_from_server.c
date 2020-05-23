@@ -218,7 +218,9 @@ void join_room(t_client_info *info, json_object *new_json) {
 }
 
 int mx_notebook_detach(t_note *note) {
-    gtk_notebook_detach_tab (GTK_NOTEBOOK(note->notebook), note->box);
+    int pos = gtk_notebook_page_num (GTK_NOTEBOOK(note->notebook),
+                       note->box);
+    gtk_notebook_remove_page (GTK_NOTEBOOK(note->notebook), pos);
     return 0;
 }
 
@@ -270,8 +272,8 @@ void edit_profile(t_client_info *info, json_object *new_json) {
     int confirmation = json_object_get_int(json_object_object_get(new_json, "confirmation"));
 
     if (confirmation) {
-        info->audio = json_object_get_int(json_object_object_get(new_json, "audio"));
-        info->visual = json_object_get_int(json_object_object_get(new_json, "visual"));
+        info->audio = json_object_get_int(json_object_object_get(new_json, "audio_n"));
+        info->visual = json_object_get_int(json_object_object_get(new_json, "visual_n"));
     }
 }
 

@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
         return -1;
     }
     gtk_init (&argc, &argv);
+    gst_init (NULL, NULL);
     info = (t_client_info *)malloc(sizeof(t_client_info));
     memset(info, 0, sizeof(t_client_info));
     (*info).argc = argc;

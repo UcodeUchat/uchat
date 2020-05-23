@@ -107,17 +107,16 @@ all: install
 server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX)  #$(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
-
 	@make -sC $(LJSOND)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS) $(TLSFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` -I./Frameworks/GStreamer.framework/Versions/1.0/include/gstreamer-1.0 -I./Frameworks/GStreamer.framework/Versions/1.0/include -I./Frameworks/GStreamer.framework/Versions/1.0/include/glib-2.0 -I./Frameworks/GStreamer.framework/Versions/1.0/lib/glib-2.0/include -L./Frameworks/GStreamer.framework/Versions/1.0/lib -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -lintl $(LMXA) $(LJSONA) $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS) $(TLSFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/server/%.c $(INCS)
-	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -I./Frameworks/GStreamer.framework/Versions/1.0/include/gstreamer-1.0 -I./Frameworks/GStreamer.framework/Versions/1.0/include -I./Frameworks/GStreamer.framework/Versions/1.0/include/glib-2.0 -I./Frameworks/GStreamer.framework/Versions/1.0/lib/glib-2.0/include -o $@ -c $< -I$(INCD) -I$(LMXI)
 	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
 
 $(OBJD)/%.o: src/functions/%.c $(INCS)
-	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -I./Frameworks/GStreamer.framework/Versions/1.0/include/gstreamer-1.0 -I./Frameworks/GStreamer.framework/Versions/1.0/include -I./Frameworks/GStreamer.framework/Versions/1.0/include/glib-2.0 -I./Frameworks/GStreamer.framework/Versions/1.0/lib/glib-2.0/include -o $@ -c $< -I$(INCD) -I$(LMXI)
 	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
 
 $(OBJS_SERVER): | $(OBJD)
@@ -145,8 +144,8 @@ $(LIBSNDFX): $(LIBSNDFA)
 	@make -sC $(LIBSNDFD)
 
 $(LIBPORTAUDIOA):
-	#(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
-	#@make -sC $(LIBPORTAUDIOD)
+# 	(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
+# 	@make -sC $(LIBPORTAUDIOD)
 
 $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 	@make -sC $(LIBPORTAUDIOD)
@@ -163,17 +162,17 @@ client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA) $(LIBSNDFA) -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` -I./Frameworks/GStreamer.framework/Versions/1.0/include/gstreamer-1.0 -I./Frameworks/GStreamer.framework/Versions/1.0/include -I./Frameworks/GStreamer.framework/Versions/1.0/include/glib-2.0 -I./Frameworks/GStreamer.framework/Versions/1.0/lib/glib-2.0/include -L./Frameworks/GStreamer.framework/Versions/1.0/lib -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -lintl $(LMXA)  $(LJSONA) $(LIBSNDFA) -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
 
 
 $(OBJD)/%.o: src/client/%.c $(INCS)
-	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -I./Frameworks/GStreamer.framework/Versions/1.0/include/gstreamer-1.0 -I./Frameworks/GStreamer.framework/Versions/1.0/include -I./Frameworks/GStreamer.framework/Versions/1.0/include/glib-2.0 -I./Frameworks/GStreamer.framework/Versions/1.0/lib/glib-2.0/include -o $@ -c $< -I$(INCD) -I$(LMXI)
 	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
 
 
 $(OBJD)/%.o: src/functions/%.c $(INCS)
-	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -I./Frameworks/GStreamer.framework/Versions/1.0/include/gstreamer-1.0 -I./Frameworks/GStreamer.framework/Versions/1.0/include -I./Frameworks/GStreamer.framework/Versions/1.0/include/glib-2.0 -I./Frameworks/GStreamer.framework/Versions/1.0/lib/glib-2.0/include  -o $@ -c $< -I$(INCD) -I$(LMXI)
 	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
 
 $(OBJS_CLIENT): | $(OBJD)
