@@ -1,10 +1,5 @@
 #include "uchat.h"
 
-typedef struct s_all {
-    t_room *room;
-    GtkWidget *widget;
-}               t_all;
-
 void focus_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     (void)widget;
     (void)event;
