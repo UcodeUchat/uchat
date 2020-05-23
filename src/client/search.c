@@ -49,6 +49,14 @@ void init_rooms (t_client_info *info, json_object *new_json, GtkWidget *v_box) {
     struct json_object *rooms;
     json_object_object_get_ex(new_json, "rooms", &rooms);
     int n_rooms = json_object_array_length(rooms);
+    if (!n_rooms) {
+        h_box = gtk_box_new(FALSE, 5);
+        gtk_widget_set_size_request(h_box, -1, 41);
+        gtk_widget_set_valign (h_box, GTK_ALIGN_CENTER);
+        gtk_box_pack_start (GTK_BOX (room_box), h_box, FALSE, FALSE, 0);
+        GtkWidget *empty_label = gtk_label_new("No rooms found");
+        gtk_box_pack_start (GTK_BOX (h_box), empty_label, FALSE, FALSE, 0); 
+    }
     for (int i = 0; i < n_rooms; i++) {
         json_object *room_data = json_object_array_get_idx(rooms, i);
         const char *name = json_object_get_string(json_object_object_get(room_data, "name"));
@@ -85,6 +93,17 @@ void init_rooms (t_client_info *info, json_object *new_json, GtkWidget *v_box) {
     }
 }
 
+void open_menu_callback1(GtkWidget *widget, GdkEventButton *event, GtkWidget *menu) {
+    (void)widget;
+    (void)event;
+    gtk_menu_popup_at_pointer (GTK_MENU(menu), NULL);
+}
+
+void load_profile_callback1(GtkWidget *widget, t_mes *mes) {
+    (void)widget;
+    mx_load_profile_client(mes->info, mes->user_id);
+}
+
 void init_users (t_client_info *info, json_object *new_json, GtkWidget *v_box) {
     GtkWidget *h_box = gtk_box_new(FALSE, 5);
     gtk_widget_set_size_request(h_box, -1, 35);
@@ -109,6 +128,14 @@ void init_users (t_client_info *info, json_object *new_json, GtkWidget *v_box) {
     struct json_object *users;
     json_object_object_get_ex(new_json, "users", &users);
     int n_users = json_object_array_length(users);
+    if (!n_users) {
+        h_box = gtk_box_new(FALSE, 5);
+        gtk_widget_set_size_request(h_box, -1, 41);
+        gtk_widget_set_valign (h_box, GTK_ALIGN_CENTER);
+        gtk_box_pack_start (GTK_BOX (room_box), h_box, FALSE, FALSE, 0);
+        GtkWidget *empty_label = gtk_label_new("No users found");
+        gtk_box_pack_start (GTK_BOX (h_box), empty_label, FALSE, FALSE, 0); 
+    }
     for (int i = 0; i < n_users; i++) {
         json_object *user_data = json_object_array_get_idx(users, i);
         const char *login = json_object_get_string(json_object_object_get(user_data, "login"));
@@ -118,8 +145,25 @@ void init_users (t_client_info *info, json_object *new_json, GtkWidget *v_box) {
             gtk_widget_set_size_request(h_box, -1, 41);
             gtk_widget_set_valign (h_box, GTK_ALIGN_CENTER);
             gtk_box_pack_start (GTK_BOX (room_box), h_box, FALSE, FALSE, 0);
+
+            GtkWidget *login_event = gtk_event_box_new();
+            //--
+            GtkWidget *login_menu  = gtk_menu_new ();
+            GtkWidget *view = gtk_menu_item_new_with_label("View profile");
+            gtk_widget_show(view);
+            gtk_menu_shell_append (GTK_MENU_SHELL (login_menu), view);
+            t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
+            mes->info = info;
+            mes->user_id = id;
+            g_signal_connect (G_OBJECT (view), "activate", G_CALLBACK (load_profile_callback1), mes);
+            //--
+            gtk_widget_add_events (login_event, GDK_BUTTON_PRESS_MASK);
+            g_signal_connect (G_OBJECT (login_event), "button_press_event", 
+                                G_CALLBACK (open_menu_callback1), G_OBJECT(login_menu));
             GtkWidget *label = gtk_label_new(login);
-            gtk_box_pack_start (GTK_BOX (h_box), label, FALSE, FALSE, 0);
+            gtk_container_add(GTK_CONTAINER(login_event), label);
+            gtk_box_pack_start(GTK_BOX (h_box), login_event, FALSE, FALSE, 0);
+
             GtkWidget *separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
             gtk_box_pack_start (GTK_BOX (room_box), separator, FALSE, FALSE, 0);
         }
