@@ -273,6 +273,8 @@ t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new
 
 void play_sound(char *sound) {
     GstElement *pipeline;
+    GstBus *bus;
+    GstMessage *msg;
     char *description;
     char *tmp;
     char cwd[1024];
@@ -288,16 +290,24 @@ void play_sound(char *sound) {
 
     /* Start playing */
     gst_element_set_state (pipeline, GST_STATE_PLAYING);
-    sleep(2);
-    free(description);
+
+    bus = gst_element_get_bus (pipeline);
+    msg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE,
+      GST_MESSAGE_ERROR | GST_MESSAGE_EOS);
+
+    /* Free resources */
+    if (msg != NULL)
+        gst_message_unref (msg);
+    gst_object_unref (bus);
     gst_element_set_state (pipeline, GST_STATE_NULL);
     gst_object_unref (pipeline);
+    free(description);
     return;
 }
 
 void *sound_thread (void *data) {
     (void)data;
-    play_sound("sounds/nani.mp3");
+    play_sound("sounds/sound.wav");
     return 0;
 }
 
