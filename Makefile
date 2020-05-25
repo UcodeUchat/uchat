@@ -104,7 +104,7 @@ SQLFLAGS = -lsqlite3
 
 all: install
 
-server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX)  #$(LIBMX)
+server: $(NAME_S) #$(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX)  #$(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
 	@make -sC $(LJSOND)
@@ -158,11 +158,11 @@ $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 #$(LIBRESSL_TLSX): $(LIBRESSLD_TLSA)
 #	@make -sC $(LIBRESSLD)
 
-client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
+client: $(NAME_C) #$(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` -I./Frameworks/GStreamer.framework/Versions/1.0/include/gstreamer-1.0 -I./Frameworks/GStreamer.framework/Versions/1.0/include -I./Frameworks/GStreamer.framework/Versions/1.0/include/glib-2.0 -I./Frameworks/GStreamer.framework/Versions/1.0/lib/glib-2.0/include -L./Frameworks/GStreamer.framework/Versions/1.0/lib -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -lintl $(LMXA)  $(LJSONA) $(LIBSNDFA) -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` -I./Frameworks/GStreamer.framework/Versions/1.0/include/gstreamer-1.0 -I./Frameworks/GStreamer.framework/Versions/1.0/include -I./Frameworks/GStreamer.framework/Versions/1.0/include/glib-2.0 -I./Frameworks/GStreamer.framework/Versions/1.0/lib/glib-2.0/include -L./Frameworks/GStreamer.framework/Versions/1.0/lib -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -lintl  -framework GStreamer $(LMXA)  $(LJSONA) $(LIBSNDFA) -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
 
 

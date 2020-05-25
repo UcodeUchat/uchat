@@ -139,14 +139,17 @@ void input_authentification(t_client_info *info, json_object *new_json) {
     int visual = json_object_get_int(json_object_object_get(new_json, "visual"));
     int audio = json_object_get_int(json_object_object_get(new_json, "audio"));
 
-    if ((*info).auth_client == 0){
+    if ((*info).auth_client == 0) {
         fprintf(stderr, "ANSWER = [%d]\n", type);
         if (type == 4) {
             info->id = user_id;
             info->visual = visual;
             info->audio = audio;
             (*info).auth_client = 1;
-            json_object_deep_copy(json_object_object_get(new_json, "rooms"), &info->rooms, NULL);
+            json_object_put(info->rooms);
+            json_object *rooms = NULL;
+            json_object_deep_copy(json_object_object_get(new_json, "rooms"), &rooms, NULL);
+            info->rooms = rooms;
         }
         else{
             (*info).auth_client = 0;

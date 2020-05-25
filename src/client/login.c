@@ -292,7 +292,7 @@ void logout_callback (GtkWidget *widget, t_client_info *info) {
     gtk_window_set_title(GTK_WINDOW(info->data->window), "Login");
     gtk_entry_set_text(GTK_ENTRY(info->data->login_entry), "");
     gtk_entry_set_text(GTK_ENTRY(info->data->password_entry), "");
-    gtk_widget_hide(info->data->general_box);
+    gtk_widget_destroy(info->data->general_box);
     gtk_widget_show (info->data->login_box);
 }
 
@@ -541,7 +541,8 @@ void init_stickers (t_client_info *info, GtkWidget *box) {
 
 
 int mx_notebook_prepend(t_note *note) {
-    gtk_notebook_prepend_page(GTK_NOTEBOOK(note->notebook), note->box, note->label);
+    gtk_notebook_append_page(GTK_NOTEBOOK(note->notebook), note->box, note->label);
+    gtk_notebook_reorder_child(GTK_NOTEBOOK(note->notebook), note->box, note->position);
     return 0;
 }
 
@@ -623,6 +624,7 @@ t_room *mx_create_room(t_client_info *info, json_object *room_data, int position
         note->notebook = info->data->notebook;
         note->box = room->room_box;
         note->label = label;
+        note->position = position;
         g_idle_add ((GSourceFunc)mx_notebook_prepend, note);
         //--msg history
         pthread_t msg_history_t = NULL;
@@ -738,9 +740,8 @@ void init_general (t_client_info *info) {
     gtk_widget_show (box);
 
     int n_rooms = json_object_array_length(info->rooms);
-    for (int i = n_rooms - 1; i >= 0; i--) {
+    for (int i = 0; i < n_rooms; i++) {
         json_object *room_data = json_object_array_get_idx(info->rooms, i);
-
         mx_push_room(info, room_data, i);   
     }
     gtk_widget_hide(info->data->login_box);

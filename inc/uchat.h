@@ -290,6 +290,7 @@ typedef struct s_note {
     GtkWidget *notebook;
     GtkWidget *label;
     GtkWidget *box;
+    int position;
 }               t_note;
 
 #define MX_PATH_TO_DB "./server_db.bin"

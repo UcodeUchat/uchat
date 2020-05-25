@@ -271,45 +271,45 @@ t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new
     return node;
 }
 
-void play_sound(char *sound) {
-    GstElement *pipeline;
-    GstBus *bus;
-    GstMessage *msg;
-    char *description;
-    char *tmp;
-    char cwd[1024];
+// void play_sound(char *sound) {
+//     GstElement *pipeline;
+//     GstBus *bus;
+//     GstMessage *msg;
+//     char *description;
+//     char *tmp;
+//     char cwd[1024];
 
-    getcwd(cwd, 1024);
-    description = mx_strjoin("playbin uri=file://", cwd);
-    tmp = mx_strjoin(description, "/");
-    free(description);
-    description = mx_strjoin(tmp, sound);
-    free(tmp);
-    printf("AAA%s\n", description);
-    pipeline = gst_parse_launch (description, NULL);
+//     getcwd(cwd, 1024);
+//     description = mx_strjoin("playbin uri=file://", cwd);
+//     tmp = mx_strjoin(description, "/");
+//     free(description);
+//     description = mx_strjoin(tmp, sound);
+//     free(tmp);
+//     printf("AAA%s\n", description);
+//     pipeline = gst_parse_launch (description, NULL);
 
-    /* Start playing */
-    gst_element_set_state (pipeline, GST_STATE_PLAYING);
+//     /* Start playing */
+//     gst_element_set_state (pipeline, GST_STATE_PLAYING);
 
-    bus = gst_element_get_bus (pipeline);
-    msg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE,
-      GST_MESSAGE_ERROR | GST_MESSAGE_EOS);
+//     bus = gst_element_get_bus (pipeline);
+//     msg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE,
+//       GST_MESSAGE_ERROR | GST_MESSAGE_EOS);
 
-    /* Free resources */
-    if (msg != NULL)
-        gst_message_unref (msg);
-    gst_object_unref (bus);
-    gst_element_set_state (pipeline, GST_STATE_NULL);
-    gst_object_unref (pipeline);
-    free(description);
-    return;
-}
+//     /* Free resources */
+//     if (msg != NULL)
+//         gst_message_unref (msg);
+//     gst_object_unref (bus);
+//     gst_element_set_state (pipeline, GST_STATE_NULL);
+//     gst_object_unref (pipeline);
+//     free(description);
+//     return;
+// }
 
-void *sound_thread (void *data) {
-    (void)data;
-    play_sound("sounds/sound.wav");
-    return 0;
-}
+// void *sound_thread (void *data) {
+//     (void)data;
+//     play_sound("sounds/sound.wav");
+//     return 0;
+// }
 
 void mx_push_message(t_client_info *info, t_room *room, json_object *new_json) {
     t_message *tmp;
@@ -332,13 +332,13 @@ void mx_push_message(t_client_info *info, t_room *room, json_object *new_json) {
     }
     int id = json_object_get_int(json_object_object_get(new_json, "id"));
     int add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
-    int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
-    if (info->audio == 1) {
-        if (user_id != info->id) {
-            pthread_t sound_t = NULL;
-            pthread_create(&sound_t, 0, sound_thread, NULL);
-        }
-    }
+    // int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
+    // if (info->audio == 1) {
+    //     if (user_id != info->id) {
+    //         pthread_t sound_t = NULL;
+    //         pthread_create(&sound_t, 0, sound_thread, NULL);
+    //     }
+    // }
     if (add_info == 2) {
         t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
         mes->info = info;
