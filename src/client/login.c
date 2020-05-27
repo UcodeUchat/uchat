@@ -332,6 +332,11 @@ void profile_callback (GtkWidget *widget, t_client_info *info) {
     mx_load_profile_client(info, info->id);
 }
 
+void create_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    gtk_widget_show(info->data->create_room->main_box);
+}
+
 void search_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
     json_object *new_json;
@@ -385,6 +390,119 @@ void init_search (t_client_info *info) {
     g_signal_connect(G_OBJECT(info->data->search_entry),"activate", G_CALLBACK(search_callback), info);
 }
 
+void close_creation_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info) {
+    (void)widget;
+    (void)event;
+    gtk_widget_hide(info->data->create_room->main_box);
+}
+
+void close_creation_callback1 (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    gtk_widget_hide(info->data->create_room->main_box);
+}
+
+void create_room_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    json_object *new_json;
+
+    gtk_widget_hide(info->data->create_room->main_box);
+    new_json = json_object_new_object();
+    json_object_object_add(new_json, "type", json_object_new_int(MX_CREATE_ROOM_TYPE));
+    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
+    json_object_object_add(new_json, "name", json_object_new_string 
+                            (gtk_entry_get_text(GTK_ENTRY(info->data->create_room->name_entry))));
+    json_object_object_add(new_json, "acces", json_object_new_int 
+                            (gtk_combo_box_get_active (GTK_COMBO_BOX(info->data->create_room->selection)) + 1));
+    json_object  *room_data = json_object_new_object();
+    json_object *messages = json_object_new_array();
+    json_object_object_add(room_data, "messages", messages);
+    json_object_object_add(room_data, "name", json_object_new_string 
+                            (gtk_entry_get_text(GTK_ENTRY(info->data->create_room->name_entry))));
+    json_object_object_add(new_json, "room_data", room_data);
+    const char *json_string = json_object_to_json_string(new_json);
+    tls_send(info->tls_client, json_string, strlen(json_string));
+    gtk_entry_set_text(GTK_ENTRY(info->data->create_room->name_entry), "");
+}
+
+void init_create (t_client_info *info) { 
+    info->data->create_room = (t_create *)malloc(sizeof(t_create));
+    info->data->create_room->main_box = gtk_box_new(FALSE, 0);
+    gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->create_room->main_box, 0, 0);
+    gtk_widget_set_size_request(info->data->create_room->main_box, gtk_widget_get_allocated_width (info->data->window), 
+                                gtk_widget_get_allocated_height (info->data->window));
+    GtkWidget *main_box = gtk_event_box_new();
+    gtk_box_pack_start (GTK_BOX (info->data->create_room->main_box), main_box, FALSE, FALSE, 0);
+    gtk_widget_set_size_request(main_box, 250, -1);
+    gtk_widget_set_name (main_box, "profile");
+    GtkWidget *fixed = gtk_fixed_new();
+    gtk_container_add(GTK_CONTAINER(main_box), fixed);
+    GtkWidget *box = gtk_box_new(FALSE, 10);
+    gtk_widget_set_size_request(box, 250, -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(box), GTK_ORIENTATION_VERTICAL);
+    gtk_fixed_put (GTK_FIXED (fixed), box, 0, 10);
+
+    GtkWidget *box1 = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
+    info->data->create_room->name_entry = gtk_entry_new();
+    gtk_box_pack_start (GTK_BOX (box1), info->data->create_room->name_entry, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(info->data->create_room->name_entry, 200, -1);
+    info->data->login_entry = gtk_entry_new ();
+    gtk_entry_set_max_length (GTK_ENTRY (info->data->create_room->name_entry), 50);
+    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->create_room->name_entry), "Write room name");
+    gtk_editable_select_region (GTK_EDITABLE (info->data->create_room->name_entry),
+                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->create_room->name_entry)));
+    gtk_widget_show(info->data->create_room->name_entry);
+    gtk_widget_show(box1);
+
+    box1 = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
+    info->data->create_room->selection = gtk_combo_box_text_new();
+    gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(info->data->create_room->selection),
+                           "0",
+                           "Public");
+    gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(info->data->create_room->selection),
+                           "1",
+                           "Private");
+    gtk_combo_box_set_active (GTK_COMBO_BOX(info->data->create_room->selection),
+                          0);
+    gtk_box_pack_start (GTK_BOX (box1), info->data->create_room->selection, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(info->data->create_room->selection, 200, -1);
+    info->data->login_entry = gtk_entry_new ();
+    gtk_widget_show(info->data->create_room->selection);
+    gtk_widget_show(box1);
+
+    box1 = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
+    info->data->create_room->create_button = gtk_button_new_with_label("OK");
+    g_signal_connect(G_OBJECT(info->data->create_room->create_button), "clicked", G_CALLBACK(create_room_callback), info);
+    gtk_box_pack_start (GTK_BOX (box1), info->data->create_room->create_button, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(info->data->create_room->create_button, 100, -1);
+    gtk_widget_show(info->data->create_room->create_button);
+    info->data->create_room->cancel_button = gtk_button_new_with_label("Cancel");
+    g_signal_connect(G_OBJECT(info->data->create_room->create_button), "clicked", G_CALLBACK(close_creation_callback1), info);
+    gtk_box_pack_start (GTK_BOX (box1), info->data->create_room->cancel_button, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(info->data->create_room->cancel_button, 100, -1);
+    gtk_widget_show(info->data->create_room->cancel_button);
+    gtk_widget_show(box1);
+
+    gtk_widget_show(box);
+    gtk_widget_show(fixed);
+    gtk_widget_show(main_box);
+
+    GtkWidget *exit_box = gtk_event_box_new();
+    gtk_box_pack_start (GTK_BOX (info->data->create_room->main_box), exit_box, TRUE, TRUE, 0);
+    gtk_widget_realize (exit_box);
+    gtk_widget_add_events (exit_box, GDK_BUTTON_PRESS_MASK);
+    g_signal_connect (G_OBJECT (exit_box), "button_press_event", G_CALLBACK (close_creation_callback), info);
+    gtk_widget_set_name (exit_box, "menu_exit");
+    gtk_widget_show(exit_box);
+    
+}
+
 void init_menu (t_client_info *info) {
     info->data->menu = gtk_box_new(FALSE, 0);
     gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->menu, 0, 0);
@@ -407,6 +525,7 @@ void init_menu (t_client_info *info) {
     gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
     gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
     GtkWidget *button = gtk_button_new_with_label("Create room");
+    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(create_callback), info);
     gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
     gtk_widget_set_size_request(button, 100, -1);
     gtk_widget_set_name(button, "entry");
@@ -790,9 +909,10 @@ void enter_callback (GtkWidget *widget, t_client_info *info) {
         pthread_create(&login_msg_t, 0, login_msg_thread, info);
     }
     else if(info->auth_client == 1) {
-        init_general(info);
-        init_menu(info);
+        init_general (info);
+        init_menu (info);
         init_search (info);
+        init_create (info);
         //--
     }  
 }

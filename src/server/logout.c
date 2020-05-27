@@ -109,6 +109,49 @@ int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js) {
     return 1;
 }
 
+int get_room_id(void *js, int argc, char **argv, char **col_name) {
+    (void)argc;
+    (void)col_name;
+    if (argv[0]) {
+        struct json_object *t = json_object_new_int(atoi(argv[0]));
+        json_object_object_add((struct json_object*) js, "room_id", t);
+        return 0;
+    }
+    return 1;
+}
+
+int mx_create_room_server (t_server_info *info, t_socket_list *csl, json_object *js) {
+    int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
+    int access = json_object_get_int(json_object_object_get(js, "acces"));
+    const char *name = json_object_get_string(json_object_object_get(js, "name"));
+    const char *json_string = NULL;
+    json_object *room_data = json_object_object_get(js, "room_data");
+    char *command = malloc(1024);
+
+    sprintf(command, "INSERT INTO rooms (name, access) VALUES ('%s', '%d'); \
+        SELECT last_insert_rowid();" , name, access);
+    if (sqlite3_exec(info->db, command, get_room_id, room_data, NULL) == SQLITE_OK) {
+        int room_id = json_object_get_int(json_object_object_get(room_data, "room_id"));
+        json_object_object_add(js, "room_id", json_object_new_int(room_id));
+        char *command1 = mx_strnew(1024);
+
+        sprintf(command1, "INSERT INTO room_user (user_id, room_id, role) VALUES ('%d', '%d', '%d');", user_id, room_id ,1);
+        if (sqlite3_exec(info->db, command1, NULL, NULL, 0) == SQLITE_OK) {
+            json_string = json_object_to_json_string(js);
+            mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
+            mx_strdel(&command1);
+            mx_strdel(&command);
+        }
+        else {
+            printf("fail2\n");
+        }
+    }
+    else {
+        printf("fail\n");
+    }
+    return 1;
+}
+
 int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js) {
     (void)csl;
     int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
@@ -118,15 +161,11 @@ int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js) {
 
     sprintf(command, "INSERT INTO room_user (user_id, room_id, role) VALUES ('%d', '%d', '%d');", user_id, room_id, 0);
     if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) {
-        printf("1\n");
         json_object *room_data = json_object_object_get(js, "room_data");
-        mx_print_json_object(room_data, "mx_process_input_from_server");
-        printf("2\n");
         json_object *messages = json_object_new_array();
         char *command1 = mx_strnew(1024);
 
         json_object_object_add(room_data, "messages", messages);
-        printf("3\n");
         sprintf(command1, "SELECT *  FROM msg_history, users \
                 where room_id = %d and users.id = msg_history.user_id order by msg_history.id desc limit 5;", room_id);
         if (sqlite3_exec(info->db, command1, mx_get_rooms_data, messages, 0) == SQLITE_OK) {

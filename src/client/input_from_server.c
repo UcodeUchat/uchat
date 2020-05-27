@@ -73,7 +73,6 @@ void input_message(t_client_info *info, json_object *new_json) {
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
-    //mx_play_sound_file("./audio/message_send.aiff");
     mx_push_message(info, room, new_json);
     t_room *head = info->data->rooms;
     while (head != NULL) {
@@ -303,6 +302,8 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
     else if (type == MX_LEAVE_ROOM_TYPE)
         leave_room(info, obj);
     else if (type == MX_JOIN_ROOM_TYPE)
+        join_room(info, obj);
+    else if (type == MX_CREATE_ROOM_TYPE)
         join_room(info, obj);
     else if (type == MX_EDIT_PROFILE_TYPE)
         edit_profile(info, obj);

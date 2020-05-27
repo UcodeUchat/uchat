@@ -77,6 +77,7 @@ SRC_CLIENT = main_client.c \
 	load_profile.c \
 	message.c \
 	search.c \
+	create.c \
 	work_with_files_list_in_client.c \
 	record_audio.c \
 	play_audio.c
