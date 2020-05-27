@@ -317,7 +317,6 @@ typedef struct  s_server_info {  // struct server
 #define MX_LEAVE_ROOM_TYPE 16
 #define MX_SEARCH_ALL_TYPE 17
 #define MX_JOIN_ROOM_TYPE 18
-#define MX_PACKAGE_SIZE sizeof(t_package)
 
 #define MX_MAX_MSG_SIZE 200
 // sizeof((type *)0)->member)
@@ -327,20 +326,6 @@ typedef struct  s_server_room {
     char *name;
     struct  s_server_room *next;
 }               t_server_room;
-
-typedef struct  s_package {
-    struct tls *client_tls_sock; // #
-    int client_sock; // #
-    char type; // input type
-    char piece; // 0 - full, 1 - start, 2 - partition, 3 - end
-    int user_id; // sender unical id
-    int room_id; // room unical id
-    int add_info; // addition information which use different package types
-    char login[50]; // user login
-    char password[32]; // user password
-    char data[1024]; // user data
-    struct  s_server_room *rooms;
-}               t_package;
 
 typedef struct  s_socket_list {
     int socket;
@@ -435,7 +420,6 @@ int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_process_message_in_client(t_client_info *info);
 void authentification(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);
-int mx_send_message_from_client(t_client_info *info, t_package *package, char *message);
 void sleep_ms (int milliseconds);
 t_message *mx_find_message(t_message *messages, int id);
 t_room *mx_find_room(t_room *rooms, int id);
@@ -481,10 +465,6 @@ char *mx_strhash(const char *to_hash);
 char *mx_encrypt(char *str);
 char *mx_decrypt(char *str);
 
-// funcs for package
-t_package *mx_create_new_package();
-t_package *mx_copy_package(t_package *package);
-
 // krivoy dizayn
 int mx_login (t_client_info *info);
 void append_message(t_client_info *info, t_room *room, json_object *new_json);
@@ -492,11 +472,5 @@ void append_message(t_client_info *info, t_room *room, json_object *new_json);
 //json
 json_object *mx_create_basic_json_object(int type);
 void mx_print_json_object(struct json_object *jobj, const char *msg);
-struct json_object * mx_find_something(struct json_object *jobj, const char *key);
-void mx_glitch_in_the_matrix(struct json_object *jobj);
-const char *mx_message_to_json_string(t_client_info *info, char *message);
-json_object *mx_package_to_json(t_package *package);
-t_package *mx_json_to_package(json_object *new_json);
-
 
 #endif

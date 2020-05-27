@@ -166,14 +166,14 @@ long mx_save_audio(t_audio *data) {
             .format = SF_FORMAT_AIFF | SF_FORMAT_FLOAT
     };
     char file_name[100];
-    snprintf(file_name, 100, "./record/rec_massage:%d.aif", rand());  //rand -> replace by message id
+    snprintf(file_name, 100, "./Uchat_downloads/rec_massage:%d.aif", rand());  //rand -> replace by message id
     printf("start save audio\n");
     SNDFILE *outfile = sf_open(file_name, SFM_WRITE, &sfinfo);
     if (!outfile) {
         printf("error outfile =%d\n", sf_error(outfile));
         return -1;
     }
-    long wr = sf_writef_float(outfile, data->rec_samples, data->size / sizeof(float));
+    long wr = sf_writef_float(outfile, data->rec_samples, data->size / 8);
     err = data->size - wr;
     printf("data to write to file =%zu\n", data->size);
     printf("write to file =%lu\n", wr);
