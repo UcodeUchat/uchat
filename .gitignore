@@ -24,8 +24,8 @@ o*.d
 *.pch
 
 # Libraries
-//*.lib
-*.a
+#*.lib
+#.a
 *.la
 *.lo
 
@@ -58,6 +58,8 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+./uchat
+./uchat_server
 
 CMakeLists.txt
 Uchat_downloads
