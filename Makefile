@@ -65,7 +65,8 @@ SRC_SERVER = main_server.c \
 	functions_for_server.c \
 	send_mail_notification.c \
 	send_mail_notification2.c \
-	send_mail_notification3.c
+	send_mail_notification3.c \
+	send_mail_notification4.c \
 
 SRC_CLIENT = main_client.c \
 	start_client.c \
