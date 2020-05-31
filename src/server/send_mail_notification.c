@@ -67,13 +67,14 @@ static int send_mail_quit(struct tls *tls_c) {
     return 0;
 }
 
-void *mx_send_mail(char *receiver, char *message) {
+void *mx_send_mail(char *login, char *receiver, char *message) {
     int server;
     struct tls *tls_c = NULL;
     t_mail *mail = NULL;
 
     mail = (t_mail *)malloc(sizeof(t_mail));
     mx_init_struct_mail(mail, receiver, message);
+    mail->user = login ? strdup(login) : NULL;
     if ((server = send_mail_connect(mail)) == 1)
         return NULL;
     tls_c = mx_create_tls();
@@ -81,11 +82,11 @@ void *mx_send_mail(char *receiver, char *message) {
         printf("%s\n", tls_error(tls_c));
         return NULL;
     }
-   if ((send_mail_autentification(tls_c)))
+    if (send_mail_autentification(tls_c))
        return NULL;
-    if ((send_mail_massage(tls_c, mail))) // send massage
+    if (send_mail_massage(tls_c, mail)) // send massage
         return NULL;
-    if ((send_mail_quit(tls_c))) // send quit
+    if (send_mail_quit(tls_c)) // send quit
         return NULL;
     close(server);
     tls_free(tls_c);
