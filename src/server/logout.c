@@ -1,52 +1,5 @@
 #include "uchat.h"
 
-static int get_rooms_data(void *messages, int argc, char **argv, char **col_name) {
-    json_object *message = json_object_new_object();
-    json_object *id = json_object_new_int(atoi(argv[0]));
-    json_object *user_id = json_object_new_int(atoi(argv[1]));
-    json_object *data = NULL;
-    json_object *login = json_object_new_string(argv[8]);
-    json_object *add_info = NULL;
-
-    if (argv[0] == NULL) {
-        return 1;
-    }
-    (void)argc;
-    (void)col_name;
-    if (strcmp(argv[4], "file") == 0) {
-        char *extention = strdup(argv[3]);
-
-        while (mx_get_char_index(extention, '.') >= 0) {
-            char *tmp = strdup(extention + mx_get_char_index(extention, '.') + 1);
-            free(extention);
-            extention = strdup(tmp);
-            free(tmp); 
-        }
-        if (strcmp(extention, "jpg") == 0 || strcmp(extention, "png") == 0 || strcmp(extention, "gif") == 0) {
-            data = json_object_new_string(argv[3]);
-            add_info = json_object_new_int(2);
-        }
-        else {
-            data = json_object_new_string(argv[3] /*+ 20*/);
-            add_info = json_object_new_int(1);
-        }
-    }
-    else {
-        if (strcmp(argv[4], "mes") == 0)
-            add_info = json_object_new_int(0);
-        else if (strcmp(argv[4], "stik") == 0)
-            add_info = json_object_new_int(3);
-        data = json_object_new_string(argv[3]);
-    }
-    json_object_object_add(message, "id", id);
-    json_object_object_add(message, "user_id", user_id);
-    json_object_object_add(message, "data", data);
-    json_object_object_add(message, "login", login);
-    json_object_object_add(message, "add_info", add_info);
-    json_object_array_add((struct json_object *)messages, message);
-    return 0;
-}
-
 int mx_delete_message (t_server_info *info, t_socket_list *csl, json_object *js) {
     (void)csl;
     int message_id = json_object_get_int(json_object_object_get(js, "message_id"));
@@ -113,7 +66,7 @@ int get_room_id(void *js, int argc, char **argv, char **col_name) {
     (void)argc;
     (void)col_name;
 
-    if (argv[0] && (atoi(argv[0]) > 0)) {
+    if (argv[0]) {
         struct json_object *t = json_object_new_int(atoi(argv[0]));
         json_object_object_add((struct json_object*) js, "room_id", t);
         return 0;
@@ -121,13 +74,36 @@ int get_room_id(void *js, int argc, char **argv, char **col_name) {
     return 1;
 }
 
+int get_logins(void *name, int argc, char **argv, char **col_name) {
+    (void)argc;
+    (void)col_name;
+    char **str = (char  **)name;
+
+    if (argv[0]) {
+        *str = mx_strjoin(*str, argv[0]);
+        return 0;
+    }
+    return 1;
+}
+
+void get_name(t_server_info *info, char **name, int first_id, int second_id) {
+    char *command = malloc(1024);
+
+    sprintf(command, "SELECT login FROM users WHERE id='%d' OR id='%d';", first_id, second_id);
+    sqlite3_exec(info->db, command, get_logins, name, NULL);
+    mx_strdel(&command);
+}
+
 int mx_direct_message (t_server_info *info, t_socket_list *csl, json_object *js) {
     int first_id = json_object_get_int(json_object_object_get(js, "first_id"));
     int second_id = json_object_get_int(json_object_object_get(js, "second_id"));
     char *command = malloc(1024);
+    char *name = mx_strnew(1);
     const char *json_string = NULL;
 
-    sprintf(command, "SELECT * FROM rooms INNER JOIN direct_rooms USING(id) WHERE access=3 AND ((first_id='%d' AND second_id='%d') OR (first_id='%d' AND second_id='%d'));",
+    get_name(info, &name, first_id, second_id);
+    sprintf(command, "SELECT * FROM rooms INNER JOIN direct_rooms USING(id) \
+        WHERE access=3 AND ((first_id='%d' AND second_id='%d') OR (first_id='%d' AND second_id='%d'));",
         first_id, second_id, second_id, first_id);
     sqlite3_exec(info->db, command, get_room_id, js, NULL);
     if (json_object_get_int(json_object_object_get(js, "room_id")) != 0) {
@@ -139,7 +115,7 @@ int mx_direct_message (t_server_info *info, t_socket_list *csl, json_object *js)
     else {
         char *command2 = malloc(1024);
         sprintf(command2, "INSERT INTO rooms (name, access) VALUES ('%s', '3'); \
-        SELECT last_insert_rowid();" , "direct");
+        SELECT last_insert_rowid();" , name);
         if (sqlite3_exec(info->db, command2, get_room_id, js, NULL) == SQLITE_OK) {
             int room_id = json_object_get_int(json_object_object_get(js, "room_id"));
             char *command3 = malloc(1024);
@@ -150,8 +126,9 @@ int mx_direct_message (t_server_info *info, t_socket_list *csl, json_object *js)
             if (sqlite3_exec(info->db, command3, NULL, NULL, NULL) == SQLITE_OK) {
                 json_object *room_data = json_object_new_object();;
                 json_object_object_add(room_data, "room_id", json_object_new_int(room_id));
-                json_object_object_add(room_data, "name", json_object_new_string("direct"));
+                json_object_object_add(room_data, "name", json_object_new_string(name));
                 json_object *messages = json_object_new_array();
+                json_object_object_add(room_data, "access", json_object_new_int(3));
                 json_object_object_add(room_data, "messages", messages);
                 json_object_object_add(js, "room_data", room_data);
                 json_object_object_add(js, "exist", json_object_new_int(0));
@@ -281,7 +258,7 @@ int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js) {
         sprintf(command1, "SELECT * FROM users;");
     }
     else {
-        sprintf(command, "SELECT * FROM rooms WHERE name LIKE '%%%s%%';", query);
+        sprintf(command, "SELECT * FROM rooms WHERE name LIKE '%%%s%%' AND NOT access=3;", query);
         sprintf(command1, "SELECT * FROM users WHERE login LIKE '%%%s%%';", query);
     }
     if (sqlite3_exec(info->db, command, search_rooms, array_rooms, NULL) != SQLITE_OK) {
@@ -374,7 +351,7 @@ int mx_load_history (t_server_info *info, t_socket_list *csl, json_object *js) {
     sprintf(command, "SELECT *  FROM msg_history, users \
                 where room_id = %d and msg_history.id < %d and users.id = msg_history.user_id \
                 order by msg_history.id desc limit 15;", room_id, last_id);
-    if (sqlite3_exec(info->db, command, get_rooms_data, messages, NULL) == SQLITE_OK) {
+    if (sqlite3_exec(info->db, command, mx_get_rooms_data, messages, NULL) == SQLITE_OK) {
         printf("succes\n");
     }
     else {

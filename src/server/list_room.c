@@ -5,13 +5,15 @@
 
 static int get_rooms(void *array, int argc, char **argv, char **col_name) {
 	json_object *room = json_object_new_object();
-	json_object *name = json_object_new_string(argv[2]);
 	json_object *id = json_object_new_int(atoi(argv[1]));
+	json_object *name = json_object_new_string(argv[2]);
+	json_object *access = json_object_new_int(atoi(argv[3]));
 
 	(void)argc;
 	(void)col_name;
 	json_object_object_add(room, "room_id", id);
 	json_object_object_add(room, "name", name);
+	json_object_object_add(room, "access", access);
 	json_object_array_add((struct json_object *)array, room);
 	return 0;
 }
@@ -69,7 +71,7 @@ void mx_get_rooms(t_server_info *info, json_object *js) {
 	json_object *array = json_object_new_array();
 
 	json_object_object_add(js, KEY10, array);
-    sprintf(req, "select distinct user_id, rooms.id, name from room_user, rooms \
+    sprintf(req, "select distinct user_id, rooms.id, rooms.name, rooms.access from room_user, rooms \
     			where rooms.id=room_user.room_id and user_id=%d;", user_id);
     printf("%s\n", req);
     if (sqlite3_exec(info->db, req, get_rooms, array, 0) != SQLITE_OK) {

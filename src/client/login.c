@@ -273,6 +273,7 @@ void leave_callback (GtkWidget *widget, t_all *data) {
 
     json_object_object_add(new_json, "type", json_object_new_int(MX_LEAVE_ROOM_TYPE));
     json_object_object_add(new_json, "room_id", json_object_new_int(data->room->id));
+    json_object_object_add(new_json, "access", json_object_new_int(data->room->access));
     json_object_object_add(new_json, "user_id", json_object_new_int(data->info->id));
     json_object_object_add(new_json, "login", json_object_new_string(data->info->login));
     const char *json_str = json_object_to_json_string(new_json);
@@ -672,10 +673,14 @@ t_room *mx_create_room(t_client_info *info, json_object *room_data, int position
     t_room *room =  (t_room *)malloc(sizeof(t_room));
     const char *name = json_object_get_string(json_object_object_get(room_data, "name"));
     int id = json_object_get_int(json_object_object_get(room_data, "room_id"));
+    int access = json_object_get_int(json_object_object_get(room_data, "access"));
 
     room->name = strdup(name);
+    if (access == 3)
+        room->name = mx_replace_substr(room->name, info->login, "");
     room->position = position;
     room->id = id;
+    room->access = access;
     room->messages = NULL;
     room->next = NULL;
 
@@ -697,7 +702,7 @@ t_room *mx_create_room(t_client_info *info, json_object *room_data, int position
         gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), history);
         g_signal_connect (G_OBJECT (history), "activate", G_CALLBACK (scroll_callback), data);
         
-        if (id != 0) {
+        if (id != 0 && access != 3) {
             GtkWidget *leave = gtk_menu_item_new_with_label("Leave room");
             gtk_widget_show(leave);
             gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), leave);

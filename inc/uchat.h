@@ -188,6 +188,7 @@ typedef struct s_room {
     int id;
     int position;
     char *name;
+    int access;
     GtkWidget *room_box;
     GtkWidget *message_box;
     GtkWidget *scrolled_window;
