@@ -35,14 +35,6 @@ LIBPORTAUDIOD  = libportaudio
 LIBPORTAUDIOX  = lib/.libs/libportaudio.a
 LIBPORTAUDIOA := $(addprefix $(LIBPORTAUDIOD)/, $(LIBPORTAUDIOX))
 
-LIBRESSLD  = libressl
-LIBRESSL_TLSX= lib/.libs/libtls.a
-LIBRESSLD_TLSA := $(addprefix $(LIBRESSLD)/, $(LIBRESSL_TLSX))
-
-LIBRESSL_TLS = libressl/tls/.libs/libtls.a
-LIBRESSL_CRYPTO = libressl/crypto/.libs/libcrypto.a
-LIBRESSL_SSL = libressl/ssl/.libs/libssl.a
-
 INCS = inc/uchat.h
 
 SRC_SERVER = main_server.c \
@@ -98,8 +90,20 @@ OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
 
+LIBRESSL_A = ./libressl_3/tls/.libs/libtls.a \
+			 ./libressl_3/ssl/.libs/libssl.a \
+			 ./libressl_3/crypto/.libs/libcrypto.a
+
+LIBRESSL_H = \
+			-I ./libressl_3/include/tls.h \
+			-I ./libressl_3/include/openssl \
+			-I ./libressl_3/include/pqueue.h \
+			-I ./libressl_3/tls \
+			-I ./libressl_3/ssl \
+			-I ./libressl_3/crypto
+
 #AUDIOFLAGS = -lportaudio
-TLSFLAGS =  -lcrypto -lssl -ltls
+#TLSFLAGS =  -lcrypto -lssl -ltls
 SQLFLAGS = -lsqlite3
 
 all: install
@@ -109,7 +113,7 @@ server: $(NAME_S) #$(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
 
 	@make -sC $(LJSOND)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS) $(TLSFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/server/%.c $(INCS)
@@ -163,7 +167,7 @@ client: $(NAME_C) #$(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA) $(LIBSNDFA) -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA) $(LIBSNDFA) -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_CLIENT) $(OBJS_HELP) -o $@
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
 
 
