@@ -279,6 +279,30 @@ void edit_profile(t_client_info *info, json_object *new_json) {
     }
 }
 
+void direct_message(t_client_info *info, json_object *new_json) {
+    int exist = json_object_get_int(json_object_object_get(new_json, "exist"));
+    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+    t_room *room = mx_find_room(info->data->rooms, room_id);
+
+    if (exist) {
+        if (room != NULL) {
+            gtk_notebook_set_current_page (GTK_NOTEBOOK(info->data->notebook), room->position);
+        }
+    }
+    else { 
+        if (room == NULL) {
+            t_room *head = info->data->rooms;
+
+            while (head != NULL) {
+                head->position = head->position + 1;
+                head = head->next;
+            }
+            json_object *room_data = NULL;
+            json_object_deep_copy(json_object_object_get(new_json, "room_data"), &room_data, NULL);
+            mx_push_room(info, room_data, 0);
+        }
+    }
+}
 
 int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
     int type = json_object_get_int(json_object_object_get(obj, "type"));
@@ -309,6 +333,8 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
         edit_profile(info, obj);
     else if (type == MX_SEARCH_ALL_TYPE)
         mx_search_all_client(info, obj);
+     else if (type == MX_DIRECT_MESSAGE_TYPE)
+        direct_message(info, obj);
     return 0;
 }
 

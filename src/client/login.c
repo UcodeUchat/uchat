@@ -243,7 +243,7 @@ void logout(t_client_info *info) {
 
     new_json = json_object_new_object();
     json_object_object_add(new_json, "type", json_object_new_int(MX_LOGOUT_TYPE));
-    json_object_object_add(new_json, "login", json_object_new_string(info->login));
+    //json_object_object_add(new_json, "login", json_object_new_string(info->login));
     json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
     mx_print_json_object(new_json, "logout");
     const char *json_string = json_object_to_json_string(new_json);
@@ -363,6 +363,7 @@ void close_search_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 void init_search (t_client_info *info) { 
+    info->data->search = NULL;
     info->data->search_box = gtk_event_box_new();
     gtk_widget_add_events (info->data->search_box, GDK_BUTTON_PRESS_MASK);
     g_signal_connect (G_OBJECT (info->data->search_box), "button_press_event", G_CALLBACK (close_search_callback), info);
@@ -403,25 +404,28 @@ void close_creation_callback1 (GtkWidget *widget, t_client_info *info) {
 
 void create_room_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
-    json_object *new_json;
+    if (strcmp("",gtk_entry_get_text(GTK_ENTRY(info->data->create_room->name_entry))) != 0) {
+        json_object *new_json;
 
-    gtk_widget_hide(info->data->create_room->main_box);
-    new_json = json_object_new_object();
-    json_object_object_add(new_json, "type", json_object_new_int(MX_CREATE_ROOM_TYPE));
-    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
-    json_object_object_add(new_json, "name", json_object_new_string 
-                            (gtk_entry_get_text(GTK_ENTRY(info->data->create_room->name_entry))));
-    json_object_object_add(new_json, "acces", json_object_new_int 
-                            (gtk_combo_box_get_active (GTK_COMBO_BOX(info->data->create_room->selection)) + 1));
-    json_object  *room_data = json_object_new_object();
-    json_object *messages = json_object_new_array();
-    json_object_object_add(room_data, "messages", messages);
-    json_object_object_add(room_data, "name", json_object_new_string 
-                            (gtk_entry_get_text(GTK_ENTRY(info->data->create_room->name_entry))));
-    json_object_object_add(new_json, "room_data", room_data);
-    const char *json_string = json_object_to_json_string(new_json);
-    tls_send(info->tls_client, json_string, strlen(json_string));
-    gtk_entry_set_text(GTK_ENTRY(info->data->create_room->name_entry), "");
+        gtk_widget_hide(info->data->create_room->main_box);
+        new_json = json_object_new_object();
+        json_object_object_add(new_json, "type", json_object_new_int(MX_CREATE_ROOM_TYPE));
+        json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
+        json_object_object_add(new_json, "name", json_object_new_string 
+                                (gtk_entry_get_text(GTK_ENTRY(info->data->create_room->name_entry))));
+        json_object_object_add(new_json, "acces", json_object_new_int 
+                                (gtk_combo_box_get_active (GTK_COMBO_BOX(info->data->create_room->selection)) + 1));
+        json_object  *room_data = json_object_new_object();
+        json_object *messages = json_object_new_array();
+        json_object_object_add(room_data, "messages", messages);
+        json_object_object_add(room_data, "name", json_object_new_string 
+                                (gtk_entry_get_text(GTK_ENTRY(info->data->create_room->name_entry))));
+        json_object_object_add(new_json, "room_data", room_data);
+        const char *json_string = json_object_to_json_string(new_json);
+        tls_send(info->tls_client, json_string, strlen(json_string));
+        gtk_entry_set_text(GTK_ENTRY(info->data->create_room->name_entry), "");
+        gtk_widget_hide(info->data->menu);
+    }
 }
 
 void init_create (t_client_info *info) { 
@@ -446,13 +450,12 @@ void init_create (t_client_info *info) {
     gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
     gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
     info->data->create_room->name_entry = gtk_entry_new();
-    gtk_box_pack_start (GTK_BOX (box1), info->data->create_room->name_entry, TRUE, FALSE, 0);
     gtk_widget_set_size_request(info->data->create_room->name_entry, 200, -1);
-    info->data->login_entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (info->data->create_room->name_entry), 50);
     gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->create_room->name_entry), "Write room name");
     gtk_editable_select_region (GTK_EDITABLE (info->data->create_room->name_entry),
                                 0, gtk_entry_get_text_length (GTK_ENTRY (info->data->create_room->name_entry)));
+    gtk_box_pack_start (GTK_BOX (box1), info->data->create_room->name_entry, TRUE, FALSE, 0);
     gtk_widget_show(info->data->create_room->name_entry);
     gtk_widget_show(box1);
 
@@ -470,7 +473,6 @@ void init_create (t_client_info *info) {
                           0);
     gtk_box_pack_start (GTK_BOX (box1), info->data->create_room->selection, TRUE, FALSE, 0);
     gtk_widget_set_size_request(info->data->create_room->selection, 200, -1);
-    info->data->login_entry = gtk_entry_new ();
     gtk_widget_show(info->data->create_room->selection);
     gtk_widget_show(box1);
 
@@ -662,6 +664,7 @@ void init_stickers (t_client_info *info, GtkWidget *box) {
 int mx_notebook_prepend(t_note *note) {
     gtk_notebook_append_page(GTK_NOTEBOOK(note->notebook), note->box, note->label);
     gtk_notebook_reorder_child(GTK_NOTEBOOK(note->notebook), note->box, note->position);
+    gtk_notebook_set_current_page (GTK_NOTEBOOK(note->notebook), note->position);
     return 0;
 }
 

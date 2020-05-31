@@ -3,8 +3,11 @@
 void close_result_callback (GtkWidget *widget, GdkEventButton *event, t_search *search) {
     (void)widget;
     (void)event;
-    gtk_widget_hide(search->main_box);
-    free(search);
+    if (search != NULL) {
+        gtk_widget_hide(search->main_box);
+        free(search);
+        search = NULL;
+    }
 }
 
 void join_callback (GtkWidget *widget, t_all *data) {

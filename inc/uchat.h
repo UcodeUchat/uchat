@@ -216,6 +216,7 @@ typedef struct s_prof {
     GtkWidget *visual;
     GtkWidget *audio;
     GtkWidget *email;
+    int id;
 }              t_prof;
 
 typedef struct s_create {
@@ -356,6 +357,7 @@ typedef struct  s_server_info {  // struct server
 #define MX_SEARCH_ALL_TYPE 17
 #define MX_JOIN_ROOM_TYPE 18
 #define MX_CREATE_ROOM_TYPE 19
+#define MX_DIRECT_MESSAGE_TYPE 20
 #define MX_PACKAGE_SIZE sizeof(t_package)
 
 #define MX_MAX_MSG_SIZE 200
@@ -433,6 +435,7 @@ int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_create_room_server (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_get_rooms_data (void *messages, int argc, char **argv, char **col_name);
+int mx_direct_message (t_server_info *info, t_socket_list *csl, json_object *js);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);

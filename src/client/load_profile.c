@@ -253,6 +253,55 @@ void show_global_settings (t_client_info *info, json_object *new_json, GtkWidget
     gtk_widget_show(box);
 }
 
+void message_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    json_object *new_json;
+    const char *json_string;
+
+    new_json = json_object_new_object();
+    json_object_object_add(new_json, "type", json_object_new_int(MX_DIRECT_MESSAGE_TYPE));
+    json_object_object_add(new_json, "first_id", json_object_new_int(info->id));
+    json_object_object_add(new_json, "second_id", json_object_new_int(info->data->profile->id));
+    json_string = json_object_to_json_string(new_json);
+    tls_send(info->tls_client, json_string, strlen(json_string));
+    gtk_widget_destroy(info->data->profile->main_box);
+    free(info->data->profile);
+    info->data->profile = NULL;
+    gtk_widget_hide(info->data->menu);
+    if (info->data->search != NULL) {
+        gtk_widget_hide(info->data->search->main_box);
+        free(info->data->search);
+        info->data->search = NULL;
+    }
+}
+
+void show_etc (t_client_info *info, json_object *new_json, GtkWidget *profile) {
+    (void)info;
+    (void)new_json;
+    GtkWidget *box = gtk_box_new(FALSE, 5);
+    GtkWidget *activityes_box = gtk_box_new(FALSE, 5);
+
+    gtk_box_pack_start (GTK_BOX (profile), box, FALSE, FALSE, 0);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(box), GTK_ORIENTATION_VERTICAL);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(activityes_box), GTK_ORIENTATION_VERTICAL);
+    show_title(" Activityes", box);
+    gtk_box_pack_start (GTK_BOX (box), activityes_box, FALSE, FALSE, 0);
+    GtkWidget *button = gtk_button_new_with_label("Add to friends");
+    //g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (add_callback), info);
+    gtk_box_pack_start (GTK_BOX (activityes_box), button, FALSE, FALSE, 0);
+    gtk_widget_show(button);
+    button = gtk_button_new_with_label("Remove from friends");
+    //g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (remove_callback), info);
+    gtk_box_pack_start (GTK_BOX (activityes_box), button, FALSE, FALSE, 0);
+    //gtk_widget_show(button);
+    button = gtk_button_new_with_label("Message");
+    g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (message_callback), info);
+    gtk_box_pack_start (GTK_BOX (activityes_box), button, FALSE, FALSE, 0);
+    gtk_widget_show(button);
+    gtk_widget_show(activityes_box);
+    gtk_widget_show(box);
+}
+
 void mx_load_user_profile(t_client_info *info, json_object *new_json) {
     if (info->data->profile != NULL) {
         g_idle_add ((GSourceFunc)mx_destroy_widget, info->data->profile->main_box);
@@ -261,6 +310,7 @@ void mx_load_user_profile(t_client_info *info, json_object *new_json) {
     }
     info->data->profile = (t_prof *)malloc(sizeof(t_prof));
     int id = json_object_get_int(json_object_object_get(new_json, "id"));
+    info->data->profile->id = id;
     info->data->profile->main_box = gtk_event_box_new();
     GtkWidget *box = gtk_box_new(FALSE, 0);
     GtkWidget *profile = gtk_box_new(FALSE, 5);
@@ -290,5 +340,7 @@ void mx_load_user_profile(t_client_info *info, json_object *new_json) {
     gtk_widget_show(box);
     if (id == info->id)
         show_global_settings(info, new_json, profile);
+    else
+        show_etc(info, new_json, profile);
     g_idle_add ((GSourceFunc)mx_show_widget, info->data->profile->main_box);
 }

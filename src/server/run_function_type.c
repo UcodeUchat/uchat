@@ -46,7 +46,9 @@ int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
         return_value = mx_search_all(info, csl, csl->obj);
     else if (type == MX_JOIN_ROOM_TYPE)
         return_value = mx_join_room(info, csl, csl->obj);
-     else if (type == MX_CREATE_ROOM_TYPE)
+    else if (type == MX_CREATE_ROOM_TYPE)
         return_value = mx_create_room_server(info, csl, csl->obj);
+    else if (type == MX_DIRECT_MESSAGE_TYPE)
+        return_value = mx_direct_message(info, csl, csl->obj);
     return return_value;
 }
