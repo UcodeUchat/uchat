@@ -61,11 +61,12 @@ void edit_email_callback (GtkWidget *widget, t_client_info *info) {
 
 void save_email_callback (GtkWidget *widget, t_client_info *info) {
     char *email = strdup(gtk_entry_get_text(GTK_ENTRY(info->data->profile->email_entry)));
-    
+    //if (validation(email) == 1)
     update_profile("email", email, info);
     gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->email_entry), FALSE);
     gtk_widget_hide(widget);
     gtk_widget_show(info->data->profile->email_button1);
+    //else
 }
 
 void show_exit (t_client_info *info,  GtkWidget *profile) {
@@ -286,15 +287,7 @@ void show_etc (t_client_info *info, json_object *new_json, GtkWidget *profile) {
     gtk_orientable_set_orientation (GTK_ORIENTABLE(activityes_box), GTK_ORIENTATION_VERTICAL);
     show_title(" Activityes", box);
     gtk_box_pack_start (GTK_BOX (box), activityes_box, FALSE, FALSE, 0);
-    GtkWidget *button = gtk_button_new_with_label("Add to friends");
-    //g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (add_callback), info);
-    gtk_box_pack_start (GTK_BOX (activityes_box), button, FALSE, FALSE, 0);
-    gtk_widget_show(button);
-    button = gtk_button_new_with_label("Remove from friends");
-    //g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (remove_callback), info);
-    gtk_box_pack_start (GTK_BOX (activityes_box), button, FALSE, FALSE, 0);
-    //gtk_widget_show(button);
-    button = gtk_button_new_with_label("Message");
+    GtkWidget *button = gtk_button_new_with_label("Message");
     g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (message_callback), info);
     gtk_box_pack_start (GTK_BOX (activityes_box), button, FALSE, FALSE, 0);
     gtk_widget_show(button);
