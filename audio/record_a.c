@@ -29,10 +29,11 @@ typedef struct s_a_snippet{
 }           t_a_snippet;
 
 
+//#include "uchat.h"
+
 static t_audio * init_audio_data() {
     t_audio *data = malloc(sizeof(t_audio));
     data->format_type = paFloat32;  //r
-//    data->format_type = paFloat32;  //r
     data->number_channels = 0;   //remove
     data->sample_rate = SAMPLE_RATE;
     data->size = 0;
@@ -40,59 +41,13 @@ static t_audio * init_audio_data() {
     return data;
 }
 
-int mx_exit_stream(t_audio *data, PaError err) {
-//    PaError             err = paNoError;
-    Pa_Terminate();
-    if (data->rec_samples)
-        free (data->rec_samples);
-    if (err != paNoError) {
-        fprintf(stderr, "An error occured while using the portaudio stream\n" );
-        fprintf(stderr, "Error number: %d\n", err);
-        fprintf(stderr, "Error message: %s\n", Pa_GetErrorText( err ));
-        err = 1; // Always return 0 or 1, but no other return codes.
-    }
-    return err;
-}
-
-
-long mx_save_audio(t_audio *data) {
-    uint8_t err = SF_ERR_NO_ERROR;
-    SF_INFO sfinfo ={
-//            .channels = data->number_channels,
-            .channels = 1,
-            .samplerate = data->sample_rate,
-//            .format = SF_FORMAT_AIFF | SF_FORMAT_FLOAT
-            .format = SF_FORMAT_FLAC | SF_FORMAT_PCM_16
-
-    };
-    sfinfo.format = (sfinfo.format & ~SF_FORMAT_TYPEMASK) | SF_FORMAT_FLAC;
-
-    char file_name[100];
-    snprintf(file_name, 100, "rec3_massage:%d.flac", rand());  //rand -> replace by message id
-    printf("start save audio\n");
-    SNDFILE *outfile = sf_open(file_name, SFM_WRITE, &sfinfo);
-    if (!outfile) {
-        printf("error open outfile =%d\n", sf_error(outfile));
-        return -1;
-    }
-    long wr = sf_writef_float(outfile, data->rec_samples, data->size / sizeof(float));
-    err = data->size - wr;
-    printf("data to write to file =%zu\n", data->size);
-    printf("write to file =%lu\n", wr);
-    sf_write_sync(outfile);
-    sf_close(outfile);
-    return err;
-}
-
-
-
 static int process_stream(PaStream *stream, t_audio *data,
                           t_a_snippet *sample_block, int *i) {
     if (!stream || !data || !sample_block)
         return -1;
 //    static int i = 0;
     (*i)++;
-    printf("process_stream  %d\n", (*i));
+//    printf("process_stream  %d\n", (*i));
     Pa_ReadStream(stream, sample_block->snippet, FRAMES_PER_BUFFER);
     data->rec_samples = realloc(data->rec_samples, sample_block->size * (*i));
     data->size = sample_block->size * (*i);
@@ -128,6 +83,28 @@ static int record(PaStream *stream, t_audio *data, t_a_snippet *sample_block) {
     return err;
 }
 
+char *mx_record_audio(void) {
+    t_audio *data = init_audio_data();
+    t_a_snippet *sample_block = malloc(sizeof(t_a_snippet));
+    PaError err = paNoError;
+
+    sample_block->snippet = NULL;
+    sample_block->size = 0;
+    PaStream *stream = NULL;
+//    bool sample_complete = false;
+    printf(" start record\n");
+    err = mx_init_stream(&stream, data, sample_block);
+    if (err){
+        fprintf(stderr, "%s\n", "error");
+        return NULL;
+    }
+    err = record(stream, data, sample_block);
+    if (err != 0)
+        printf("err =%d\n", err);
+    printf(" exit record\n");
+    printf("record to file->%s\n", data->file_name);
+    return data->file_name;
+}
 
 int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) {
     PaError err;
@@ -178,8 +155,7 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
     printf( "Num channels = %d.\n", numChannels );
 
     data->number_channels = numChannels;
-//    input_parameters.channelCount = numChannels;
-    input_parameters.channelCount = 1;
+    input_parameters.channelCount = numChannels;
     input_parameters.sampleFormat = paFloat32;
     input_parameters.suggestedLatency = inputInfo->defaultLowInputLatency;
 //            Pa_GetDeviceInfo(input_parameters.device)->defaultLowInputLatency;
@@ -199,31 +175,47 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
     return Pa_StartStream(*stream);
 }
 
-int mx_record_audio(void) {
-    t_audio *data = init_audio_data();
-    t_a_snippet *sample_block = malloc(sizeof(t_a_snippet));
-    PaError err = paNoError;
-
-    sample_block->snippet = NULL;
-    sample_block->size = 0;
-    PaStream *stream = NULL;
-//    bool sample_complete = false;
-    printf(" start record\n");
-    err = mx_init_stream(&stream, data, sample_block);
-    if (err){
-        fprintf(stderr, "%s\n", "error");
-        return err;
+int mx_exit_stream(t_audio *data, PaError err) {
+//    PaError             err = paNoError;
+    Pa_Terminate();
+    if (data->rec_samples)
+        free (data->rec_samples);
+    if (err != paNoError) {
+        fprintf(stderr, "An error occured while using the portaudio stream\n" );
+        fprintf(stderr, "Error number: %d\n", err);
+        fprintf(stderr, "Error message: %s\n", Pa_GetErrorText( err ));
+        err = 1; // Always return 0 or 1, but no other return codes.
     }
-    err = record(stream, data, sample_block);
-    if (err != 0)
-        printf("err =%d\n", err);
-    printf(" exit record\n");
+    return err;
+}
+
+static long mx_save_audio(t_audio *data) {
+    uint8_t err = SF_ERR_NO_ERROR;
+    SF_INFO sfinfo ={
+            .channels = data->number_channels,
+            .samplerate = data->sample_rate,
+            .format = SF_FORMAT_AIFF | SF_FORMAT_FLOAT
+    };
+    char file_name[100];
+    snprintf(file_name, 100, "./Uchat_downloads/rec_massage:%d.aif", rand());  //rand -> replace by message id
+    printf("start save audio\n");
+    SNDFILE *outfile = sf_open(file_name, SFM_WRITE, &sfinfo);
+    if (!outfile) {
+        printf("error outfile =%d\n", sf_error(outfile));
+        return -1;
+    }
+    long wr = sf_writef_float(outfile, data->rec_samples, data->size / sizeof(float));
+    err = data->size - wr;
+    printf("data to write to file =%zu\n", data->size);
+    printf("write to file =%lu\n", wr);
+    sf_write_sync(outfile);
+    sf_close(outfile);
+    data->file_name = strdup(file_name);
     return err;
 }
 
 
 
-/*
 float mx_change_threshold(float talking_threshold, float talking_ntensity) {
     return TALKING_THRESHOLD_WEIGHT * talking_threshold +
            (1 - TALKING_THRESHOLD_WEIGHT) * talking_ntensity /
@@ -305,7 +297,11 @@ int mx_process_stream_ext(PaStream *stream, t_audio *data,
 //    free (sample_block->snippet);
 //    Pa_Terminate();
 }
-*/
+
+
+
+
+////
 
 int main (int argc, char * argv []) {
     mx_record_audio();
@@ -313,5 +309,6 @@ int main (int argc, char * argv []) {
     return 0;
 
 }
+
 
 
