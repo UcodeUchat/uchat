@@ -258,6 +258,7 @@ typedef struct s_data {
     t_create *create_room;
     gint current_room;
     int login_msg_flag;
+    pthread_t login_msg_t;
 }              t_data;
 
 typedef struct  s_client_info {  //struct client

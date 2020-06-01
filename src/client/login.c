@@ -52,14 +52,11 @@ void *msg_history_thread (void *data) {
 void *login_msg_thread (void *data) {
     t_client_info *n_data = (t_client_info *)data;
 
-        if (n_data->data->login_msg_flag) {
-            sleep(3);
-            if (n_data->data->login_msg_flag) {
-                n_data->data->login_msg_flag = 0;
-                gtk_widget_hide(n_data->data->login_msg);
-                gtk_widget_hide(n_data->data->stop);
-            }
-        }
+
+    sleep(3);
+    //n_data->data->login_msg_flag = 0;
+    gtk_widget_hide(n_data->data->login_msg);
+    gtk_widget_hide(n_data->data->stop);
     return 0;
 }
 
@@ -883,36 +880,22 @@ void authentification(t_client_info *info) {
     info->responce = 0;
 }
 
-void close_widget_callback (GtkWidget *widget, GtkWidget *widget_ptr) {
-    (void)widget;
-    gtk_widget_hide(widget_ptr);
-}
-
 void enter_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
-    pthread_t login_msg_t = NULL;
-    //--auth
     info->login = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->login_entry));
     info->password = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->password_entry));
     authentification(info);
-    //--
     if (info->auth_client == 0) {
-        pthread_cancel(login_msg_t);
-        if (info->data->login_msg_flag) {
-            gtk_widget_hide(info->data->login_msg);
-            gtk_widget_hide(info->data->stop);
-        }
-        info->data->login_msg_flag = 1;
+        pthread_cancel(info->data->login_msg_t);
         gtk_widget_show(info->data->login_msg);
         gtk_widget_show(info->data->stop);
-        pthread_create(&login_msg_t, 0, login_msg_thread, info);
+        pthread_create(&info->data->login_msg_t, 0, login_msg_thread, info);
     }
     else if(info->auth_client == 1) {
         init_general (info);
         init_menu (info);
         init_search (info);
         init_create (info);
-        //--
     }  
 }
 
@@ -982,7 +965,7 @@ void init_login_button (t_client_info *info, char *placeholder, int heigth,
 }
 
 void init_login(t_client_info *info) {
-    info->data->login_msg_flag = 0;
+    info->data->login_msg_t = NULL;
     info->editing = -1;
     info->data->login_box = gtk_fixed_new ();
     gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->login_box, 0, 0);
