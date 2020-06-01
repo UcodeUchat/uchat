@@ -60,9 +60,9 @@
 
 #include <stddef.h>
 
-#include <openssl/opensslconf.h>
+#include <../../libressl_3/include/openssl/opensslconf.h>
 
-#include <openssl/asn1.h>
+#include <../../libressl_3/include/openssl/asn1.h>
 
 /* ASN1 template defines, structures and functions */
 

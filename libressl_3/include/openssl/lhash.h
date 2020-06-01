@@ -63,12 +63,12 @@
 #ifndef HEADER_LHASH_H
 #define HEADER_LHASH_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl_3/include/openssl/opensslconf.h>
 
 #include <stdio.h>
 
 #ifndef OPENSSL_NO_BIO
-#include <openssl/bio.h>
+#include <../../libressl_3/include/openssl/bio.h>
 #endif
 
 #ifdef  __cplusplus

@@ -145,21 +145,21 @@
 
 #include <stdint.h>
 
-#include <openssl/opensslconf.h>
+#include <../../libressl_3/include/openssl/opensslconf.h>
 
-#include <openssl/hmac.h>
-#include <openssl/pem.h>
-#include <openssl/safestack.h>
+#include <../../libressl_3/include/openssl/hmac.h>
+#include <../../libressl_3/include/openssl/pem.h>
+#include <../../libressl_3/include/openssl/safestack.h>
 
-#include <openssl/bio.h>
+#include <../../libressl_3/include/openssl/bio.h>
 
 #ifndef OPENSSL_NO_DEPRECATED
-#include <openssl/buffer.h>
-#include <openssl/crypto.h>
-#include <openssl/lhash.h>
+#include <../../libressl_3/include/openssl/buffer.h>
+#include <../../libressl_3/include/openssl/crypto.h>
+#include <../../libressl_3/include/openssl/lhash.h>
 
 #ifndef OPENSSL_NO_X509
-#include <openssl/x509.h>
+#include <../../libressl_3/include/openssl/x509.h>
 #endif
 #endif
 
@@ -879,12 +879,12 @@ struct ssl_st {
 }
 #endif
 
-#include <openssl/ssl2.h>
-#include <openssl/ssl3.h>
-#include <openssl/tls1.h>	/* This is mostly sslv3 with a few tweaks */
-#include <openssl/dtls1.h>	/* Datagram TLS */
-#include <openssl/ssl23.h>
-#include <openssl/srtp.h>	/* Support for the use_srtp extension */
+#include <../../libressl_3/include/openssl/ssl2.h>
+#include <../../libressl_3/include/openssl/ssl3.h>
+#include <../../libressl_3/include/openssl/tls1.h>	/* This is mostly sslv3 with a few tweaks */
+#include <../../libressl_3/include/openssl/dtls1.h>	/* Datagram TLS */
+#include <../../libressl_3/include/openssl/ssl23.h>
+#include <../../libressl_3/include/openssl/srtp.h>	/* Support for the use_srtp extension */
 
 #ifdef  __cplusplus
 extern "C" {

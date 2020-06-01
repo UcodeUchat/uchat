@@ -121,12 +121,12 @@
 #ifndef HEADER_CRYPTO_H
 #define HEADER_CRYPTO_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl_3/include/openssl/opensslconf.h>
 
-#include <openssl/stack.h>
-#include <openssl/safestack.h>
-#include <openssl/opensslv.h>
-#include <openssl/ossl_typ.h>
+#include <../../libressl_3/include/openssl/stack.h>
+#include <../../libressl_3/include/openssl/safestack.h>
+#include <../../libressl_3/include/openssl/opensslv.h>
+#include <../../libressl_3/include/openssl/ossl_typ.h>
 
 #ifdef  __cplusplus
 extern "C" {

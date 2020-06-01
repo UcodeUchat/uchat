@@ -61,7 +61,7 @@
 #ifndef HEADER_RIPEMD_H
 #define HEADER_RIPEMD_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl_3/include/openssl/opensslconf.h>
 
 #ifdef  __cplusplus
 extern "C" {

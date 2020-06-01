@@ -64,39 +64,39 @@
 #ifndef HEADER_ENGINE_H
 #define HEADER_ENGINE_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl_3/include/openssl/opensslconf.h>
 
 #ifdef OPENSSL_NO_ENGINE
 #error ENGINE is disabled.
 #endif
 
 #ifndef OPENSSL_NO_DEPRECATED
-#include <openssl/bn.h>
+#include <../../libressl_3/include/openssl/bn.h>
 #ifndef OPENSSL_NO_RSA
-#include <openssl/rsa.h>
+#include <../../libressl_3/include/openssl/rsa.h>
 #endif
 #ifndef OPENSSL_NO_DSA
-#include <openssl/dsa.h>
+#include <../../libressl_3/include/openssl/dsa.h>
 #endif
 #ifndef OPENSSL_NO_DH
-#include <openssl/dh.h>
+#include <../../libressl_3/include/openssl/dh.h>
 #endif
 #ifndef OPENSSL_NO_ECDH
-#include <openssl/ecdh.h>
+#include <../../libressl_3/include/openssl/ecdh.h>
 #endif
 #ifndef OPENSSL_NO_ECDSA
-#include <openssl/ecdsa.h>
+#include <../../libressl_3/include/openssl/ecdsa.h>
 #endif
 #ifndef OPENSSL_NO_EC
-#include <openssl/ec.h>
+#include <../../libressl_3/include/openssl/ec.h>
 #endif
-#include <openssl/ui.h>
-#include <openssl/err.h>
+#include <../../libressl_3/include/openssl/ui.h>
+#include <../../libressl_3/include/openssl/err.h>
 #endif
 
-#include <openssl/ossl_typ.h>
+#include <../../libressl_3/include/openssl/ossl_typ.h>
 
-#include <openssl/x509.h>
+#include <../../libressl_3/include/openssl/x509.h>
 
 #ifdef  __cplusplus
 extern "C" {

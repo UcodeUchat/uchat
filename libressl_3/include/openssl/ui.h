@@ -59,13 +59,13 @@
 #ifndef HEADER_UI_H
 #define HEADER_UI_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl_3/include/openssl/opensslconf.h>
 
 #ifndef OPENSSL_NO_DEPRECATED
-#include <openssl/crypto.h>
+#include <../../libressl_3/include/openssl/crypto.h>
 #endif
-#include <openssl/safestack.h>
-#include <openssl/ossl_typ.h>
+#include <../../libressl_3/include/openssl/safestack.h>
+#include <../../libressl_3/include/openssl/ossl_typ.h>
 
 #ifdef  __cplusplus
 extern "C" {

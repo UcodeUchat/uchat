@@ -1,13 +1,10 @@
-//
-// Created by snikolayen on 22.05.2020.
-//
-
 #ifndef UCHAT_AUDIO_H
 #define UCHAT_AUDIO_H
 
 #include <stdbool.h>
 
 #include "../libportaudio/include/portaudio.h"
+#include "../libsndfile/src/sndfile.h"
 
 #define MIN_TALKING_BUFFERS 8
 #define TALKING_THRESHOLD_WEIGHT 0.99

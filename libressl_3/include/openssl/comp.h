@@ -3,7 +3,7 @@
 #ifndef HEADER_COMP_H
 #define HEADER_COMP_H
 
-#include <openssl/crypto.h>
+#include <../../libressl_3/include/openssl/crypto.h>
 
 #ifdef  __cplusplus
 extern "C" {

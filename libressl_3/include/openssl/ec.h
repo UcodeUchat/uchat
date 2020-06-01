@@ -76,15 +76,15 @@
 #ifndef HEADER_EC_H
 #define HEADER_EC_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl_3/include/openssl/opensslconf.h>
 
 #ifdef OPENSSL_NO_EC
 #error EC is disabled.
 #endif
 
-#include <openssl/asn1.h>
+#include <../../libressl_3/include/openssl/asn1.h>
 #ifndef OPENSSL_NO_DEPRECATED
-#include <openssl/bn.h>
+#include <../../libressl_3/include/openssl/bn.h>
 #endif
 
 #ifdef  __cplusplus
