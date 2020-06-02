@@ -6,19 +6,16 @@ static int add_new_client(t_server_info *info, struct tls *tls, int server) {
     struct kevent new_ev;
     struct sockaddr_storage client_address;
     socklen_t client_len = sizeof(client_address);
-    int client_sock = accept(server, (struct sockaddr*) &client_address, &client_len);
+    int client_sock = accept(server, (struct sockaddr*) &client_address,
+                             &client_len);
 
-    if (client_sock == -1) {
-        printf("error = %s\n", strerror(errno));
-        return 1;
-    }
+    if (client_sock == -1)
+        mx_err_return2("error =", strerror(errno));
     printf("server new client socket %d\n", client_sock);
     mx_print_client_address(client_address, client_len);
     EV_SET(&new_ev, client_sock, EVFILT_READ, EV_ADD,0, 0, 0);
-    if (kevent(info->kq, &new_ev, 1, 0, 0, NULL) == -1) {
-        printf("error = %s\n", strerror(errno));
-        return 1;
-    }
+    if (kevent(info->kq, &new_ev, 1, 0, 0, NULL) == -1)
+        mx_err_return2("error =", strerror(errno));
     tls_socket = NULL;
     if ((mx_make_tls_connect(tls, &tls_socket, client_sock)) != 0)
         return 1;
@@ -38,10 +35,8 @@ static int work_with_client(t_server_info *info, struct kevent new_ev) {
     }
     else {
         rc = mx_tls_worker(mx_find_socket_elem(info->socket_list, new_ev.ident), info);
-        if (rc == -1) {
-            printf("error = %s\n", strerror(errno));
-            return 1;
-        }
+        if (rc == -1)
+            mx_err_return2("error =", strerror(errno));
     }
     return 0;
 }
@@ -61,24 +56,54 @@ static int config_kevent(t_server_info *info, int server) {
     }
     return 0;
 }
-int mx_start_server(t_server_info *info) {
-    int server;
-    struct tls *tls = NULL;
+
+static void server_loop(t_server_info *info, int server, struct tls *tls) {
+    struct timespec timeout;
     struct kevent new_ev;
     int event;
 
-    tls = mx_create_tls_configuration(info);
-    server = mx_create_server_socket(info);
-    if (listen(server, SOMAXCONN) == -1) {
+    timeout.tv_sec = 1;  // seconds
+    timeout.tv_nsec = 0;  // nanoseconds
+    while (1) {
+        event = kevent(info->kq, NULL, 0, &new_ev, 1, &timeout);
+        if (event == 0)  // check new event
+            continue;
+        if (event == -1) {
+            printf("error = %s\n", strerror(errno));
+            break;
+        }
+        if (new_ev.ident == (uintptr_t) server) {  // if new con - add new clt
+            if ((add_new_client(info, tls, server)) != 0)
+                break;
+        }
+        else {  // if read from client
+            if ((work_with_client(info, new_ev)) != 0)
+                break;
+        }
+    }
+}
+
+int mx_start_server(t_server_info *info) {
+    int server_soc;
+    struct tls *tls = NULL;
+//    struct kevent new_ev;
+//    int event;
+
+    if ((mx_create_tls_configuration(&tls)) != 0)
+        return -1;
+    if ((server_soc = mx_create_server_socket(info)) == -1)
+        return -1;
+    if (listen(server_soc, SOMAXCONN) == -1) {
         printf("listen error = %s\n", strerror(errno));
         return -1;
     }
-    printf("listen fd = %d\n", server);
-    if ((config_kevent(info, server) != 0)) {
-        close(server);
+    printf("listen fd = %d\n", server_soc);
+    if ((config_kevent(info, server_soc) != 0)) {
+        close(server_soc);
         return -1;
     }
-
+    server_loop(info, server_soc, tls);
+    /*
     struct timespec timeout;
     timeout.tv_sec = 1;  // seconds
     timeout.tv_nsec = 0;  // nanoseconds
@@ -100,8 +125,8 @@ int mx_start_server(t_server_info *info) {
                 break;
         }
     }
+     */
     close(info->kq);
-    close(server);
+    close(server_soc);
     return 0;
 }
-

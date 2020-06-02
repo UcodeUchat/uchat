@@ -302,7 +302,8 @@ int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_get_rooms_data(void *messages, int argc, char **argv, char **col_name);
 int mx_make_tls_connect(struct tls *tls, struct tls **tls_sock,
                         int client_sock);
-struct tls *mx_create_tls_configuration(t_server_info *info);
+//struct tls *mx_create_tls_configuration(t_server_info *info);
+int mx_create_tls_configuration(struct tls **tls);
 int mx_create_server_socket(t_server_info *info);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
@@ -375,6 +376,7 @@ void mx_print_curr_time(void);
 char *mx_curr_time(void);
 void mx_print_tid(const char *s);
 void mx_err_exit(const char *err_msg);  // вивести помилку
+int mx_err_return2(const char *err_msg, const char *err_msg2);
 int mx_err_return(const char *err_msg);
 void mx_sha_hash_password(char *password);
 int addr_socet_info(int argc, char *argv[]);  // test adress
