@@ -1,13 +1,35 @@
 #include "uchat.h"
 
+//static void add_new_client() {
+//    struct sockaddr_storage client_address;
+//    socklen_t client_len = sizeof(client_address);
+//    int client_sock = accept(server, (struct sockaddr*) &client_address, &client_len);
+//
+//    if (client_sock == -1) {
+//        printf("error = %s\n", strerror(errno));
+//        break;
+//    }
+//    printf("server new client socket %d\n", client_sock);
+//    mx_print_client_address(client_address, client_len);
+//    // add client_sock in struct kevent
+//    EV_SET(&new_ev, client_sock, EVFILT_READ, EV_ADD,0, 0, 0);
+//    if (kevent(kq, &new_ev, 1, 0, 0, NULL) == -1) {
+//        printf("error = %s\n", strerror(errno));
+//        break;
+//    }
+//    tls_socket = NULL;
+//    make_tls_connect(tls, &tls_socket, client_sock);
+//    mx_add_socket_elem(&(info->socket_list), client_sock, tls_socket);
+//}
+
+
+
 static struct tls *create_tls_configuration(t_server_info *info) {
     struct tls_config *tls_cfg = NULL;
     struct tls *tls;
     uint32_t protocols = 0;
     (void)info;
 
-//    if (tls_init() != 0)  // not
-//        mx_err_exit("tls_init error\n");
     if ((tls_cfg = tls_config_new()) == NULL)
         mx_err_exit("unable to allocate tls_cnfg");
     if(tls_config_parse_protocols(&protocols, "secure") != 0)
@@ -33,7 +55,8 @@ static struct tls *create_tls_configuration(t_server_info *info) {
     return tls;
 }
 
-static void make_tls_connect(struct tls *tls, struct tls **tls_sock, int client_sock) {
+static void make_tls_connect(struct tls *tls, struct tls **tls_sock,
+                             int client_sock) {
     printf("client_sock = %d\n", client_sock);
     if(tls_accept_socket(tls, tls_sock, client_sock) < 0) {
         printf("tls_accept_socket error\n");
@@ -63,7 +86,7 @@ static int create_server_socket(t_server_info *info) {
                     bind_address->ai_socktype, bind_address->ai_protocol);
     if (server_socket == -1) {
         printf("socket error = %s\n", strerror(errno));
-        return -1;
+        exit(1);
     }
     freeaddrinfo(bind_address);
     printf("Configuring local address...\n");
@@ -72,14 +95,14 @@ static int create_server_socket(t_server_info *info) {
     inet_aton("127.0.0.1", &serv_addr.sin_addr);
     if (bind(server_socket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0) {
         printf("bind error = %s\n", strerror(errno));
-        return -1;
+        exit(1);
     }
     return server_socket;
 }
 
 int mx_start_server(t_server_info *info) {
     int server;
-
+    int kq;
     struct tls *tls = NULL;
     struct tls *tls_socket = NULL;
 
@@ -91,8 +114,6 @@ int mx_start_server(t_server_info *info) {
         return -1;
     }
     printf("listen fd = %d\n", server);
-
-    int kq;
     if ((kq = kqueue()) == -1) {
         printf("error = %s\n", strerror(errno));
         close(server);

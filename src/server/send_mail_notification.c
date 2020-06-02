@@ -47,7 +47,8 @@ static int send_mail_massage(struct tls *tls_c, t_mail *mail) {
     mx_send_format_tls(tls_c, "To:<%s>\r\n", mail->receiver);
     mx_send_format_tls(tls_c, "Subject:%s\r\n", mail->subject);
     mx_send_format_tls(tls_c, "Mime-Version:%s\r\n", "1.0");
-    mx_send_format_tls(tls_c, "Content-Type:%s\r\n", "text/html; charset=\"ISO-8859-1\"");
+    mx_send_format_tls(tls_c, "Content-Type:%s\r\n",
+                       "text/html; charset=\"ISO-8859-1\"");
     mx_send_format_tls(tls_c, "Content-Transfer-Encoding:%s\r\n", "7bit");
     mx_send_format_tls(tls_c, "Date:%s\r\n", mx_date_to_char());
     if (mx_mail_data_sending(tls_c, mail) != MX_OK)
