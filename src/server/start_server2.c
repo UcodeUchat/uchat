@@ -53,6 +53,23 @@ int mx_make_tls_connect(struct tls *tls, struct tls **tls_sock,
     return 0;
 }
 
+/*
+static int make_bind_server(t_server_info *info,
+                            struct sockaddr_in *serv_addr, int server_sock) {
+
+    serv_addr->sin_family = AF_INET;
+    serv_addr->sin_port = htons(info->port);
+    inet_aton("127.0.0.1", &serv_addr->sin_addr);
+    if (bind(server_sock, (struct sockaddr *) &serv_addr,
+             sizeof(serv_addr)) != 0) {
+        printf("bind error = %s\n", strerror(errno));
+        close(server_sock);
+        return -1;
+    }
+    return 0;
+}
+*/
+
 int mx_create_server_socket(t_server_info *info) {
     struct addrinfo hints;
     struct addrinfo *bind_address;
@@ -71,7 +88,6 @@ int mx_create_server_socket(t_server_info *info) {
         return -1;
     }
     freeaddrinfo(bind_address);
-//    printf("Configuring local address...\n");
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(info->port);
     inet_aton("127.0.0.1", &serv_addr.sin_addr);
@@ -80,6 +96,8 @@ int mx_create_server_socket(t_server_info *info) {
         close(server_socket);
         return -1;
     }
+//    if ((make_bind_server(info, &serv_addr, server_socket)) != 0)
+//        return -1;
     return server_socket;
 }
 
