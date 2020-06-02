@@ -208,8 +208,8 @@ typedef struct s_work {
 typedef struct  s_server_info {  // struct server
     int argc;
     char **argv;
-
     char *ip; // my ip address
+    int kq;
     uint16_t port;
     struct s_clients *clients; // структура де зберігаються усі клієнти, що приєдналися
     struct s_socket_list *socket_list;
@@ -300,6 +300,10 @@ int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_get_rooms_data(void *messages, int argc, char **argv, char **col_name);
+int mx_make_tls_connect(struct tls *tls, struct tls **tls_sock,
+                        int client_sock);
+struct tls *mx_create_tls_configuration(t_server_info *info);
+int mx_create_server_socket(t_server_info *info);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);
