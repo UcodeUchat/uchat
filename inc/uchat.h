@@ -253,6 +253,7 @@ typedef struct s_data {
     GtkWidget *file_button;
     GtkWidget *menu_button;
     GtkWidget *login_msg;
+    GtkWidget *register_msg;
     GtkWidget *notebook;
     GtkWidget *stop;
     GtkWidget *menu;
@@ -267,6 +268,7 @@ typedef struct s_data {
     gint current_room;
     int login_msg_flag;
     pthread_t login_msg_t;
+    pthread_t register_msg_t;
 }              t_data;
 
 typedef struct  s_client_info {  //struct client
