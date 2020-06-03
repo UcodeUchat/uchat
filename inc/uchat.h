@@ -36,12 +36,20 @@
 //#include <sndfile.h>
 //#include <json.h>
 // openssl
-#include <openssl/evp.h>
-#include <openssl/sha.h>
-#include <openssl/aes.h>
-#include <tls.h>
+// #include <openssl/evp.h>
+// #include <openssl/sha.h>
+// #include <openssl/aes.h>
+// #include <tls.h>
 
 #include "../libportaudio/include/portaudio.h"
+
+#include "../../libmx/inc/libmx.h"
+#include "../libressl_3/include/tls.h"
+#include "../libressl_3/include/openssl/evp.h"
+#include "../libressl_3/include/openssl/sha.h"
+#include "../libressl_3/include/openssl/aes.h"
+#include "../libressl_3/include/openssl/conf.h"
+#include "../libjson/json.h"
 
 // #include <gst/gst.h>
 

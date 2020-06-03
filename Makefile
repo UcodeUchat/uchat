@@ -35,14 +35,6 @@ LIBPORTAUDIOD  = libportaudio
 LIBPORTAUDIOX  = lib/.libs/libportaudio.a
 LIBPORTAUDIOA := $(addprefix $(LIBPORTAUDIOD)/, $(LIBPORTAUDIOX))
 
-LIBRESSLD  = libressl
-LIBRESSL_TLSX= lib/.libs/libtls.a
-LIBRESSLD_TLSA := $(addprefix $(LIBRESSLD)/, $(LIBRESSL_TLSX))
-
-LIBRESSL_TLS = libressl/tls/.libs/libtls.a
-LIBRESSL_CRYPTO = libressl/crypto/.libs/libcrypto.a
-LIBRESSL_SSL = libressl/ssl/.libs/libssl.a
-
 INCS = inc/uchat.h
 
 SRC_SERVER = main_server.c \
@@ -65,7 +57,7 @@ SRC_SERVER = main_server.c \
 	functions_for_server.c \
 	send_mail_notification.c \
 	send_mail_notification2.c \
-	send_mail_notification3.c
+	send_mail_notification3.c \
 
 SRC_CLIENT = main_client.c \
 	start_client.c \
@@ -77,7 +69,6 @@ SRC_CLIENT = main_client.c \
 	load_profile.c \
 	message.c \
 	search.c \
-	create.c \
 	work_with_files_list_in_client.c \
 	record_audio.c \
 	play_audio.c
@@ -85,7 +76,6 @@ SRC_CLIENT = main_client.c \
 # SRC_HELP = $(wildcard *.c)
 SRC_HELP = err_exit.c \
 	functions.c \
-	package.c \
 	crypto.c \
 	json_functions.c
 
@@ -99,25 +89,38 @@ OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
 
+LIBRESSL_A = ./libressl_3/tls/.libs/libtls.a \
+			 ./libressl_3/ssl/.libs/libssl.a \
+			 ./libressl_3/crypto/.libs/libcrypto.a
+
+LIBRESSL_H = \
+			-I ./libressl_3/include/tls.h \
+			-I ./libressl_3/include/openssl \
+			-I ./libressl_3/include/pqueue.h \
+			-I ./libressl_3/tls \
+			-I ./libressl_3/ssl \
+			-I ./libressl_3/crypto
+
 #AUDIOFLAGS = -lportaudio
-TLSFLAGS =  -lcrypto -lssl -ltls
+#TLSFLAGS =  -lcrypto -lssl -ltls
 SQLFLAGS = -lsqlite3
 
 all: install
 
-server: $(NAME_S) #$(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX)  #$(LIBMX)
+server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
+
 	@make -sC $(LJSOND)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` -I./Frameworks/GStreamer.framework/Versions/1.0/include/gstreamer-1.0 -I./Frameworks/GStreamer.framework/Versions/1.0/include -I./Frameworks/GStreamer.framework/Versions/1.0/include/glib-2.0 -I./Frameworks/GStreamer.framework/Versions/1.0/lib/glib-2.0/include -L./Frameworks/GStreamer.framework/Versions/1.0/lib -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -lintl $(LMXA) $(LJSONA) $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS) $(TLSFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/server/%.c $(INCS)
-	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -I./Frameworks/GStreamer.framework/Versions/1.0/include/gstreamer-1.0 -I./Frameworks/GStreamer.framework/Versions/1.0/include -I./Frameworks/GStreamer.framework/Versions/1.0/include/glib-2.0 -I./Frameworks/GStreamer.framework/Versions/1.0/lib/glib-2.0/include -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
 	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
 
 $(OBJD)/%.o: src/functions/%.c $(INCS)
-	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -I./Frameworks/GStreamer.framework/Versions/1.0/include/gstreamer-1.0 -I./Frameworks/GStreamer.framework/Versions/1.0/include -I./Frameworks/GStreamer.framework/Versions/1.0/include/glib-2.0 -I./Frameworks/GStreamer.framework/Versions/1.0/lib/glib-2.0/include -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
 	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
 
 $(OBJS_SERVER): | $(OBJD)
@@ -145,8 +148,8 @@ $(LIBSNDFX): $(LIBSNDFA)
 	@make -sC $(LIBSNDFD)
 
 $(LIBPORTAUDIOA):
-# 	(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
-# 	@make -sC $(LIBPORTAUDIOD)
+	(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
+	@make -sC $(LIBPORTAUDIOD)
 
 $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 	@make -sC $(LIBPORTAUDIOD)
@@ -159,21 +162,21 @@ $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 #$(LIBRESSL_TLSX): $(LIBRESSLD_TLSA)
 #	@make -sC $(LIBRESSLD)
 
-client: $(NAME_C) #$(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
+client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0`  $(LMXA)  $(LJSONA) $(LIBSNDFA) -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(OBJS_CLIENT) $(OBJS_HELP) -o $@ $(TLSFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA) $(LIBSNDFA) -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_CLIENT) $(OBJS_HELP) -o $@
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
 
 
 $(OBJD)/%.o: src/client/%.c $(INCS)
-	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0`  -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
 	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
 
 
 $(OBJD)/%.o: src/functions/%.c $(INCS)
-	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0`  -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
 	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
 
 $(OBJS_CLIENT): | $(OBJD)

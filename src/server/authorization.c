@@ -6,7 +6,7 @@ static int search_email(void *data, int argc, char **argv, char **col_name) {
     (void)argc;
     char **email = (char **)data;
     if (argv[0]) {
-        if (mx_atoi(argv[0]) == 1 && argv[1] != NULL) {
+        if (atoi(argv[0]) == 1 && argv[1] != NULL) {
             *email = strdup(argv[1]);
             return 0;
         } 

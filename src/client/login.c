@@ -114,15 +114,14 @@ void send_data_callback (GtkWidget *widget, t_client_info *info) {
     char *password = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->registration->password_entry));
     char *repeat = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->registration->repeat_password_entry));
     if (validation(login, password, repeat)) {
-        t_package *p = mx_create_new_package();
-        strncat(p->login, login, sizeof(p->login) - 1);
-        strncat(p->password, password, sizeof(p->password) - 1);
-        p->type = MX_REG_TYPE;
+        json_object *json_obj = mx_create_basic_json_object(MX_REG_TYPE);
+        const char *json_str;
 
+        json_object_object_add(json_obj, "login", json_object_new_string(login));
+        json_object_object_add(json_obj, "password", json_object_new_string(password));
 
-        json_object  *new_json = mx_package_to_json(p);
-        mx_print_json_object(new_json, "login send_data_callback");
-        const char *json_str = json_object_to_json_string(new_json);
+        mx_print_json_object(json_obj, "login send_data_callback");
+        json_str = json_object_to_json_string(json_obj);
 
         tls_send(info->tls_client, json_str, strlen(json_str));
 
