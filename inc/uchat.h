@@ -368,6 +368,7 @@ typedef struct  s_server_info {  // struct server
 #define MX_JOIN_ROOM_TYPE 18
 #define MX_CREATE_ROOM_TYPE 19
 #define MX_DIRECT_MESSAGE_TYPE 20
+#define MX_DELETE_ACCOUNT_TYPE 21
 #define MX_PACKAGE_SIZE sizeof(t_package)
 
 #define MX_MAX_MSG_SIZE 200
@@ -476,6 +477,9 @@ int mx_final_file_input_server(t_server_info *info, t_socket_list *csl);
 
 //get_rooms
 void mx_get_rooms(t_server_info *i, json_object *js);
+
+//delete account
+int mx_delete_acc(t_server_info *i, json_object *j);
 
 //reg
 int mx_registration(t_server_info *i, t_socket_list *csl, json_object *js);

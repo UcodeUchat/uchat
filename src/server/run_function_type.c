@@ -50,5 +50,9 @@ int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
         return_value = mx_create_room_server(info, csl, csl->obj);
     else if (type == MX_DIRECT_MESSAGE_TYPE)
         return_value = mx_direct_message(info, csl, csl->obj);
+    else if (type == MX_DELETE_ACCOUNT_TYPE){
+        fprintf(stderr, "MX_DELETE_ACCOUNT_TYPE\n");
+        return_value = mx_delete_acc(info, csl->obj);
+    }
     return return_value;
 }
