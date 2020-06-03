@@ -656,6 +656,19 @@ int mx_notebook_prepend(t_note *note) {
     return 0;
 }
 
+void load_room_history (t_all *data) {
+    struct json_object *messages;
+    json_object_object_get_ex(data->room_data, "messages", &messages);
+    int n_msg = json_object_array_length(messages);
+    for (int j = 0; j < n_msg; j++) {
+        json_object *msg_data = json_object_array_get_idx(messages, j);
+        append_message(data->info, data->room, msg_data);
+    }
+    gtk_adjustment_set_value(data->room->Adjust, 
+                            gtk_adjustment_get_upper(data->room->Adjust) - 
+                            gtk_adjustment_get_page_size(data->room->Adjust) + 2.0);
+}
+
 t_room *mx_create_room(t_client_info *info, json_object *room_data, int position) {
     t_room *room =  (t_room *)malloc(sizeof(t_room));
     const char *name = json_object_get_string(json_object_object_get(room_data, "name"));
@@ -741,18 +754,7 @@ t_room *mx_create_room(t_client_info *info, json_object *room_data, int position
         note->position = position;
         g_idle_add ((GSourceFunc)mx_notebook_prepend, note);
         //--msg history
-        // pthread_t msg_history_t = NULL;
-        // pthread_create(&msg_history_t, 0, msg_history_thread, data);
-        struct json_object *messages;
-        json_object_object_get_ex(data->room_data, "messages", &messages);
-        int n_msg = json_object_array_length(messages);
-        for (int j = 0; j < n_msg; j++) {
-            json_object *msg_data = json_object_array_get_idx(messages, j);
-            append_message(data->info, data->room, msg_data);
-        }
-        gtk_adjustment_set_value(data->room->Adjust, 
-                                gtk_adjustment_get_upper(data->room->Adjust) - 
-                                gtk_adjustment_get_page_size(data->room->Adjust) + 2.0);
+        load_room_history(data);
         //--
     return room;
 }
