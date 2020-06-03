@@ -147,18 +147,42 @@ void cancel_callback (GtkWidget *widget, t_client_info *info) {
     gtk_widget_show(info->data->login_box);
 }
 
+void init_main_title(t_client_info *info, GtkWidget *screen)  {
+    GtkWidget *table = gtk_grid_new();
+    GtkWidget *title1 = gtk_label_new("Ucode");
+    gtk_widget_show (title1);
+    gtk_widget_set_name(title1, "title1");
+    gtk_grid_attach (GTK_GRID (table), title1, 0, 0, 1, 1);
+    GtkWidget *title2 = gtk_label_new("chat");
+    gtk_widget_show (title2);
+    gtk_widget_set_name(title2, "title2");
+    gtk_grid_attach (GTK_GRID (table), title2, 1, 0, 1, 1);
+    GtkWidget *box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (screen), box, 0, 125);
+    gtk_box_pack_start (GTK_BOX (box), table, TRUE, FALSE, 0);
+    gtk_widget_show(table);
+    gtk_widget_show (box);
+}
+
 void init_reg(t_client_info *info) {
     info->data->register_box = gtk_fixed_new();
     gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->register_box, 0, 0);
+    init_main_title(info, info->data->register_box);
     
 
     info->data->registration = (t_reg *)malloc(sizeof(t_reg));
     info->data->registration->login_entry = gtk_entry_new ();
     //--stop image
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/uk1.png", 400, 320, TRUE, NULL);
-    info->data->registration->stop = gtk_image_new_from_pixbuf(pixbuf);
-    gtk_fixed_put (GTK_FIXED (info->data->register_box), info->data->registration->stop, 200, 150);
-    gtk_widget_show(info->data->registration->stop);
+    // GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/uk1.png", 400, 320, TRUE, NULL);
+    // info->data->registration->stop = gtk_image_new_from_pixbuf(pixbuf);
+    // gtk_fixed_put (GTK_FIXED (info->data->register_box), info->data->registration->stop, 535, 150);
+    // gtk_widget_show(info->data->registration->stop);
+    GdkPixbuf *pixbuf1 = gdk_pixbuf_new_from_file_at_scale ("img/lr3.png", 400, 320, TRUE, NULL);
+    GtkWidget *image1 = gtk_image_new_from_pixbuf(pixbuf1);
+    gtk_fixed_put (GTK_FIXED (info->data->register_box), image1, 300, 150);
+    gtk_widget_show(image1);
     //--
     gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->login_entry), 50);
     gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->login_entry), "Write your login(6+ chars)");
@@ -925,25 +949,6 @@ void init_auth_fail(t_client_info *info) {
     gtk_widget_show (box);
 }
 
-void init_main_title(t_client_info *info)  {
-    GtkWidget *table = gtk_grid_new();
-    GtkWidget *title1 = gtk_label_new("Ucode");
-    gtk_widget_show (title1);
-    gtk_widget_set_name(title1, "title1");
-    gtk_grid_attach (GTK_GRID (table), title1, 0, 0, 1, 1);
-    GtkWidget *title2 = gtk_label_new("chat");
-    gtk_widget_show (title2);
-    gtk_widget_set_name(title2, "title2");
-    gtk_grid_attach (GTK_GRID (table), title2, 1, 0, 1, 1);
-    GtkWidget *box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
-    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
-    gtk_fixed_put (GTK_FIXED (info->data->login_box), box, 0, 125);
-    gtk_box_pack_start (GTK_BOX (box), table, TRUE, FALSE, 0);
-    gtk_widget_show(table);
-    gtk_widget_show (box);
-}
-
 void init_login_entry (t_client_info *info, GtkWidget **entry, char *placeholder, int heigth) {
     *entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (*entry), 50);
@@ -981,7 +986,7 @@ void init_login(t_client_info *info) {
     info->data->login_box = gtk_fixed_new ();
     gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->login_box, 0, 0);
     init_auth_fail(info);
-    init_main_title(info);
+    init_main_title(info, info->data->login_box);
     init_login_entry(info, &info->data->login_entry, "login", 200);
     init_login_entry(info, &info->data->password_entry, "password", 250);
     init_login_button(info, "Sign in", 300, enter_callback);
