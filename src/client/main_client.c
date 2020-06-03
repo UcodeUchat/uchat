@@ -27,7 +27,9 @@ int main(int argc, char **argv) {
     create_download_folder();
     if (mx_start_client(info)) {
         printf("error = %s\n", strerror(errno));
+        // info clean and close
         return -1;
     }
+    printf("exit client\n");
     return 0;
 }
