@@ -42,6 +42,8 @@ int mx_process_stream_ext(PaStream *stream, t_audio *data,
                           bool *sample_complete);
 float mx_rms(float *data, size_t len);
 float mx_change_threshold(float talking_threshold, float talking_ntensity);
-int mx_play_sound_file(char *file_name);
+//int mx_play_sound_file(char *file_name);
+
+int mx_play_sound_file(char *file_name, char *start_time, char *duration_t);
 
 #endif //UCHAT_AUDIO_H

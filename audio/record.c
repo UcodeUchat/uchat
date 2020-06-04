@@ -129,6 +129,34 @@ static int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_
     return Pa_StartStream(*stream);
 }
 
+
+static long mx_save_audio(t_audio *data) {
+    uint8_t err = SF_ERR_NO_ERROR;
+    SF_INFO sfinfo ={
+            .channels = data->number_channels,
+            .samplerate = data->sample_rate,
+            .format = SF_FORMAT_AIFF | SF_FORMAT_FLOAT
+    };
+    char file_name[100];
+    snprintf(file_name, 100, "./Uchat_downloads/rec_massage:%d.aif", rand());  //rand -> replace by message id
+    printf("start save audio\n");
+    SNDFILE *outfile = sf_open(file_name, SFM_WRITE, &sfinfo);
+    if (!outfile) {
+        printf("error outfile =%d\n", sf_error(outfile));
+        return -1;
+    }
+    long wr = sf_writef_float(outfile, data->rec_samples, data->size /sizeof(float));
+    err = data->size - wr;
+    printf("data to write to file =%zu\n", data->size);
+    printf("write to file =%lu\n", wr);
+    sf_write_sync(outfile);
+    sf_close(outfile);
+    data->file_name = strdup(file_name);
+    return err;
+}
+
+
+/*
 static long mx_save_audio(t_audio *data) {
     uint8_t err = SF_ERR_NO_ERROR;
     SF_INFO sfinfo ={
@@ -154,7 +182,7 @@ static long mx_save_audio(t_audio *data) {
     return err;
 }
 
-
+*/
 
 
 

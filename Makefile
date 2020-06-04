@@ -109,7 +109,7 @@ SQLFLAGS = -lsqlite3
 
 all: install
 
-server: $(NAME_S) #$(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
+server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
 
@@ -150,8 +150,8 @@ $(LIBSNDFX): $(LIBSNDFA)
 	@make -sC $(LIBSNDFD)
 
 $(LIBPORTAUDIOA):
-	#(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
-	#@make -sC $(LIBPORTAUDIOD)
+# 	(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
+# 	@make -sC $(LIBPORTAUDIOD)
 
 $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 	@make -sC $(LIBPORTAUDIOD)
@@ -164,7 +164,7 @@ $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 #$(LIBRESSL_TLSX): $(LIBRESSLD_TLSA)
 #	@make -sC $(LIBRESSLD)
 
-client: $(NAME_C) #$(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
+client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)

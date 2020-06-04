@@ -727,6 +727,7 @@ void init_general (t_client_info *info) {
     g_signal_connect(G_OBJECT(info->data->record_button), "clicked", G_CALLBACK(record_callback), info);
     gtk_box_pack_start (GTK_BOX (box), info->data->record_button, FALSE, FALSE, 0);
     gtk_widget_set_size_request(info->data->record_button, 40, 20);
+    gtk_widget_set_name(info->data->record_button, "entry");
     gtk_widget_show(info->data->record_button);
 
     //--stop button

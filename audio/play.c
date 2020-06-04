@@ -2,9 +2,13 @@
 #include    <stdlib.h>
 #include    <string.h>
 #include    <math.h>
-#include <portaudio.h>
+//#include <portaudio.h>
 #include <math.h>
-#include <sndfile.h>
+//#include <sndfile.h>
+
+
+#include "../libportaudio/include/portaudio.h"
+#include "../libsndfile/src/sndfile.h"
 
 #define MIN_TALKING_BUFFERS 8
 #define TALKING_THRESHOLD_WEIGHT 0.99
@@ -14,6 +18,7 @@
 #define SAMPLE_SILENCE  (0.0f)
 #define NUM_SECONDS     (4)
 #define BUFFER_LEN    512
+
 
 static void print_s_info(SF_INFO s_info) {
     printf ("frames = %lld\n", s_info.frames);
@@ -56,6 +61,7 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
     sf_count_t length;	// length of file in frames
     sf_count_t start_point; // start_point of frames read
     sf_count_t end_point; // end point of frames playing
+
     double starttime = 0;
     double duration = 0;
 
@@ -63,7 +69,9 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
     if (err != paNoError) {
         printf("error Pa_Initialize =%s\n", Pa_GetErrorText(err));
         return -1;
+
     }
+    printf("play 1\n");
     memset(&s_info, 0, sizeof(s_info));
     a_file = sf_open(file_name, SFM_READ, &s_info);
     if (!a_file) {
@@ -73,11 +81,12 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
         Pa_Terminate();
         return -1;
     }
+
     print_s_info(s_info);
 //    if (s_info.channels > 1) {
 //        return -1;
 //    }
-
+    printf("play 2\n");
     length = s_info.frames;
     if (start_time) {
         starttime = atof(start_time);
@@ -108,15 +117,21 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
         fprintf(stderr, "%s\n", "error");
         return err;
     }
+    printf("play 3\n");
     sf_count_t read_count = 0;
     sf_count_t read_sum = 0;
-    float data[BUFFER_LEN];
-    memset(data, 0, sizeof(data));
 
+//    if (s_info.channels > 1)
+
+    float data[BUFFER_LEN * s_info.channels];
+    memset(data, 0, sizeof(data));
     int subFormat = s_info.format & SF_FORMAT_SUBMASK;
     double scale = 1.0;
     int m = 0;
     sf_seek(a_file, start_point, SEEK_SET);
+
+    printf("play 4\n");
+
     while ((read_count = sf_readf_float(a_file, data, BUFFER_LEN))) {
         if (subFormat == SF_FORMAT_FLOAT || subFormat == SF_FORMAT_DOUBLE) {
             for (m = 0 ; m < read_count ; ++m) {
@@ -135,6 +150,7 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
         }
         memset(data, 0, sizeof(data));
     }
+
     err = Pa_CloseStream(stream);
     if (err != paNoError)
         printf("error Pa_CloseStream =%s\n", Pa_GetErrorText(err));

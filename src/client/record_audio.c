@@ -124,6 +124,7 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
     printf( "Num channels = %d.\n", numChannels );
 
     data->number_channels = numChannels;
+//    data->number_channels = 1;
     input_parameters.channelCount = numChannels;
     input_parameters.sampleFormat = paFloat32;
     input_parameters.suggestedLatency = inputInfo->defaultLowInputLatency;
@@ -158,6 +159,7 @@ int mx_exit_stream(t_audio *data, PaError err) {
     return err;
 }
 
+
 long mx_save_audio(t_audio *data) {
     uint8_t err = SF_ERR_NO_ERROR;
     SF_INFO sfinfo ={
@@ -173,7 +175,7 @@ long mx_save_audio(t_audio *data) {
         printf("error outfile =%d\n", sf_error(outfile));
         return -1;
     }
-    long wr = sf_writef_float(outfile, data->rec_samples, data->size / sizeof(float));
+    long wr = sf_writef_float(outfile, data->rec_samples, data->size / 8);
     err = data->size - wr;
     printf("data to write to file =%zu\n", data->size);
     printf("write to file =%lu\n", wr);

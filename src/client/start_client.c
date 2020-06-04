@@ -1,5 +1,10 @@
 #include "uchat.h"
 
+
+//static int (t_client_info *info, ) {
+//
+//}
+
 static int create_client_socket(t_client_info *info) {
     struct addrinfo hints;
     struct addrinfo *peer_address = NULL;
@@ -8,6 +13,7 @@ static int create_client_socket(t_client_info *info) {
     int enable = 1;
 
     memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     if ((err = getaddrinfo(info->ip, info->argv[2],
                            &hints, &peer_address)) != 0) {
@@ -25,15 +31,17 @@ static int create_client_socket(t_client_info *info) {
     sock = socket(peer_address->ai_family,
                   peer_address->ai_socktype, peer_address->ai_protocol);
     if (sock == -1) {
-        printf("error sock = %s\n", strerror(errno));
-        return 1;
+        freeaddrinfo(peer_address);
+        mx_err_return2("error socket =", strerror(errno));
+//        printf("error sock = %s\n", ;
+//        return 1;
     }
     setsockopt(sock, IPPROTO_TCP, SO_KEEPALIVE, &enable, sizeof(int));
-    if (connect(sock, peer_address->ai_addr, peer_address->ai_addrlen))
-        mx_err_return2("connect error: ",strerror(errno));
-//        printf("connect error = %s\n", strerror(errno));
-//        return 1;
-//    }
+    if (connect(sock, peer_address->ai_addr, peer_address->ai_addrlen)) {
+        close(sock);
+        freeaddrinfo(peer_address);
+        mx_err_return2("connect error: ", strerror(errno));
+    }
     freeaddrinfo(peer_address);
     info->socket = sock;
     return 0;
