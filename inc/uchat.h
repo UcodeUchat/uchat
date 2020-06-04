@@ -346,6 +346,8 @@ typedef struct  s_server_info {  // struct server
     struct s_work *wdb;
 }               t_server_info;
 
+#define KEY10 "rooms"
+
 #define MX_MAX_FILE_SIZE 300000000
 #define MX_MAX_USERS_IN_ROOM 1024
 #define MX_MSG_TYPE 1
@@ -373,6 +375,15 @@ typedef struct  s_server_info {  // struct server
 
 #define MX_MAX_MSG_SIZE 200
 // sizeof((type *)0)->member)
+
+typedef struct  s_file_tmp {
+    pthread_mutex_t *mutex;
+    struct tls *tls;
+    char *file_name;
+    int size;
+    int file_id;
+    int room_id;
+}               t_file_tmp;
 
 typedef struct  s_server_room {
     int room_id;
@@ -423,6 +434,8 @@ typedef struct s_mes {
 }               t_mes;
 
 // server
+void email_notify(t_server_info *i, json_object *js);
+
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
 int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info);
@@ -450,6 +463,17 @@ int mx_direct_message (t_server_info *info, t_socket_list *csl, json_object *js)
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);
+
+char *check_file_in_db_and_user_access(t_server_info *info, json_object *obj);
+int get_result(void *arg, int argc, char **argv, char **col_name);
+int res(void *arg, int argc, char **argv, char **col_name);
+int check_is_object_valid(json_object *obj);
+t_file_tmp *set_variables(t_socket_list *csl);
+void file_is_not_exist(t_file_tmp *vars);
+void *send_file(void *arg);
+void start_sending(FILE *file, t_file_tmp *vars);
+int mx_send_file_from_server(t_server_info *info, t_socket_list *csl);
+
 
 // socket_list
 t_socket_list *mx_create_socket_elem(int socket, struct tls *tls_socket,
@@ -483,7 +507,7 @@ int mx_delete_acc(t_server_info *i, json_object *j);
 
 //reg
 int mx_registration(t_server_info *i, t_socket_list *csl, json_object *js);
-int mx_add_to_db(t_server_info *i, const char *l, const char *pa);
+int mx_add_to_db(t_server_info *i, const char *l, const char *pa, int us_id);
 int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
 
 // client
