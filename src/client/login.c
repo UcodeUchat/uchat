@@ -204,85 +204,54 @@ void init_reg_fail(t_client_info *info) {
     gtk_widget_show (box);
 }
 
+void init_reg_entry (t_client_info *info, GtkWidget **entry, char *placeholder, int heigth) {
+    *entry = gtk_entry_new ();
+    gtk_entry_set_max_length (GTK_ENTRY (*entry), 50);
+    gtk_entry_set_placeholder_text (GTK_ENTRY (*entry), placeholder);
+    gtk_editable_select_region (GTK_EDITABLE (*entry),
+                                0, gtk_entry_get_text_length (GTK_ENTRY (*entry)));
+    GtkWidget *box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, heigth);
+    gtk_box_pack_start (GTK_BOX (box), *entry, TRUE, FALSE, 0);
+    gtk_widget_show (box);
+    gtk_widget_show (*entry);
+    gtk_widget_set_name(*entry, "entry");
+}
+
+void init_reg_button (t_client_info *info, char *placeholder, int heigth, 
+                        void (*callback) (GtkWidget *widget, t_client_info *info) ) {
+    GtkWidget *button = gtk_button_new_with_label(placeholder);
+    g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (callback), info);
+    GtkWidget *box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, heigth);
+    gtk_box_pack_start (GTK_BOX (box), button, TRUE, FALSE, 0);
+    gtk_widget_show (box);
+    gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_show (button);
+    gtk_widget_set_name(button, "entry");
+}
+
 void init_reg(t_client_info *info) {
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/lr3.png", 400, 320, TRUE, NULL);
+    GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
+
     info->data->register_msg_t = NULL;
     info->data->register_box = gtk_fixed_new();
     gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->register_box, 0, 0);
     init_main_title(info, info->data->register_box);
-
     info->data->registration = (t_reg *)malloc(sizeof(t_reg));
-    info->data->registration->login_entry = gtk_entry_new ();
-    //--stop image
-    GdkPixbuf *pixbuf1 = gdk_pixbuf_new_from_file_at_scale ("img/lr3.png", 400, 320, TRUE, NULL);
-    GtkWidget *image1 = gtk_image_new_from_pixbuf(pixbuf1);
-    gtk_fixed_put (GTK_FIXED (info->data->register_box), image1, 300, 150);
-    gtk_widget_show(image1);
+    gtk_fixed_put (GTK_FIXED (info->data->register_box), image, 300, 150);
+    gtk_widget_show(image);
     init_reg_fail(info);
-    //--
-    gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->login_entry), 50);
-    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->login_entry), "Your login(6+ chars)");
-    gtk_editable_select_region (GTK_EDITABLE (info->data->registration->login_entry),
-                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->registration->login_entry)));
-    GtkWidget *box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
-    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
-    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, 200);
-    gtk_box_pack_start (GTK_BOX (box), info->data->registration->login_entry, TRUE, FALSE, 0);
-    gtk_widget_show (box);
-    gtk_widget_show (info->data->registration->login_entry);
-    gtk_widget_set_name(info->data->registration->login_entry, "entry");
-
-    info->data->registration->password_entry = gtk_entry_new ();
-    gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->password_entry), 50);
-    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->password_entry), "Your password(6+ chars)");
-    gtk_editable_select_region (GTK_EDITABLE (info->data->registration->password_entry),
-                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->registration->password_entry)));
-    box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
-    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
-    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, 250);
-    gtk_box_pack_start (GTK_BOX (box), info->data->registration->password_entry, TRUE, FALSE, 0);
-    gtk_widget_show (box);
-    gtk_widget_show (info->data->registration->password_entry);
-    gtk_widget_set_name(info->data->registration->password_entry, "entry");
-
-    info->data->registration->repeat_password_entry = gtk_entry_new ();
-    gtk_entry_set_max_length (GTK_ENTRY (info->data->registration->repeat_password_entry), 50);
-    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->registration->repeat_password_entry), "Repeat your password");
-    gtk_editable_select_region (GTK_EDITABLE (info->data->registration->repeat_password_entry),
-                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->registration->repeat_password_entry)));
-    box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
-    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
-    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, 300);
-    gtk_box_pack_start (GTK_BOX (box), info->data->registration->repeat_password_entry, TRUE, FALSE, 0);
-    gtk_widget_show (box);
-    gtk_widget_show (info->data->registration->repeat_password_entry);
-    gtk_widget_set_name(info->data->registration->repeat_password_entry, "entry");
-                                                    
-    GtkWidget *button = gtk_button_new_with_label("Register");
-    g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (send_data_callback),info);
-    box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
-    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
-    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, 350);
-    gtk_box_pack_start (GTK_BOX (box), button, TRUE, FALSE, 0);
-    gtk_widget_show (box);
-    gtk_widget_set_size_request(button, 100, -1);
-    gtk_widget_show (button);
-    gtk_widget_set_name(button, "entry");
-
-    button = gtk_button_new_with_label("Cancel");
-    g_signal_connect (G_OBJECT (button), "clicked",G_CALLBACK (cancel_callback),info);
-    box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
-    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
-    gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, 390);
-    gtk_box_pack_start (GTK_BOX (box), button, TRUE, FALSE, 0);
-    gtk_widget_show (box);
-    gtk_widget_set_size_request(button, 100, -1);
-    gtk_widget_show (button);
-    gtk_widget_set_name(button, "entry");
+    init_reg_entry(info, &info->data->registration->login_entry, "login", 200);
+    init_reg_entry(info, &info->data->registration->password_entry, "password", 250);
+    init_reg_entry(info, &info->data->registration->repeat_password_entry, "repeat password", 300);
+    init_reg_button(info, "Register", 350, send_data_callback);  
+    init_reg_button(info, "Cancel", 390, cancel_callback);
 }
 
 
@@ -418,30 +387,39 @@ void close_search_callback (GtkWidget *widget, t_client_info *info) {
     gtk_widget_hide(widget);
 }
 
-void init_search (t_client_info *info) { 
+void config_serach_box (t_client_info *info) {
     info->data->search = NULL;
     info->data->search_box = gtk_event_box_new();
     gtk_widget_add_events (info->data->search_box, GDK_BUTTON_PRESS_MASK);
-    g_signal_connect (G_OBJECT (info->data->search_box), "button_press_event", G_CALLBACK (close_search_callback), info);
+    g_signal_connect (G_OBJECT (info->data->search_box), "button_press_event", 
+        G_CALLBACK (close_search_callback), info);
     gtk_widget_set_name (info->data->search_box, "search_exit");
     gtk_widget_set_size_request(info->data->search_box, 
                             gtk_widget_get_allocated_width (info->data->window), 
                             gtk_widget_get_allocated_height (info->data->window));
     gtk_fixed_put(GTK_FIXED(info->data->general_box),
                     info->data->search_box, 0, 0);
-    GtkWidget *v_box = gtk_box_new(FALSE, 0);
-    gtk_orientable_set_orientation (GTK_ORIENTABLE(v_box), GTK_ORIENTATION_VERTICAL);
-    gtk_widget_set_valign (v_box, GTK_ALIGN_CENTER);
-    gtk_container_add(GTK_CONTAINER(info->data->search_box), v_box);
-    GtkWidget *h_box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_halign (h_box, GTK_ALIGN_CENTER);
-    gtk_box_pack_start (GTK_BOX (v_box), h_box, FALSE, FALSE, 0);  
     info->data->search_entry = gtk_entry_new ();
     gtk_widget_set_size_request(info->data->search_entry, 300, 45);
     gtk_entry_set_max_length (GTK_ENTRY (info->data->search_entry), 50);
-    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->search_entry), "Anything you want or \"All\" for everything");
+    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->search_entry), 
+        "Anything you want or \"All\" for everything");
     gtk_editable_select_region (GTK_EDITABLE (info->data->search_entry),
-                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->search_entry)));
+                    0, gtk_entry_get_text_length (GTK_ENTRY (info->data->search_entry)));
+}
+
+void init_search (t_client_info *info) { 
+    GtkWidget *v_box = NULL;
+    GtkWidget *h_box = NULL;
+
+    config_serach_box(info);
+    v_box = gtk_box_new(FALSE, 0);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(v_box), GTK_ORIENTATION_VERTICAL);
+    gtk_widget_set_valign (v_box, GTK_ALIGN_CENTER);
+    gtk_container_add(GTK_CONTAINER(info->data->search_box), v_box);
+    h_box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (h_box, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (v_box), h_box, FALSE, FALSE, 0);  
     gtk_box_pack_start (GTK_BOX (h_box), info->data->search_entry, FALSE, FALSE, 0);
     gtk_widget_set_name(info->data->search_entry, "entry");
     g_signal_connect(G_OBJECT(info->data->search_entry),"activate", G_CALLBACK(search_callback), info);
@@ -460,7 +438,7 @@ void close_creation_callback1 (GtkWidget *widget, t_client_info *info) {
 
 void create_room_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
-    if (strcmp("",gtk_entry_get_text(GTK_ENTRY(info->data->create_room->name_entry))) != 0) {
+    if (strcmp ("", gtk_entry_get_text(GTK_ENTRY(info->data->create_room->name_entry))) != 0) {
         json_object *new_json;
 
         gtk_widget_hide(info->data->create_room->main_box);
