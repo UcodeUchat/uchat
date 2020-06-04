@@ -271,46 +271,9 @@ t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new
     return node;
 }
 
-// void play_sound(char *sound) {
-//     GstElement *pipeline;
-//     GstBus *bus;
-//     GstMessage *msg;
-//     char *description;
-//     char *tmp;
-//     char cwd[1024];
-
-//     getcwd(cwd, 1024);
-//     description = mx_strjoin("playbin uri=file://", cwd);
-//     tmp = mx_strjoin(description, "/");
-//     free(description);
-//     description = mx_strjoin(tmp, sound);
-//     free(tmp);
-//     printf("AAA%s\n", description);
-//     printf("fffffffffffgg\n");
-//     pipeline = gst_parse_launch (description, NULL);
-//     printf("66666666666\n");
-
-//     /* Start playing */
-//     gst_element_set_state (pipeline, GST_STATE_PLAYING);
-
-//     bus = gst_element_get_bus (pipeline);
-//     msg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE,
-//       GST_MESSAGE_ERROR | GST_MESSAGE_EOS);
-
-//     /* Free resources */
-//     if (msg != NULL)
-//         gst_message_unref (msg);
-//     gst_object_unref (bus);
-//     gst_element_set_state (pipeline, GST_STATE_NULL);
-//     gst_object_unref (pipeline);
-//     free(description);
-//     return;
-// }
-
 void *sound_thread (void *data) {
     (void)data;
     mx_play_sound_file("audio/moby.aif");
-    //play_sound("sounds/sound.wav");
     return 0;
 }
 
