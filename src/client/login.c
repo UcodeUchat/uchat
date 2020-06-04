@@ -557,70 +557,81 @@ void init_create (t_client_info *info) {
     gtk_widget_add_events (exit_box, GDK_BUTTON_PRESS_MASK);
     g_signal_connect (G_OBJECT (exit_box), "button_press_event", G_CALLBACK (close_creation_callback), info);
     gtk_widget_set_name (exit_box, "menu_exit");
-    gtk_widget_show(exit_box);
-    
+    gtk_widget_show(exit_box); 
 }
 
-void init_menu (t_client_info *info) {
-    info->data->menu = gtk_box_new(FALSE, 0);
-    gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->menu, 0, 0);
-    gtk_widget_set_size_request(info->data->menu, gtk_widget_get_allocated_width (info->data->window), 
-                                gtk_widget_get_allocated_height (info->data->window));
+void init_menu_button (t_client_info *info, GtkWidget *box, char *text,
+                        void (*callback) (GtkWidget *widget, t_client_info *info)) {
+    GtkWidget *box1 = gtk_box_new(FALSE, 0);
+    GtkWidget *button = gtk_button_new_with_label(text);
+
+    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
+    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(callback), info);
+    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_set_name(button, "entry");
+    gtk_widget_show(button);
+    gtk_widget_show(box1);
+}
+
+GtkWidget *init_menu_main_box (t_client_info *info) {
     GtkWidget *main_box = gtk_event_box_new();
+
     gtk_box_pack_start (GTK_BOX (info->data->menu), main_box, FALSE, FALSE, 0);
     gtk_widget_set_size_request(main_box, 150, -1);
     gtk_widget_set_name (main_box, "menu_main");
-    
-    GtkWidget *fixed = gtk_fixed_new();
-    gtk_container_add(GTK_CONTAINER(main_box), fixed);
-    GtkWidget *box = gtk_box_new(FALSE, 10);
-    gtk_widget_set_size_request(box, 150, -1);
-    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
-    gtk_orientable_set_orientation (GTK_ORIENTABLE(box), GTK_ORIENTATION_VERTICAL);
-    gtk_fixed_put (GTK_FIXED (fixed), box, 0, 10);
-    //--buttons
-    GtkWidget *box1 = gtk_box_new(FALSE, 0);
-    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
-    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
-    GtkWidget *button = gtk_button_new_with_label("Create room");
-    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(create_callback), info);
-    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
-    gtk_widget_set_size_request(button, 100, -1);
-    gtk_widget_set_name(button, "entry");
-    gtk_widget_show(button);
-    gtk_widget_show(box1);
-    box1 = gtk_box_new(FALSE, 0);
-    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
-    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
-    button = gtk_button_new_with_label("Profile");
-    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(profile_callback), info);
-    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
-    gtk_widget_set_size_request(button, 100, -1);
-    gtk_widget_set_name(button, "entry");
-    gtk_widget_show(button);
-    gtk_widget_show(box1);
-    box1 = gtk_box_new(FALSE, 0);
-    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
-    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
-    button = gtk_button_new_with_label("Logout");
-    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(logout_callback), info);
-    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
-    gtk_widget_set_size_request(button, 100, -1);
-    gtk_widget_set_name(button, "entry");
-    gtk_widget_show(button);
-    gtk_widget_show(box1);
-    //--
-    gtk_widget_show (box);
-    gtk_widget_show(fixed);
     gtk_widget_show(main_box);
-    
+    return main_box;
+}
+
+GtkWidget *init_menu_exit_box (t_client_info *info) {
     GtkWidget *exit_box = gtk_event_box_new();
+
     gtk_box_pack_start (GTK_BOX (info->data->menu), exit_box, TRUE, TRUE, 0);
     gtk_widget_realize (exit_box);
     gtk_widget_add_events (exit_box, GDK_BUTTON_PRESS_MASK);
     g_signal_connect (G_OBJECT (exit_box), "button_press_event", G_CALLBACK (close_menu_callback), info);
     gtk_widget_set_name (exit_box, "menu_exit");
     gtk_widget_show(exit_box);
+    return exit_box;
+}
+
+GtkWidget *init_menu_fixed (GtkWidget *main_box) {
+    GtkWidget *fixed = gtk_fixed_new();
+
+    gtk_container_add(GTK_CONTAINER(main_box), fixed);
+    gtk_widget_show(fixed);
+    return fixed;
+}
+
+GtkWidget *init_menu_box (GtkWidget *fixed) {
+    GtkWidget *box = gtk_box_new(FALSE, 10);
+    gtk_widget_set_size_request(box, 150, -1);
+    gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(box), GTK_ORIENTATION_VERTICAL);
+    gtk_fixed_put (GTK_FIXED (fixed), box, 0, 10);
+    gtk_widget_show (box);
+    return box;
+}
+
+void init_menu (t_client_info *info) {
+    GtkWidget *main_box = gtk_event_box_new ();
+    GtkWidget *fixed = gtk_fixed_new ();
+    GtkWidget *exit_box = gtk_event_box_new ();
+    GtkWidget *box = gtk_box_new (FALSE, 10);
+
+    info->data->menu = gtk_box_new (FALSE, 0);
+    gtk_fixed_put (GTK_FIXED(info->data->general_box), info->data->menu, 0, 0);
+    gtk_widget_set_size_request (info->data->menu, gtk_widget_get_allocated_width (info->data->window), 
+                                gtk_widget_get_allocated_height (info->data->window));
+    main_box = init_menu_main_box (info);
+    fixed = init_menu_fixed (main_box);
+    box = init_menu_box (fixed);
+    init_menu_button (info, box, "Create room", create_callback);
+    init_menu_button (info, box, "Profile", profile_callback);
+    init_menu_button (info, box, "Logout", logout_callback);
+    exit_box = init_menu_exit_box(info);
 }
 
 void item_callback (GtkWidget *widget, t_stik *stik) {

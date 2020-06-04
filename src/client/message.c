@@ -242,7 +242,6 @@ t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new
         GtkWidget *box2 =  gtk_box_new(FALSE, 0);
         gtk_widget_show(box2);
         gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
-        //char *path = mx_strjoin("stickers/", message);
         GdkPixbuf *item_pixbuf = gdk_pixbuf_new_from_file_at_scale (message, 200, 200, TRUE, NULL);
         GtkWidget *item_image = gtk_image_new_from_pixbuf(item_pixbuf);;
         gtk_widget_show(item_image);
