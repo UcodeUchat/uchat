@@ -728,50 +728,64 @@ void load_room_history (t_all *data) {
                             gtk_adjustment_get_page_size(data->room->Adjust) + 2.0);
 }
 
-t_room *mx_create_room(t_client_info *info, json_object *room_data, int position) {
-    t_room *room =  (t_room *)malloc(sizeof(t_room));
-    const char *name = json_object_get_string(json_object_object_get(room_data, "name"));
+void init_room (t_client_info *info ,t_room *room, int position, json_object *room_data) {
+    char *name = strdup(json_object_get_string(json_object_object_get(room_data, "name")));
     int id = json_object_get_int(json_object_object_get(room_data, "room_id"));
     int access = json_object_get_int(json_object_object_get(room_data, "access"));
 
-    room->name = strdup(name);
     if (access == 3)
-        room->name = mx_replace_substr(room->name, info->login, "");
+        room->name = mx_replace_substr (name, info->login, "");
+    else
+        room->name = strdup(name);
     room->position = position;
     room->id = id;
     room->access = access;
     room->messages = NULL;
     room->next = NULL;
+    free(name);
+}
 
-    //--
-        t_all *data = (t_all *)malloc(sizeof(t_all));
-        data->info = info;
-        data->room = room;
-        data->room_data = room_data;
-        //--
-        room->room_box = gtk_box_new(FALSE, 0);
-        gtk_widget_set_name(room->room_box, "mesage_box");
-        gtk_orientable_set_orientation (GTK_ORIENTABLE(room->room_box), GTK_ORIENTATION_VERTICAL);
-        //--
-        //--room menu
-        GtkWidget *room_menu  = gtk_menu_new ();
-        //--items
-        GtkWidget *history = gtk_menu_item_new_with_label("Load history");
-        gtk_widget_show(history);
-        gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), history);
-        g_signal_connect (G_OBJECT (history), "activate", G_CALLBACK (scroll_callback), data);
+void init_room_menu(t_room *room, t_all *data) {
+    GtkWidget *history = NULL;
+    GtkWidget *leave = NULL;
+
+    room->room_menu  = gtk_menu_new ();
+    history = gtk_menu_item_new_with_label ("Load history");
+    gtk_widget_show(history);
+    gtk_menu_shell_append (GTK_MENU_SHELL (room->room_menu), history);
+    g_signal_connect (G_OBJECT (history), "activate", G_CALLBACK (scroll_callback), data);
+    
+    if (room->id != 0 && room->access != 3) {
+        leave = gtk_menu_item_new_with_label ("Leave room");
+        gtk_widget_show(leave);
+        gtk_menu_shell_append (GTK_MENU_SHELL (room->room_menu), leave);
+        g_signal_connect (G_OBJECT (leave), "activate", G_CALLBACK (leave_callback), data);
+    }
+}
+
+void init_room_data (t_client_info *info, t_room *room, json_object *room_data, t_all *data) {
+    data->info = info;
+    data->room = room;
+    data->room_data = room_data;
+}
+
+t_room *mx_create_room (t_client_info *info, json_object *room_data, int position) {
+    t_room *room =  (t_room *)malloc(sizeof(t_room));
+    t_all *data = (t_all *)malloc(sizeof(t_all));
+
+    init_room(info, room, position, room_data);
+    init_room_data(info, room ,room_data, data);
+    room->room_box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_name(room->room_box, "mesage_box");
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(room->room_box), GTK_ORIENTATION_VERTICAL);
+    init_room_menu (room, data);
         
-        if (id != 0 && access != 3) {
-            GtkWidget *leave = gtk_menu_item_new_with_label("Leave room");
-            gtk_widget_show(leave);
-            gtk_menu_shell_append (GTK_MENU_SHELL (room_menu), leave);
-            g_signal_connect (G_OBJECT (leave), "activate", G_CALLBACK (leave_callback), data);
-        }
-        //--
+    
+
         GtkWidget *event = gtk_event_box_new();
         gtk_widget_set_size_request(event, -1, 40);
         gtk_widget_add_events (event, GDK_BUTTON_PRESS_MASK);
-        g_signal_connect (G_OBJECT (event), "button_press_event", G_CALLBACK (room_menu_callback), room_menu);
+        g_signal_connect (G_OBJECT (event), "button_press_event", G_CALLBACK (room_menu_callback), room->room_menu);
         GtkWidget *full_name = gtk_label_new(room->name);
         gtk_widget_set_name (full_name, "title");
         gtk_container_add (GTK_CONTAINER (event), full_name);
@@ -850,6 +864,7 @@ void init_vars_general(t_client_info *info) {
 void init_general_button_text (t_client_info *info, char *text, GtkWidget *box,
                         void (*callback) (GtkWidget *widget, t_client_info *info)) {
     GtkWidget *button = gtk_button_new_with_label(text);
+
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(callback), info);
     gtk_box_pack_start (GTK_BOX (box), button, FALSE, FALSE, 0);
     gtk_widget_set_size_request(button, 75, -1);
@@ -862,6 +877,7 @@ void init_general_button (t_client_info *info, char *i_name, GtkWidget *box,
     GtkWidget *button = gtk_button_new();
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale (i_name, 20, 20, TRUE, NULL);
     GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
+
     gtk_button_set_image(GTK_BUTTON(button), image);
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK (callback), info);
     gtk_box_pack_start (GTK_BOX (box), button, FALSE, FALSE, 0);
@@ -870,10 +886,11 @@ void init_general_button (t_client_info *info, char *i_name, GtkWidget *box,
 }
 
 void init_edit_button (t_client_info *info, char *i_name, GtkWidget *fixed_message) {
-    info->data->edit_button = gtk_event_box_new ();
-    gtk_widget_add_events (info->data->edit_button, GDK_BUTTON_PRESS_MASK);
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale (i_name, 20, 20, TRUE, NULL);
     GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
+
+    info->data->edit_button = gtk_event_box_new ();
+    gtk_widget_add_events (info->data->edit_button, GDK_BUTTON_PRESS_MASK);
     gtk_container_add (GTK_CONTAINER (info->data->edit_button), image);
     gtk_widget_show(image);
     g_signal_connect(G_OBJECT(info->data->edit_button), "button_press_event", G_CALLBACK(edit_cancel_callback), info);
@@ -883,6 +900,7 @@ void init_edit_button (t_client_info *info, char *i_name, GtkWidget *fixed_messa
 void init_message_box (t_client_info *info, GtkWidget *box, 
                     void (*callback) (GtkWidget *widget, t_client_info *info)) {
     GtkWidget *fixed_message = gtk_fixed_new();
+
     info->data->message_entry = gtk_entry_new ();
     gtk_entry_set_placeholder_text(GTK_ENTRY (info->data->message_entry), "Write something");
     gtk_entry_set_max_length(GTK_ENTRY (info->data->message_entry), 100);
@@ -934,7 +952,7 @@ GtkWidget *init_top_box (t_client_info *info) {
 
 void init_general (t_client_info *info) {
     GtkWidget *box = NULL;
-    
+
     info->data->general_box = gtk_fixed_new();
     gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->general_box, 0, 0);
     init_vars_general(info);

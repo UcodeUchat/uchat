@@ -200,6 +200,7 @@ typedef struct s_room {
     GtkWidget *room_box;
     GtkWidget *message_box;
     GtkWidget *scrolled_window;
+    GtkWidget *room_menu;
     GtkAdjustment *Adjust;
     t_message *messages;
     struct s_room *next;
