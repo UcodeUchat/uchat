@@ -769,56 +769,74 @@ void init_room_data (t_client_info *info, t_room *room, json_object *room_data, 
     data->room_data = room_data;
 }
 
+void init_room_box (t_room *room) {
+    room->room_box = gtk_box_new(FALSE, 0);
+    gtk_widget_set_name(room->room_box, "mesage_box");
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(room->room_box), GTK_ORIENTATION_VERTICAL);
+    gtk_widget_show(room->room_box);
+}
+
+void init_room_header (t_room *room) {
+    room->header = gtk_event_box_new();
+    gtk_widget_set_size_request(room->header, -1, 40);
+    gtk_widget_add_events (room->header, GDK_BUTTON_PRESS_MASK);
+    g_signal_connect (G_OBJECT (room->header), "button_press_event", G_CALLBACK (room_menu_callback), room->room_menu);
+    GtkWidget *full_name = gtk_label_new(room->name);
+    gtk_widget_set_name (full_name, "title");
+    gtk_container_add (GTK_CONTAINER (room->header), full_name);
+    gtk_widget_show(full_name);
+    gtk_box_pack_start (GTK_BOX (room->room_box), room->header, FALSE, FALSE, 0);
+    gtk_widget_show(room->header);
+}
+
+void init_room_window (t_room *room) {
+    GtkWidget *ptrVscrollBar = NULL;
+
+    room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+    gtk_box_pack_start (GTK_BOX (room->room_box), room->scrolled_window, TRUE, TRUE, 0);
+    gtk_widget_show(room->scrolled_window);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(room->scrolled_window),
+                                GTK_POLICY_NEVER,
+                                GTK_POLICY_AUTOMATIC);
+    room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
+    ptrVscrollBar = gtk_scrolled_window_get_vscrollbar(GTK_SCROLLED_WINDOW(room->scrolled_window));
+    gtk_widget_set_name (ptrVscrollBar, "bar");
+}
+
+void init_room_messsage_box (t_room *room) {
+    room->message_box = gtk_box_new(FALSE, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(room->message_box), 5);
+    gtk_container_add(GTK_CONTAINER(room->scrolled_window), room->message_box);
+    gtk_widget_show(room->message_box);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);
+}
+
+
 t_room *mx_create_room (t_client_info *info, json_object *room_data, int position) {
     t_room *room =  (t_room *)malloc(sizeof(t_room));
     t_all *data = (t_all *)malloc(sizeof(t_all));
 
     init_room(info, room, position, room_data);
     init_room_data(info, room ,room_data, data);
-    room->room_box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_name(room->room_box, "mesage_box");
-    gtk_orientable_set_orientation (GTK_ORIENTABLE(room->room_box), GTK_ORIENTATION_VERTICAL);
+    init_room_box(room);
     init_room_menu (room, data);
-        
+    init_room_header(room);
+    init_room_window(room);
+    init_room_messsage_box(room);
     
-
-        GtkWidget *event = gtk_event_box_new();
-        gtk_widget_set_size_request(event, -1, 40);
-        gtk_widget_add_events (event, GDK_BUTTON_PRESS_MASK);
-        g_signal_connect (G_OBJECT (event), "button_press_event", G_CALLBACK (room_menu_callback), room->room_menu);
-        GtkWidget *full_name = gtk_label_new(room->name);
-        gtk_widget_set_name (full_name, "title");
-        gtk_container_add (GTK_CONTAINER (event), full_name);
-        gtk_widget_show(event);
-        gtk_box_pack_start (GTK_BOX (room->room_box), event, FALSE, FALSE, 0);
-        gtk_widget_show(full_name);
-
-        room->scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-        gtk_box_pack_start (GTK_BOX (room->room_box), room->scrolled_window, TRUE, TRUE, 0);
-        gtk_widget_show(room->scrolled_window);
-        gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(room->scrolled_window),
-                                GTK_POLICY_NEVER,
-                                GTK_POLICY_AUTOMATIC);
-
-        room->Adjust = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(room->scrolled_window));
-        GtkWidget *ptrVscrollBar = gtk_scrolled_window_get_vscrollbar(GTK_SCROLLED_WINDOW(room->scrolled_window));
-        gtk_widget_set_name (ptrVscrollBar, "bar");
-
         char *str = NULL;
+        char *tmp = NULL;
+
         if (strlen(room->name) > 15) {
             str = strndup(room->name, 12);
-            str = mx_strjoin(room->name, "...");
+            tmp = mx_strjoin(str, "...");
+            free (str);
+            str = strdup (tmp);
+            free(tmp);
         }
         else {
             str = strdup(room->name);
         }
-        //--
-        room->message_box = gtk_box_new(FALSE, 5);
-        gtk_container_set_border_width(GTK_CONTAINER(room->message_box), 5);
-        gtk_container_add(GTK_CONTAINER(room->scrolled_window), room->message_box);
-        gtk_widget_show(room->message_box);
-        gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);
-        g_idle_add ((GSourceFunc)mx_show_widget, room->room_box);
         GtkWidget *label = gtk_label_new(str);
         t_note *note = (t_note *)malloc(sizeof(t_note));
         note->notebook = info->data->notebook;
@@ -826,9 +844,8 @@ t_room *mx_create_room (t_client_info *info, json_object *room_data, int positio
         note->label = label;
         note->position = position;
         g_idle_add ((GSourceFunc)mx_notebook_prepend, note);
-        //--msg history
-        load_room_history(data);
-        //--
+
+    load_room_history(data);
     return room;
 }
 
