@@ -14,9 +14,7 @@ static int process_stream(PaStream *stream, t_audio *data,
                            t_a_snippet *sample_block, int *i) {
     if (!stream || !data || !sample_block)
         return -1;
-//    static int i = 0;
     (*i)++;
-//    printf("process_stream  %d\n", (*i));
         Pa_ReadStream(stream, sample_block->snippet, FRAMES_PER_BUFFER);
         data->rec_samples = realloc(data->rec_samples, sample_block->size * (*i));
         data->size = sample_block->size * (*i);
@@ -29,7 +27,6 @@ static int process_stream(PaStream *stream, t_audio *data,
             free(data->rec_samples);
             data->rec_samples = NULL;
             data->size = 0;
-//            i = 0;
         }
     return 0;
 }
@@ -168,6 +165,7 @@ long mx_save_audio(t_audio *data) {
             .format = SF_FORMAT_AIFF | SF_FORMAT_FLOAT
     };
     char file_name[100];
+
     snprintf(file_name, 100, "./Uchat_downloads/rec_massage:%d.aif", rand());  //rand -> replace by message id
     printf("start save audio\n");
     SNDFILE *outfile = sf_open(file_name, SFM_WRITE, &sfinfo);
@@ -178,7 +176,6 @@ long mx_save_audio(t_audio *data) {
     long wr = sf_writef_float(outfile, data->rec_samples, data->size / 8);
     err = data->size - wr;
     printf("data to write to file =%zu\n", data->size);
-    printf("write to file =%lu\n", wr);
     sf_write_sync(outfile);
     sf_close(outfile);
     data->file_name = strdup(file_name);

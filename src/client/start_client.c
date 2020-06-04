@@ -68,7 +68,7 @@ static int tls_config_client(t_client_info *info) {
     return 0;
 }
 
-static int make_tls_connect_client(t_client_info *info) {
+int mx_make_tls_connect_client(t_client_info *info) {
     if (tls_connect_socket(info->tls_client, info->socket, "uchat") < 0)
         mx_err_return2("tls_connect error: ", tls_error(info->tls_client));
     if (tls_handshake(info->tls_client) < 0)
@@ -87,7 +87,7 @@ int mx_start_client(t_client_info *info) {
         return 1;
     if (create_client_socket(info))  // socket create and connect
         return 1;
-    if (make_tls_connect_client(info)) // tls connect and handshake
+    if (mx_make_tls_connect_client(info)) // tls connect and handshake
         return 1;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED); // #

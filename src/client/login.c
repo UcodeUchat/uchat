@@ -108,6 +108,15 @@ void record_callback (GtkWidget *widget, t_client_info *info) {
     gtk_widget_show(info->data->record_button);
 }
 
+void play_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    (void)info;
+
+    mx_play_sound_file("./audio/moby.aif", "0", "5");
+}
+
+
+
 
 int validation (char *login, char *password, char *repeat_password) {
     if (!login || strlen(login) < 6) {
@@ -730,6 +739,17 @@ void init_general (t_client_info *info) {
     gtk_widget_set_name(info->data->record_button, "entry");
     gtk_widget_show(info->data->record_button);
 
+    //--play button
+    info->data->play_button = gtk_button_new_with_label("Play");
+    GdkPixbuf *pixbuf4 = gdk_pixbuf_new_from_file_at_scale ("img/rec.png", 20, 20, TRUE, NULL);
+    GtkWidget *image4 = gtk_image_new_from_pixbuf(pixbuf4);
+    gtk_button_set_image(GTK_BUTTON(info->data->play_button), image4);
+    g_signal_connect(G_OBJECT(info->data->play_button), "clicked", G_CALLBACK(play_callback), info);
+    gtk_box_pack_start (GTK_BOX (box), info->data->play_button, FALSE, FALSE, 0);
+    gtk_widget_set_size_request(info->data->play_button, 40, 20);
+    gtk_widget_set_name(info->data->play_button, "entry");
+    gtk_widget_show(info->data->play_button);
+
     //--stop button
     info->data->stop_button = gtk_button_new_with_label("Stop");
 //    g_signal_connect(G_OBJECT(info->data->stop_button), "clicked", G_CALLBACK(record_callback), info);
@@ -752,8 +772,6 @@ void init_general (t_client_info *info) {
     gtk_scale_set_draw_value(GTK_SCALE(seek_scale), FALSE);
     gtk_range_set_update_policy(GTK_RANGE(seek_scale),GTK_UPDATE_DISCONTINUOUS);
     gtk_box_pack_start(GTK_BOX(main_vbox), seek_scale, FALSE, FALSE, 0);
-
-
 */
 
     //--SEARCH

@@ -125,6 +125,7 @@ typedef struct s_data {
     GtkWidget *message_entry;
     GtkWidget *send_button;
     GtkWidget *record_button;
+    GtkWidget *play_button;
     GtkWidget *stop_button;
     GtkWidget *file_button;
     GtkWidget *menu_button;
@@ -359,6 +360,7 @@ void mx_push_message(t_client_info *info, t_room *room, json_object *new_json);
 t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new_json, int order);
 t_room *mx_create_room(t_client_info *info,  json_object *room_data, int position);
 void mx_push_room(t_client_info *info, json_object *room_data, int position);
+int mx_make_tls_connect_client(t_client_info *info);
 
 //void mx_send_file_from_client(t_client_info *info);
 void mx_send_file_from_client(t_client_info *info, char *file_name);

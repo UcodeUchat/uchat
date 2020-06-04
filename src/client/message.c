@@ -38,7 +38,8 @@ void load_profile_callback(GtkWidget *widget, t_mes *mes) {
 void load_audio_callback(GtkWidget *widget, t_mes *mes) {
     (void)widget;
     (void)mes;
-    mx_play_sound_file("./audio/moby.aif");
+    mx_play_sound_file("./audio/moby.aif", "0", "5");
+//    mx_play_sound_file(mes->message->data, "0", "5");
 }
 
 
