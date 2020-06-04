@@ -811,41 +811,47 @@ void init_room_messsage_box (t_room *room) {
     gtk_orientable_set_orientation (GTK_ORIENTABLE(room->message_box), GTK_ORIENTATION_VERTICAL);
 }
 
+char *trim_name (t_room *room) {
+    char *str = NULL;
+    char *tmp = NULL;
+
+    if (strlen(room->name) > 15) {
+        str = strndup(room->name, 12);
+        tmp = mx_strjoin(str, "...");
+        free (str);
+        str = strdup (tmp);
+        free(tmp);
+    }
+    else 
+        str = strdup(room->name);
+    return str;
+}
+
+void show_room (t_client_info *info, t_room *room, int position) {
+    char *str = trim_name (room);
+    GtkWidget *label = gtk_label_new(str);
+    t_note *note = (t_note *)malloc(sizeof(t_note));
+
+    note->notebook = info->data->notebook;
+    note->box = room->room_box;
+    note->label = label;
+    note->position = position;
+    g_idle_add ((GSourceFunc)mx_notebook_prepend, note);
+}
 
 t_room *mx_create_room (t_client_info *info, json_object *room_data, int position) {
     t_room *room =  (t_room *)malloc(sizeof(t_room));
     t_all *data = (t_all *)malloc(sizeof(t_all));
 
-    init_room(info, room, position, room_data);
-    init_room_data(info, room ,room_data, data);
-    init_room_box(room);
+    init_room (info, room, position, room_data);
+    init_room_data (info, room ,room_data, data);
+    init_room_box (room);
     init_room_menu (room, data);
-    init_room_header(room);
-    init_room_window(room);
-    init_room_messsage_box(room);
-    
-        char *str = NULL;
-        char *tmp = NULL;
-
-        if (strlen(room->name) > 15) {
-            str = strndup(room->name, 12);
-            tmp = mx_strjoin(str, "...");
-            free (str);
-            str = strdup (tmp);
-            free(tmp);
-        }
-        else {
-            str = strdup(room->name);
-        }
-        GtkWidget *label = gtk_label_new(str);
-        t_note *note = (t_note *)malloc(sizeof(t_note));
-        note->notebook = info->data->notebook;
-        note->box = room->room_box;
-        note->label = label;
-        note->position = position;
-        g_idle_add ((GSourceFunc)mx_notebook_prepend, note);
-
-    load_room_history(data);
+    init_room_header (room);
+    init_room_window (room);
+    init_room_messsage_box (room);
+    load_room_history (data);
+    show_room (info, room, position);
     return room;
 }
 
