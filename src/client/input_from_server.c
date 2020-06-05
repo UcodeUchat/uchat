@@ -348,8 +348,11 @@ void *mx_process_input_from_server(void *taken_info) {
 
     while (1) { // read all input from server
         rc = tls_read(info->tls_client, buffer, sizeof(buffer));    // get json
-        if (rc == -1)
-            mx_err_exit("tls connection error\n"); // logout!!!
+        if (rc == -1) {
+            if (mx_reconnect_client(info))
+                break;
+            //send autentification json
+        }
         if (rc != 0) {
             new_json = json_tokener_parse_ex(tok, buffer, rc);
             jerr = json_tokener_get_error(tok);
