@@ -38,7 +38,10 @@ void load_profile_callback(GtkWidget *widget, t_mes *mes) {
 void load_audio_callback(GtkWidget *widget, t_mes *mes) {
     (void)widget;
     (void)mes;
-    mx_play_sound_file("./audio/moby.aif");
+
+    mes->message = mx_find_message(mes->room->messages, mes->id);
+    printf("mes----->%s\n", mes->message->data);
+    mx_play_sound_file("./audio/moby.aif", "0", "5");
 }
 
 
@@ -134,6 +137,7 @@ t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new
     node->data = strdup(message);
 
     t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
+    mes->message = node;
     mes->info = info;
     mes->room = room;
     mes->id = id;
@@ -293,7 +297,7 @@ t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new
 
 void *sound_thread (void *data) {
     (void)data;
-    mx_play_sound_file("audio/moby.aif");
+    mx_play_sound_file("audio/moby.aif", "0", "5");
     return 0;
 }
 
