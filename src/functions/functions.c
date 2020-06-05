@@ -97,6 +97,7 @@ void mx_report_tls(struct tls * tls_ctx, char * host) {
             break;
 
     }
+    printf("\n");
 }
 
 void mx_print_curr_time(void) {

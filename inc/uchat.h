@@ -32,14 +32,7 @@
 #include <time.h>
 #include <math.h>
 #include <ctype.h>
-//#include <portaudio.h>
-//#include <sndfile.h>
-//#include <json.h>
-// openssl
-// #include <openssl/evp.h>
-// #include <openssl/sha.h>
-// #include <openssl/aes.h>
-// #include <tls.h>
+
 
 #include "../libportaudio/include/portaudio.h"
 
@@ -51,135 +44,18 @@
 #include "../libressl_3/include/openssl/conf.h"
 #include "../libjson/json.h"
 
-// #include <gst/gst.h>
-
-/*
-#include "../libressl/include/tls.h"
-//#include "../libressl/include/pqueue.h"
-#include "../libressl/include/openssl/aes.h"
-#include "../libressl/include/openssl/asn1.h"
-#include "../libressl/include/openssl/asn1t.h"
-#include "../libressl/include/openssl/bio.h"
-#include "../libressl/include/openssl/blowfish.h"
-#include "../libressl/include/openssl/bn.h"
-#include "../libressl/include/openssl/buffer.h"
-#include "../libressl/include/openssl/camellia.h"
-#include "../libressl/include/openssl/cast.h"
-#include "../libressl/include/openssl/chacha.h"
-#include "../libressl/include/openssl/cmac.h"
-#include "../libressl/include/openssl/cms.h"
-#include "../libressl/include/openssl/comp.h"
-#include "../libressl/include/openssl/conf.h"
-#include "../libressl/include/openssl/conf_api.h"
-#include "../libressl/include/openssl/crypto.h"
-#include "../libressl/include/openssl/curve25519.h"
-#include "../libressl/include/openssl/des.h"
-#include "../libressl/include/openssl/dh.h"
-#include "../libressl/include/openssl/dsa.h"
-#include "../libressl/include/openssl/dso.h"
-//#include "../libressl/include/openssl/dtls1.h"
-#include "../libressl/include/openssl/ec.h"
-#include "../libressl/include/openssl/ecdh.h"
-#include "../libressl/include/openssl/ecdsa.h"
-#include "../libressl/include/openssl/engine.h"
-#include "../libressl/include/openssl/err.h"
-#include "../libressl/include/openssl/evp.h"
-#include "../libressl/include/openssl/gost.h"
-#include "../libressl/include/openssl/hkdf.h"
-#include "../libressl/include/openssl/hmac.h"
-#include "../libressl/include/openssl/idea.h"
-#include "../libressl/include/openssl/lhash.h"
-#include "../libressl/include/openssl/md4.h"
-#include "../libressl/include/openssl/md5.h"
-#include "../libressl/include/openssl/modes.h"
-#include "../libressl/include/openssl/obj_mac.h"
-#include "../libressl/include/openssl/objects.h"
-#include "../libressl/include/openssl/ocsp.h"
-#include "../libressl/include/openssl/opensslconf.h"
-#include "../libressl/include/openssl/opensslfeatures.h"
-#include "../libressl/include/openssl/opensslv.h"
-#include "../libressl/include/openssl/ossl_typ.h"
-#include "../libressl/include/openssl/pem.h"
-#include "../libressl/include/openssl/pem2.h"
-#include "../libressl/include/openssl/pkcs12.h"
-#include "../libressl/include/openssl/pkcs7.h"
-#include "../libressl/include/openssl/poly1305.h"
-#include "../libressl/include/openssl/rand.h"
-#include "../libressl/include/openssl/rc2.h"
-#include "../libressl/include/openssl/rc4.h"
-#include "../libressl/include/openssl/ripemd.h"
-#include "../libressl/include/openssl/rsa.h"
-#include "../libressl/include/openssl/safestack.h"
-#include "../libressl/include/openssl/sha.h"
-#include "../libressl/include/openssl/sm3.h"
-#include "../libressl/include/openssl/sm4.h"
-//#include "../libressl/include/openssl/srtp.h"
-#include "../libressl/include/openssl/ssl.h"
-#include "../libressl/include/openssl/ssl2.h"
-#include "../libressl/include/openssl/ssl23.h"
-#include "../libressl/include/openssl/ssl3.h"
-#include "../libressl/include/openssl/stack.h"
-#include "../libressl/include/openssl/tls1.h"
-#include "../libressl/include/openssl/ts.h"
-#include "../libressl/include/openssl/txt_db.h"
-#include "../libressl/include/openssl/ui.h"
-#include "../libressl/include/openssl/ui_compat.h"
-#include "../libressl/include/openssl/whrlpool.h"
-#include "../libressl/include/openssl/x509.h"
-#include "../libressl/include/openssl/x509_vfy.h"
-#include "../libressl/include/openssl/x509v3.h"
-
-//#include "../libressl/include/openssl/
-
-*/
-
-#include "../libjson/json.h"
-#include "../libsndfile/src/sndfile.h"
-
 #include <gtk/gtk.h>
-#include "../../libmx/inc/libmx.h"
+#include "mail.h"
+#include "audio.h"
 
 #define MAX_CLIENT_INPUT 1024
-#define MAXRESPONSE 1024
 #define REPORT_FILENAME "server_log.txt"
 #define BUFLEN 128
 #define QLEN 10
 #define HOST_NAME_MAX 256
-
 #define MX_OK 0
-
 #define MX_SAVE_FOLDER_IN_CLIENT "./Uchat_downloads/"
 #define MX_SAVE_FOLDER_IN_SERVER "./files/"
-
-#define MIN_TALKING_BUFFERS 8
-#define TALKING_THRESHOLD_WEIGHT 0.99
-#define TALKING_TRIGGER_RATIO 4.0
-#define SAMPLE_RATE       (44100)  // в 1 секунде записи содержится 44100 семплов.
-#define FRAMES_PER_BUFFER   (1024)
-#define SAMPLE_SILENCE  (0.0f)
-#define NUM_SECONDS     (5)
-#define BUFFER_LEN      1024
-
-typedef struct s_audio {
-    uint16_t format_type;
-    uint8_t number_channels;
-    uint32_t sample_rate;
-    size_t size;
-    float *rec_samples;
-}               t_audio;
-
-typedef struct s_a_snippet {
-    float *snippet;
-    size_t size;
-}           t_a_snippet;
-
-typedef struct s_mail {
-    char *hostname;
-    char *sender;
-    char *receiver;
-    char *subject;
-    char *message;
-}           t_mail;
 
 typedef struct s_message {
     int id;
@@ -189,6 +65,7 @@ typedef struct s_message {
     GtkWidget *image_box;
     GtkWidget *message_label;
     GtkWidget *message_box;
+    GtkWidget *player_box;
     struct s_message *next;
 }              t_message;
 
@@ -199,6 +76,7 @@ typedef struct s_room {
     int access;
     GtkWidget *room_box;
     GtkWidget *message_box;
+    GtkWidget *player_box;
     GtkWidget *scrolled_window;
     GtkWidget *room_menu;
     GtkWidget *header;
@@ -252,6 +130,8 @@ typedef struct s_data {
     GtkWidget *general_box;
     GtkWidget *message_entry;
     GtkWidget *send_button;
+    GtkWidget *record_button;
+    GtkWidget *stop_button;
     GtkWidget *file_button;
     GtkWidget *menu_button;
     GtkWidget *login_msg;
@@ -339,8 +219,8 @@ typedef struct s_work {
 typedef struct  s_server_info {  // struct server
     int argc;
     char **argv;
-
     char *ip; // my ip address
+    int kq;
     uint16_t port;
     struct s_clients *clients; // структура де зберігаються усі клієнти, що приєдналися
     struct s_socket_list *socket_list;
@@ -394,20 +274,6 @@ typedef struct  s_server_room {
     char *name;
     struct  s_server_room *next;
 }               t_server_room;
-
-typedef struct  s_package {
-    struct tls *client_tls_sock; // #
-    int client_sock; // #
-    char type; // input type
-    char piece; // 0 - full, 1 - start, 2 - partition, 3 - end
-    int user_id; // sender unical id
-    int room_id; // room unical id
-    int add_info; // addition information which use different package types
-    char login[50]; // user login
-    char password[32]; // user password
-    char data[1024]; // user data
-    struct  s_server_room *rooms;
-}               t_package;
 
 typedef struct  s_socket_list {
     int socket;
@@ -464,6 +330,12 @@ int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_create_room_server (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_get_rooms_data (void *messages, int argc, char **argv, char **col_name);
 int mx_direct_message (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_get_rooms_data(void *messages, int argc, char **argv, char **col_name);
+int mx_make_tls_connect(struct tls *tls, struct tls **tls_sock,
+                        int client_sock);
+//struct tls *mx_create_tls_configuration(t_server_info *info);
+int mx_create_tls_configuration(struct tls **tls);
+int mx_create_server_socket(t_server_info *info);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);
@@ -520,7 +392,6 @@ int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_process_message_in_client(t_client_info *info);
 void authentification(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);
-int mx_send_message_from_client(t_client_info *info, t_package *package, char *message);
 void sleep_ms (int milliseconds);
 t_message *mx_find_message(t_message *messages, int id);
 t_room *mx_find_room(t_room *rooms, int id);
@@ -535,7 +406,8 @@ t_room *mx_create_room(t_client_info *info,  json_object *room_data, int positio
 void mx_push_room(t_client_info *info, json_object *room_data, int position);
 void mx_create (t_client_info *info);
 
-void mx_send_file_from_client(t_client_info *info);
+//void mx_send_file_from_client(t_client_info *info);
+void mx_send_file_from_client(t_client_info *info, char *file_name);
 int mx_load_file(t_mes *msg);
 int mx_save_file_in_client(t_client_info *info, json_object *obj);
 
@@ -550,6 +422,7 @@ void mx_print_curr_time(void);
 char *mx_curr_time(void);
 void mx_print_tid(const char *s);
 void mx_err_exit(const char *err_msg);  // вивести помилку
+int mx_err_return2(const char *err_msg, const char *err_msg2);
 int mx_err_return(const char *err_msg);
 void mx_sha_hash_password(char *password);
 int addr_socet_info(int argc, char *argv[]);  // test adress
@@ -559,25 +432,12 @@ void mx_report_tls(struct tls * tls_ctx, char * host);
 void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
 char *mx_date_to_char(void);
 
-// send mail
-void *mx_send_mail(char *receiver, char *message);
-void mx_send_format(int socket, const char *text);
-void mx_send_format_tls(struct tls *tls, const char *text, ...);
-void mx_init_struct_mail(t_mail *mail, char *receiver, char *message);
-int mx_connect_to_server(const char *hostname, const char *port);
-struct tls *mx_create_tls(void);
-int mx_check_response(const char *response);
-int mx_wait_on_response(int socket, struct tls *tls, int reply_code);
 
 // crypto funcs
 // char *mx_encrypt_EVP(char *str);
 char *mx_strhash(const char *to_hash);
 char *mx_encrypt(char *str);
 char *mx_decrypt(char *str);
-
-// funcs for package
-t_package *mx_create_new_package();
-t_package *mx_copy_package(t_package *package);
 
 // krivoy dizayn
 int mx_login (t_client_info *info);
@@ -586,24 +446,5 @@ void append_message(t_client_info *info, t_room *room, json_object *new_json);
 //json
 json_object *mx_create_basic_json_object(int type);
 void mx_print_json_object(struct json_object *jobj, const char *msg);
-struct json_object * mx_find_something(struct json_object *jobj, const char *key);
-void mx_glitch_in_the_matrix(struct json_object *jobj);
-const char *mx_message_to_json_string(t_client_info *info, char *message);
-json_object *mx_package_to_json(t_package *package);
-t_package *mx_json_to_package(json_object *new_json);
-
-//audio
-int mx_record_audio(void);
-int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block);
-int mx_exit_stream(t_audio *data, PaError err);
-long mx_save_audio(t_audio *data);
-int mx_process_stream_ext(PaStream *stream, t_audio *data,
-                          t_a_snippet *sample_block, const char *fileName,
-                          bool *sample_complete);
-float mx_rms(float *data, size_t len);
-float mx_change_threshold(float talking_threshold, float talking_ntensity);
-int mx_play_sound_file(char *file_name);
-
-
 
 #endif

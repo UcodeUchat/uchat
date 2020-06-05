@@ -23,6 +23,7 @@ o*.d
 # *.gch
 # *.pch
 
+<<<<<<< HEAD
 # # Libraries
 # //*.lib
 # *.a
@@ -34,6 +35,19 @@ o*.d
 # *.so
 # *.so.*
 # *.dylib
+=======
+# Libraries
+#*.lib
+#.a
+#*.la
+#*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+#*.dylib
+>>>>>>> master
 
 # # Executables
 # *.exe
@@ -58,6 +72,8 @@ o*.d
 # Mkfile.old
 # dkms.conf
 
+./uchat
+./uchat_server
 
 CMakeLists.txt
 Uchat_downloads

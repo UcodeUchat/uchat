@@ -39,6 +39,7 @@ INCS = inc/uchat.h
 
 SRC_SERVER = main_server.c \
 	start_server.c \
+	start_server2.c \
 	set_daemon.c \
 	server_worker.c \
 	work_with_db.c \
@@ -61,6 +62,7 @@ SRC_SERVER = main_server.c \
 	send_mail_notification.c \
 	send_mail_notification2.c \
 	send_mail_notification3.c \
+	send_mail_notification4.c \
 
 SRC_CLIENT = main_client.c \
 	start_client.c \

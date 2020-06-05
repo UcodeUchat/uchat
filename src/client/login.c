@@ -19,7 +19,7 @@ void choose_file_callback(GtkWidget *widget, t_client_info *info) {
     int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
     t_room *room = find_room(info->data->rooms, position);
     info->data->current_room = room->id;
-    mx_send_file_from_client(info);
+    mx_send_file_from_client(info, NULL);
 }
 
 void choose_sticker_callback(GtkWidget *widget, GtkWidget *menu) {
@@ -115,6 +115,20 @@ void send_callback (GtkWidget *widget, t_client_info *info) {
         gtk_entry_set_text(GTK_ENTRY(info->data->message_entry), "");
     }
 }
+
+void record_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    (void)info;
+
+    gtk_widget_hide(info->data->record_button);
+    char *audio_file = mx_record_audio();
+    printf("new %s\n", audio_file);
+//    gtk_widget_show(info->data->stop_button);
+//    gtk_widget_hide(info->data->stop_button);
+//    mx_send_file_from_client(info, "audio_file");
+    gtk_widget_show(info->data->record_button);
+}
+
 
 int validation (char *login, char *password, char *repeat_password) {
     if (!login || strlen(login) < 6) {
@@ -975,7 +989,7 @@ void init_edit_button (t_client_info *info, char *i_name, GtkWidget *fixed_messa
     gtk_container_add (GTK_CONTAINER (info->data->edit_button), image);
     gtk_widget_show(image);
     g_signal_connect(G_OBJECT(info->data->edit_button), "button_press_event", G_CALLBACK(edit_cancel_callback), info);
-    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->edit_button, 670, 7);
+    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->edit_button, 620, 7);
 }
 
 void init_message_box (t_client_info *info, GtkWidget *box, 
@@ -990,7 +1004,7 @@ void init_message_box (t_client_info *info, GtkWidget *box,
     g_signal_connect(G_OBJECT(info->data->message_entry),"activate", G_CALLBACK(callback), info);
     gtk_box_pack_start (GTK_BOX (box), fixed_message, TRUE, TRUE, 0);
     gtk_fixed_put(GTK_FIXED(fixed_message), info->data->message_entry, 0, 0);
-    gtk_widget_set_size_request(info->data->message_entry, 700, -1);
+    gtk_widget_set_size_request(info->data->message_entry, 650, -1);
     gtk_widget_set_name(info->data->message_entry, "entry");
     gtk_widget_show(info->data->message_entry);
     gtk_widget_show(fixed_message);
@@ -1041,6 +1055,17 @@ void init_general (t_client_info *info) {
     init_general_button (info ,"img/a.png", box, menu_callback);
     init_message_box (info, box, send_callback);
     init_general_button_text (info ,"Send", box, send_callback);
+
+    info->data->record_button = gtk_button_new_with_label("Rec");
+    GdkPixbuf *pixbuf3 = gdk_pixbuf_new_from_file_at_scale ("img/rec.png", 20, 20, TRUE, NULL);
+    GtkWidget *image3 = gtk_image_new_from_pixbuf(pixbuf3);
+    gtk_button_set_image(GTK_BUTTON(info->data->record_button), image3);
+    g_signal_connect(G_OBJECT(info->data->record_button), "clicked", G_CALLBACK(record_callback), info);
+    gtk_box_pack_start (GTK_BOX (box), info->data->record_button, FALSE, FALSE, 0);
+    gtk_widget_set_size_request(info->data->record_button, 40, 20);
+    gtk_widget_show(info->data->record_button);
+
+    
     init_general_button (info ,"img/search.png", box, show_search_callback);
     init_general_button (info ,"img/file.png", box, choose_file_callback);
     init_stickers(info, box);

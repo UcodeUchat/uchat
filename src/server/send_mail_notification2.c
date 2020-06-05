@@ -1,10 +1,5 @@
 #include "uchat.h"
 
-int mx_err_return(const char *err_msg) {
-    mx_printerr(err_msg);
-    return 1;
-}
-
 void mx_send_format(int socket, const char *text) {
     send(socket, text, strlen(text), 0);
     printf("C: %s", text);

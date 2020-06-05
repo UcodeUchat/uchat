@@ -16,7 +16,7 @@ static int process_stream(PaStream *stream, t_audio *data,
         return -1;
 //    static int i = 0;
     (*i)++;
-    printf("process_stream  %d\n", (*i));
+//    printf("process_stream  %d\n", (*i));
         Pa_ReadStream(stream, sample_block->snippet, FRAMES_PER_BUFFER);
         data->rec_samples = realloc(data->rec_samples, sample_block->size * (*i));
         data->size = sample_block->size * (*i);
@@ -52,7 +52,7 @@ static int record(PaStream *stream, t_audio *data, t_a_snippet *sample_block) {
     return err;
 }
 
-int mx_record_audio(void) {
+char *mx_record_audio(void) {
     t_audio *data = init_audio_data();
     t_a_snippet *sample_block = malloc(sizeof(t_a_snippet));
     PaError err = paNoError;
@@ -65,13 +65,14 @@ int mx_record_audio(void) {
     err = mx_init_stream(&stream, data, sample_block);
     if (err){
         fprintf(stderr, "%s\n", "error");
-        return err;
+        return NULL;
     }
     err = record(stream, data, sample_block);
     if (err != 0)
         printf("err =%d\n", err);
     printf(" exit record\n");
-    return err;
+    printf("record to file->%s\n", data->file_name);
+    return data->file_name;
 }
 
 int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) {
@@ -165,19 +166,20 @@ long mx_save_audio(t_audio *data) {
             .format = SF_FORMAT_AIFF | SF_FORMAT_FLOAT
     };
     char file_name[100];
-    snprintf(file_name, 100, "./record/rec_massage:%d.aif", rand());  //rand -> replace by message id
+    snprintf(file_name, 100, "./Uchat_downloads/rec_massage:%d.aif", rand());  //rand -> replace by message id
     printf("start save audio\n");
     SNDFILE *outfile = sf_open(file_name, SFM_WRITE, &sfinfo);
     if (!outfile) {
         printf("error outfile =%d\n", sf_error(outfile));
         return -1;
     }
-    long wr = sf_writef_float(outfile, data->rec_samples, data->size / sizeof(float));
+    long wr = sf_writef_float(outfile, data->rec_samples, data->size / 8);
     err = data->size - wr;
     printf("data to write to file =%zu\n", data->size);
     printf("write to file =%lu\n", wr);
     sf_write_sync(outfile);
     sf_close(outfile);
+    data->file_name = strdup(file_name);
     return err;
 }
 
