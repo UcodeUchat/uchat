@@ -120,13 +120,13 @@ void record_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
     (void)info;
 
-    gtk_widget_hide(info->data->record_button);
+    //gtk_widget_hide(info->data->record_button);
     char *audio_file = mx_record_audio();
     printf("new %s\n", audio_file);
 //    gtk_widget_show(info->data->stop_button);
 //    gtk_widget_hide(info->data->stop_button);
 //    mx_send_file_from_client(info, "audio_file");
-    gtk_widget_show(info->data->record_button);
+    //gtk_widget_show(info->data->record_button);
 }
 
 
@@ -962,7 +962,6 @@ void init_general_button_text (t_client_info *info, char *text, GtkWidget *box,
 
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(callback), info);
     gtk_box_pack_start (GTK_BOX (box), button, FALSE, FALSE, 0);
-    gtk_widget_set_size_request(button, 75, -1);
     gtk_widget_set_name(button, "entry");
     gtk_widget_show(button);
 }
@@ -989,7 +988,7 @@ void init_edit_button (t_client_info *info, char *i_name, GtkWidget *fixed_messa
     gtk_container_add (GTK_CONTAINER (info->data->edit_button), image);
     gtk_widget_show(image);
     g_signal_connect(G_OBJECT(info->data->edit_button), "button_press_event", G_CALLBACK(edit_cancel_callback), info);
-    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->edit_button, 620, 7);
+    gtk_fixed_put(GTK_FIXED(fixed_message), info->data->edit_button, 640, 7);
 }
 
 void init_message_box (t_client_info *info, GtkWidget *box, 
@@ -1004,7 +1003,7 @@ void init_message_box (t_client_info *info, GtkWidget *box,
     g_signal_connect(G_OBJECT(info->data->message_entry),"activate", G_CALLBACK(callback), info);
     gtk_box_pack_start (GTK_BOX (box), fixed_message, TRUE, TRUE, 0);
     gtk_fixed_put(GTK_FIXED(fixed_message), info->data->message_entry, 0, 0);
-    gtk_widget_set_size_request(info->data->message_entry, 650, -1);
+    gtk_widget_set_size_request(info->data->message_entry, 670, -1);
     gtk_widget_set_name(info->data->message_entry, "entry");
     gtk_widget_show(info->data->message_entry);
     gtk_widget_show(fixed_message);
@@ -1045,33 +1044,21 @@ GtkWidget *init_top_box (t_client_info *info) {
     return box;
 }
 
-void init_general (t_client_info *info) {
-    GtkWidget *box = NULL;
+    // info->data->record_button = gtk_button_new_with_label("Rec");
+    // GdkPixbuf *pixbuf3 = gdk_pixbuf_new_from_file_at_scale ("img/rec.png", 20, 20, TRUE, NULL);
+    // GtkWidget *image3 = gtk_image_new_from_pixbuf(pixbuf3);
+    // gtk_button_set_image(GTK_BUTTON(info->data->record_button), image3);
+    // g_signal_connect(G_OBJECT(info->data->record_button), "clicked", G_CALLBACK(record_callback), info);
+    // gtk_box_pack_start (GTK_BOX (box), info->data->record_button, FALSE, FALSE, 0);
+    // gtk_widget_set_size_request(info->data->record_button, 40, 20);
+    // gtk_widget_show(info->data->record_button);
 
-    info->data->general_box = gtk_fixed_new();
-    gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->general_box, 0, 0);
-    init_vars_general(info);
-    box = init_bottom_box(info);
-    init_general_button (info ,"img/a.png", box, menu_callback);
-    init_message_box (info, box, send_callback);
-    init_general_button_text (info ,"Send", box, send_callback);
-
-    info->data->record_button = gtk_button_new_with_label("Rec");
-    GdkPixbuf *pixbuf3 = gdk_pixbuf_new_from_file_at_scale ("img/rec.png", 20, 20, TRUE, NULL);
-    GtkWidget *image3 = gtk_image_new_from_pixbuf(pixbuf3);
-    gtk_button_set_image(GTK_BUTTON(info->data->record_button), image3);
-    g_signal_connect(G_OBJECT(info->data->record_button), "clicked", G_CALLBACK(record_callback), info);
-    gtk_box_pack_start (GTK_BOX (box), info->data->record_button, FALSE, FALSE, 0);
-    gtk_widget_set_size_request(info->data->record_button, 40, 20);
-    gtk_widget_show(info->data->record_button);
-
-        //--stop button
-    //info->data->stop_button = gtk_button_new_with_label("Stop");
-//    g_signal_connect(G_OBJECT(info->data->stop_button), "clicked", G_CALLBACK(record_callback), info);
-    //gtk_box_pack_start (GTK_BOX (box), info->data->stop_button, FALSE, FALSE, 0);
-    //gtk_widget_set_size_request(info->data->stop_button, 40, 20);
-//    gtk_widget_set_name(info->data->stop_button, "entry");
-//    gtk_widget_show(info->data->stop_button);
+    // info->data->stop_button = gtk_button_new_with_label("Stop");
+    // g_signal_connect(G_OBJECT(info->data->stop_button), "clicked", G_CALLBACK(record_callback), info);
+    // gtk_box_pack_start (GTK_BOX (box), info->data->stop_button, FALSE, FALSE, 0);
+    // gtk_widget_set_size_request(info->data->stop_button, 40, 20);
+    // gtk_widget_set_name(info->data->stop_button, "entry");
+    // gtk_widget_show(info->data->stop_button);
 
 /*
     //--
@@ -1087,7 +1074,17 @@ void init_general (t_client_info *info) {
     gtk_box_pack_start(GTK_BOX(main_vbox), seek_scale, FALSE, FALSE, 0);
 */
 
-    
+void init_general (t_client_info *info) {
+    GtkWidget *box = NULL;
+
+    info->data->general_box = gtk_fixed_new();
+    gtk_fixed_put(GTK_FIXED(info->data->main_box), info->data->general_box, 0, 0);
+    init_vars_general(info);
+    box = init_bottom_box(info);
+    init_general_button (info ,"img/a.png", box, menu_callback);
+    init_message_box (info, box, send_callback);
+    init_general_button_text (info ,"Send", box, send_callback);
+    init_general_button (info ,"img/rec.png", box, record_callback);
     init_general_button (info ,"img/search.png", box, show_search_callback);
     init_general_button (info ,"img/file.png", box, choose_file_callback);
     init_stickers(info, box);
