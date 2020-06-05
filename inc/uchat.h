@@ -344,6 +344,14 @@ int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
 
 // client
 int mx_start_client(t_client_info *info);
+int mx_tls_config_client(t_client_info *info);
+int mx_connect_client(t_client_info *info);
+void mx_reconect_client(t_client_info *info);
+
+//int mx_connect_client_s(t_client_info *info, struct addrinfo *peer_address);
+//int mx_connect_client(t_client_info *info, const struct sockaddr *addr, socklen_t alen);
+//int mx_connect_client(t_client_info *info, const struct sockaddr *addr);
+
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_process_message_in_client(t_client_info *info);
 void authentification(t_client_info *info);

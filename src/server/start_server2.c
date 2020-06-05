@@ -75,6 +75,7 @@ int mx_create_server_socket(t_server_info *info) {
     struct addrinfo *bind_address;
     struct sockaddr_in serv_addr;
     int server_socket;
+    int reuse = 1;
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -84,6 +85,11 @@ int mx_create_server_socket(t_server_info *info) {
     server_socket = socket(bind_address->ai_family,
                            bind_address->ai_socktype, bind_address->ai_protocol);
     if (server_socket == -1) {
+        printf("socket error = %s\n", strerror(errno));
+        return -1;
+    }
+
+    if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) < 0) {
         printf("socket error = %s\n", strerror(errno));
         return -1;
     }

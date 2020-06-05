@@ -316,10 +316,15 @@ void *mx_process_input_from_server(void *taken_info) {
 
     while (1) { // read all input from server
         rc = tls_read(info->tls_client, buffer, sizeof(buffer));    // get json
-        if (rc == -1) {
-            sleep(3);
-            printf("tls connection error\n");
-            mx_make_tls_connect_client(info);
+        if (rc == -1) {  // lost connection
+            mx_reconect_client(info);
+//            tls_close(info->tls_client);
+//            tls_free(info->tls_client);
+//            mx_tls_config_client(info);
+//            info->socket = mx_connect_client(info);
+//            mx_make_tls_connect_client(info); // tls connect and handshake
+//            printf("tls connection error\n");
+//            mx_make_tls_connect_client(info);
 //            mx_err_exit("tls connection error\n"); // logout!!!
         }
         if (rc != 0) {
