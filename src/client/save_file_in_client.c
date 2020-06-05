@@ -101,7 +101,7 @@ int mx_save_file_in_client(t_client_info *info, json_object *obj) {
     return 0;
 }
 
-int is_file_exist(char *file_name) {
+int is_file_exist2(char *file_name) {
     char *full_path = mx_strjoin(MX_SAVE_FOLDER_IN_CLIENT, file_name);
     struct stat buffer;
     int exist = stat(full_path, &buffer);

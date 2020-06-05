@@ -274,6 +274,36 @@ void logout(t_client_info *info) {
     tls_send(info->tls_client, json_string, strlen(json_string));
 }
 
+void mx_delete_account(t_client_info *info) {
+    json_object *new_json;
+
+    new_json = json_object_new_object();
+    json_object_object_add(new_json, "type", json_object_new_int(MX_DELETE_ACCOUNT_TYPE));
+    json_object_object_add(new_json, "login", json_object_new_string(info->login));
+    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
+    mx_print_json_object(new_json, "delete_account");
+    const char *json_string = json_object_to_json_string(new_json);
+    tls_send(info->tls_client, json_string, strlen(json_string));
+}
+
+void yep_callback(GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    info->auth_client = 0;
+    mx_delete_account(info);
+    logout(info);
+    gtk_window_set_title(GTK_WINDOW(info->data->window), "Login");
+    gtk_entry_set_text(GTK_ENTRY(info->data->login_entry), "");
+    gtk_entry_set_text(GTK_ENTRY(info->data->password_entry), "");
+    gtk_widget_destroy(info->data->general_box);
+    gtk_widget_show (info->data->login_box);
+}
+
+void delete_acc_callback(GtkWidget *widget, GtkWidget *answer_menu) {
+    (void)widget;
+
+    gtk_menu_popup_at_pointer (GTK_MENU(answer_menu), NULL);
+}
+
 void scroll_callback (GtkWidget *widget, t_all *data) {
     (void)widget;
     if (gtk_adjustment_get_value(data->room->Adjust) == 
@@ -607,6 +637,32 @@ void init_menu (t_client_info *info) {
     init_menu_button (info, box, "Profile", profile_callback);
     init_menu_button (info, box, "Logout", logout_callback);
     exit_box = init_menu_exit_box(info, info->data->menu, close_menu_callback);
+
+
+    //create delete_menu yes/no
+    GtkWidget *answer_menu = gtk_menu_new();
+    GtkWidget *item_question = gtk_menu_item_new_with_label("Delete or not?");
+    gtk_widget_set_sensitive (item_question, FALSE);
+    gtk_widget_show(item_question);
+    gtk_menu_shell_append (GTK_MENU_SHELL (answer_menu), item_question);
+    GtkWidget *item_no = gtk_menu_item_new_with_label("Nope");
+    gtk_widget_show(item_no);
+    gtk_menu_shell_append (GTK_MENU_SHELL (answer_menu), item_no);
+    GtkWidget *item_yep = gtk_menu_item_new_with_label("Yep");
+    gtk_widget_show(item_yep);
+    gtk_menu_shell_append (GTK_MENU_SHELL (answer_menu), item_yep);
+    g_signal_connect (G_OBJECT (item_yep), "activate", G_CALLBACK (yep_callback), info);
+
+    GtkWidget *box1 = gtk_box_new(FALSE, 0);
+    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
+    GtkWidget *button = gtk_button_new_with_label("Delete acc");
+    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(delete_acc_callback), answer_menu);
+    gtk_box_pack_start (GTK_BOX (box1), button, TRUE, FALSE, 0);
+    gtk_widget_set_size_request(button, 100, -1);
+    gtk_widget_set_name(button, "entry");
+    gtk_widget_show(button);
+    gtk_widget_show(box1);
 }
 
 void item_callback (GtkWidget *widget, t_stik *stik) {

@@ -12,33 +12,34 @@ int mx_get_data(void *js, int argc, char **argv, char **col_name) {
 }
 
 int save_message(t_server_info *info, json_object *js) {
-	char command[1024];
+    char command[1024];
     int add_info = json_object_get_int(json_object_object_get(js, "add_info"));
     int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
     int room_id = json_object_get_int(json_object_object_get(js, "room_id"));
-    char *message = mx_replace_substr(json_object_get_string(json_object_object_get(js, "data")), "'", "''");
+    char *message = mx_replace_substr(json_object_get_string(\
+                            json_object_object_get(js, "data")), "'", "''");
     char *type = NULL;
 
     if (add_info == 0)
         type = strdup("mes");
     else
         type = strdup("stik");
-    command[sprintf(command, "INSERT INTO msg_history (user_id, room_id, message, addition_cont)\
-     		VALUES ('%d', '%d', '%s', '%s'); SELECT last_insert_rowid()", 
-            user_id, room_id, message, type)] = '\0';
+    command[sprintf(command, "INSERT INTO msg_history (user_id, room_id,\
+        message, addition_cont) VALUES ('%d', '%d', '%s', '%s'); SELECT\
+        last_insert_rowid()", user_id, room_id, message, type)] = '\0';
     mx_strdel(&message);
     if (sqlite3_exec(info->db, command, mx_get_data, js, NULL) != SQLITE_OK) {
-		return -1;
+        return -1;
     }
-	return 1;
+    return 1;
 }
 
 int mx_process_message_in_server(t_server_info *info, json_object *js) {
     int res = save_message(info, js);
     if (res > 0)
-    	mx_send_json_to_all_in_room(info, js);
+        mx_send_json_to_all_in_room(info, js);
     else
-    	printf("loh, ne sohranilos'\n");
+        printf("loh, ne sohranilos'\n");
     return 0;
 }
 

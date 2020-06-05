@@ -1,5 +1,5 @@
 #include "uchat.h"
-
+// удалить ее перед сдачей
 static int print_users(void *status, int argc, char **argv, char **in) {
     (void)argc;
     if (*(int *)status == 0) {
@@ -44,15 +44,33 @@ int mx_drop_socket(t_server_info *i, int client_sock) {
         return -1;
     }
     mx_strdel(&command);
+    //удалить перед сдачей
     sprintf(command1, "SELECT * FROM users");
     if (sqlite3_exec(i->db, command1, print_users, &count1, NULL) != SQLITE_OK) {
         return -1;
     }
     mx_strdel(&command1);
+    // -----
     return 1;
 }
 
+int mx_delete_acc(t_server_info *i, json_object *j) {
+    int user_id = json_object_get_int(json_object_object_get(j, "user_id"));
+    char *command = malloc(1024);
+    char *command2 = malloc(1024);
 
+    sprintf(command, "DELETE FROM users WHERE users.id=%d", user_id);
+    if (sqlite3_exec(i->db, command, 0, 0, NULL) != SQLITE_OK) {
+        return -1;
+    }
+    mx_strdel(&command);
+    sprintf(command2, "DELETE FROM room_user WHERE room_user.user_id=%d", user_id);
+    if (sqlite3_exec(i->db, command2, 0, 0, NULL) != SQLITE_OK) {
+        return -1;
+    }
+    mx_strdel(&command2);
+    return 1;
+}
 
 
 

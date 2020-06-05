@@ -47,7 +47,10 @@ SRC_SERVER = main_server.c \
 	process_message_in_server.c \
 	save_file_in_server.c \
 	send_file_from_server.c \
+	send_file_from_server2.c \
+	send_file_from_server3.c \
 	authorization.c \
+	authorization2.c \
 	work_with_socket_list.c \
 	work_with_socket_list_2.c \
 	work_with_files_list.c \
