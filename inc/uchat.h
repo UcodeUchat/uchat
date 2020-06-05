@@ -116,6 +116,7 @@ typedef struct s_prof {
     GtkWidget *visual;
     GtkWidget *audio;
     GtkWidget *email;
+    GtkWidget *save;
     int id;
 }              t_prof;
 

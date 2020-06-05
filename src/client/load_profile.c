@@ -46,8 +46,9 @@ void save_name_callback (GtkWidget *widget, t_client_info *info) {
 
 void show_title (const char *title, GtkWidget *box) {
     GtkWidget *title_box = gtk_box_new(FALSE, 5);
-    gtk_box_pack_start (GTK_BOX (box), title_box, FALSE, FALSE, 0);
     GtkWidget *label = gtk_label_new(title);
+
+    gtk_box_pack_start (GTK_BOX (box), title_box, FALSE, FALSE, 0);
     gtk_box_pack_start (GTK_BOX (title_box), label, FALSE, FALSE, 0);
     gtk_widget_show(label);
     gtk_widget_show(title_box);
@@ -61,12 +62,11 @@ void edit_email_callback (GtkWidget *widget, t_client_info *info) {
 
 void save_email_callback (GtkWidget *widget, t_client_info *info) {
     char *email = strdup(gtk_entry_get_text(GTK_ENTRY(info->data->profile->email_entry)));
-    //if (validation(email) == 1)
+ 
     update_profile("email", email, info);
     gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->email_entry), FALSE);
     gtk_widget_hide(widget);
     gtk_widget_show(info->data->profile->email_button1);
-    //else
 }
 
 void show_exit (t_client_info *info,  GtkWidget *profile) {
@@ -203,10 +203,10 @@ void show_id (t_client_info *info, int id, GtkWidget *profile) {
 }
 
 void save_settings_callback(GtkWidget *widget, t_client_info *info) {
-    (void)widget;
     json_object *new_json;
     const char *json_string;
 
+    (void)widget;
     new_json = json_object_new_object();
     json_object_object_add(new_json, "type", json_object_new_int(MX_EDIT_PROFILE_TYPE));
     json_object_object_add(new_json, "add_info", json_object_new_int(1));
@@ -221,19 +221,11 @@ void save_settings_callback(GtkWidget *widget, t_client_info *info) {
     tls_send(info->tls_client, json_string, strlen(json_string));
 }
 
-void show_global_settings (t_client_info *info, json_object *new_json, GtkWidget *profile) {
-    (void)info;
+void init_check_boxes (t_client_info *info, json_object *new_json, GtkWidget *notifications_box) {
     int visual_n = json_object_get_int(json_object_object_get(new_json, "visual_n"));
     int audio_n = json_object_get_int(json_object_object_get(new_json, "audio_n"));
     int email_n = json_object_get_int(json_object_object_get(new_json, "email_n"));
-    GtkWidget *box = gtk_box_new(FALSE, 5);
-    GtkWidget *notifications_box = gtk_box_new(FALSE, 5);
 
-    gtk_box_pack_start (GTK_BOX (profile), box, FALSE, FALSE, 0);
-    gtk_orientable_set_orientation (GTK_ORIENTABLE(box), GTK_ORIENTATION_VERTICAL);
-    gtk_orientable_set_orientation (GTK_ORIENTABLE(notifications_box), GTK_ORIENTATION_VERTICAL);
-    show_title(" Notifications", box);
-    gtk_box_pack_start (GTK_BOX (box), notifications_box, FALSE, FALSE, 0);
     info->data->profile->visual = gtk_check_button_new_with_label ("Visual");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(info->data->profile->visual), visual_n);
     gtk_box_pack_start (GTK_BOX (notifications_box), info->data->profile->visual, FALSE, FALSE, 0);
@@ -243,22 +235,29 @@ void show_global_settings (t_client_info *info, json_object *new_json, GtkWidget
     info->data->profile->email = gtk_check_button_new_with_label ("Email");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(info->data->profile->email), email_n);
     gtk_box_pack_start (GTK_BOX (notifications_box), info->data->profile->email, FALSE, FALSE, 0);
-    GtkWidget *button = gtk_button_new_with_label("Save");
-    g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (save_settings_callback), info);
-    gtk_box_pack_start (GTK_BOX (notifications_box), button, FALSE, FALSE, 0);
-    gtk_widget_show(info->data->profile->visual);
-    gtk_widget_show(info->data->profile->audio);
-    gtk_widget_show(info->data->profile->email);
-    gtk_widget_show(button);
-    gtk_widget_show(notifications_box);
-    gtk_widget_show(box);
+    info->data->profile->save = gtk_button_new_with_label("Save");
+    g_signal_connect (G_OBJECT (info->data->profile->save), "clicked", G_CALLBACK (save_settings_callback), info);
+    gtk_box_pack_start (GTK_BOX (notifications_box), info->data->profile->save, FALSE, FALSE, 0);
+}
+
+void show_global_settings (t_client_info *info, json_object *new_json, GtkWidget *profile) {
+    GtkWidget *box = gtk_box_new(FALSE, 5);
+    GtkWidget *notifications_box = gtk_box_new(FALSE, 5);
+
+    gtk_box_pack_start (GTK_BOX (profile), box, FALSE, FALSE, 0);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(box), GTK_ORIENTATION_VERTICAL);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(notifications_box), GTK_ORIENTATION_VERTICAL);
+    show_title(" Notifications", box);
+    gtk_box_pack_start (GTK_BOX (box), notifications_box, FALSE, FALSE, 0);
+    init_check_boxes(info, new_json, notifications_box);
+    gtk_widget_show_all(box);
 }
 
 void message_callback (GtkWidget *widget, t_client_info *info) {
-    (void)widget;
     json_object *new_json;
     const char *json_string;
 
+    (void)widget;
     new_json = json_object_new_object();
     json_object_object_add(new_json, "type", json_object_new_int(MX_DIRECT_MESSAGE_TYPE));
     json_object_object_add(new_json, "first_id", json_object_new_int(info->id));
@@ -277,11 +276,11 @@ void message_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 void show_etc (t_client_info *info, json_object *new_json, GtkWidget *profile) {
-    (void)info;
-    (void)new_json;
     GtkWidget *box = gtk_box_new(FALSE, 5);
     GtkWidget *activityes_box = gtk_box_new(FALSE, 5);
 
+    (void)info;
+    (void)new_json;
     gtk_box_pack_start (GTK_BOX (profile), box, FALSE, FALSE, 0);
     gtk_orientable_set_orientation (GTK_ORIENTABLE(box), GTK_ORIENTATION_VERTICAL);
     gtk_orientable_set_orientation (GTK_ORIENTABLE(activityes_box), GTK_ORIENTATION_VERTICAL);
@@ -295,45 +294,53 @@ void show_etc (t_client_info *info, json_object *new_json, GtkWidget *profile) {
     gtk_widget_show(box);
 }
 
+void init_profile (t_client_info *info, GtkWidget *box, int id, json_object *new_json) {
+    GtkWidget *profile = gtk_box_new(FALSE, 5);
+
+    gtk_box_pack_start (GTK_BOX (box), profile, FALSE, FALSE, 0);
+    gtk_widget_set_name(profile, "profile");
+    gtk_fixed_put(GTK_FIXED(info->data->general_box), 
+        info->data->profile->main_box, 0, 0);
+    gtk_widget_set_size_request(info->data->profile->main_box, 
+                            gtk_widget_get_allocated_width (info->data->window), 
+                            gtk_widget_get_allocated_height (info->data->window));
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(profile), 
+                                    GTK_ORIENTATION_VERTICAL);
+    show_exit(info, profile);
+    show_login(info, new_json, profile);
+    show_id(info, id, profile);
+    show_name(info, id, new_json, profile);
+    show_email(info, id, new_json, profile);
+    gtk_widget_show(profile);
+    id == info->id ? show_global_settings(info, new_json, profile) : show_etc(info, new_json, profile);
+}
+
+void init_close_event (t_client_info *info, GtkWidget *box) {
+    GtkWidget *close_event = gtk_event_box_new();
+
+    gtk_widget_set_name (close_event, "menu_exit");
+    gtk_widget_add_events (close_event, GDK_BUTTON_PRESS_MASK);
+    g_signal_connect (G_OBJECT (close_event), "button_press_event", 
+                        G_CALLBACK (close_profile_callback1), info);
+    gtk_box_pack_start (GTK_BOX (box), close_event, TRUE, TRUE, 0);
+    gtk_widget_show(close_event);
+}
+
 void mx_load_user_profile(t_client_info *info, json_object *new_json) {
+    int id = json_object_get_int(json_object_object_get(new_json, "id"));
+    GtkWidget *box = gtk_box_new(FALSE, 0);
+
     if (info->data->profile != NULL) {
         g_idle_add ((GSourceFunc)mx_destroy_widget, info->data->profile->main_box);
         free(info->data->profile);
         info->data->profile = NULL;
     }
     info->data->profile = (t_prof *)malloc(sizeof(t_prof));
-    int id = json_object_get_int(json_object_object_get(new_json, "id"));
     info->data->profile->id = id;
     info->data->profile->main_box = gtk_event_box_new();
-    GtkWidget *box = gtk_box_new(FALSE, 0);
-    GtkWidget *profile = gtk_box_new(FALSE, 5);
     gtk_container_add(GTK_CONTAINER(info->data->profile->main_box),box);
-    gtk_box_pack_start (GTK_BOX (box), profile, FALSE, FALSE, 0);
-    gtk_widget_set_name(profile, "profile");
-    gtk_fixed_put(GTK_FIXED(info->data->general_box), 
-    	info->data->profile->main_box, 0, 0);
-    gtk_widget_set_size_request(info->data->profile->main_box, 
-    						gtk_widget_get_allocated_width (info->data->window), 
-    						gtk_widget_get_allocated_height (info->data->window));
-    gtk_orientable_set_orientation (GTK_ORIENTABLE(profile), 
-    								GTK_ORIENTATION_VERTICAL);
-    show_exit(info, profile);
-    show_login(info, new_json, profile);
-    show_id(info, id, profile);
-    show_name(info, id, new_json, profile);
-    show_email(info, id, new_json, profile);
-    GtkWidget *close_event = gtk_event_box_new();
-    gtk_widget_set_name (close_event, "menu_exit");
-    gtk_widget_add_events (close_event, GDK_BUTTON_PRESS_MASK);
-    g_signal_connect (G_OBJECT (close_event), "button_press_event", 
-    					G_CALLBACK (close_profile_callback1), info);
-    gtk_box_pack_start (GTK_BOX (box), close_event, TRUE, TRUE, 0);
-    gtk_widget_show(profile);
-    gtk_widget_show(close_event);
     gtk_widget_show(box);
-    if (id == info->id)
-        show_global_settings(info, new_json, profile);
-    else
-        show_etc(info, new_json, profile);
+    init_profile(info, box, id ,new_json);
+    init_close_event(info, box);
     g_idle_add ((GSourceFunc)mx_show_widget, info->data->profile->main_box);
 }
