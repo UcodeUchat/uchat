@@ -36,7 +36,7 @@
 
 #include "../libportaudio/include/portaudio.h"
 
-#include "../../libmx/inc/libmx.h"
+#include "../libmx/inc/libmx.h"
 #include "../libressl_3/include/tls.h"
 #include "../libressl_3/include/openssl/evp.h"
 #include "../libressl_3/include/openssl/sha.h"
@@ -234,6 +234,7 @@ typedef struct  s_server_info {  // struct server
 
 #define MX_MAX_FILE_SIZE 300000000
 #define MX_MAX_USERS_IN_ROOM 1024
+#define MX_EMPTY_JSON 1000
 #define MX_MSG_TYPE 1
 #define MX_FILE_SEND_TYPE 2
 #define MX_AUTH_TYPE 3
@@ -350,7 +351,6 @@ void *send_file(void *arg);
 void start_sending(FILE *file, t_file_tmp *vars);
 int mx_send_file_from_server(t_server_info *info, t_socket_list *csl);
 
-
 // socket_list
 t_socket_list *mx_create_socket_elem(int socket, struct tls *tls_socket,
                                      t_socket_list *parent);
@@ -405,6 +405,7 @@ t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new
 t_room *mx_create_room(t_client_info *info,  json_object *room_data, int position);
 void mx_push_room(t_client_info *info, json_object *room_data, int position);
 void mx_create (t_client_info *info);
+void mx_send_empty_json(struct tls *tls_socket);
 
 //void mx_send_file_from_client(t_client_info *info);
 void mx_send_file_from_client(t_client_info *info, char *file_name);

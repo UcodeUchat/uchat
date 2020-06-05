@@ -125,7 +125,7 @@ void record_callback (GtkWidget *widget, t_client_info *info) {
     printf("new %s\n", audio_file);
 //    gtk_widget_show(info->data->stop_button);
 //    gtk_widget_hide(info->data->stop_button);
-//    mx_send_file_from_client(info, "audio_file");
+    mx_send_file_from_client(info, audio_file);
     gtk_widget_show(info->data->record_button);
 }
 

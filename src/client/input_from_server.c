@@ -309,12 +309,12 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
 
     if (type != MX_FILE_DOWNLOAD_TYPE)
         mx_print_json_object(obj, "mx_process_input_from_server");
-    if (type == MX_FILE_DOWNLOAD_TYPE) 
+    if (type == MX_MSG_TYPE)
+        input_message(info, obj);
+    else if (type == MX_FILE_DOWNLOAD_TYPE) 
         mx_save_file_in_client(info, obj);
     else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) 
         input_authentification(info, obj);
-    else if (type == MX_MSG_TYPE)
-        input_message(info, obj);
     else if (type == MX_LOAD_MORE_TYPE)
         load_history(info, obj);
     else if (type == MX_DELETE_MESSAGE_TYPE)
