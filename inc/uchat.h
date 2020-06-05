@@ -59,9 +59,20 @@
 
 typedef struct s_message {
     int id;
+    int user_id;
+    int add_info;
     char *data;
     GtkWidget *h_box;
+    GtkWidget *general_box;
+    GtkWidget *event;
+    GtkWidget *main_box;
+    GtkWidget *left_box;
+    GtkWidget *central_box;
+    GtkWidget *right_box;
+    GtkWidget *login_box;
+    GtkWidget *login_event;
     GtkWidget *menu;
+    GtkWidget *menu_event;
     GtkWidget *image_box;
     GtkWidget *message_label;
     GtkWidget *message_box;
