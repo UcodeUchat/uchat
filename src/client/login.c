@@ -117,16 +117,14 @@ void send_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 void record_callback (GtkWidget *widget, t_client_info *info) {
-    (void)widget;
-    (void)info;
-
-    //gtk_widget_hide(info->data->record_button);
     char *audio_file = mx_record_audio();
+    int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
+    t_room *room = find_room(info->data->rooms, position);
+    
+    info->data->current_room = room->id;
     printf("new %s\n", audio_file);
-//    gtk_widget_show(info->data->stop_button);
-//    gtk_widget_hide(info->data->stop_button);
-//    mx_send_file_from_client(info, "audio_file");
-    //gtk_widget_show(info->data->record_button);
+    mx_send_file_from_client(info, audio_file);
+    (void)widget;
 }
 
 

@@ -44,19 +44,20 @@ int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
     int type = json_object_get_int(json_object_object_get(csl->obj, "type"));
 
     if (type == MX_MSG_TYPE)
-        return_value = mx_process_message_in_server(info, csl->obj);
+        return mx_process_message_in_server(info, csl->obj);
     else if (type == MX_FILE_SEND_TYPE)
-        return_value = mx_save_file_in_server(info, csl);
+        return mx_save_file_in_server(info, csl);
     else if (type == MX_FILE_DOWNLOAD_TYPE)
-        return_value = mx_send_file_from_server(info, csl);
+        return mx_send_file_from_server(info, csl);
     else if (type == MX_AUTH_TYPE)
-    	return_value = mx_authorization(info, csl, csl->obj);
+    	return mx_authorization(info, csl, csl->obj);
     else if (type == MX_REG_TYPE)
-        return_value = mx_registration(info, csl, csl->obj);
+        return mx_registration(info, csl, csl->obj);
     else if (type == MX_LOGOUT_TYPE)
-        return_value = mx_logout(info, csl, csl->obj);
+        return mx_logout(info, csl, csl->obj);
     else if (type == MX_LOAD_MORE_TYPE)
-        return_value = mx_load_history(info, csl, csl->obj);
-    run2(info, csl, &return_value, type);
-    return return_value;
+        return mx_load_history(info, csl, csl->obj);
+    else
+        run2(info, csl, &return_value, type);
+    return type == MX_EMPTY_JSON ? 0 : return_value;
 }

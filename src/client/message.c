@@ -25,6 +25,7 @@ void focus_menu_callback(GtkWidget *widget, GdkEventButton *event, GtkWidget *me
 void open_menu_callback(GtkWidget *widget, GdkEventButton *event, GtkWidget *menu) {
     (void)widget;
     (void)event;
+
     gtk_menu_popup_at_pointer (GTK_MENU(menu), NULL);
 }
 
@@ -33,23 +34,25 @@ void load_profile_callback(GtkWidget *widget, t_mes *mes) {
     mx_load_profile_client(mes->info, mes->user_id);
 }
 
-void load_audio_callback(GtkWidget *widget, t_mes *mes) {
+void load_audio_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     (void)widget;
-    (void)mes;
-    mx_play_sound_file("./audio/moby.aif");
+    (void)event;
+    
+    printf("mes----->%s\n", mes->message->data);
+    mx_play_sound_file("./audio/moby.aif", "0", "5");
 }
 
 void delete_callback (GtkWidget *widget, t_mes *mes) {
-    (void)widget;
     t_message *message = mx_find_message(mes->room->messages, mes->id);
     json_object  *new_json = json_object_new_object();
+    const char *json_str = json_object_to_json_string(new_json);
 
     json_object_object_add(new_json, "type", json_object_new_int(MX_DELETE_MESSAGE_TYPE));
     json_object_object_add(new_json, "message_id", json_object_new_int(message->id));
     json_object_object_add(new_json, "room_id", json_object_new_int(mes->room->id));
     mx_print_json_object(new_json, "delete message");
-    const char *json_str = json_object_to_json_string(new_json);
     tls_send(mes->info->tls_client, json_str, strlen(json_str));
+    (void)widget;
 }
 
 void edit_callback (GtkWidget *widget, t_mes *mes) {
@@ -321,7 +324,6 @@ t_message *mx_create_message (t_client_info *info, t_room *room, json_object *ne
     init_message_menu(node, mes);
     init_message_login(node, mes, login);
     mes->message = node;
-    // printf("%s\n", mes->message->data);
     choose_type(mes, node, message);
     choose_side (info, node, room, order);
 
@@ -331,7 +333,7 @@ t_message *mx_create_message (t_client_info *info, t_room *room, json_object *ne
 
 void *sound_thread (void *data) {
     (void)data;
-    mx_play_sound_file("audio/moby.aif");
+    mx_play_sound_file("audio/moby.aif", "0", "5");
     return 0;
 }
 

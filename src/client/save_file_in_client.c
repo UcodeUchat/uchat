@@ -55,7 +55,7 @@ int final_file_input_client(t_file_list **list, json_object *obj, t_client_info 
                     free(tmp); 
                 }
 
-                char *file_path = mx_strjoin("Uchat_downloads/", file_name);
+                char *file_path = mx_strjoin("./Uchat_downloads/", file_name);
                 int file_id = json_object_get_int(json_object_object_get(obj, "file_id"));
                 int room_id = json_object_get_int(json_object_object_get(obj, "room_id"));
                 t_room *room = mx_find_room(info->data->rooms, room_id);

@@ -1,5 +1,17 @@
 #include "uchat.h"
 
+char *get_name(char *path) {
+    char *extention = strdup(path);
+    char *tmp = NULL;
+    while (mx_get_char_index(extention, '/') >= 0) {
+        tmp = strdup(extention + mx_get_char_index(extention, '/') + 1);
+        free(extention);
+        extention = strdup(tmp);
+        free(tmp);
+    }
+    return extention;
+}
+
 bool pick_file_to_send(t_client_info *info, FILE **file, json_object **obj) {
     struct stat file_stat;
     char *file_path;
@@ -48,21 +60,20 @@ bool pick_file_to_send(t_client_info *info, FILE **file, json_object **obj) {
     }
     return 1;
 }
-bool open_file_to_send(t_client_info *info, FILE **file, json_object **obj, char *file_name) {
+static bool open_file_to_send(FILE **file, json_object **obj, char *path) {
     struct stat file_stat;
-//    char *file_path;
-//    char *file_name;
-    (void)info;
 
-    if (stat(file_name, &file_stat) != MX_OK) {
+    if (stat(path, &file_stat) != MX_OK)
         return 1;
-    }
     if (file_stat.st_size > 0 && file_stat.st_size <= MX_MAX_FILE_SIZE) {
         if (!(file_stat.st_mode & S_IFDIR) && (file_stat.st_mode & S_IFREG)) {
-            if ((*file = fopen(file_name, "r")) != NULL) {
+            if ((*file = fopen(path, "r")) != NULL) {
+                char *file_name = get_name(path);
+
                 *obj = mx_create_basic_json_object(MX_FILE_SEND_TYPE);
-                json_object_object_add(*obj, "file_name", json_object_new_string("17.aif"));
+                json_object_object_add(*obj, "file_name", json_object_new_string(file_name));
                 json_object_object_add(*obj, "file_size", json_object_new_int(file_stat.st_size));
+                mx_strdel(&file_name);
                 return 0;
             }
             else
@@ -95,7 +106,7 @@ void mx_send_file_from_client(t_client_info *info, char *file_name) {
 
     if (file_name != NULL) {
         printf("file name->%s\n", file_name);
-        if (open_file_to_send(info, &file, &send_obj, file_name) != 0) {
+        if (open_file_to_send(&file, &send_obj, file_name) != 0) {
             printf("exit from function_98\n");
             return;
         }
@@ -130,8 +141,9 @@ void mx_send_file_from_client(t_client_info *info, char *file_name) {
         }
         json_string = json_object_to_json_string(send_obj);
         tls_send(info->tls_client, json_string, strlen(json_string));
-        mx_print_json_object(send_obj, "send aiff");
+        // mx_print_json_object(send_obj, "send aiff");
     }
+    mx_send_empty_json(info->tls_client);
     json_object_put(send_obj);
     // unlock file
     fclose(file);

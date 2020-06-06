@@ -16,6 +16,7 @@ int save_file_in_db(t_server_info *info, json_object *obj, t_file_list *file_lis
 }
 
 void mx_send_notification(t_server_info *info, t_socket_list *csl, t_file_list *file_list) {
+    printf("SEND NOTIFICATION\n");
     json_object *send_obj = mx_create_basic_json_object(MX_MSG_TYPE);
     //const char *json_str;
 

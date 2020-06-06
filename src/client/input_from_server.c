@@ -309,12 +309,12 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
 
     if (type != MX_FILE_DOWNLOAD_TYPE)
         mx_print_json_object(obj, "mx_process_input_from_server");
-    if (type == MX_FILE_DOWNLOAD_TYPE) 
+    if (type == MX_MSG_TYPE)
+        input_message(info, obj);
+    else if (type == MX_FILE_DOWNLOAD_TYPE) 
         mx_save_file_in_client(info, obj);
     else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) 
         input_authentification(info, obj);
-    else if (type == MX_MSG_TYPE)
-        input_message(info, obj);
     else if (type == MX_LOAD_MORE_TYPE)
         load_history(info, obj);
     else if (type == MX_DELETE_MESSAGE_TYPE)
@@ -348,8 +348,11 @@ void *mx_process_input_from_server(void *taken_info) {
 
     while (1) { // read all input from server
         rc = tls_read(info->tls_client, buffer, sizeof(buffer));    // get json
-        if (rc == -1)
-            mx_err_exit("tls connection error\n"); // logout!!!
+        if (rc == -1) {
+            if (mx_reconnect_client(info))
+                break;
+            //send autentification json
+        }
         if (rc != 0) {
             new_json = json_tokener_parse_ex(tok, buffer, rc);
             jerr = json_tokener_get_error(tok);
