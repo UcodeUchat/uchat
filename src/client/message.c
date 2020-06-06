@@ -34,12 +34,30 @@ void load_profile_callback(GtkWidget *widget, t_mes *mes) {
     mx_load_profile_client(mes->info, mes->user_id);
 }
 
+
+void *play_sound_pthread(void *taken_info) {
+    char *file = (char *)taken_info;
+    (void)file;
+
+//    mx_play_sound_file("./audio/moby.aif", "0", NULL);
+    mx_play_sound_file(mx_strjoin("./Uchat_downloads/", "rec_massage889119397.aif"), "0", NULL);
+    return 0;
+}
+
 void load_audio_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     (void)widget;
     (void)event;
-    
-    printf("mes----->%s\n", mes->message->data);
-    mx_play_sound_file("./audio/moby.aif", "0", "5");
+    pthread_t sound_play;
+    pthread_attr_t attr;
+    int tc;
+
+    mx_load_file(mes);
+    printf("%s\n", mx_strjoin("./Uchat_downloads/", mes->message->data));
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED); // #
+    tc = pthread_create(&sound_play, &attr, play_sound_pthread, mes->message->data);
+    if (tc != 0)
+        printf("pthread_create error = %s\n", strerror(tc));
 }
 
 void delete_callback (GtkWidget *widget, t_mes *mes) {
