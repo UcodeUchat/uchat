@@ -15,6 +15,8 @@ int mx_detect_file_extention(char *filename) {
 		dot++;
 		if (!strcmp(dot, "jpg") || !strcmp(dot, "jpeg") || !strcmp(dot, "png") || !strcmp(dot, "gif"))
 			return 1; // image
+        else if (!strcmp(dot, "aif"))
+            return 2; //audio
 		else
 			return 0; // just file
 	}
