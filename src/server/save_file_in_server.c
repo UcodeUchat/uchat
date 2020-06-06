@@ -23,8 +23,11 @@ void mx_send_notification(t_server_info *info, t_socket_list *csl, t_file_list *
     json_object_object_add(send_obj, "user_id", json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "user_id"))));
     json_object_object_add(send_obj, "room_id", json_object_new_int(json_object_get_int(json_object_object_get(csl->obj, "room_id"))));
     json_object_object_add(send_obj, "login", json_object_new_string(json_object_get_string(json_object_object_get(csl->obj, "login"))));
+
     if (mx_detect_file_extention(file_list->file_name) == 1)
         json_object_object_add(send_obj, "add_info", json_object_new_int(2));
+    else if (mx_detect_file_extention(file_list->file_name) == 2)
+        json_object_object_add(send_obj, "add_info", json_object_new_int(4));
     else
         json_object_object_add(send_obj, "add_info", json_object_new_int(1));
     json_object_object_add(send_obj, "data", json_object_new_string(file_list->file_name));
