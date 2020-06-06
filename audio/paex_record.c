@@ -18,7 +18,7 @@
 /* #define DITHER_FLAG     (paDitherOff) */
 #define DITHER_FLAG     (0) /**/
 /** Set to 1 if you want to capture the recording to a file. */
-#define WRITE_TO_FILE   (1)
+#define WRITE_TO_FILE   (0)
 
 /* Select sample format. */
 #if 1
