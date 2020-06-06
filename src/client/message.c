@@ -68,7 +68,6 @@ void file_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     (void)event;
     (void)mes;
     gtk_widget_set_name(widget, "file_pressed");
-    mes->message = mx_find_message(mes->room->messages, mes->id);
     if (mes->message != NULL)
         mx_load_file(mes);
 }
@@ -85,6 +84,7 @@ void file_notify_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) 
     (void)event;
     (void)mes;
     t_message *message = mx_find_message(mes->room->messages, mes->id);
+
     if (message != NULL) {
         gtk_widget_show(message->menu);
         gtk_widget_set_name(widget, "file_hover");
@@ -184,10 +184,11 @@ void sticker (t_message *node, const char *message) {
 }
 
 void audio (t_mes *mes, t_message *node, const char *message) {
+    GtkWidget *label2 = gtk_label_new(message + 20);
+
     node->message_box = gtk_event_box_new();
     gtk_widget_show(node->message_box);
     gtk_box_pack_start (GTK_BOX (node->central_box), node->message_box, FALSE, FALSE, 0);
-    GtkWidget *label2 = gtk_label_new(message + 20);
     gtk_widget_show(label2);
     gtk_container_add (GTK_CONTAINER (node->message_box), label2);
     gtk_widget_set_name(node->message_box, "file");
@@ -319,7 +320,8 @@ t_message *mx_create_message (t_client_info *info, t_room *room, json_object *ne
     init_main_message(node, mes);
     init_message_menu(node, mes);
     init_message_login(node, mes, login);
-    
+    mes->message = node;
+    // printf("%s\n", mes->message->data);
     choose_type(mes, node, message);
     choose_side (info, node, room, order);
 

@@ -188,29 +188,40 @@ void cancel_callback (GtkWidget *widget, t_client_info *info) {
     gtk_widget_show(info->data->login_box);
 }
 
+void url_callback (GtkWidget *widget, GdkEventButton *event, void *data) {
+    (void)widget;
+    (void)event;
+    (void)data;
+    system("open https://ucode.world");
+}
+
 void init_main_title(t_client_info *info, GtkWidget *screen)  {
     GtkWidget *table = gtk_grid_new();
     GtkWidget *title1 = gtk_label_new("Ucode");
-    gtk_widget_show (title1);
+    GtkWidget *title2 = gtk_label_new("chat");
+    GtkWidget *box = gtk_box_new(FALSE, 0);
+    GtkWidget *event_box = gtk_event_box_new();
+
     gtk_widget_set_name(title1, "title1");
     gtk_grid_attach (GTK_GRID (table), title1, 0, 0, 1, 1);
-    GtkWidget *title2 = gtk_label_new("chat");
-    gtk_widget_show (title2);
     gtk_widget_set_name(title2, "title2");
     gtk_grid_attach (GTK_GRID (table), title2, 1, 0, 1, 1);
-    GtkWidget *box = gtk_box_new(FALSE, 0);
     gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
     gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
     gtk_fixed_put (GTK_FIXED (screen), box, 0, 125);
-    gtk_box_pack_start (GTK_BOX (box), table, TRUE, FALSE, 0);
-    gtk_widget_show(table);
-    gtk_widget_show (box);
+    gtk_container_add (GTK_CONTAINER (event_box), table);
+    gtk_widget_add_events (event_box, GDK_BUTTON_PRESS_MASK);
+    g_signal_connect (G_OBJECT (event_box), "button_press_event", 
+        G_CALLBACK (url_callback), NULL);
+    gtk_box_pack_start (GTK_BOX (box), event_box, TRUE, FALSE, 0);
+    gtk_widget_show_all(box);
 }
 
 void init_reg_fail(t_client_info *info) {
+    GtkWidget *box = gtk_box_new(FALSE, 0);
+
     info->data->register_msg = gtk_label_new("Your login or password is invalid");
     gtk_widget_set_name (info->data->register_msg, "auth_fail1");
-    GtkWidget *box = gtk_box_new(FALSE, 0);
     gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
     gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
     gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, 180);
@@ -219,12 +230,13 @@ void init_reg_fail(t_client_info *info) {
 }
 
 void init_reg_entry (t_client_info *info, GtkWidget **entry, char *placeholder, int heigth) {
+    GtkWidget *box = gtk_box_new(FALSE, 0);
+
     *entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (*entry), 50);
     gtk_entry_set_placeholder_text (GTK_ENTRY (*entry), placeholder);
     gtk_editable_select_region (GTK_EDITABLE (*entry),
                                 0, gtk_entry_get_text_length (GTK_ENTRY (*entry)));
-    GtkWidget *box = gtk_box_new(FALSE, 0);
     gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
     gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
     gtk_fixed_put (GTK_FIXED (info->data->register_box), box, 0, heigth);
@@ -1178,6 +1190,7 @@ void init_login(t_client_info *info) {
     init_main_title(info, info->data->login_box);
     init_login_entry(info, &info->data->login_entry, "login", 200);
     init_login_entry(info, &info->data->password_entry, "password", 250);
+    gtk_entry_set_visibility (GTK_ENTRY(info->data->password_entry), FALSE);
     init_login_button(info, "Sign in", 300, enter_callback);
     init_login_button(info, "Registration", 340, reg_callback);
     gtk_widget_show(info->data->login_box);
