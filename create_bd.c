@@ -131,6 +131,12 @@ int main(int argc, char *argv[]){
 					FOREIGN KEY (user_id) REFERENCES users (id),\
 					FOREIGN KEY (room_id) REFERENCES rooms (id));\n\
 				\
+				create table direct_rooms (\
+					id INTEGER PRIMARY KEY AUTOINCREMENT,\
+					first_id integer, second_id integer,\
+					FOREIGN KEY (first_id) REFERENCES users (id),\
+					FOREIGN KEY (second_id) REFERENCES users (id));\
+				\
 				create table blacklist (\
 					id INTEGER PRIMARY KEY AUTOINCREMENT,\
 					blocker_id integer, blocked_id integer,\

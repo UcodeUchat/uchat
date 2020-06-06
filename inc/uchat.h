@@ -32,17 +32,11 @@
 #include <time.h>
 #include <math.h>
 #include <ctype.h>
-//#include <portaudio.h>
-//#include <sndfile.h>
-//#include <json.h>
-// openssl
-//#include <openssl/evp.h>
-//#include <openssl/sha.h>
-//#include <openssl/aes.h>
-//#include <tls.h>
 
 
-#include "../../libmx/inc/libmx.h"
+#include "../libportaudio/include/portaudio.h"
+
+#include "../libmx/inc/libmx.h"
 #include "../libressl_3/include/tls.h"
 #include "../libressl_3/include/openssl/evp.h"
 #include "../libressl_3/include/openssl/sha.h"
@@ -54,6 +48,7 @@
 #include "mail.h"
 #include "audio.h"
 
+#define MAXSLEEP 24  // max seconds / 2 sleep for reconnect client
 #define MAX_CLIENT_INPUT 1024
 #define REPORT_FILENAME "server_log.txt"
 #define BUFLEN 128
@@ -65,9 +60,20 @@
 
 typedef struct s_message {
     int id;
+    int user_id;
+    int add_info;
     char *data;
     GtkWidget *h_box;
+    GtkWidget *general_box;
+    GtkWidget *event;
+    GtkWidget *main_box;
+    GtkWidget *left_box;
+    GtkWidget *central_box;
+    GtkWidget *right_box;
+    GtkWidget *login_box;
+    GtkWidget *login_event;
     GtkWidget *menu;
+    GtkWidget *menu_event;
     GtkWidget *image_box;
     GtkWidget *message_label;
     GtkWidget *message_box;
@@ -79,10 +85,13 @@ typedef struct s_room {
     int id;
     int position;
     char *name;
+    int access;
     GtkWidget *room_box;
     GtkWidget *message_box;
     GtkWidget *player_box;
     GtkWidget *scrolled_window;
+    GtkWidget *room_menu;
+    GtkWidget *header;
     GtkAdjustment *Adjust;
     t_message *messages;
     struct s_room *next;
@@ -108,7 +117,17 @@ typedef struct s_prof {
     GtkWidget *visual;
     GtkWidget *audio;
     GtkWidget *email;
+    GtkWidget *save;
+    int id;
 }              t_prof;
+
+typedef struct s_create {
+    GtkWidget *main_box;
+    GtkWidget *name_entry;
+    GtkWidget *create_button;
+    GtkWidget *cancel_button;
+    GtkWidget *selection;
+}              t_create;
 
 typedef struct s_search {
     GtkWidget *main_box;
@@ -125,11 +144,11 @@ typedef struct s_data {
     GtkWidget *message_entry;
     GtkWidget *send_button;
     GtkWidget *record_button;
-    GtkWidget *play_button;
     GtkWidget *stop_button;
     GtkWidget *file_button;
     GtkWidget *menu_button;
     GtkWidget *login_msg;
+    GtkWidget *register_msg;
     GtkWidget *notebook;
     GtkWidget *stop;
     GtkWidget *menu;
@@ -140,8 +159,11 @@ typedef struct s_data {
     t_reg *registration;
     t_prof *profile;
     t_search *search;
+    t_create *create_room;
     gint current_room;
     int login_msg_flag;
+    pthread_t login_msg_t;
+    pthread_t register_msg_t;
 }              t_data;
 
 typedef struct  s_client_info {  //struct client
@@ -185,6 +207,7 @@ typedef struct s_note {
     GtkWidget *notebook;
     GtkWidget *label;
     GtkWidget *box;
+    int position;
 }               t_note;
 
 #define MX_PATH_TO_DB "./server_db.bin"
@@ -220,8 +243,11 @@ typedef struct  s_server_info {  // struct server
     struct s_work *wdb;
 }               t_server_info;
 
+#define KEY10 "rooms"
+
 #define MX_MAX_FILE_SIZE 300000000
 #define MX_MAX_USERS_IN_ROOM 1024
+#define MX_EMPTY_JSON 1000
 #define MX_MSG_TYPE 1
 #define MX_FILE_SEND_TYPE 2
 #define MX_AUTH_TYPE 3
@@ -240,9 +266,23 @@ typedef struct  s_server_info {  // struct server
 #define MX_LEAVE_ROOM_TYPE 16
 #define MX_SEARCH_ALL_TYPE 17
 #define MX_JOIN_ROOM_TYPE 18
+#define MX_CREATE_ROOM_TYPE 19
+#define MX_DIRECT_MESSAGE_TYPE 20
+#define MX_DELETE_ACCOUNT_TYPE 21
+#define MX_RECONNECTION_TYPE 22
+#define MX_PACKAGE_SIZE sizeof(t_package)
 
 #define MX_MAX_MSG_SIZE 200
 // sizeof((type *)0)->member)
+
+typedef struct  s_file_tmp {
+    pthread_mutex_t *mutex;
+    struct tls *tls;
+    char *file_name;
+    int size;
+    int file_id;
+    int room_id;
+}               t_file_tmp;
 
 typedef struct  s_server_room {
     int room_id;
@@ -254,7 +294,7 @@ typedef struct  s_socket_list {
     int socket;
     struct tls *tls_socket;
     struct json_object *obj;
-	struct json_tokener *tok;
+    struct json_tokener *tok;
     pthread_mutex_t mutex;
     struct s_socket_list *left;
     struct s_socket_list *right;
@@ -279,6 +319,8 @@ typedef struct s_mes {
 }               t_mes;
 
 // server
+void email_notify(t_server_info *i, json_object *js);
+int mx_reconnection(t_server_info *info, t_socket_list *csl);
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
 int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info);
@@ -300,6 +342,9 @@ int mx_edit_profile (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_create_room_server (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_get_rooms_data (void *messages, int argc, char **argv, char **col_name);
+int mx_direct_message (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_get_rooms_data(void *messages, int argc, char **argv, char **col_name);
 int mx_make_tls_connect(struct tls *tls, struct tls **tls_sock,
                         int client_sock);
@@ -309,6 +354,16 @@ int mx_create_server_socket(t_server_info *info);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);
+
+char *check_file_in_db_and_user_access(t_server_info *info, json_object *obj);
+int get_result(void *arg, int argc, char **argv, char **col_name);
+int res(void *arg, int argc, char **argv, char **col_name);
+int check_is_object_valid(json_object *obj);
+t_file_tmp *set_variables(t_socket_list *csl);
+void file_is_not_exist(t_file_tmp *vars);
+void *send_file(void *arg);
+void start_sending(FILE *file, t_file_tmp *vars);
+int mx_send_file_from_server(t_server_info *info, t_socket_list *csl);
 
 // socket_list
 t_socket_list *mx_create_socket_elem(int socket, struct tls *tls_socket,
@@ -337,20 +392,21 @@ int mx_final_file_input_server(t_server_info *info, t_socket_list *csl);
 //get_rooms
 void mx_get_rooms(t_server_info *i, json_object *js);
 
+//delete account
+int mx_delete_acc(t_server_info *i, json_object *j);
+
 //reg
 int mx_registration(t_server_info *i, t_socket_list *csl, json_object *js);
-int mx_add_to_db(t_server_info *i, const char *l, const char *pa);
+int mx_add_to_db(t_server_info *i, const char *l, const char *pa, int us_id);
 int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
 
 // client
 int mx_start_client(t_client_info *info);
-int mx_tls_config_client(t_client_info *info);
-int mx_connect_client(t_client_info *info);
-void mx_reconect_client(t_client_info *info);
 
-//int mx_connect_client_s(t_client_info *info, struct addrinfo *peer_address);
-//int mx_connect_client(t_client_info *info, const struct sockaddr *addr, socklen_t alen);
-//int mx_connect_client(t_client_info *info, const struct sockaddr *addr);
+int mx_reconnect_client(t_client_info *info);
+int mx_connect_client(t_client_info *info);
+int mx_tls_config_client(t_client_info *info);
+int mx_make_tls_connect_client(t_client_info *info);
 
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_process_message_in_client(t_client_info *info);
@@ -368,7 +424,8 @@ void mx_push_message(t_client_info *info, t_room *room, json_object *new_json);
 t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new_json, int order);
 t_room *mx_create_room(t_client_info *info,  json_object *room_data, int position);
 void mx_push_room(t_client_info *info, json_object *room_data, int position);
-int mx_make_tls_connect_client(t_client_info *info);
+void mx_create (t_client_info *info);
+void mx_send_empty_json(struct tls *tls_socket);
 
 //void mx_send_file_from_client(t_client_info *info);
 void mx_send_file_from_client(t_client_info *info, char *file_name);

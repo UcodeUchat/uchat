@@ -1,84 +1,35 @@
 #include "uchat.h"
 
-#define MAXSLEEP 12
+void reconnection_socket(t_client_info *info) {
+    json_object *json = mx_create_basic_json_object(MX_RECONNECTION_TYPE);
+    const char *json_str = NULL;
 
-//static int (t_client_info *info, ) {
-//
-//}
-
-
-/*
-static int create_client_socket(t_client_info *info,  struct addrinfo **peer_address) {
-    struct addrinfo hints;
-//    struct addrinfo *peer_address = NULL;
-    int sock;
-    int err;
-    int enable = 1;
-
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    if ((err = getaddrinfo(info->ip, info->argv[2],
-                           &hints, peer_address)) != 0) {
-        fprintf(stderr, "getaddrinfo() failed. (%s)\n", gai_strerror(err));
-        return 1;
-    }
-//    printf("Remote address is: ");
-//    char address_buffer[100];
-//    char service_buffer[100];
-    getnameinfo(peer_address->ai_addr, peer_address->ai_addrlen,
-                address_buffer, sizeof(address_buffer),
-                service_buffer, sizeof(service_buffer),
-                NI_NUMERICHOST);
-    printf("%s %s\n", address_buffer, service_buffer);
-//    printf("=========%d %d\n", peer_address->ai_family, peer_address->ai_socktype);
-    sock = socket(peer_address->ai_family,
-                  peer_address->ai_socktype, peer_address->ai_protocol);
-    if (sock == -1) {
-        freeaddrinfo(*peer_address);
-        mx_err_return2("error socket =", strerror(errno));
-//        printf("error sock = %s\n", ;
-//        return 1;
-    }
-    setsockopt(sock, IPPROTO_TCP, SO_KEEPALIVE, &enable, sizeof(int));
-    info->socket = sock;
-    ////
-    if (connect(sock, peer_address->ai_addr, peer_address->ai_addrlen)) {
-        close(sock);
-        freeaddrinfo(peer_address);
-        mx_err_return2("connect error: ", strerror(errno));
-    }
-    freeaddrinfo(peer_address);
-    info->socket = sock;
-    return 0;
+    json_object_object_add(json, "login", json_object_new_string(info->login));
+    json_object_object_add(json, "password", json_object_new_string(info->password));
+    json_str = json_object_to_json_string(json);
+    json_str ? tls_send(info->tls_client, json_str, strlen(json_str)) : 0;
 }
 
-*/
-/*
-int mx_connect_client_s(t_client_info *info, struct addrinfo *peer_address) {
-    if (connect(info->socket, peer_address->ai_addr, peer_address->ai_addrlen)) {
-        close(info->socket);
-        freeaddrinfo(peer_address);
-        mx_err_return2("connect error: ", strerror(errno));
-    }
-    return 0;
-}
-
-*/
-
-void mx_reconect_client(t_client_info *info) {
+int mx_reconnect_client(t_client_info *info) {
     int numsec;
 
     for (numsec = 1; numsec <= MAXSLEEP; numsec <<= 1) {
-        printf("reconnect attemp\n");
+        printf("reconnect attemp = %d\n", numsec);
         tls_close(info->tls_client);
         tls_free(info->tls_client);
-        mx_tls_config_client(info);
+        if (mx_tls_config_client(info))  // conf tls
+            return 1;
         info->socket = mx_connect_client(info);
-        mx_make_tls_connect_client(info);  // tls connect and handshake
+        if (info->socket == -1)
+            return 1;
+        if ((mx_make_tls_connect_client(info)) == 0) { // tls connect and handshake
+            reconnection_socket(info);
+            break;
+        }
         if (numsec <= MAXSLEEP / 2)
             sleep(numsec);
     }
+    return 0;
 }
 
 int mx_connect_client(t_client_info *info) {
@@ -94,7 +45,7 @@ int mx_connect_client(t_client_info *info) {
     if ((err = getaddrinfo(info->ip, info->argv[2],
                            &hints, &peer_address)) != 0) {
         fprintf(stderr, "getaddrinfo() failed. (%s)\n", gai_strerror(err));
-        return 1;
+        return -1;
     }
     for (numsec = 1; numsec <= MAXSLEEP; numsec <<= 1) {
         if ((sock = socket(peer_address->ai_family,
@@ -107,14 +58,13 @@ int mx_connect_client(t_client_info *info) {
             printf("connect to server cocket %d\n", sock);
             return sock;
         }
-            printf("no conection\n");
-            close(sock);
+        printf("not connect\n");
+        close(sock);
         if (numsec <= MAXSLEEP / 2)
             sleep(numsec);
     }
-        return -1;
+    return -1;
 }
-
 
 int mx_tls_config_client(t_client_info *info) {
     struct tls_config *config = NULL;
@@ -136,6 +86,7 @@ int mx_tls_config_client(t_client_info *info) {
     tls_config_free(config);
     return 0;
 }
+
 
 int mx_make_tls_connect_client(t_client_info *info) {
     if (tls_connect_socket(info->tls_client, info->socket, "uchat") < 0)
@@ -167,19 +118,50 @@ int mx_start_client(t_client_info *info) {
     // return ?
     mx_login(info);
     pthread_cancel(thread_input);
-//    freeaddrinfo(peer_address);
     tls_close(info->tls_client);
     tls_free(info->tls_client);
     close(info->socket);
     return 0;
 }
 
-/*
- *
-    (void)info;
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_port = info->port;
-    inet_aton(info->ip, &addr.sin_addr);
 
- */
+/*
+static int create_client_socket(t_client_info *info) {
+    struct addrinfo hints;
+    struct addrinfo *peer_address = NULL;
+    int sock;
+    int err;
+    int enable = 1;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_socktype = SOCK_STREAM;
+    if ((err = getaddrinfo(info->ip, info->argv[2],
+                           &hints, &peer_address)) != 0) {
+        fprintf(stderr, "getaddrinfo() failed. (%s)\n", gai_strerror(err));
+        return 1;
+    }
+//    printf("Remote address is: ");
+//    char address_buffer[100];
+//    char service_buffer[100];
+//    getnameinfo(peer_address->ai_addr, peer_address->ai_addrlen,
+//                address_buffer, sizeof(address_buffer),
+//                service_buffer, sizeof(service_buffer),
+//                NI_NUMERICHOST);
+//    printf("%s %s\n", address_buffer, service_buffer);
+    sock = socket(peer_address->ai_family,
+                  peer_address->ai_socktype, peer_address->ai_protocol);
+    if (sock == -1) {
+        printf("error sock = %s\n", strerror(errno));
+        return 1;
+    }
+    setsockopt(sock, IPPROTO_TCP, SO_KEEPALIVE, &enable, sizeof(int));
+    if (connect(sock, peer_address->ai_addr, peer_address->ai_addrlen))
+        mx_err_return2("connect error: ",strerror(errno));
+//        printf("connect error = %s\n", strerror(errno));
+//        return 1;
+//    }
+    freeaddrinfo(peer_address);
+    info->socket = sock;
+    return 0;
+}
+*/
+

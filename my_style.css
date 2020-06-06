@@ -122,8 +122,8 @@ entry#entry:focus {
 notebook tab label {
 	font-weight: bold;
 	font-size: 110%;
-    text-shadow: Black 0px 0px 0, Black 0px 0px 0, 
-                 Black -1px 1px 1px, Black 0px 0px 0;
+    text-shadow: Black 0px 0px 0, Black 0px 0px 0,
+                 Black -1px 1px 1px, Black -1px 0px 0;
 	color: DarkOrange;
 }
 

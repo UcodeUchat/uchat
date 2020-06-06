@@ -125,5 +125,3 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
     sf_close(a_file);
     return 0;
 }
-
-

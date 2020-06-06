@@ -6,9 +6,10 @@
 #include <math.h>
 //#include <sndfile.h>
 
-
 #include "../libportaudio/include/portaudio.h"
 #include "../libsndfile/src/sndfile.h"
+#include <math.h>
+
 
 #define MIN_TALKING_BUFFERS 8
 #define TALKING_THRESHOLD_WEIGHT 0.99

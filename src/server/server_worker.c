@@ -1,6 +1,7 @@
 #include "uchat.h"
 
-int mx_process_input_objects(t_server_info *info, t_socket_list *csl, char buffer[], size_t rd) {
+int mx_process_input_objects(t_server_info *info, t_socket_list *csl,\
+                                char buffer[], size_t rd) {
     enum json_tokener_error jerr;
 
     csl->obj = json_tokener_parse_ex(csl->tok, buffer, rd);

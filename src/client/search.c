@@ -3,8 +3,11 @@
 void close_result_callback (GtkWidget *widget, GdkEventButton *event, t_search *search) {
     (void)widget;
     (void)event;
-    gtk_widget_hide(search->main_box);
-    free(search);
+    if (search != NULL) {
+        gtk_widget_hide(search->main_box);
+        free(search);
+        search = NULL;
+    }
 }
 
 void join_callback (GtkWidget *widget, t_all *data) {
@@ -23,6 +26,11 @@ void join_callback (GtkWidget *widget, t_all *data) {
     json_object_object_add(new_json, "room_data", room_data);
     const char *json_str = json_object_to_json_string(new_json);
     tls_send(data->info->tls_client, json_str, strlen(json_str));
+    if (data->info->data->search != NULL) {
+        gtk_widget_hide(data->info->data->search->main_box);
+        free(data->info->data->search);
+        data->info->data->search = NULL;
+    }
 }
 
 void init_rooms (t_client_info *info, json_object *new_json, GtkWidget *v_box) {

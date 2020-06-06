@@ -9,9 +9,12 @@ t_file_list *mx_new_file_list_elem(json_object *obj) {
     new_file->file = fopen(full_filename, "w+");
     mx_strdel(&full_filename);
     if (new_file->file != NULL) {
-        new_file->id = json_object_get_int(json_object_object_get(obj, "user_id"));
-        new_file->file_size = json_object_get_int(json_object_object_get(obj, "file_size"));
-        new_file->file_name = mx_strdup(json_object_get_string(json_object_object_get(obj, "file_name")));
+        new_file->id = json_object_get_int(json_object_object_get(obj,\
+                                            "user_id"));
+        new_file->file_size = json_object_get_int(json_object_object_get(obj,\
+                                                    "file_size"));
+        new_file->file_name = mx_strdup(json_object_get_string(\
+                                    json_object_object_get(obj, "file_name")));
     }
     else {
         free(new_file);

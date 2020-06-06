@@ -38,8 +38,10 @@ void load_profile_callback(GtkWidget *widget, t_mes *mes) {
 void load_audio_callback(GtkWidget *widget, t_mes *mes) {
     (void)widget;
     (void)mes;
+
+    mes->message = mx_find_message(mes->room->messages, mes->id);
+    printf("mes----->%s\n", mes->message->data);
     mx_play_sound_file("./audio/moby.aif", "0", "5");
-//    mx_play_sound_file(mes->message->data, "0", "5");
 }
 
 
@@ -135,6 +137,7 @@ t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new
     node->data = strdup(message);
 
     t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
+    mes->message = node;
     mes->info = info;
     mes->room = room;
     mes->id = id;
@@ -253,7 +256,6 @@ t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new
         GtkWidget *box2 =  gtk_box_new(FALSE, 0);
         gtk_widget_show(box2);
         gtk_box_pack_start (GTK_BOX (main_box), box2, FALSE, FALSE, 0);
-        //char *path = mx_strjoin("stickers/", message);
         GdkPixbuf *item_pixbuf = gdk_pixbuf_new_from_file_at_scale (message, 200, 200, TRUE, NULL);
         GtkWidget *item_image = gtk_image_new_from_pixbuf(item_pixbuf);;
         gtk_widget_show(item_image);
@@ -293,6 +295,12 @@ t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new
     return node;
 }
 
+void *sound_thread (void *data) {
+    (void)data;
+    mx_play_sound_file("audio/moby.aif", "0", "5");
+    return 0;
+}
+
 void mx_push_message(t_client_info *info, t_room *room, json_object *new_json) {
     t_message *tmp;
     t_message *p;
@@ -314,6 +322,13 @@ void mx_push_message(t_client_info *info, t_room *room, json_object *new_json) {
     }
     int id = json_object_get_int(json_object_object_get(new_json, "id"));
     int add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
+    int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
+    if (info->audio == 1) {
+        if (user_id != info->id) {
+            pthread_t sound_t = NULL;
+            pthread_create(&sound_t, 0, sound_thread, NULL);
+        }
+    }
     if (add_info == 2) {
         t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
         mes->info = info;

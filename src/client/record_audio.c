@@ -11,23 +11,23 @@ static t_audio * init_audio_data() {
 }
 
 static int process_stream(PaStream *stream, t_audio *data,
-                           t_a_snippet *sample_block, int *i) {
+                          t_a_snippet *sample_block, int *i) {
     if (!stream || !data || !sample_block)
         return -1;
     (*i)++;
-        Pa_ReadStream(stream, sample_block->snippet, FRAMES_PER_BUFFER);
-        data->rec_samples = realloc(data->rec_samples, sample_block->size * (*i));
-        data->size = sample_block->size * (*i);
-        if (data->rec_samples) {
-            size_t next_ndex = ((*i)- 1) * sample_block->size;
-            char *destination = (char*)data->rec_samples + next_ndex;
-            memcpy(destination, sample_block->snippet, sample_block->size);
-        }
-        else{
-            free(data->rec_samples);
-            data->rec_samples = NULL;
-            data->size = 0;
-        }
+    Pa_ReadStream(stream, sample_block->snippet, FRAMES_PER_BUFFER);
+    data->rec_samples = realloc(data->rec_samples, sample_block->size * (*i));
+    data->size = sample_block->size * (*i);
+    if (data->rec_samples) {
+        size_t next_ndex = ((*i)- 1) * sample_block->size;
+        char *destination = (char*)data->rec_samples + next_ndex;
+        memcpy(destination, sample_block->snippet, sample_block->size);
+    }
+    else{
+        free(data->rec_samples);
+        data->rec_samples = NULL;
+        data->size = 0;
+    }
     return 0;
 }
 
@@ -264,5 +264,3 @@ int mx_process_stream_ext(PaStream *stream, t_audio *data,
 //    free (sample_block->snippet);
 //    Pa_Terminate();
 }
-
-

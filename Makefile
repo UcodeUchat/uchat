@@ -48,7 +48,10 @@ SRC_SERVER = main_server.c \
 	process_message_in_server.c \
 	save_file_in_server.c \
 	send_file_from_server.c \
+	send_file_from_server2.c \
+	send_file_from_server3.c \
 	authorization.c \
+	authorization2.c \
 	work_with_socket_list.c \
 	work_with_socket_list_2.c \
 	work_with_files_list.c \
@@ -59,7 +62,7 @@ SRC_SERVER = main_server.c \
 	send_mail_notification.c \
 	send_mail_notification2.c \
 	send_mail_notification3.c \
-	send_mail_notification4.c \
+	send_mail_notification4.c
 
 SRC_CLIENT = main_client.c \
 	start_client.c \
@@ -73,7 +76,8 @@ SRC_CLIENT = main_client.c \
 	search.c \
 	work_with_files_list_in_client.c \
 	record_audio.c \
-	play_audio.c
+	play_audio.c \
+	send_empty_json.c \
 
 # SRC_HELP = $(wildcard *.c)
 SRC_HELP = err_exit.c \
@@ -150,8 +154,8 @@ $(LIBSNDFX): $(LIBSNDFA)
 	@make -sC $(LIBSNDFD)
 
 $(LIBPORTAUDIOA):
-# 	(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
-# 	@make -sC $(LIBPORTAUDIOD)
+	(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
+	@make -sC $(LIBPORTAUDIOD)
 
 $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 	@make -sC $(LIBPORTAUDIOD)

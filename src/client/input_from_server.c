@@ -1,8 +1,8 @@
 #include "uchat.h"
 
 t_message *mx_find_message(t_message *messages, int id) {
-   t_message *head = messages;
-   t_message *node = NULL;
+    t_message *head = messages;
+    t_message *node = NULL;
 
     while (head != NULL) {
         if (head->id == id) {
@@ -56,8 +56,8 @@ void pop_message_id(t_message *messages, int id) {
 }
 
 t_room *mx_find_room(t_room *rooms, int id) {
-   t_room *head = rooms;
-   t_room *node = NULL;
+    t_room *head = rooms;
+    t_room *node = NULL;
 
     while (head != NULL) {
         if (head->id == id) {
@@ -73,7 +73,6 @@ void input_message(t_client_info *info, json_object *new_json) {
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
-    //mx_play_sound_file("./audio/message_send.aiff");
     mx_push_message(info, room, new_json);
     t_room *head = info->data->rooms;
     while (head != NULL) {
@@ -88,7 +87,7 @@ void input_message(t_client_info *info, json_object *new_json) {
 
 void load_history(t_client_info *info, json_object *new_json) {
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
-    t_room *room = mx_find_room(info->data->rooms, room_id);           
+    t_room *room = mx_find_room(info->data->rooms, room_id);
     struct json_object *messages;
 
     json_object_object_get_ex(new_json, "messages", &messages);
@@ -100,19 +99,19 @@ void load_history(t_client_info *info, json_object *new_json) {
     info->can_load = 1;
 }
 
-void delete_message(t_client_info *info, json_object *new_json) { 
+void delete_message(t_client_info *info, json_object *new_json) {
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
     int message_id = json_object_get_int(json_object_object_get(new_json, "message_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
     if (message_id >= room->messages->id) {
-        sleep_ms(50);
+        sleep_ms(100);
         t_message *message = mx_find_message(room->messages, message_id);
         g_idle_add ((GSourceFunc)mx_destroy_widget, message->h_box);
         pop_message_id(room->messages, message_id);
     }
 }
 
-void edit_message(t_client_info *info, json_object *new_json) { 
+void edit_message(t_client_info *info, json_object *new_json) {
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
     int message_id = json_object_get_int(json_object_object_get(new_json, "message_id"));
     const char *data = json_object_get_string(json_object_object_get(new_json, "data"));
@@ -139,14 +138,17 @@ void input_authentification(t_client_info *info, json_object *new_json) {
     int visual = json_object_get_int(json_object_object_get(new_json, "visual"));
     int audio = json_object_get_int(json_object_object_get(new_json, "audio"));
 
-    if ((*info).auth_client == 0){
+    if ((*info).auth_client == 0) {
         fprintf(stderr, "ANSWER = [%d]\n", type);
         if (type == 4) {
             info->id = user_id;
             info->visual = visual;
             info->audio = audio;
             (*info).auth_client = 1;
-            json_object_deep_copy(json_object_object_get(new_json, "rooms"), &info->rooms, NULL);
+            json_object_put(info->rooms);
+            json_object *rooms = NULL;
+            json_object_deep_copy(json_object_object_get(new_json, "rooms"), &rooms, NULL);
+            info->rooms = rooms;
         }
         else{
             (*info).auth_client = 0;
@@ -163,7 +165,7 @@ void pop_room_id(t_room **rooms, int id) {
     if (head->id == id) {
         *rooms = head->next;
     }
-    else {    
+    else {
         while (head->next != NULL) {
             if (head->next->id == id) {
                 head->next = head->next->next;
@@ -218,7 +220,9 @@ void join_room(t_client_info *info, json_object *new_json) {
 }
 
 int mx_notebook_detach(t_note *note) {
-    gtk_notebook_detach_tab (GTK_NOTEBOOK(note->notebook), note->box);
+    int pos = gtk_notebook_page_num (GTK_NOTEBOOK(note->notebook),
+                                     note->box);
+    gtk_notebook_remove_page (GTK_NOTEBOOK(note->notebook), pos);
     return 0;
 }
 
@@ -270,23 +274,47 @@ void edit_profile(t_client_info *info, json_object *new_json) {
     int confirmation = json_object_get_int(json_object_object_get(new_json, "confirmation"));
 
     if (confirmation) {
-        info->audio = json_object_get_int(json_object_object_get(new_json, "audio"));
-        info->visual = json_object_get_int(json_object_object_get(new_json, "visual"));
+        info->audio = json_object_get_int(json_object_object_get(new_json, "audio_n"));
+        info->visual = json_object_get_int(json_object_object_get(new_json, "visual_n"));
     }
 }
 
+void direct_message(t_client_info *info, json_object *new_json) {
+    int exist = json_object_get_int(json_object_object_get(new_json, "exist"));
+    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+    t_room *room = mx_find_room(info->data->rooms, room_id);
+
+    if (exist) {
+        if (room != NULL) {
+            gtk_notebook_set_current_page (GTK_NOTEBOOK(info->data->notebook), room->position);
+        }
+    }
+    else {
+        if (room == NULL) {
+            t_room *head = info->data->rooms;
+
+            while (head != NULL) {
+                head->position = head->position + 1;
+                head = head->next;
+            }
+            json_object *room_data = NULL;
+            json_object_deep_copy(json_object_object_get(new_json, "room_data"), &room_data, NULL);
+            mx_push_room(info, room_data, 0);
+        }
+    }
+}
 
 int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
     int type = json_object_get_int(json_object_object_get(obj, "type"));
 
     if (type != MX_FILE_DOWNLOAD_TYPE)
         mx_print_json_object(obj, "mx_process_input_from_server");
-    if (type == MX_FILE_DOWNLOAD_TYPE) 
-        mx_save_file_in_client(info, obj);
-    else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV) 
-        input_authentification(info, obj);
-    else if (type == MX_MSG_TYPE)
+    if (type == MX_MSG_TYPE)
         input_message(info, obj);
+    else if (type == MX_FILE_DOWNLOAD_TYPE)
+        mx_save_file_in_client(info, obj);
+    else if (type == MX_AUTH_TYPE_V || type == MX_AUTH_TYPE_NV)
+        input_authentification(info, obj);
     else if (type == MX_LOAD_MORE_TYPE)
         load_history(info, obj);
     else if (type == MX_DELETE_MESSAGE_TYPE)
@@ -299,10 +327,14 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
         leave_room(info, obj);
     else if (type == MX_JOIN_ROOM_TYPE)
         join_room(info, obj);
+    else if (type == MX_CREATE_ROOM_TYPE)
+        join_room(info, obj);
     else if (type == MX_EDIT_PROFILE_TYPE)
         edit_profile(info, obj);
     else if (type == MX_SEARCH_ALL_TYPE)
         mx_search_all_client(info, obj);
+    else if (type == MX_DIRECT_MESSAGE_TYPE)
+        direct_message(info, obj);
     return 0;
 }
 
@@ -316,18 +348,12 @@ void *mx_process_input_from_server(void *taken_info) {
 
     while (1) { // read all input from server
         rc = tls_read(info->tls_client, buffer, sizeof(buffer));    // get json
-        if (rc == -1) {  // lost connection
-            mx_reconect_client(info);
-//            tls_close(info->tls_client);
-//            tls_free(info->tls_client);
-//            mx_tls_config_client(info);
-//            info->socket = mx_connect_client(info);
-//            mx_make_tls_connect_client(info); // tls connect and handshake
-//            printf("tls connection error\n");
-//            mx_make_tls_connect_client(info);
-//            mx_err_exit("tls connection error\n"); // logout!!!
+        if (rc == -1) {
+            if (mx_reconnect_client(info))
+                break;
+            //send autentification json
         }
-        if (rc != 0) {
+        else if (rc != 0) {
             new_json = json_tokener_parse_ex(tok, buffer, rc);
             jerr = json_tokener_get_error(tok);
             if (jerr == json_tokener_success) {
