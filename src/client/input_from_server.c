@@ -353,7 +353,7 @@ void *mx_process_input_from_server(void *taken_info) {
                 break;
             //send autentification json
         }
-        if (rc != 0) {
+        else if (rc != 0) {
             new_json = json_tokener_parse_ex(tok, buffer, rc);
             jerr = json_tokener_get_error(tok);
             if (jerr == json_tokener_success) {

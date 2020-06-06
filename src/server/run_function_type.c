@@ -15,6 +15,14 @@ void mx_send_json_to_all_in_room(t_server_info *info, json_object *json_obj) {
     }
 }
 
+void run3(t_server_info *info, t_socket_list *csl, int* return_value,\
+                                                            int type) {
+    if (type == MX_DELETE_ACCOUNT_TYPE)
+        *return_value = mx_delete_acc(info, csl->obj);
+    else if (type == MX_RECONNECTION_TYPE)
+        *return_value = mx_reconnection(info, csl);
+}
+
 void run2(t_server_info *info, t_socket_list *csl, int* return_value,\
                                                             int type) {
     if (type == MX_DELETE_MESSAGE_TYPE)
@@ -35,8 +43,8 @@ void run2(t_server_info *info, t_socket_list *csl, int* return_value,\
         *return_value = mx_create_room_server(info, csl, csl->obj);
     else if (type == MX_DIRECT_MESSAGE_TYPE)
         *return_value = mx_direct_message(info, csl, csl->obj);
-    else if (type == MX_DELETE_ACCOUNT_TYPE)
-        *return_value = mx_delete_acc(info, csl->obj);
+    else
+        run3(info, csl, return_value, type);
 }
 
 int mx_run_function_type(t_server_info *info, t_socket_list *csl) {

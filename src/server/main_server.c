@@ -17,6 +17,13 @@ static void init_db(t_server_info *info) {
     }
 }
 
+static void zero_sockets(t_server_info *info) {
+    char command[1024];
+
+    command[sprintf(command, "UPDATE users SET socket='0' WHERE NOT socket='0';")] = 0;
+    sqlite3_exec(info->db, command, NULL, NULL, NULL);
+}
+
 int main(int argc, char **argv) {
     t_server_info *info = NULL;
     struct servent *servent;
@@ -41,6 +48,7 @@ int main(int argc, char **argv) {
     // }
     printf("Configuring demon ++...\n");
     init_db(info);
+    zero_sockets(info);
     create_download_folder();
     if (mx_start_server(info) == -1) {
         printf("error = %s\n", strerror(errno));
