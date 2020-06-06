@@ -166,7 +166,7 @@ long mx_save_audio(t_audio *data) {
     };
     char file_name[100];
 
-    snprintf(file_name, 100, "./Uchat_downloads/rec_massage:%d.aif", rand());  //rand -> replace by message id
+    snprintf(file_name, 100, "./Uchat_downloads/rec_massage%d.aif", rand());  //rand -> replace by message id
     printf("start save audio\n");
     SNDFILE *outfile = sf_open(file_name, SFM_WRITE, &sfinfo);
     if (!outfile) {
