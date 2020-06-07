@@ -1,72 +1,74 @@
 #include "uchat.h"
 
-static void init_create_entry (t_client_info *info, GtkWidget *box) {
-    GtkWidget *box1 = gtk_box_new(FALSE, 0);
-
-    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
-    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
-    info->data->create_room->name_entry = gtk_entry_new();
-    gtk_widget_set_size_request(info->data->create_room->name_entry, 200, -1);
-    gtk_entry_set_max_length (GTK_ENTRY (info->data->create_room->name_entry), 50);
-    gtk_entry_set_placeholder_text (GTK_ENTRY (info->data->create_room->name_entry), "Write room name");
-    gtk_editable_select_region (GTK_EDITABLE (info->data->create_room->name_entry),
-                                0, gtk_entry_get_text_length (GTK_ENTRY (info->data->create_room->name_entry)));
-    gtk_box_pack_start (GTK_BOX (box1), info->data->create_room->name_entry, TRUE, FALSE, 0);
-    gtk_widget_show(info->data->create_room->name_entry);
-    gtk_widget_show(box1);
+static int mx_notebook_prepend(t_note *note) {
+    gtk_notebook_append_page(GTK_NOTEBOOK(note->notebook), note->box, note->label);
+    gtk_notebook_reorder_child(GTK_NOTEBOOK(note->notebook), note->box, note->position);
+    gtk_notebook_set_current_page (GTK_NOTEBOOK(note->notebook), note->position);
+    return 0;
 }
 
-static void init_create_combo_box (t_client_info *info, GtkWidget *box) {
-    GtkWidget *box1 = gtk_box_new(FALSE, 0);
+static char *trim_name (t_room *room) {
+    char *str = NULL;
+    char *tmp = NULL;
 
-    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
-    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
-    info->data->create_room->selection = gtk_combo_box_text_new();
-    gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(info->data->create_room->selection), "0", "Public");
-    gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(info->data->create_room->selection), "1", "Private");
-    gtk_combo_box_set_active (GTK_COMBO_BOX(info->data->create_room->selection), 0);
-    gtk_box_pack_start (GTK_BOX (box1), info->data->create_room->selection, TRUE, FALSE, 0);
-    gtk_widget_set_size_request(info->data->create_room->selection, 200, -1);
-    gtk_widget_show(info->data->create_room->selection);
-    gtk_widget_show(box1);
+    if (strlen(room->name) > 15) {
+        str = strndup(room->name, 12);
+        tmp = mx_strjoin(str, "...");
+        free (str);
+        str = strdup (tmp);
+        free(tmp);
+    }
+    else 
+        str = strdup(room->name);
+    return str;
 }
 
-static void init_create_buttons (t_client_info *info, GtkWidget *box) {
-    GtkWidget *box1 = gtk_box_new(FALSE, 0);
+static void show_room (t_client_info *info, t_room *room, int position) {
+    char *str = trim_name (room);
+    GtkWidget *label = gtk_label_new(str);
+    t_note *note = (t_note *)malloc(sizeof(t_note));
 
-    gtk_widget_set_halign (box1, GTK_ALIGN_CENTER);
-    gtk_box_pack_start (GTK_BOX (box), box1, TRUE, FALSE, 0);
-    info->data->create_room->create_button = gtk_button_new_with_label("OK");
-    g_signal_connect(G_OBJECT(info->data->create_room->create_button), "clicked", G_CALLBACK(mx_create_room_callback), info);
-    gtk_box_pack_start (GTK_BOX (box1), info->data->create_room->create_button, TRUE, FALSE, 0);
-    gtk_widget_set_size_request(info->data->create_room->create_button, 100, -1);
-    gtk_widget_show(info->data->create_room->create_button);
-    info->data->create_room->cancel_button = gtk_button_new_with_label("Cancel");
-    g_signal_connect(G_OBJECT(info->data->create_room->cancel_button), "clicked", G_CALLBACK(mx_close_creation_callback1), info);
-    gtk_box_pack_start (GTK_BOX (box1), info->data->create_room->cancel_button, TRUE, FALSE, 0);
-    gtk_widget_set_size_request(info->data->create_room->cancel_button, 100, -1);
-    gtk_widget_show(info->data->create_room->cancel_button);
-    gtk_widget_show(box1);
+    note->notebook = info->data->notebook;
+    note->box = room->room_box;
+    note->label = label;
+    note->position = position;
+    g_idle_add ((GSourceFunc)mx_notebook_prepend, note);
 }
 
-void mx_init_create (t_client_info *info) { 
-    GtkWidget *main_box = NULL;
-    GtkWidget *fixed = NULL;
-    GtkWidget *exit_box = NULL;
-    GtkWidget *box = NULL;
+static t_room *create_room (t_client_info *info, json_object *room_data, int position) {
+    t_room *room =  (t_room *)malloc(sizeof(t_room));
+    t_all *data = (t_all *)malloc(sizeof(t_all));
 
-    info->data->create_room = (t_create *)malloc(sizeof(t_create));
-    info->data->create_room->main_box = gtk_box_new(FALSE, 0);
-    gtk_fixed_put(GTK_FIXED(info->data->general_box), info->data->create_room->main_box, 0, 0);
-    gtk_widget_set_size_request(info->data->create_room->main_box, 
-                                gtk_widget_get_allocated_width (info->data->window), 
-                                gtk_widget_get_allocated_height (info->data->window));
-    main_box = mx_init_menu_main_box(info, info->data->create_room->main_box, "profile");
-    fixed = mx_init_menu_fixed (main_box);
-    box = mx_init_menu_box (fixed, 250);
-    init_create_entry (info, box);
-    init_create_combo_box (info, box);
-    init_create_buttons (info, box);
-    exit_box = mx_init_menu_exit_box (info, info->data->create_room->main_box, 
-                                    mx_close_creation_callback);
+    mx_init_room (info, room, position, room_data);
+    mx_init_room_data (info, room ,room_data, data);
+    mx_init_room_box (room);
+    mx_init_room_menu (room, data);
+    mx_init_room_header (room);
+    mx_init_room_window (room);
+    mx_init_room_messsage_box (room);
+    mx_load_room_history (data);
+    show_room (info, room, position);
+    return room;
+}
+
+void mx_push_room(t_client_info *info, json_object *room_data, int position) {
+    t_room *tmp;
+    t_room *p;
+    t_room **list = &info->data->rooms;
+
+    if (!list)
+        return;
+    tmp = create_room(info, room_data, position);  // Create new
+    if (!tmp)
+        return;
+    p = *list;
+    if (*list == NULL) {  // Find Null-node
+        *list = tmp;
+        return;
+    }
+    else {
+        while (p->next != NULL)  // Find Null-node
+            p = p->next;
+        p->next = tmp;
+    }
 }

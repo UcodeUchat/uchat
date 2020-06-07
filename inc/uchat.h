@@ -410,7 +410,6 @@ int mx_tls_config_client(t_client_info *info);
 int mx_make_tls_connect_client(t_client_info *info);
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_process_message_in_client(t_client_info *info);
-void authentification(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);
 void sleep_ms (int milliseconds);
 t_message *mx_find_message(t_message *messages, int id);
@@ -422,7 +421,6 @@ int mx_show_widget(GtkWidget *widget);
 int mx_destroy_widget(GtkWidget *widget);
 void mx_push_message(t_client_info *info, t_room *room, json_object *new_json);
 t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new_json, int order);
-t_room *mx_create_room(t_client_info *info,  json_object *room_data, int position);
 void mx_push_room(t_client_info *info, json_object *room_data, int position);
 void mx_create (t_client_info *info);
 void mx_send_empty_json(struct tls *tls_socket);
@@ -480,6 +478,25 @@ void mx_init_stickers (t_client_info *info, GtkWidget *box);
 
 void mx_init_search (t_client_info *info);
 void mx_search_callback (GtkWidget *widget, t_client_info *info);
+
+void mx_scroll_callback (GtkWidget *widget, t_all *data);
+void mx_leave_callback (GtkWidget *widget, t_all *data);
+void mx_room_menu_callback(GtkWidget *widget, GdkEventButton *event, GtkWidget *menu);
+
+t_room *mx_find_room_position(t_room *rooms, int position);
+void mx_init_room_data (t_client_info *info, t_room *room, json_object *room_data, t_all *data);
+void mx_init_room_box (t_room *room);
+void mx_init_room_header (t_room *room);
+void mx_init_room_window (t_room *room);
+void mx_init_room_messsage_box (t_room *room);
+void mx_load_room_history (t_all *data);
+void mx_init_room (t_client_info *info ,t_room *room, int position, json_object *room_data);
+void mx_init_room_menu(t_room *room, t_all *data);
+
+void mx_item_callback (GtkWidget *widget, t_stik *stik);
+void mx_choose_sticker_callback(GtkWidget *widget, GtkWidget *menu);
+void mx_url_callback (GtkWidget *widget, GdkEventButton *event, void *data);
+void mx_logout_client(t_client_info *info);
 
 // functions
 int mx_detect_file_extention(char *filename);
