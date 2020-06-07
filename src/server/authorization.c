@@ -1,10 +1,10 @@
 #include "uchat.h"
 
 static int search_email(void *data, int argc, char **argv, char **col_name) {
-    (void)col_name;
-    (void)argc;
     char **email = (char **)data;
-    if (argv[0]) {
+
+    (void)col_name;
+    if (argc > 0) {
         if (atoi(argv[0]) == 1 && argv[1] != NULL) {
             *email = strdup(argv[1]);
             return 0;
@@ -33,26 +33,6 @@ static char *get_user_name(t_server_info *i, json_object *js) {
     return login;
 }
 
-void email_notify(t_server_info *i, json_object *js) {
-    int id = json_object_get_int(json_object_object_get(js, "user_id"));
-    char *login = get_user_name(i, js);
-    char *command = malloc(1024);
-    char *email = NULL;
-    sprintf(command, "SELECT user_notifications.email, \
-            users.email FROM user_notifications, users \
-            WHERE  user_notifications.user_id='%d' and users.id='%d'", id, id);
-    if (sqlite3_exec(i->db, command, search_email, &email, 0) == SQLITE_OK) {
-        printf("%s\n", email);
-        mx_send_mail(login, email, "Someone logged in your account in Uchat");
-        mx_strdel(&email);
-    }
-    else {
-        printf("fail\n");//!!!!!
-    }
-    mx_strdel(&login);
-    mx_strdel(&command);
-}
-
 static int get_user_id(void *p, int argc, char **argv, char **col_name) {
     int *id = (int *)p;
 
@@ -63,26 +43,41 @@ static int get_user_id(void *p, int argc, char **argv, char **col_name) {
     return 0;
 }
 
-int mx_add_to_db(t_server_info *i, const char *l, const char *pa, int us_id) {
+void mx_email_notify(t_server_info *i, json_object *js) {
+    int id = json_object_get_int(json_object_object_get(js, "user_id"));
+    char *login = get_user_name(i, js);
     char *command = malloc(1024);
-    char *command1 = malloc(1024);
-    char *command2 = malloc(1024);
-    
+    char *email = NULL;
+
+    sprintf(command, "SELECT user_notifications.email, \
+            users.email FROM user_notifications, users \
+            WHERE  user_notifications.user_id='%d' and users.id='%d'", id, id);
+    if (sqlite3_exec(i->db, command, search_email, &email, 0) == SQLITE_OK) {
+        printf("%s\n", email);
+        mx_send_mail(login, email, "Someone logged in your account in Uchat");
+        mx_strdel(&email);
+    }
+    else
+        fprintf(stderr, "email is not exist\n");
+    mx_strdel(&login);
+    mx_strdel(&command);
+}
+
+int mx_add_to_db(t_server_info *i, const char *l, const char *pa, int us_id) {
+    char command[1024];
+
     sprintf(command, "insert into users (socket, login, password, access)\
                 values (0,'%s', '%s', 1);\nSELECT last_insert_rowid()", l, pa);
     if (sqlite3_exec(i->db, command, get_user_id, &us_id, 0) != SQLITE_OK)
         return -1;
-    mx_strdel(&command);
-    sprintf(command1, "insert into room_user (room_id, user_id)\
+    sprintf(command, "insert into room_user (room_id, user_id)\
                 values (0,%d);", us_id);
-    if (sqlite3_exec(i->db, command1, NULL, NULL, 0) != SQLITE_OK)
+    if (sqlite3_exec(i->db, command, NULL, NULL, 0) != SQLITE_OK)
         return -1;
-    mx_strdel(&command1);
-    sprintf(command2, "insert into user_notifications (user_id, visual, audio,\
+    sprintf(command, "insert into user_notifications (user_id, visual, audio,\
             email) values (%d, 0, 0, 0);", us_id);
-    if (sqlite3_exec(i->db, command2, NULL, NULL, 0) != SQLITE_OK)
+    if (sqlite3_exec(i->db, command, NULL, NULL, 0) != SQLITE_OK)
         return -1;
-    mx_strdel(&command2);
     return 1;
 }
 

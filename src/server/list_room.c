@@ -15,6 +15,50 @@ static int get_rooms(void *array, int argc, char **argv, char **col_name) {
 	return 0;
 }
 
+static void set_file(json_object **add_info, json_object **data, char **argv) {
+	char *ext = strdup(argv[3]);
+
+	while (mx_get_char_index(ext, '.') >= 0) {
+		mx_strdel(&ext);
+		ext = strdup(argv[3] + mx_get_char_index(argv[3], '.') + 1);
+	}
+	if (strcmp(ext, "jpg") == 0 || strcmp(ext, "png") == 0
+		|| strcmp(ext, "gif") == 0) {
+		*data = json_object_new_string(argv[3]);
+		*add_info = json_object_new_int(2);
+	}
+	else if (strcmp(ext, "aif") == 0) {
+		*data = json_object_new_string(argv[3]);
+		*add_info = json_object_new_int(4);
+	}
+	else {
+		*data = json_object_new_string(argv[3] /*+ 20*/);
+		*add_info = json_object_new_int(1);
+	}
+}
+
+static void set_msg(json_object **add_info, json_object **data, char **argv) {
+	if (strcmp(argv[4], "mes") == 0)
+		*add_info = json_object_new_int(0);
+	else if (strcmp(argv[4], "stik") == 0)
+		*add_info = json_object_new_int(3);
+	*data = json_object_new_string(argv[3]);
+}
+
+static void set_data_to_room_json(json_object **message, json_object **id,
+						   json_object **user_id, json_object **data) {
+	json_object_object_add(*message, "id", *id);
+	json_object_object_add(*message, "user_id", *user_id);
+	json_object_object_add(*message, "data", *data);
+}
+
+static void set_data_to_room_json_2(json_object **message, json_object **login,
+							 json_object **add_info, void **messages) {
+	json_object_object_add(*message, "login", *login);
+	json_object_object_add(*message, "add_info", *add_info);
+	json_object_array_add(*(struct json_object **)messages, *message);
+}
+
 int mx_get_rooms_data(void *messages, int argc, char **argv, char **col_name) {
 	json_object *message = json_object_new_object();
 	json_object *id = json_object_new_int(atoi(argv[0]));
@@ -23,46 +67,17 @@ int mx_get_rooms_data(void *messages, int argc, char **argv, char **col_name) {
 	json_object *login = json_object_new_string(argv[8]);
 	json_object *add_info = NULL;
 
-	if (argv[0] == NULL) {
+	if (argv[0] == NULL)
 		return 1;
-	}
 	(void)argc;
 	(void)col_name;
-	if (strcmp(argv[4], "file") == 0) {
-		char *extention = strdup(argv[3]);
-
-	    while (mx_get_char_index(extention, '.') >= 0) {
-	        char *tmp = strdup(extention + mx_get_char_index(extention, '.') + 1);
-	        free(extention);
-	        extention = strdup(tmp);
-	        free(tmp); 
-	    }
-	    if (strcmp(extention, "jpg") == 0 || strcmp(extention, "png") == 0 || strcmp(extention, "gif") == 0) {
-	    	data = json_object_new_string(argv[3]);
-			add_info = json_object_new_int(2);
-	    }
-	    else if (strcmp(extention, "aif") == 0) {
-            data = json_object_new_string(argv[3]);
-            add_info = json_object_new_int(4);
-        }
-	    else {
-			data = json_object_new_string(argv[3] /*+ 20*/);
-			add_info = json_object_new_int(1);
-		}
-	}
+	if (strcmp(argv[4], "file") == 0)
+	    set_file(&add_info, &data, argv);
 	else {
-		if (strcmp(argv[4], "mes") == 0)
-			add_info = json_object_new_int(0);
-		else if (strcmp(argv[4], "stik") == 0)
-			add_info = json_object_new_int(3);
-		data = json_object_new_string(argv[3]);
+		set_msg(&add_info, &data, argv);
 	}
-	json_object_object_add(message, "id", id);
-	json_object_object_add(message, "user_id", user_id);
-	json_object_object_add(message, "data", data);
-	json_object_object_add(message, "login", login);
-	json_object_object_add(message, "add_info", add_info);
-	json_object_array_add((struct json_object *)messages, message);
+	set_data_to_room_json(&message, &id, &user_id, &data);
+	set_data_to_room_json_2(&message, &login, &add_info, &messages);
 	return 0;
 }
 
@@ -70,16 +85,14 @@ void mx_get_rooms(t_server_info *info, json_object *js) {
 	char *req = mx_strnew(1024);
 	int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
 	json_object *array = json_object_new_array();
+	int n_rooms;
 
 	json_object_object_add(js, KEY10, array);
     sprintf(req, "select distinct user_id, rooms.id, rooms.name, rooms.access from room_user, rooms \
     			where rooms.id=room_user.room_id and user_id=%d;", user_id);
-    printf("%s\n", req);
-    if (sqlite3_exec(info->db, req, get_rooms, array, 0) != SQLITE_OK) {
-        printf("Work rooms\n");
+    if (sqlite3_exec(info->db, req, get_rooms, array, 0) != SQLITE_OK)
         return;
-    }
-    int n_rooms = json_object_array_length(array);
+    n_rooms = json_object_array_length(array);
     for (int i = 0; i < n_rooms; i++) {
         json_object *room_data = json_object_array_get_idx(array, i);
         json_object *messages = json_object_new_array();

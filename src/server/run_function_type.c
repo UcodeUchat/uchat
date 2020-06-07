@@ -2,29 +2,30 @@
 
 void mx_send_json_to_all_in_room(t_server_info *info, json_object *json_obj) {
     int *sockets_online = mx_get_users_sock_in_room(&info,
-        json_object_get_int(json_object_object_get(json_obj, "room_id")));
+        json_object_get_int(json_object_object_get(json_obj,
+        "room_id")));
     t_socket_list *tls_list = NULL;
     const char *json_string = json_object_to_json_string(json_obj);
 
     for (int i = 0; i < info->wdb->i; i++) {
         tls_list = mx_find_socket_elem(info->socket_list, sockets_online[i]);
         if (tls_list) {
-            mx_save_send(&tls_list->mutex, tls_list->tls_socket, json_string,\
-                         strlen(json_string));
+            mx_save_send(&tls_list->mutex, tls_list->tls_socket, json_string,
+                strlen(json_string));
         }
     }
 }
 
-void run3(t_server_info *info, t_socket_list *csl, int* return_value,\
-                                                            int type) {
+static void run3(t_server_info *info, t_socket_list *csl, int* return_value,
+                 int type) {
     if (type == MX_DELETE_ACCOUNT_TYPE)
         *return_value = mx_delete_acc(info, csl->obj);
     else if (type == MX_RECONNECTION_TYPE)
         *return_value = mx_reconnection(info, csl);
 }
 
-void run2(t_server_info *info, t_socket_list *csl, int* return_value,\
-                                                            int type) {
+static void run2(t_server_info *info, t_socket_list *csl, int* return_value,
+                 int type) {
     if (type == MX_DELETE_MESSAGE_TYPE)
         *return_value = mx_delete_message(info, csl, csl->obj);
     else if (type == MX_EDIT_MESSAGE_TYPE)
