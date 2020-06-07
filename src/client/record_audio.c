@@ -2,7 +2,7 @@
 
 static t_audio * init_audio_data() {
     t_audio *data = malloc(sizeof(t_audio));
-    data->format_type = paFloat32;  //r
+    data->format_type = PA_SAMPLE_TYPE;  //r
     data->number_channels = 0;   //remove
     data->sample_rate = SAMPLE_RATE;
     data->size = 0;
@@ -122,14 +122,16 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
 
     data->number_channels = numChannels;
 //    data->number_channels = 1;
-    input_parameters.channelCount = numChannels;
-    input_parameters.sampleFormat = paFloat32;
+    input_parameters.channelCount = numChannels;  // 2 stereo
+    input_parameters.sampleFormat = PA_SAMPLE_TYPE;
     input_parameters.suggestedLatency = inputInfo->defaultLowInputLatency;
 //            Pa_GetDeviceInfo(input_parameters.device)->defaultLowInputLatency;
     input_parameters.hostApiSpecificStreamInfo = NULL;
+
     err = Pa_OpenStream(stream, &input_parameters, NULL, data->sample_rate, FRAMES_PER_BUFFER, paClipOff, NULL, NULL);
     if (err)
         return mx_exit_stream(data, err);
+
     sample_block->size = FRAMES_PER_BUFFER * sizeof(float) * data->number_channels;  //number bytes
     sample_block->snippet = malloc(sample_block->size);
 
@@ -173,7 +175,8 @@ long mx_save_audio(t_audio *data) {
         printf("error outfile =%d\n", sf_error(outfile));
         return -1;
     }
-    long wr = sf_writef_float(outfile, data->rec_samples, data->size / 8);
+    long wr = sf_writef_float(outfile, data->rec_samples, data->size / sizeof(SAMPLE));
+//    long wr = sf_writef_float(outfile, data->rec_samples, data->size / 8);
     err = data->size - wr;
     printf("data to write to file =%zu\n", data->size);
     sf_write_sync(outfile);

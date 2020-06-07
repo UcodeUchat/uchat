@@ -72,7 +72,7 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
         start_point = 0;
     }  // start play with the beginning
 
-    if (duration_t) {
+    if (duration_t) {  // время проигрывания
         duration = atof(duration_t);
         end_point = (sf_count_t) (duration * s_info.samplerate + start_point);
         end_point = (end_point < length) ? end_point : length;

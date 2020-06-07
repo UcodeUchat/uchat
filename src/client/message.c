@@ -40,7 +40,7 @@ void *play_sound_pthread(void *taken_info) {
     (void)file;
 
 //    mx_play_sound_file("./audio/moby.aif", "0", NULL);
-    mx_play_sound_file(mx_strjoin("./Uchat_downloads/", file), "0", NULL);
+    mx_play_sound_file2(mx_strjoin("./Uchat_downloads/", "rec_massage2005815166.aif"), "0", NULL);
     return 0;
 }
 
@@ -351,7 +351,8 @@ t_message *mx_create_message (t_client_info *info, t_room *room, json_object *ne
 
 void *sound_thread (void *data) {
     (void)data;
-    mx_play_sound_file("audio/moby.aif", "0", "5");
+//    mx_play_sound_file("audio/moby.aif", "0", "5");
+    mx_play_sound_file("audio/ message_receive.aiff", "0", "1");
     return 0;
 }
 

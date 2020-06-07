@@ -14,7 +14,7 @@
 #define SAMPLE_RATE  (44100)
 #define FRAMES_PER_BUFFER (512)
 #define NUM_SECONDS     (5)
-#define NUM_CHANNELS    (2)
+#define NUM_CHANNELS    (1)
 /* #define DITHER_FLAG     (paDitherOff) */
 #define DITHER_FLAG     (0) /**/
 /** Set to 1 if you want to capture the recording to a file. */
@@ -43,6 +43,7 @@ typedef unsigned char SAMPLE;
 #define PRINTF_S_FORMAT "%d"
 #endif
 
+//static  int NUM_CHANNELS;
 typedef struct
 {
     int          frameIndex;  /* Index into sample array. */
@@ -172,33 +173,62 @@ int main(void)
     SAMPLE              max, val;
     double              average;
 
-    printf("patest_record.c\n"); fflush(stdout);
+    PaStreamParameters input_parameters;
+//    PaStreamParameters output_parameters;
+    const PaDeviceInfo* inputInfo;
+    const PaDeviceInfo* outputInfo;
+    int numChannels;
 
+
+    printf("patest_record.c\n"); fflush(stdout);
     data.maxFrameIndex = totalFrames = NUM_SECONDS * SAMPLE_RATE; /* Record for a few seconds. */
     data.frameIndex = 0;
     numSamples = totalFrames * NUM_CHANNELS;
     numBytes = numSamples * sizeof(SAMPLE);
     data.recordedSamples = (SAMPLE *) malloc( numBytes ); /* From now on, recordedSamples is initialised. */
-    if( data.recordedSamples == NULL )
-    {
+    printf("1\n");
+    if( data.recordedSamples == NULL ) {
         printf("Could not allocate record array.\n");
         goto done;
     }
-    for( i=0; i<numSamples; i++ ) data.recordedSamples[i] = 0;
+
+    for( i=0; i<numSamples; i++ ) {
+        data.recordedSamples[i] = 0;
+    }
+    printf("2\n");
 
     err = Pa_Initialize();
     if( err != paNoError ) goto done;
+    printf("3\n");
+
+    ///////////////
+    input_parameters.device = Pa_GetDefaultInputDevice();
+    printf( "Input device # %d.\n", input_parameters.device);
+    inputInfo = Pa_GetDeviceInfo(input_parameters.device);
+
+    printf( "    Name: %s\n", inputInfo->name );
+    printf( "      LL: %g s\n", inputInfo->defaultLowInputLatency);
+    printf( "      HL: %g s\n", inputInfo->defaultHighInputLatency);
+    numChannels = inputInfo->maxInputChannels < outputInfo->maxOutputChannels
+                  ? inputInfo->maxInputChannels : outputInfo->maxOutputChannels;
+    printf( "Num channels = %d.\n", numChannels );
+//    NUM_CHANNELS = numChannels;
+
+
+    ////////////////
 
     inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
     if (inputParameters.device == paNoDevice) {
         fprintf(stderr,"Error: No default input device.\n");
         goto done;
     }
-    inputParameters.channelCount = 2;                    /* stereo input */
+    inputParameters.channelCount = NUM_CHANNELS;                    /* stereo input */
     inputParameters.sampleFormat = PA_SAMPLE_TYPE;
     inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
     inputParameters.hostApiSpecificStreamInfo = NULL;
 
+    printf("4\n");
+    err = Pa_Initialize();
     /* Record some audio. -------------------------------------------- */
     err = Pa_OpenStream(
               &stream,
@@ -213,15 +243,15 @@ int main(void)
 
     err = Pa_StartStream( stream );
     if( err != paNoError ) goto done;
-    printf("\n=== Now recording!! Please speak into the microphone. ===\n"); fflush(stdout);
+    printf("\n=== Now recording!! Please speak into the microphone. ===\n");
+    fflush(stdout);
 
-    while( ( err = Pa_IsStreamActive( stream ) ) == 1 )
-    {
+    while( ( err = Pa_IsStreamActive( stream ) ) == 1 ) {
         Pa_Sleep(1000);
-        printf("index = %d\n", data.frameIndex ); fflush(stdout);
+        printf("index = %d\n", data.frameIndex );
+        fflush(stdout);
     }
     if( err < 0 ) goto done;
-
     err = Pa_CloseStream( stream );
     if( err != paNoError ) goto done;
 
@@ -289,7 +319,6 @@ int main(void)
 
 
 #endif
-/*
     // Playback recorded data.  --------------------------------------------
     data.frameIndex = 0;
 
@@ -322,7 +351,8 @@ int main(void)
         
         printf("Waiting for playback to finish.\n"); fflush(stdout);
 
-        while( ( err = Pa_IsStreamActive( stream ) ) == 1 ) Pa_Sleep(100);
+        while( ( err = Pa_IsStreamActive( stream ) ) == 1 )
+            Pa_Sleep(100);
         if( err < 0 ) goto done;
         
         err = Pa_CloseStream( stream );
@@ -331,7 +361,6 @@ int main(void)
         printf("Done.\n"); fflush(stdout);
     }
 
-    */
 
 done:
     Pa_Terminate();

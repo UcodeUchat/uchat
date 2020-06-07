@@ -15,8 +15,31 @@
 #define SAMPLE_RATE       (44100)  // в 1 секунде записи содержится 44100 семплов.
 #define FRAMES_PER_BUFFER   (1024)
 #define SAMPLE_SILENCE  (0.0f)
-#define NUM_SECONDS     (2)
+#define NUM_SECONDS     (5)
 #define BUFFER_LEN      1024
+
+/* Select sample format. */
+#if 1
+#define PA_SAMPLE_TYPE  paFloat32
+typedef float SAMPLE;
+#define SAMPLE_SILENCE  (0.0f)
+#define PRINTF_S_FORMAT "%.8f"
+#elif 1
+#define PA_SAMPLE_TYPE  paInt16
+typedef short SAMPLE;
+#define SAMPLE_SILENCE  (0)
+#define PRINTF_S_FORMAT "%d"
+#elif 0
+#define PA_SAMPLE_TYPE  paInt8
+typedef char SAMPLE;
+#define SAMPLE_SILENCE  (0)
+#define PRINTF_S_FORMAT "%d"
+#else
+#define PA_SAMPLE_TYPE  paUInt8
+typedef unsigned char SAMPLE;
+#define SAMPLE_SILENCE  (128)
+#define PRINTF_S_FORMAT "%d"
+#endif
 
 typedef struct s_audio {
     uint16_t format_type;
@@ -114,7 +137,15 @@ static int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_
     input_parameters.suggestedLatency = inputInfo->defaultLowInputLatency;
 //            Pa_GetDeviceInfo(input_parameters.device)->defaultLowInputLatency;
     input_parameters.hostApiSpecificStreamInfo = NULL;
-    err = Pa_OpenStream(stream, &input_parameters, NULL, data->sample_rate, FRAMES_PER_BUFFER, paClipOff, NULL, NULL);
+
+    err = Pa_OpenStream(stream,
+                        &input_parameters,  // input Parameters
+                        NULL,               // output Parameters
+                        data->sample_rate,
+                        FRAMES_PER_BUFFER,
+                        paClipOff,
+                        NULL,
+                        NULL);
     if (err)
         return mx_exit_stream(data, err);
     sample_block->size = FRAMES_PER_BUFFER * sizeof(float) * data->number_channels;  //number bytes

@@ -78,6 +78,7 @@ SRC_CLIENT = main_client.c \
 	work_with_files_list_in_client.c \
 	record_audio.c \
 	play_audio.c \
+	play_audio2.c \
 	send_empty_json.c \
 
 # SRC_HELP = $(wildcard *.c)
