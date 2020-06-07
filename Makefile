@@ -84,8 +84,14 @@ SRC_CLIENT = main_client.c \
 	init_search.c \
 	init_stickers.c \
 	load_profile.c \
+	load_profile_functions.c \
+	load_profile_functions1.c \
+	load_profile_functions2.c \
 	message.c \
 	search.c \
+	search_functions.c \
+	search_functions1.c \
+	search_functions2.c \
 	callbacks1.c \
 	callbacks2.c \
 	callbacks3.c \
@@ -93,6 +99,9 @@ SRC_CLIENT = main_client.c \
 	callbacks5.c \
 	callbacks6.c \
 	callbacks7.c \
+	callbacks8.c \
+	callbacks9.c \
+	callbacks10.c \
 	work_with_files_list_in_client.c \
 	record_audio.c \
 	play_audio.c \

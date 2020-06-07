@@ -498,6 +498,30 @@ void mx_choose_sticker_callback(GtkWidget *widget, GtkWidget *menu);
 void mx_url_callback (GtkWidget *widget, GdkEventButton *event, void *data);
 void mx_logout_client(t_client_info *info);
 
+void mx_show_etc (t_client_info *info, json_object *new_json, GtkWidget *profile);
+void mx_show_global_settings (t_client_info *info, json_object *new_json, GtkWidget *profile);
+void mx_show_title (const char *title, GtkWidget *box);
+void mx_show_login (t_client_info *info, json_object *new_json, GtkWidget *profile);
+void mx_show_email (t_client_info *info, int id, json_object *new_json, GtkWidget *profile);
+void mx_show_id (t_client_info *info, int id, GtkWidget *profile);
+void mx_show_name (t_client_info *info, int id, json_object *new_json, GtkWidget *profile);
+void mx_show_exit (t_client_info *info,  GtkWidget *profile);
+void mx_edit_name_callback (GtkWidget *widget, t_client_info *info);
+void mx_save_name_callback (GtkWidget *widget, t_client_info *info);
+void mx_edit_email_callback (GtkWidget *widget, t_client_info *info);
+void mx_save_email_callback (GtkWidget *widget, t_client_info *info);
+void mx_close_profile_callback1 (GtkWidget *widget, 
+    GdkEventButton *event, t_client_info *info);
+void mx_close_profile_callback (GtkWidget *widget, t_client_info *info);
+void mx_show_empty_result (GtkWidget *room_box, char *title);
+void mx_show_users_result (GtkWidget *room_box, int n_users, 
+                        json_object *users, t_client_info *info);
+void mx_show_rooms_result (GtkWidget *room_box, int n_rooms, 
+                        json_object *rooms, t_client_info *info);
+GtkWidget *mx_init_search_h_box (GtkWidget *room_box);
+void mx_join_callback (GtkWidget *widget, t_all *data);
+GtkWidget *mx_init_content_box (GtkWidget *v_box, char *title);
+
 // functions
 int mx_detect_file_extention(char *filename);
 int tls_send(struct tls *tls_socket, const char *content, int size);

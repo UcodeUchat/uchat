@@ -38,6 +38,7 @@ void email_notify(t_server_info *i, json_object *js) {
     char *login = get_user_name(i, js);
     char *command = malloc(1024);
     char *email = NULL;
+    
     sprintf(command, "SELECT user_notifications.email, \
             users.email FROM user_notifications, users \
             WHERE  user_notifications.user_id='%d' and users.id='%d'", id, id);
