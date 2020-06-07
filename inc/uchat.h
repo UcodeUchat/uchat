@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sqlite3.h>
-#include <stdarg.h>
+#include <stdarg.h> 
 #include <stdint.h>
 #include <syslog.h>
 #include <sys/event.h>
@@ -399,14 +399,15 @@ int mx_registration(t_server_info *i, t_socket_list *csl, json_object *js);
 int mx_add_to_db(t_server_info *i, const char *l, const char *pa, int us_id);
 int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
 
+
+
+
 // client
 int mx_start_client(t_client_info *info);
-
 int mx_reconnect_client(t_client_info *info);
 int mx_connect_client(t_client_info *info);
 int mx_tls_config_client(t_client_info *info);
 int mx_make_tls_connect_client(t_client_info *info);
-
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_process_message_in_client(t_client_info *info);
 void authentification(t_client_info *info);
@@ -425,15 +426,60 @@ t_room *mx_create_room(t_client_info *info,  json_object *room_data, int positio
 void mx_push_room(t_client_info *info, json_object *room_data, int position);
 void mx_create (t_client_info *info);
 void mx_send_empty_json(struct tls *tls_socket);
-
 //void mx_send_file_from_client(t_client_info *info);
 void mx_send_file_from_client(t_client_info *info, char *file_name);
 int mx_load_file(t_mes *msg);
 int mx_save_file_in_client(t_client_info *info, json_object *obj);
-
 t_file_list *mx_find_file_in_list(t_file_list *list, int id);
 int mx_add_file_to_list_in_client(t_file_list **list, int id, char *name, int file_size);
 void mx_pop_file_list_in_client(t_file_list **list, int id);
+
+void mx_init_login(t_client_info *info);
+void mx_init_main_title(t_client_info *info, GtkWidget *screen);
+void mx_enter_callback (GtkWidget *widget, t_client_info *info);
+void mx_reg_callback (GtkWidget *widget, t_client_info *info);
+
+void mx_init_reg(t_client_info *info);
+void mx_cancel_callback (GtkWidget *widget, t_client_info *info);
+void mx_send_data_callback (GtkWidget *widget, t_client_info *info);
+
+void mx_init_general (t_client_info *info);
+void mx_choose_file_callback(GtkWidget *widget, t_client_info *info);
+void mx_send_callback (GtkWidget *widget, t_client_info *info);
+void mx_edit_cancel_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info);
+void mx_record_callback (GtkWidget *widget, t_client_info *info);
+void mx_show_search_callback (GtkWidget *widget, t_client_info *info);
+void mx_menu_callback (GtkWidget *widget, t_client_info *info);
+void mx_init_notebook (t_client_info *info, GtkWidget *box);
+void mx_init_general_button (t_client_info *info, char *i_name, GtkWidget *box,
+                        void (*callback) (GtkWidget *widget, t_client_info *info));
+void mx_init_general_button_text (t_client_info *info, char *text, GtkWidget *box,
+                        void (*callback) (GtkWidget *widget, t_client_info *info));
+void mx_init_message_box (t_client_info *info, GtkWidget *box, 
+                    void (*callback) (GtkWidget *widget, t_client_info *info));
+
+void mx_init_menu (t_client_info *info);
+void mx_profile_callback (GtkWidget *widget, t_client_info *info);
+void mx_create_callback (GtkWidget *widget, t_client_info *info);
+void mx_logout_callback (GtkWidget *widget, t_client_info *info);
+void mx_delete_acc_callback(GtkWidget *widget, GtkWidget *answer_menu);
+void mx_close_menu_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info);
+void mx_yep_callback(GtkWidget *widget, t_client_info *info);
+GtkWidget *mx_init_menu_main_box (t_client_info *info, GtkWidget *parent, char *style);
+GtkWidget *mx_init_menu_fixed (GtkWidget *main_box);
+GtkWidget *mx_init_menu_box (GtkWidget *fixed, int size);
+GtkWidget *mx_init_menu_exit_box (t_client_info *info, GtkWidget *parent,
+                        void (*callback) (GtkWidget *widget, GdkEventButton *event, t_client_info *info));
+void mx_create_room_callback (GtkWidget *widget, t_client_info *info);
+void mx_close_creation_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info);
+void mx_close_creation_callback1 (GtkWidget *widget, t_client_info *info);
+
+void mx_init_create (t_client_info *info);
+
+void mx_init_stickers (t_client_info *info, GtkWidget *box);
+
+void mx_init_search (t_client_info *info);
+void mx_search_callback (GtkWidget *widget, t_client_info *info);
 
 // functions
 int mx_detect_file_extention(char *filename);

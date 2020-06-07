@@ -70,7 +70,15 @@ SRC_CLIENT = main_client.c \
 	save_file_in_client.c \
 	send_file_from_client.c \
 	input_from_server.c \
+	gui.c \
 	login.c \
+	reg.c \
+	general.c \
+	general_functions.c \
+	menu.c \
+	menu_functions.c \
+	create_room.c \
+	init_search.c \
 	load_profile.c \
 	message.c \
 	search.c \
