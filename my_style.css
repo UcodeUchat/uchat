@@ -76,6 +76,20 @@ button#entry:active {
 	background-color : #C0732F;
 }
 
+/*#audio_play {
+	color: black;
+	background: white;
+}
+
+button#audio_play:hover {
+
+}
+*/
+/*button#audio_play:active {
+	color: white;
+	background-color : #595959;
+}*/
+
 entry#entry:focus {
 	box-shadow: inset 0 0 0 1px DarkOrange;
 	border: 1px solid DarkOrange;

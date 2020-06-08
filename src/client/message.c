@@ -204,17 +204,59 @@ void sticker (t_message *node, const char *message) {
     gtk_box_pack_start (GTK_BOX (stick_box), item_image, FALSE, FALSE, 0);
 }
 
-void audio (t_mes *mes, t_message *node, const char *message) {
-    GtkWidget *label2 = gtk_label_new(message + 20);
+GtkWidget *mx_make_button(char *name, int x, int y) {
+    GtkWidget *button1 = gtk_button_new();
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale (name, x, y, TRUE, NULL);
+    GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
 
-    node->message_box = gtk_event_box_new();
-    gtk_widget_show(node->message_box);
-    gtk_box_pack_start (GTK_BOX (node->central_box), node->message_box, FALSE, FALSE, 0);
-    gtk_widget_show(label2);
-    gtk_container_add (GTK_CONTAINER (node->message_box), label2);
-    gtk_widget_set_name(node->message_box, "file");
-    gtk_widget_add_events (node->message_box, GDK_BUTTON_PRESS_MASK);
-    g_signal_connect (G_OBJECT (node->message_box), "button_press_event", G_CALLBACK (load_audio_callback), mes);
+    gtk_button_set_image(GTK_BUTTON(button1), image);
+    return button1;
+}
+
+void audio (t_mes *mes, t_message *node, const char *message) {
+    (void)message;
+    (void)mes;
+    
+    // GtkWidget *label2 = gtk_label_new(message + 20);
+    GtkWidget *box2 = gtk_box_new(FALSE, 0);
+    GtkWidget *box3 = gtk_box_new(FALSE, 0);
+    GtkWidget *progbar = gtk_progress_bar_new();
+    
+    // node->message_box = gtk_event_box_new();
+    // gtk_widget_show(node->message_box);
+    
+    //box2
+    gtk_widget_show(box2);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(box2), GTK_ORIENTATION_VERTICAL);
+    gtk_box_pack_start(GTK_BOX (node->central_box), box2, FALSE, FALSE, 0);
+    //progress_bar
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progbar), (message + 20));
+    gtk_progress_bar_set_show_text(GTK_PROGRESS_BAR(progbar), TRUE);
+    gtk_progress_bar_pulse (GTK_PROGRESS_BAR(progbar));
+    gtk_widget_set_name(progbar, "file");
+    gtk_widget_show(progbar);
+    gtk_box_pack_start(GTK_BOX (box2), progbar, FALSE, FALSE, 0);
+
+    gtk_box_pack_start(GTK_BOX (box2), box3, FALSE, FALSE, 0);
+    //box3
+    GtkWidget *button1 = mx_make_button("img/last.png", 20, 20);
+    GtkWidget *button2 = mx_make_button("img/pause.png", 20, 20);
+    GtkWidget *button3 = mx_make_button("img/play.png", 20, 20);
+    GtkWidget *button4 = mx_make_button("img/next.png", 20, 20);
+
+    // gtk_widget_set_name(button1, "entry");
+    gtk_box_pack_start(GTK_BOX (box3), button1, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX (box3), button2, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX (box3), button3, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX (box3), button4, FALSE, FALSE, 0);
+    gtk_widget_show_all(box2);
+
+    // gtk_box_pack_start (GTK_BOX (node->central_box), node->message_box, FALSE, FALSE, 0);
+    // gtk_widget_show(label2);
+    // gtk_container_add (GTK_CONTAINER (node->message_box), label2);
+    
+    // gtk_widget_add_events (node->message_box, GDK_BUTTON_PRESS_MASK);
+    // g_signal_connect (G_OBJECT (node->message_box), "button_press_event", G_CALLBACK (load_audio_callback), mes);
 }
 
 void choose_type (t_mes *mes, t_message *node, const char *message) {
