@@ -109,7 +109,7 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
         //     printf("read_sum frames =%lld\n", read_sum);
         //     break;
         // }
-        err = Pa_WriteStream(stream, data, 512);
+        err = Pa_WriteStream(stream, data, BUFFER_LEN / s_info.channels);
         if (err != paNoError) {
             printf("error Pa_WriteStream =%s\n", Pa_GetErrorText(err));
             break;

@@ -1,11 +1,20 @@
 #include "uchat.h"
 
-void create_download_folder() {
+static void create_download_folder() {
     struct stat st;// = {0};
 
     if (stat(MX_SAVE_FOLDER_IN_CLIENT, &st) == -1) {
         mkdir(MX_SAVE_FOLDER_IN_CLIENT, 0700);
     }
+}
+
+static void init_info(t_client_info *info, int argc, char **argv) {
+    (*info).argc = argc;
+    (*info).argv = argv;
+    (*info).ip = argv[1];
+    (*info).port = (uint16_t) atoi(argv[2]);
+    (*info).tls_client = NULL;
+    (*info).responce = 0;
 }
 
 int main(int argc, char **argv) {
@@ -16,15 +25,9 @@ int main(int argc, char **argv) {
         return -1;
     }
     gtk_init (&argc, &argv);
-    
     info = (t_client_info *)malloc(sizeof(t_client_info));
     memset(info, 0, sizeof(t_client_info));
-    (*info).argc = argc;
-    (*info).argv = argv;
-    (*info).ip = argv[1];
-    (*info).port = (uint16_t) atoi(argv[2]);
-    (*info).tls_client = NULL;
-    (*info).responce = 0;
+    init_info(info, argc, argv);
     create_download_folder();
     if (mx_start_client(info)) {
         printf("error = %s\n", strerror(errno));

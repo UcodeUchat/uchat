@@ -173,7 +173,7 @@ long mx_save_audio(t_audio *data) {
         printf("error outfile =%d\n", sf_error(outfile));
         return -1;
     }
-    long wr = sf_writef_float(outfile, data->rec_samples, data->size / 8);
+    long wr = sf_writef_float(outfile, data->rec_samples, data->size / sizeof(float));
     err = data->size - wr;
     printf("data to write to file =%zu\n", data->size);
     sf_write_sync(outfile);
