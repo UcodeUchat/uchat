@@ -36,7 +36,7 @@ static void choose_type (t_mes *mes, t_message *node, const char *message) {
 
 t_message *mx_create_message (t_client_info *info, t_room *room, 
                 json_object *new_json, int order) {
-    t_message *node =  (t_message *)malloc(sizeof(t_message)); 
+    t_message *node =  (t_message *)malloc(sizeof(t_message));
     t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
     const char *login = json_object_get_string(json_object_object_get(new_json, "login"));
     const char *message = json_object_get_string(json_object_object_get(new_json, "data"));
@@ -60,7 +60,8 @@ static void *sound_thread (void *data) {
     return 0;
 }
 
-static void additional_act (t_client_info *info, t_room *room, json_object *new_json) {
+static void additional_act (t_client_info *info, t_room *room, 
+                            json_object *new_json, t_message *tmp) {
     int id = json_object_get_int(json_object_object_get(new_json, "id"));
     int add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
     int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
@@ -76,6 +77,7 @@ static void additional_act (t_client_info *info, t_room *room, json_object *new_
         mes->info = info;
         mes->room = room;
         mes->id = id;
+        mes->message = tmp;
         mx_load_file(mes);
     }
 }
@@ -99,5 +101,5 @@ void mx_push_message(t_client_info *info, t_room *room, json_object *new_json) {
             p = p->next;
         p->next = tmp;
     }
-    additional_act (info, room, new_json);
+    additional_act (info, room, new_json, tmp);
 }

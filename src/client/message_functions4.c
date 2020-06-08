@@ -13,13 +13,13 @@ void mx_choose_side (t_client_info *info, t_message *node,
         gtk_box_pack_end(GTK_BOX (node->right_box), node->menu_event, 0, 0, 0);
         gtk_box_pack_end(GTK_BOX (node->login_box), node->login_event, 0, 0, 0);
         gtk_box_pack_end (GTK_BOX (node->h_box), node->general_box, 0, 0, 0);
-        if (node->add_info != 2) {
+        //if (node->add_info != 2) {
             g_idle_add ((GSourceFunc)mx_show_widget, node->h_box);
             if (order == 1) {
                 mx_sleep_ms(50);
                 g_idle_add ((GSourceFunc)move_bar, room);
             }
-        }
+        //}
     }
     else {
         gtk_box_pack_start (GTK_BOX (node->login_box), node->login_event, 0, 0, 0);

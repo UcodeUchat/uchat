@@ -1,6 +1,6 @@
 #include "uchat.h"
 
-static int mx_notebook_prepend(t_note *note) {
+int mx_notebook_prepend(t_note *note) {
     gtk_notebook_append_page(GTK_NOTEBOOK(note->notebook), note->box, note->label);
     gtk_notebook_reorder_child(GTK_NOTEBOOK(note->notebook), note->box, note->position);
     gtk_notebook_set_current_page (GTK_NOTEBOOK(note->notebook), note->position);

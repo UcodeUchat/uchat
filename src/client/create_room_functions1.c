@@ -7,7 +7,7 @@ void mx_load_room_history (t_all *data) {
     int n_msg = json_object_array_length(messages);
     for (int j = 0; j < n_msg; j++) {
         json_object *msg_data = json_object_array_get_idx(messages, j);
-        append_message(data->info, data->room, msg_data);
+        mx_append_message(data->info, data->room, msg_data);
     }
     gtk_adjustment_set_value(data->room->Adjust, 
                             gtk_adjustment_get_upper(data->room->Adjust) - 

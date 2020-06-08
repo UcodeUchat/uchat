@@ -545,6 +545,7 @@ void mx_simple_message (t_message *node, const char *message);
 void mx_file (t_mes *mes, t_message *node, const char *message);
 void mx_image (t_message *node);
 void mx_sticker (t_message *node, const char *message);
+int mx_notebook_prepend(t_note *note);
 
 
 // functions
@@ -573,7 +574,7 @@ char *mx_decrypt(char *str);
 
 // krivoy dizayn
 int mx_login (t_client_info *info);
-void append_message(t_client_info *info, t_room *room, json_object *new_json);
+void mx_append_message(t_client_info *info, t_room *room, json_object *new_json);
 
 //json
 json_object *mx_create_basic_json_object(int type);

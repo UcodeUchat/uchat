@@ -39,6 +39,18 @@ void mx_init_main_message (t_message *node, t_mes *mes) {
     init_main_message_part2(node);
 }
 
+int add(t_mes *mes) {
+    gtk_box_pack_start (GTK_BOX (mes->room->message_box), 
+        mes->message->h_box, FALSE, FALSE, 0);;
+    return 0;
+}
+
+int reorder(t_mes *mes) {
+    gtk_box_reorder_child (GTK_BOX (mes->room->message_box), mes->message->h_box, 0);
+    return 0;
+}
+
+
 void mx_init_message (t_message *node, t_room *room, 
                         json_object *new_json, int order) {
     node->id = json_object_get_int(json_object_object_get(new_json, "id"));
@@ -49,10 +61,12 @@ void mx_init_message (t_message *node, t_room *room,
     node->data = strdup (json_object_get_string(
                         json_object_object_get(new_json, "data")));
     node->h_box = gtk_box_new(FALSE, 0);
-    gtk_box_pack_start (GTK_BOX (room->message_box), 
-        node->h_box, FALSE, FALSE, 0);
+    t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
+    mes->room = room;
+    mes->message = node;
+    g_idle_add ((GSourceFunc)add, mes);
     if (order == 2)
-        gtk_box_reorder_child (GTK_BOX (room->message_box), node->h_box, 0);
+        g_idle_add ((GSourceFunc)reorder, mes);
 }
 
 void mx_init_message_data (t_client_info *info, t_room *room, 
