@@ -18,7 +18,6 @@ static void additional_act1 (t_client_info *info, t_room *room,
                             json_object *new_json, t_message *tmp) {
     int id = json_object_get_int(json_object_object_get(new_json, "id"));
     int add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
-
     if (add_info == 2) {
         t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
         mes->info = info;
@@ -41,7 +40,6 @@ void mx_append_message(t_client_info *info, t_room *room, json_object *new_json)
         return;
     if (*list == NULL) {  // Find Null-node
         *list = tmp;
-        return;
     }
     else {
         tmp->next = *list;

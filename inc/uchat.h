@@ -546,6 +546,8 @@ void mx_file (t_mes *mes, t_message *node, const char *message);
 void mx_image (t_message *node);
 void mx_sticker (t_message *node, const char *message);
 int mx_notebook_prepend(t_note *note);
+int mx_add(t_mes *mes);
+int mx_reorder(t_mes *mes);
 
 
 // functions
