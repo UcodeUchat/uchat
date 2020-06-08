@@ -71,10 +71,45 @@ SRC_CLIENT = main_client.c \
 	save_file_in_client.c \
 	send_file_from_client.c \
 	input_from_server.c \
+	gui.c \
 	login.c \
+	reg.c \
+	general.c \
+	general_functions.c \
+	menu.c \
+	menu_functions.c \
+	create_room_menu.c \
+	create_room.c \
+	create_room_functions1.c \
+	create_room_functions2.c \
+	init_search.c \
+	init_stickers.c \
 	load_profile.c \
+	load_profile_functions.c \
+	load_profile_functions1.c \
+	load_profile_functions2.c \
 	message.c \
+	message_functions1.c \
+	message_functions2.c \
+	message_functions3.c \
+	message_functions4.c \
+	message_functions5.c \
+	message_functions6.c \
 	search.c \
+	search_functions.c \
+	search_functions1.c \
+	search_functions2.c \
+	callbacks1.c \
+	callbacks2.c \
+	callbacks3.c \
+	callbacks4.c \
+	callbacks5.c \
+	callbacks6.c \
+	callbacks7.c \
+	callbacks8.c \
+	callbacks9.c \
+	callbacks10.c \
+	callbacks11.c \
 	work_with_files_list_in_client.c \
 	record_audio.c \
 	play_audio.c \

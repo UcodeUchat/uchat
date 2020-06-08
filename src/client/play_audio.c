@@ -105,11 +105,11 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
 //            }
 //        }
         read_sum += read_count;
-        if (read_sum > end_point - start_point) {
-            printf("read_sum frames =%lld\n", read_sum);
-            break;
-        }
-        err = Pa_WriteStream(stream, data, BUFFER_LEN);
+        // if (read_sum > end_point - start_point) {
+        //     printf("read_sum frames =%lld\n", read_sum);
+        //     break;
+        // }
+        err = Pa_WriteStream(stream, data, 512);
         if (err != paNoError) {
             printf("error Pa_WriteStream =%s\n", Pa_GetErrorText(err));
             break;

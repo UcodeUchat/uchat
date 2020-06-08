@@ -34,7 +34,8 @@ static int work_with_client(t_server_info *info, struct kevent new_ev) {
         mx_delete_socket_elem(&(info->socket_list), new_ev.ident);
     }
     else {
-        rc = mx_tls_worker(mx_find_socket_elem(info->socket_list, new_ev.ident), info);
+        rc = mx_tls_worker(mx_find_socket_elem(info->socket_list,
+                                               new_ev.ident), info);
         if (rc == -1)
             mx_err_return2("error =", strerror(errno));
     }

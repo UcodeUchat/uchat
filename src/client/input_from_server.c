@@ -14,7 +14,21 @@ t_message *mx_find_message(t_message *messages, int id) {
     return node;
 }
 
-void append_message(t_client_info *info, t_room *room, json_object *new_json) {
+static void additional_act1 (t_client_info *info, t_room *room, 
+                            json_object *new_json, t_message *tmp) {
+    int id = json_object_get_int(json_object_object_get(new_json, "id"));
+    int add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
+    if (add_info == 2) {
+        t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
+        mes->info = info;
+        mes->room = room;
+        mes->id = id;
+        mes->message = tmp;
+        mx_load_file(mes);
+    }
+}
+
+void mx_append_message(t_client_info *info, t_room *room, json_object *new_json) {
     t_message *tmp;
     //t_message *p;
     t_message **list = &room->messages;
@@ -26,21 +40,12 @@ void append_message(t_client_info *info, t_room *room, json_object *new_json) {
         return;
     if (*list == NULL) {  // Find Null-node
         *list = tmp;
-        return;
     }
     else {
         tmp->next = *list;
         *list = tmp;
     }
-    int id = json_object_get_int(json_object_object_get(new_json, "id"));
-    int add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
-    if (add_info == 2) {
-        t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
-        mes->info = info;
-        mes->room = room;
-        mes->id = id;
-        mx_load_file(mes);
-    }
+    additional_act1 (info, room, new_json, tmp);
 }
 
 void pop_message_id(t_message *messages, int id) {
@@ -69,6 +74,11 @@ t_room *mx_find_room(t_room *rooms, int id) {
     return node;
 }
 
+int notebook_reorder(t_note *note) {
+    gtk_notebook_reorder_child(GTK_NOTEBOOK(note->notebook), note->box, note->position);
+    return 0;
+}
+
 void input_message(t_client_info *info, json_object *new_json) {
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
@@ -82,7 +92,12 @@ void input_message(t_client_info *info, json_object *new_json) {
         head = head->next;
     }
     room->position = 0;
-    gtk_notebook_reorder_child(GTK_NOTEBOOK(info->data->notebook), room->room_box, 0);
+    t_note *note = (t_note *)malloc(sizeof(t_note));
+    note->notebook = info->data->notebook;
+    note->box = room->room_box;
+    note->position = 0;
+    g_idle_add ((GSourceFunc)notebook_reorder, note);
+    // gtk_notebook_reorder_child(GTK_NOTEBOOK(info->data->notebook), room->room_box, 0);
 }
 
 void load_history(t_client_info *info, json_object *new_json) {
@@ -94,7 +109,7 @@ void load_history(t_client_info *info, json_object *new_json) {
     int n_msg = json_object_array_length(messages);
     for (int i = 0; i < n_msg; i++) {
         json_object *msg_data = json_object_array_get_idx(messages, i);
-        append_message(info, room, msg_data);
+        mx_append_message(info, room, msg_data);
     }
     info->can_load = 1;
 }
@@ -104,7 +119,7 @@ void delete_message(t_client_info *info, json_object *new_json) {
     int message_id = json_object_get_int(json_object_object_get(new_json, "message_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
     if (message_id >= room->messages->id) {
-        sleep_ms(100);
+        mx_sleep_ms(100);
         t_message *message = mx_find_message(room->messages, message_id);
         g_idle_add ((GSourceFunc)mx_destroy_widget, message->h_box);
         pop_message_id(room->messages, message_id);
@@ -118,7 +133,7 @@ void edit_message(t_client_info *info, json_object *new_json) {
     t_room *room = mx_find_room(info->data->rooms, room_id);
     if (room) {
         if (message_id >= room->messages->id) {
-            sleep_ms(50);
+            mx_sleep_ms(50);
             t_message *node = mx_find_message(room->messages, message_id);
             if (node) {
                 free(node->data);
