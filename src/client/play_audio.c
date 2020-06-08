@@ -94,24 +94,22 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
 
     float data[BUFFER_LEN * s_info.channels];
     memset(data, 0, sizeof(data));
-    int subFormat = s_info.format & SF_FORMAT_SUBMASK;
-    double scale = 1.0;
-    int m = 0;
-
+//    int subFormat = s_info.format & SF_FORMAT_SUBMASK;
+//    double scale = 1.0;
+//    int m = 0;
     sf_seek(a_file, start_point, SEEK_SET);
-
     while ((read_count = sf_read_float(a_file, data, BUFFER_LEN))) {
-        if (subFormat == SF_FORMAT_FLOAT || subFormat == SF_FORMAT_DOUBLE) {
-            for (m = 0 ; m < read_count ; ++m) {
-                data[m] *= scale;
-            }
-        }
+//        if (subFormat == SF_FORMAT_FLOAT || subFormat == SF_FORMAT_DOUBLE) {
+//            for (m = 0 ; m < read_count ; ++m) {
+//                data[m] *= scale;
+//            }
+//        }
         read_sum += read_count;
-        if (read_sum > end_point - start_point) {
-            printf("read_sum frames =%lld\n", read_sum);
-            break;
-        }
-        err = Pa_WriteStream(stream, data, BUFFER_LEN);
+        // if (read_sum > end_point - start_point) {
+        //     printf("read_sum frames =%lld\n", read_sum);
+        //     break;
+        // }
+        err = Pa_WriteStream(stream, data, 512);
         if (err != paNoError) {
             printf("error Pa_WriteStream =%s\n", Pa_GetErrorText(err));
             break;

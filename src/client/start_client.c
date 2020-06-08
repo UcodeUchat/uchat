@@ -1,5 +1,15 @@
 #include "uchat.h"
 
+void reconnection_socket(t_client_info *info) {
+    json_object *json = mx_create_basic_json_object(MX_RECONNECTION_TYPE);
+    const char *json_str = NULL;
+
+    json_object_object_add(json, "login", json_object_new_string(info->login));
+    json_object_object_add(json, "password", json_object_new_string(info->password));
+    json_str = json_object_to_json_string(json);
+    json_str ? tls_send(info->tls_client, json_str, strlen(json_str)) : 0;
+}
+
 int mx_reconnect_client(t_client_info *info) {
     int numsec;
 
@@ -12,8 +22,10 @@ int mx_reconnect_client(t_client_info *info) {
         info->socket = mx_connect_client(info);
         if (info->socket == -1)
             return 1;
-        if ((mx_make_tls_connect_client(info)) == 0) // tls connect and handshake
+        if ((mx_make_tls_connect_client(info)) == 0) { // tls connect and handshake
+            reconnection_socket(info);
             break;
+        }
         if (numsec <= MAXSLEEP / 2)
             sleep(numsec);
     }

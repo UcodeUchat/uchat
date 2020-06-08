@@ -269,6 +269,7 @@ typedef struct  s_server_info {  // struct server
 #define MX_CREATE_ROOM_TYPE 19
 #define MX_DIRECT_MESSAGE_TYPE 20
 #define MX_DELETE_ACCOUNT_TYPE 21
+#define MX_RECONNECTION_TYPE 22
 #define MX_PACKAGE_SIZE sizeof(t_package)
 
 #define MX_MAX_MSG_SIZE 200
@@ -319,7 +320,7 @@ typedef struct s_mes {
 
 // server
 void email_notify(t_server_info *i, json_object *js);
-
+int mx_reconnection(t_server_info *info, t_socket_list *csl);
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
 int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info);
