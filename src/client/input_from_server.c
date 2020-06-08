@@ -28,9 +28,9 @@ static void additional_act1 (t_client_info *info, t_room *room,
     }
 }
 
-void mx_append_message(t_client_info *info, t_room *room, json_object *new_json) {
+void mx_append_message(t_client_info *info, t_room *room, 
+                        json_object *new_json) {
     t_message *tmp;
-    //t_message *p;
     t_message **list = &room->messages;
 
     if (!list)
@@ -75,7 +75,8 @@ t_room *mx_find_room(t_room *rooms, int id) {
 }
 
 int notebook_reorder(t_note *note) {
-    gtk_notebook_reorder_child(GTK_NOTEBOOK(note->notebook), note->box, note->position);
+    gtk_notebook_reorder_child(GTK_NOTEBOOK(note->notebook), 
+        note->box, note->position);
     return 0;
 }
 
@@ -97,7 +98,6 @@ void input_message(t_client_info *info, json_object *new_json) {
     note->box = room->room_box;
     note->position = 0;
     g_idle_add ((GSourceFunc)notebook_reorder, note);
-    // gtk_notebook_reorder_child(GTK_NOTEBOOK(info->data->notebook), room->room_box, 0);
 }
 
 void load_history(t_client_info *info, json_object *new_json) {
@@ -118,6 +118,7 @@ void delete_message(t_client_info *info, json_object *new_json) {
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
     int message_id = json_object_get_int(json_object_object_get(new_json, "message_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
+
     if (message_id >= room->messages->id) {
         mx_sleep_ms(100);
         t_message *message = mx_find_message(room->messages, message_id);
@@ -131,18 +132,19 @@ void edit_message(t_client_info *info, json_object *new_json) {
     int message_id = json_object_get_int(json_object_object_get(new_json, "message_id"));
     const char *data = json_object_get_string(json_object_object_get(new_json, "data"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
-    if (room) {
-        if (message_id >= room->messages->id) {
-            mx_sleep_ms(50);
-            t_message *node = mx_find_message(room->messages, message_id);
-            if (node) {
-                free(node->data);
-                node->data = strdup(data);
-                g_idle_add ((GSourceFunc)mx_destroy_widget, node->message_label);
-                node->message_label = gtk_label_new(data);
-                gtk_box_pack_start (GTK_BOX (node->message_box), node->message_label, FALSE, FALSE, 0);
-                g_idle_add ((GSourceFunc)mx_show_widget, node->message_label);
-            }
+    t_message *node = NULL;
+
+    if (room && message_id >= room->messages->id) {
+        mx_sleep_ms(50);
+        node = mx_find_message(room->messages, message_id);
+        if (node) {
+            free(node->data);
+            node->data = strdup(data);
+            g_idle_add ((GSourceFunc)mx_destroy_widget, node->message_label);
+            node->message_label = gtk_label_new(data);
+            gtk_box_pack_start (GTK_BOX (node->message_box), 
+                node->message_label, FALSE, FALSE, 0);
+            g_idle_add ((GSourceFunc)mx_show_widget, node->message_label);
         }
     }
 }
@@ -154,7 +156,6 @@ void input_authentification(t_client_info *info, json_object *new_json) {
     int audio = json_object_get_int(json_object_object_get(new_json, "audio"));
 
     if ((*info).auth_client == 0) {
-        fprintf(stderr, "ANSWER = [%d]\n", type);
         if (type == 4) {
             info->id = user_id;
             info->visual = visual;
@@ -165,10 +166,8 @@ void input_authentification(t_client_info *info, json_object *new_json) {
             json_object_deep_copy(json_object_object_get(new_json, "rooms"), &rooms, NULL);
             info->rooms = rooms;
         }
-        else{
+        else
             (*info).auth_client = 0;
-        }
-        fprintf(stderr, "(*info).auth_client = [%d]\n", (*info).auth_client);
         (*info).responce = 1;
     }
 }
@@ -191,6 +190,40 @@ void pop_room_id(t_room **rooms, int id) {
     }
 }
 
+void show_gif(char *gif, char *event, t_room *room, json_object *new_json) {
+    GtkWidget *h_box = gtk_box_new(FALSE, 5);
+    char *label = mx_strjoin(json_object_get_string(
+                            json_object_object_get(new_json, "login")), event);
+    GtkWidget *login = gtk_label_new(label);
+    GtkWidget *image_box = gtk_box_new(FALSE, 0);
+    GtkWidget *image = gtk_image_new_from_file(gif);
+
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(h_box), 
+                                    GTK_ORIENTATION_VERTICAL);
+    gtk_box_pack_start (GTK_BOX (room->message_box), h_box, FALSE, FALSE, 0);
+    gtk_widget_set_halign (login, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (h_box), login, FALSE, FALSE, 0);
+    gtk_widget_show(login);
+    gtk_widget_set_halign (image_box, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (h_box), image_box, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (image_box), image, FALSE, FALSE, 0);
+    gtk_widget_show(image);
+    gtk_widget_show(image_box);
+    g_idle_add ((GSourceFunc)mx_show_widget, h_box);
+}
+
+void add_room(t_client_info *info, json_object *new_json) {
+    t_room *head = info->data->rooms;
+    json_object *room_data = NULL;
+
+    while (head != NULL) {
+        head->position = head->position + 1;
+        head = head->next;
+    }  
+    json_object_deep_copy(json_object_object_get(new_json, "room_data"), &room_data, NULL);
+    mx_push_room(info, room_data, 0);
+}
+
 void join_room(t_client_info *info, json_object *new_json) {
     int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
@@ -198,38 +231,12 @@ void join_room(t_client_info *info, json_object *new_json) {
 
     if (user_id == info->id) {
         if (room == NULL) {
-            t_room *head = info->data->rooms;
-
-            while (head != NULL) {
-                head->position = head->position + 1;
-                head = head->next;
-            }
-            json_object *room_data = NULL;
-            json_object_deep_copy(json_object_object_get(new_json, "room_data"), &room_data, NULL);
-            mx_push_room(info, room_data, 0);
+            add_room (info, new_json);
         }
     }
     else {
         if (room != NULL) {
-            GtkWidget *h_box = gtk_box_new(FALSE, 5);
-            gtk_orientable_set_orientation (GTK_ORIENTABLE(h_box), GTK_ORIENTATION_VERTICAL);
-            gtk_box_pack_start (GTK_BOX (room->message_box), h_box, FALSE, FALSE, 0);
-            GtkWidget *login_box = gtk_box_new(FALSE, 0);
-            gtk_widget_set_halign (login_box, GTK_ALIGN_CENTER);
-            gtk_box_pack_start (GTK_BOX (h_box), login_box, FALSE, FALSE, 0);
-            char *label = mx_strjoin(json_object_get_string(json_object_object_get(new_json, "login")), " joined room");
-            GtkWidget *login = gtk_label_new(label);
-            gtk_box_pack_start (GTK_BOX (login_box), login, FALSE, FALSE, 0);
-            gtk_widget_show(login);
-            gtk_widget_show(login_box);
-            GtkWidget *image_box = gtk_box_new(FALSE, 0);
-            gtk_widget_set_halign (image_box, GTK_ALIGN_CENTER);
-            gtk_box_pack_start (GTK_BOX (h_box), image_box, FALSE, FALSE, 0);
-            GtkWidget *image = gtk_image_new_from_file("img/welcome.gif");
-            gtk_box_pack_start (GTK_BOX (image_box), image, FALSE, FALSE, 0);
-            gtk_widget_show(image);
-            gtk_widget_show(image_box);
-            g_idle_add ((GSourceFunc)mx_show_widget, h_box);
+            show_gif ("img/welcome.gif", " joined room", room, new_json);
         }
     }
 }
@@ -241,6 +248,21 @@ int mx_notebook_detach(t_note *note) {
     return 0;
 }
 
+void exit_room(t_client_info *info, t_room *room, int room_id) {
+    t_room *head = info->data->rooms;
+    t_note *note = (t_note *)malloc(sizeof(t_note));
+
+    while (head != NULL) {
+        if (head && head->position > room->position)
+            head->position = head->position - 1;
+        head = head->next;
+    }
+    note->notebook = info->data->notebook;
+    note->box = room->room_box;
+    g_idle_add ((GSourceFunc)mx_notebook_detach, note);
+    pop_room_id(&info->data->rooms, room_id);
+}
+
 void leave_room(t_client_info *info, json_object *new_json) {
     int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
     int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
@@ -248,39 +270,10 @@ void leave_room(t_client_info *info, json_object *new_json) {
 
     if (room != NULL) {
         if (user_id == info->id) {
-            t_room *head = info->data->rooms;
-
-            while (head != NULL) {
-                if (head && head->position > room->position)
-                    head->position = head->position - 1;
-                head = head->next;
-            }
-            t_note *note = (t_note *)malloc(sizeof(t_note));
-            note->notebook = info->data->notebook;
-            note->box = room->room_box;
-            g_idle_add ((GSourceFunc)mx_notebook_detach, note);
-            pop_room_id(&info->data->rooms, room_id);
+            exit_room (info, room, room_id);
         }
         else {
-            GtkWidget *h_box = gtk_box_new(FALSE, 5);
-            gtk_orientable_set_orientation (GTK_ORIENTABLE(h_box), GTK_ORIENTATION_VERTICAL);
-            gtk_box_pack_start (GTK_BOX (room->message_box), h_box, FALSE, FALSE, 0);
-            GtkWidget *login_box = gtk_box_new(FALSE, 0);
-            gtk_widget_set_halign (login_box, GTK_ALIGN_CENTER);
-            gtk_box_pack_start (GTK_BOX (h_box), login_box, FALSE, FALSE, 0);
-            char *label = mx_strjoin(json_object_get_string(json_object_object_get(new_json, "login")), " left room");
-            GtkWidget *login = gtk_label_new(label);
-            gtk_box_pack_start (GTK_BOX (login_box), login, FALSE, FALSE, 0);
-            gtk_widget_show(login);
-            gtk_widget_show(login_box);
-            GtkWidget *image_box = gtk_box_new(FALSE, 0);
-            gtk_widget_set_halign (image_box, GTK_ALIGN_CENTER);
-            gtk_box_pack_start (GTK_BOX (h_box), image_box, FALSE, FALSE, 0);
-            GtkWidget *image = gtk_image_new_from_file("img/leave.gif");
-            gtk_box_pack_start (GTK_BOX (image_box), image, FALSE, FALSE, 0);
-            gtk_widget_show(image);
-            gtk_widget_show(image_box);
-            g_idle_add ((GSourceFunc)mx_show_widget, h_box);
+            show_gif ("img/leave.gif", " lrgt room", room, new_json);
         }
     }
 }
@@ -294,36 +287,35 @@ void edit_profile(t_client_info *info, json_object *new_json) {
     }
 }
 
+void init_direect_message(t_client_info *info, json_object *new_json) {
+    t_room *head = info->data->rooms;
+    json_object *room_data = NULL;
+
+    while (head != NULL) {
+        head->position = head->position + 1;
+        head = head->next;
+    }
+    json_object_deep_copy(json_object_object_get(new_json, "room_data"), &room_data, NULL);
+    mx_push_room(info, room_data, 0);
+}
+
 void direct_message(t_client_info *info, json_object *new_json) {
-    int exist = json_object_get_int(json_object_object_get(new_json, "exist"));
-    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+    int exist = json_object_get_int(json_object_object_get(new_json, 
+                                                            "exist"));
+    int room_id = json_object_get_int(json_object_object_get(new_json, 
+                                                            "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
-    if (exist) {
-        if (room != NULL) {
-            gtk_notebook_set_current_page (GTK_NOTEBOOK(info->data->notebook), room->position);
-        }
+    if (exist && room != NULL) {
+        gtk_notebook_set_current_page (GTK_NOTEBOOK(info->data->notebook), 
+                                        room->position);
     }
-    else { 
-        if (room == NULL) {
-            t_room *head = info->data->rooms;
-
-            while (head != NULL) {
-                head->position = head->position + 1;
-                head = head->next;
-            }
-            json_object *room_data = NULL;
-            json_object_deep_copy(json_object_object_get(new_json, "room_data"), &room_data, NULL);
-            mx_push_room(info, room_data, 0);
-        }
+    else if (!exist && room == NULL) { 
+            init_direect_message (info, new_json);
     }
 }
 
-int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
-    int type = json_object_get_int(json_object_object_get(obj, "type"));
-
-    if (type != MX_FILE_DOWNLOAD_TYPE)
-        mx_print_json_object(obj, "mx_process_input_from_server");
+void part1 (int type, json_object *obj, t_client_info *info) {
     if (type == MX_MSG_TYPE)
         input_message(info, obj);
     else if (type == MX_FILE_DOWNLOAD_TYPE) 
@@ -338,7 +330,10 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
         edit_message(info, obj);
     else if (type == MX_LOAD_PROFILE_TYPE)
         mx_load_user_profile(info, obj);
-    else if (type == MX_LEAVE_ROOM_TYPE)
+}
+
+void part2 (int type, json_object *obj, t_client_info *info) {
+    if (type == MX_LEAVE_ROOM_TYPE)
         leave_room(info, obj);
     else if (type == MX_JOIN_ROOM_TYPE)
         join_room(info, obj);
@@ -348,8 +343,16 @@ int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
         edit_profile(info, obj);
     else if (type == MX_SEARCH_ALL_TYPE)
         mx_search_all_client(info, obj);
-     else if (type == MX_DIRECT_MESSAGE_TYPE)
+    else if (type == MX_DIRECT_MESSAGE_TYPE)
         direct_message(info, obj);
+}
+
+int mx_run_function_type_in_client(t_client_info *info, json_object *obj) {
+    int type = json_object_get_int(json_object_object_get(obj, "type"));
+    // if (type != MX_FILE_DOWNLOAD_TYPE) mx_print_json_object(obj, "mx_process_input_from_server");
+
+    part1(type, obj, info);
+    part2(type, obj, info);
     return 0;
 }
 
@@ -366,7 +369,6 @@ void *mx_process_input_from_server(void *taken_info) {
         if (rc == -1) {
             if (mx_reconnect_client(info))
                 break;
-            //send autentification json
         }
         else if (rc != 0) {
             new_json = json_tokener_parse_ex(tok, buffer, rc);

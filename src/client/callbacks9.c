@@ -8,7 +8,7 @@ void mx_close_profile_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 void mx_close_profile_callback1 (GtkWidget *widget, 
-	GdkEventButton *event, t_client_info *info) {
+	           GdkEventButton *event, t_client_info *info) {
     (void)widget;
     (void)event;
     gtk_widget_destroy(info->data->profile->main_box);

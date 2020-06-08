@@ -3,7 +3,8 @@
 void mx_scroll_callback (GtkWidget *widget, t_all *data) {
     (void)widget;
     if (gtk_adjustment_get_value(data->room->Adjust) == 
-        gtk_adjustment_get_lower(data->room->Adjust) && data->info->can_load == 1 && data->room->messages != NULL) {
+        gtk_adjustment_get_lower(data->room->Adjust) && data->info->can_load == 1 
+        && data->room->messages != NULL) {
         json_object  *new_json = json_object_new_object();
 
         data->info->can_load = 0;
@@ -18,16 +19,17 @@ void mx_scroll_callback (GtkWidget *widget, t_all *data) {
 
 
 void mx_leave_callback (GtkWidget *widget, t_all *data) {
-    (void)widget;
     json_object  *new_json = json_object_new_object();
+    const char *json_str = NULL;
 
     json_object_object_add(new_json, "type", json_object_new_int(MX_LEAVE_ROOM_TYPE));
     json_object_object_add(new_json, "room_id", json_object_new_int(data->room->id));
     json_object_object_add(new_json, "access", json_object_new_int(data->room->access));
     json_object_object_add(new_json, "user_id", json_object_new_int(data->info->id));
     json_object_object_add(new_json, "login", json_object_new_string(data->info->login));
-    const char *json_str = json_object_to_json_string(new_json);
+    json_str = json_object_to_json_string(new_json);
     tls_send(data->info->tls_client, json_str, strlen(json_str));
+    (void)widget;
 }
 
 void mx_room_menu_callback(GtkWidget *widget, GdkEventButton *event, GtkWidget *menu) {
@@ -38,13 +40,13 @@ void mx_room_menu_callback(GtkWidget *widget, GdkEventButton *event, GtkWidget *
 
 void mx_logout_client(t_client_info *info) {
     json_object *new_json;
+    const char *json_string = NULL;
 
     new_json = json_object_new_object();
     json_object_object_add(new_json, "type", json_object_new_int(MX_LOGOUT_TYPE));
-    //json_object_object_add(new_json, "login", json_object_new_string(info->login));
     json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
     mx_print_json_object(new_json, "logout");
-    const char *json_string = json_object_to_json_string(new_json);
+    json_string = json_object_to_json_string(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
 }
 

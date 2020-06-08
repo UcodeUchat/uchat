@@ -46,8 +46,8 @@ void mx_enter_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 void mx_search_callback (GtkWidget *widget, t_client_info *info) {
-    (void)widget;
     json_object *new_json;
+    const char *json_string = NULL;
 
     gtk_widget_hide(info->data->search_box);
     new_json = json_object_new_object();
@@ -55,9 +55,10 @@ void mx_search_callback (GtkWidget *widget, t_client_info *info) {
     json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
     json_object_object_add(new_json, "query", json_object_new_string 
                             (gtk_entry_get_text(GTK_ENTRY(info->data->search_entry))));
-    const char *json_string = json_object_to_json_string(new_json);
+    json_string = json_object_to_json_string(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
     gtk_entry_set_text(GTK_ENTRY(info->data->search_entry), "");
+    (void)widget;
 }
 
 void mx_show_search_callback (GtkWidget *widget, t_client_info *info) {
