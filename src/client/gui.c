@@ -14,7 +14,7 @@ t_room *mx_find_room_position(t_room *rooms, int position) {
     return node;
 }
 
-void sleep_ms (int milliseconds) {
+void mx_sleep_ms (int milliseconds) {
     struct timespec ts;
 
     ts.tv_sec = milliseconds / 1000;

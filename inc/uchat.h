@@ -411,7 +411,7 @@ int mx_make_tls_connect_client(t_client_info *info);
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_process_message_in_client(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);
-void sleep_ms (int milliseconds);
+void mx_sleep_ms (int milliseconds);
 t_message *mx_find_message(t_message *messages, int id);
 t_room *mx_find_room(t_room *rooms, int id);
 void mx_load_profile_client(t_client_info *info, int id);
@@ -521,6 +521,31 @@ void mx_show_rooms_result (GtkWidget *room_box, int n_rooms,
 GtkWidget *mx_init_search_h_box (GtkWidget *room_box);
 void mx_join_callback (GtkWidget *widget, t_all *data);
 GtkWidget *mx_init_content_box (GtkWidget *v_box, char *title);
+
+
+void mx_init_message_data (t_client_info *info, t_room *room, 
+                            json_object *new_json, t_mes *mes);
+void mx_init_message (t_message *node, t_room *room, 
+                        json_object *new_json, int order);
+void mx_init_main_message (t_message *node, t_mes *mes);
+void mx_focus1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes);
+void mx_focus_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes);
+void mx_init_message_login (t_message *node, t_mes *mes, const char *login);
+void mx_init_message_menu (t_message *node, t_mes *mes);
+void mx_delete_callback (GtkWidget *widget, t_mes *mes);
+void mx_edit_callback (GtkWidget *widget, t_mes *mes);
+void mx_focus_menu_callback(GtkWidget *widget, 
+                    GdkEventButton *event, GtkWidget *menu);
+void mx_open_menu_callback(GtkWidget *widget, 
+                    GdkEventButton *event, GtkWidget *menu);
+void mx_load_profile_callback(GtkWidget *widget, t_mes *mes);
+void mx_choose_side (t_client_info *info, t_message *node, 
+                    t_room *room, int order);
+void mx_simple_message (t_message *node, const char *message);
+void mx_file (t_mes *mes, t_message *node, const char *message);
+void mx_image (t_message *node);
+void mx_sticker (t_message *node, const char *message);
+
 
 // functions
 int mx_detect_file_extention(char *filename);
