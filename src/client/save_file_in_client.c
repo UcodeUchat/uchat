@@ -101,7 +101,7 @@ int mx_save_file_in_client(t_client_info *info, json_object *obj) {
     return 0;
 }
 
-int is_file_exist2(char *file_name) {
+int is_file_exist(char *file_name) {
     char *full_path = mx_strjoin(MX_SAVE_FOLDER_IN_CLIENT, file_name);
     struct stat buffer;
     int exist = stat(full_path, &buffer);
@@ -117,8 +117,8 @@ int mx_load_file(t_mes *msg) {
 // need to know msg_id (file), user_id, room_id, file_name
     printf("msg->id = %d\n", msg->id);
 
-    //if (is_file_exist(msg->message->data) != MX_OK) {
-        //if (mx_find_file_in_list(msg->info->input_files, msg->message->id) == NULL) {
+    if (is_file_exist(msg->message->data) != MX_OK) {
+        if (mx_find_file_in_list(msg->info->input_files, msg->message->id) == NULL) {
             json_object *send_obj = mx_create_basic_json_object(MX_FILE_DOWNLOAD_TYPE);
             const char *send_str;
 
@@ -129,11 +129,11 @@ int mx_load_file(t_mes *msg) {
             tls_send(msg->info->tls_client, send_str, strlen(send_str));
             json_object_put(send_obj);
             printf("Sended\n");
-        // }
-        // else
-        //     fprintf(stderr, "File %s in progress...\n", msg->message->data);
-    // }
-    // else
-    //     printf("Open file...\n");
+         }
+         else
+             fprintf(stderr, "File %s in progress...\n", msg->message->data);
+     }
+     else
+         printf("Open file...\n");
     return 0;
 }

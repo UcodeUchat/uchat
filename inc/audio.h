@@ -38,7 +38,7 @@ typedef unsigned char SAMPLE;
 #endif
 
 
-#define BUFFER_LEN      1024
+#define BUFFER_LEN     512
 
 typedef struct s_audio {
     uint16_t format_type;
@@ -58,7 +58,8 @@ typedef struct s_a_snippet {
 //int mx_record_audio(void);
 char *mx_record_audio(void);
 int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block);
-int mx_exit_stream(t_audio *data, PaError err);
+int mx_exit_stream(PaStream **stream, t_audio *data, PaError err);
+//int mx_exit_stream(t_audio *data, PaError err);
 long mx_save_audio(t_audio *data);
 int mx_process_stream_ext(PaStream *stream, t_audio *data,
                           t_a_snippet *sample_block, const char *fileName,

@@ -7,11 +7,13 @@ static void print_s_info(SF_INFO s_info) {
     printf ("format = %d\n", s_info.format);
     printf ("sections = %d\n", s_info.sections);
     printf ("seekable = %d\n", s_info.seekable);
-
+    fflush(stdout);
 }
 
 static int exit_program(PaError err, const char *text, SNDFILE* a_file) {
     printf("error in %s =%s\n", text, Pa_GetErrorText(err));
+    fflush(stdout);
+
     Pa_Terminate();
     if (a_file)
         sf_close(a_file);
@@ -27,8 +29,15 @@ static int init_stream(PaStream** stream, SF_INFO s_info) {
     output_parameters.sampleFormat = paFloat32;
     output_parameters.suggestedLatency = Pa_GetDeviceInfo(output_parameters.device)->defaultLowOutputLatency;
     output_parameters.hostApiSpecificStreamInfo = NULL;
-    err = Pa_OpenStream(stream, NULL, &output_parameters, s_info.samplerate,
-                        paFramesPerBufferUnspecified, paClipOff, NULL, NULL);
+    err = Pa_OpenStream(stream,
+                        NULL,
+                        &output_parameters,
+                        s_info.samplerate,
+                        FRAMES_PER_BUFFER,
+                        paClipOff,
+                        NULL,
+                        NULL);
+
     if (err != paNoError || ! stream)
         return exit_program(err, "Pa_OpenStream", NULL);
     return Pa_StartStream(*stream);
@@ -48,7 +57,6 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
     sf_count_t read_count = 0;
     sf_count_t read_sum = 0;
 
-    printf("play =\n"); fflush(stdout);
     if ((err = Pa_Initialize()) != paNoError)
         return exit_program(err, "Pa_Initialize", a_file);
 
@@ -56,13 +64,14 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
 
     if (!(a_file = sf_open(file_name, SFM_READ, &s_info))) {
         printf("error sf_info =%d\n", sf_error(a_file));
+        fflush(stdout);
         Pa_Terminate();
         return 1;
     }
-//    if (s_info.channels > 1)
-//        return 1;
+
     print_s_info(s_info);
     printf("play 2\n");
+    fflush(stdout);
     length = s_info.frames;
     if (start_time) {
         starttime = atof(start_time);
@@ -82,43 +91,49 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
         duration = (double) (end_point - start_point) / (double) s_info.samplerate;
     }
 
-    printf("length frames =%lld\n", length);
-    printf("starttime  =%f\n", starttime);
-    printf("duration  =%f\n", duration);
-    printf("start_point frames =%lld\n", start_point);
-    printf("end_point frames =%lld\n\n", end_point);
+    printf("length frames =%lld\n", length); fflush(stdout);
+    printf("starttime  =%f\n", starttime); fflush(stdout);
+    printf("duration  =%f\n", duration); fflush(stdout);
+    printf("start_point frames =%lld\n", start_point); fflush(stdout);
+    printf("end_point frames =%lld\n\n", end_point); fflush(stdout);
 
     err = init_stream(&stream, s_info);
     if (err != paNoError)
         return exit_program(err, "init_stream", a_file);
 
-    float data[BUFFER_LEN * s_info.channels];
+    float data[FRAMES_PER_BUFFER * s_info.channels];
     memset(data, 0, sizeof(data));
-//    int subFormat = s_info.format & SF_FORMAT_SUBMASK;
-//    double scale = 1.0;
-//    int m = 0;
+
+    int subFormat = s_info.format & SF_FORMAT_SUBMASK;
+    double scale = 1.0;
+    int m = 0;
     sf_seek(a_file, start_point, SEEK_SET);
-    while ((read_count = sf_read_float(a_file, data, BUFFER_LEN))) {
-//        if (subFormat == SF_FORMAT_FLOAT || subFormat == SF_FORMAT_DOUBLE) {
-//            for (m = 0 ; m < read_count ; ++m) {
-//                data[m] *= scale;
-//            }
-//        }
-        read_sum += read_count;
-        if (read_sum > end_point - start_point) {
-            printf("read_sum frames =%lld\n", read_sum);
-            break;
+    while ((read_count = sf_read_float(a_file, data, FRAMES_PER_BUFFER ))) {
+        if (subFormat == SF_FORMAT_FLOAT || subFormat == SF_FORMAT_DOUBLE) {
+            for (m = 0 ; m < read_count ; ++m) {
+                data[m] *= scale;
+            }
         }
-        err = Pa_WriteStream(stream, data, BUFFER_LEN);
+        read_sum += read_count;
+//        if (read_sum > end_point - start_point) {
+//            printf("read_sum frames =%lld\n", read_sum); fflush(stdout);
+//            break;
+//        }
+        err = Pa_WriteStream(stream, data, FRAMES_PER_BUFFER / s_info.channels);
         if (err != paNoError) {
-            printf("error Pa_WriteStream =%s\n", Pa_GetErrorText(err));
+            printf("error Pa_WriteStream =%s\n", Pa_GetErrorText(err)); fflush(stdout);
             break;
         }
         memset(data, 0, sizeof(data));
     }
+
+    err = Pa_StopStream(stream);
+        if( err != paNoError )
+            printf("error Pa_StopStream =%s\n", Pa_GetErrorText(err)); fflush(stdout);
+
     err = Pa_CloseStream(stream);
     if (err != paNoError)
-        printf("error Pa_CloseStream =%s\n", Pa_GetErrorText(err));
+        printf("error Pa_CloseStream =%s\n", Pa_GetErrorText(err)); fflush(stdout);
     Pa_Terminate();
     sf_close(a_file);
     return 0;

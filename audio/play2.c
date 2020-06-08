@@ -10,7 +10,7 @@
 #include "../libsndfile/src/sndfile.h"
 #include <math.h>
 
-
+#define NUM_CHANNELS    (2)
 #define MIN_TALKING_BUFFERS 8
 #define TALKING_THRESHOLD_WEIGHT 0.99
 #define TALKING_TRIGGER_RATIO 4.0
@@ -19,6 +19,15 @@
 #define SAMPLE_SILENCE  (0.0f)
 #define NUM_SECONDS     (4)
 #define BUFFER_LEN    512
+
+typedef struct
+{
+    int          frameIndex;  /* Index into sample array. */
+    int          maxFrameIndex;
+    SAMPLE      recordedSamples[FRAMES_PER_BUFFER * 2];
+}
+        paTestData;
+
 
 static int playCallback( const void *inputBuffer, void *outputBuffer,
                          unsigned long framesPerBuffer,
@@ -38,8 +47,7 @@ static int playCallback( const void *inputBuffer, void *outputBuffer,
     (void) statusFlags;
     (void) userData;
 
-    if( framesLeft < framesPerBuffer )
-    {
+    if( framesLeft < framesPerBuffer ) {
         /* final buffer... */
         for( i=0; i<framesLeft; i++ )
         {
@@ -52,10 +60,8 @@ static int playCallback( const void *inputBuffer, void *outputBuffer,
             if( NUM_CHANNELS == 2 ) *wptr++ = 0;  /* right */
         }
         data->frameIndex += framesLeft;
-        finished = paComplete;
-    }
-    else
-    {
+        finished = paComplete; }
+    else {
         for( i=0; i<framesPerBuffer; i++ )
         {
             *wptr++ = *rptr++;  /* left */
@@ -68,14 +74,13 @@ static int playCallback( const void *inputBuffer, void *outputBuffer,
 }
 
 
-
 static void print_s_info(SF_INFO s_info) {
-    printf ("frames = %lld\n", s_info.frames);
-    printf ("samplerate = %d\n", s_info.samplerate);
-    printf ("channels = %d\n", s_info.channels);
-    printf ("format = %d\n", s_info.format);
-    printf ("sections = %d\n", s_info.sections);
-    printf ("seekable = %d\n", s_info.seekable);
+    printf ("frames = %lld\n", s_info.frames); fflush(stdout);
+    printf ("samplerate = %d\n", s_info.samplerate); fflush(stdout);
+    printf ("channels = %d\n", s_info.channels); fflush(stdout);
+    printf ("format = %d\n", s_info.format); fflush(stdout);
+    printf ("sections = %d\n", s_info.sections); fflush(stdout);
+    printf ("seekable = %d\n", s_info.seekable); fflush(stdout);
 
 }
 
@@ -113,6 +118,22 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
 
     double starttime = 0;
     double duration = 0;
+    paTestData          data2;
+
+    int                 i;
+//    int                 totalFrames;
+//    int                 numSamples;
+    int                 numBytes;
+    SAMPLE              max, val;
+    double              average;
+
+
+    data2.maxFrameIndex = NUM_SECONDS * SAMPLE_RATE; // Record for a few seconds.
+    data2.frameIndex = 0;
+//    numSamples = totalFrames * NUM_CHANNELS;
+//    numBytes = numSamples * sizeof(SAMPLE);
+//    data.recordedSamples = (SAMPLE *) malloc( numBytes ); // From now on, recordedSamples is initialised.
+//    if( data.recordedSamples == NULL )
 
     err = Pa_Initialize();
     if (err != paNoError) {
@@ -132,9 +153,7 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
     }
 
     print_s_info(s_info);
-//    if (s_info.channels > 1) {
-//        return -1;
-//    }
+
     printf("play 2\n");
     length = s_info.frames;
     if (start_time) {
@@ -172,15 +191,47 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
 
 //    if (s_info.channels > 1)
 
-    float data[BUFFER_LEN * s_info.channels];
-    memset(data, 0, sizeof(data));
+//    float data[BUFFER_LEN * s_info.channels];
+//    memset(data, 0, sizeof(data));
+    memset(data2.recordedSamples, 0, sizeof(data2.recordedSamples));
+
+
     int subFormat = s_info.format & SF_FORMAT_SUBMASK;
     double scale = 1.0;
     int m = 0;
     sf_seek(a_file, start_point, SEEK_SET);
 
     printf("play 4\n");
+/////===========
+    printf("\n=== Now playing back. ===\n"); fflush(stdout);
+    err = Pa_OpenStream(
+            &stream,
+            NULL, /* no input */
+            &outputParameters,
+            SAMPLE_RATE,
+            FRAMES_PER_BUFFER,
+            paClipOff,      /* we won't output out of range samples so don't bother clipping them */
+            playCallback,
+            &data );
+    if( err != paNoError ) goto done;
 
+    if( stream )
+    {
+        err = Pa_StartStream( stream );
+        if( err != paNoError ) goto done;
+
+        printf("Waiting for playback to finish.\n"); fflush(stdout);
+
+        while( ( err = Pa_IsStreamActive( stream ) ) == 1 ) Pa_Sleep(100);
+        if( err < 0 ) goto done;
+
+        err = Pa_CloseStream( stream );
+        if( err != paNoError ) goto done;
+
+        printf("Done.\n"); fflush(stdout);
+    }
+
+    ///////======
     while ((read_count = sf_readf_float(a_file, data, BUFFER_LEN))) {
         if (subFormat == SF_FORMAT_FLOAT || subFormat == SF_FORMAT_DOUBLE) {
             for (m = 0 ; m < read_count ; ++m) {
@@ -216,8 +267,4 @@ int main (int argc, char * argv []) {
     return 0;
 
 }
-
-//
-// Created by Serhiy Nikolayenko on 6/6/20.
-//
 

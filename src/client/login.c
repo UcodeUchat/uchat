@@ -115,16 +115,42 @@ void send_callback (GtkWidget *widget, t_client_info *info) {
         gtk_entry_set_text(GTK_ENTRY(info->data->message_entry), "");
     }
 }
+//////===========
+//
+//void *play_sound_pthread2(void *taken_info) {
+//    char *file = (char *)taken_info;
+//    (void)file;
+//
+//    printf ("new audio mx_play_sound_file pthread TID=%u\n", (unsigned int) pthread_self());
+////    mx_play_sound_file("./audio/moby.aif", "0", NULL);
+//    mx_play_sound_file(file, "0", NULL);
+//    return 0;
+//}
+////========
+
 
 void record_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
     char *audio_file = mx_record_audio();
     int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
     t_room *room = find_room(info->data->rooms, position);
 
     info->data->current_room = room->id;
-    printf("new %s\n", audio_file);
+    printf("new =  %s\n", audio_file);
+//    mx_play_sound_file2(mx_strjoin("./Uchat_downloads/", audio_file), "0", NULL);
+//    mx_play_sound_file2(audio_file, "0", NULL);
     mx_send_file_from_client(info, audio_file);
-    (void)widget;
+
+//    pthread_t sound_play;
+//    pthread_attr_t attr;
+//    int tc;
+//
+//    pthread_attr_init(&attr);
+//    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED); // #
+//    tc = pthread_create(&sound_play, &attr, play_sound_pthread2, audio_file);
+//    if (tc != 0)
+//        printf("pthread_create error = %s\n", strerror(tc));
+
 }
 
 

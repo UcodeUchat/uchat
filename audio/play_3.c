@@ -1,4 +1,49 @@
-#include "uchat.h"
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    <math.h>
+//#include <portaudio.h>
+#include <math.h>
+//#include <sndfile.h>
+
+#include "../libportaudio/include/portaudio.h"
+#include "../libsndfile/src/sndfile.h"
+#include <math.h>
+
+
+#define MIN_TALKING_BUFFERS 8
+#define TALKING_THRESHOLD_WEIGHT 0.99
+#define TALKING_TRIGGER_RATIO 4.0
+#define SAMPLE_RATE       (44100)  // в 1 секунде записи содержится 44100 семплов.
+#define FRAMES_PER_BUFFER   (512)
+#define SAMPLE_SILENCE  (0.0f)
+#define NUM_SECONDS     (4)
+#define BUFFER_LEN    512
+
+/* Select sample format. */
+#if 1
+#define PA_SAMPLE_TYPE  paFloat32
+typedef float SAMPLE;
+#define SAMPLE_SILENCE  (0.0f)
+#define PRINTF_S_FORMAT "%.8f"
+#elif 1
+#define PA_SAMPLE_TYPE  paInt16
+typedef short SAMPLE;
+#define SAMPLE_SILENCE  (0)
+#define PRINTF_S_FORMAT "%d"
+#elif 0
+#define PA_SAMPLE_TYPE  paInt8
+typedef char SAMPLE;
+#define SAMPLE_SILENCE  (0)
+#define PRINTF_S_FORMAT "%d"
+#else
+#define PA_SAMPLE_TYPE  paUInt8
+typedef unsigned char SAMPLE;
+#define SAMPLE_SILENCE  (128)
+#define PRINTF_S_FORMAT "%d"
+#endif
+
+
 
 
 typedef struct
@@ -116,7 +161,7 @@ int mx_play_sound_file2(char *file_name, char *start_time, char *duration_t) {
 
     printf("play 11=\n"); fflush(stdout);
     if ((err = Pa_Initialize()) != paNoError)
-    return exit_program(err, "Pa_Initialize", a_file);
+        return exit_program(err, "Pa_Initialize", a_file);
 
     memset(&s_info, 0, sizeof(s_info));
 
@@ -190,6 +235,7 @@ int mx_play_sound_file2(char *file_name, char *start_time, char *duration_t) {
 //        Pa_Sleep( 20 );
         memset(data, 0, sizeof(data));
     }
+    printf ("end while\n");
     err = Pa_CloseStream(stream);
     if (err != paNoError)
         printf("error Pa_CloseStream =%s\n", Pa_GetErrorText(err)); fflush(stdout);
@@ -231,3 +277,10 @@ int mx_play_sound_file2(char *file_name, char *start_time, char *duration_t) {
     }
     //==============
 */
+
+int main (int argc, char * argv []) {
+    mx_play_sound_file2(argv[1], argv[2], argv[3]);
+    return 0;
+
+}
+

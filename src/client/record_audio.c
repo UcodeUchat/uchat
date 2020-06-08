@@ -10,6 +10,26 @@ static t_audio * init_audio_data() {
     return data;
 }
 
+int mx_exit_stream(PaStream **stream, t_audio *data, PaError err) {
+
+//    PaError             err = paNoError;
+
+    err = Pa_CloseStream(stream);
+    if (err != paNoError)
+        printf("error Pa_CloseStream =%s\n", Pa_GetErrorText(err));
+    Pa_Terminate();
+    if (data->rec_samples)
+        free (data->rec_samples);
+    if (err != paNoError) {
+        fprintf(stderr, "An error occured while using the portaudio stream\n" );
+        fprintf(stderr, "Error number: %d\n", err);
+        fprintf(stderr, "Error message: %s\n", Pa_GetErrorText( err ));
+        err = 1; // Always return 0 or 1, but no other return codes.
+    }
+    return err;
+}
+
+
 static int process_stream(PaStream *stream, t_audio *data,
                           t_a_snippet *sample_block, int *i) {
     if (!stream || !data || !sample_block)
@@ -45,7 +65,7 @@ static int record(PaStream *stream, t_audio *data, t_a_snippet *sample_block) {
     printf("Wire off.\n"); fflush(stdout);
     err = Pa_StopStream(stream);
     if (err != paNoError)
-        mx_exit_stream(data, err);
+        mx_exit_stream(stream, data, err);
     return err;
 }
 
@@ -67,6 +87,12 @@ char *mx_record_audio(void) {
     err = record(stream, data, sample_block);
     if (err != 0)
         printf("err =%d\n", err);
+
+    err = Pa_CloseStream(stream);
+    if (err != paNoError)
+        printf("error Pa_CloseStream =%s\n", Pa_GetErrorText(err));
+    Pa_Terminate();
+
     printf(" exit record\n");
     printf("record to file->%s\n", data->file_name);
     return data->file_name;
@@ -90,7 +116,7 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
 
     err = Pa_Initialize();
     if (err != paNoError)
-        return mx_exit_stream(data, err);
+        return mx_exit_stream(*stream, data, err);
     err = Pa_GetDeviceCount();
 //    info = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice());
 //    if (!info) {
@@ -130,33 +156,20 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
 
     err = Pa_OpenStream(stream, &input_parameters, NULL, data->sample_rate, FRAMES_PER_BUFFER, paClipOff, NULL, NULL);
     if (err)
-        return mx_exit_stream(data, err);
+        return mx_exit_stream(stream, data, err);
 
     sample_block->size = FRAMES_PER_BUFFER * sizeof(float) * data->number_channels;  //number bytes
     sample_block->snippet = malloc(sample_block->size);
 
     if( sample_block->snippet == NULL ) {
         printf("Could not allocate record array.\n");
-        return mx_exit_stream(data, err);
+        return mx_exit_stream(stream, data, err);
     }
     memset(sample_block->snippet, SAMPLE_SILENCE, sample_block->size);
 
     return Pa_StartStream(*stream);
 }
 
-int mx_exit_stream(t_audio *data, PaError err) {
-//    PaError             err = paNoError;
-    Pa_Terminate();
-    if (data->rec_samples)
-        free (data->rec_samples);
-    if (err != paNoError) {
-        fprintf(stderr, "An error occured while using the portaudio stream\n" );
-        fprintf(stderr, "Error number: %d\n", err);
-        fprintf(stderr, "Error message: %s\n", Pa_GetErrorText( err ));
-        err = 1; // Always return 0 or 1, but no other return codes.
-    }
-    return err;
-}
 
 
 long mx_save_audio(t_audio *data) {
@@ -175,8 +188,8 @@ long mx_save_audio(t_audio *data) {
         printf("error outfile =%d\n", sf_error(outfile));
         return -1;
     }
-    long wr = sf_writef_float(outfile, data->rec_samples, data->size / sizeof(SAMPLE));
-//    long wr = sf_writef_float(outfile, data->rec_samples, data->size / 8);
+//    long wr = sf_writef_float(outfile, data->rec_samples, data->size / sizeof(SAMPLE));
+    long wr = sf_writef_float(outfile, data->rec_samples, data->size / 8);
     err = data->size - wr;
     printf("data to write to file =%zu\n", data->size);
     sf_write_sync(outfile);
