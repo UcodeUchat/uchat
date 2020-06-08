@@ -1,7 +1,7 @@
 #include "uchat.h"
 
-int mx_process_input_objects(t_server_info *info, t_socket_list *csl,\
-                                char buffer[], size_t rd) {
+int mx_process_input_objects(t_server_info *info, t_socket_list *csl,
+                             char buffer[], size_t rd) {
     enum json_tokener_error jerr;
 
     csl->obj = json_tokener_parse_ex(csl->tok, buffer, rd);
@@ -21,7 +21,7 @@ int mx_tls_worker(t_socket_list *csl, t_server_info *info) {
     size_t readed;
     char input[1024];
 
-    readed = tls_read(csl->tls_socket, input, sizeof(input));   // get json
+    readed = tls_read(csl->tls_socket, input, sizeof(input));
     if (readed > 0)
         mx_process_input_objects(info, csl, input, readed);
     else

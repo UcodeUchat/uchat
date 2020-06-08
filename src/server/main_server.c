@@ -1,7 +1,7 @@
 #include "uchat.h"
 
 void create_download_folder() {
-    struct stat st;// = {0};
+    struct stat st;
 
     if (stat(MX_SAVE_FOLDER_IN_SERVER, &st) == -1) {
         mkdir(MX_SAVE_FOLDER_IN_SERVER, 0700);
@@ -20,7 +20,7 @@ static void init_db(t_server_info *info) {
 static void zero_sockets(t_server_info *info) {
     char command[1024];
 
-    command[sprintf(command, "UPDATE users SET socket='0' WHERE NOT socket='0';")] = 0;
+    sprintf(command, "UPDATE users SET socket='0' WHERE NOT socket='0';");
     sqlite3_exec(info->db, command, NULL, NULL, NULL);
 }
 

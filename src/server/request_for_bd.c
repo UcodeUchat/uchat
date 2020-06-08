@@ -25,7 +25,7 @@ static int print_users(void *status, int argc, char **argv, char **in) {
 }
 
 int mx_update_socket(t_server_info *i, int client_sock, const char *login) {
-    char *command = malloc(1024);
+    char command[1024];
 
     sprintf(command, "UPDATE users SET socket='%d' WHERE login='%s'",
     		client_sock, login);
@@ -57,22 +57,18 @@ int mx_drop_socket(t_server_info *i, int client_sock) {
 int mx_delete_acc(t_server_info *i, json_object *j) {
     int user_id = json_object_get_int(json_object_object_get(j, "user_id"));
     char *command = malloc(1024);
-    char *command2 = malloc(1024);
 
     sprintf(command, "DELETE FROM users WHERE users.id=%d", user_id);
     if (sqlite3_exec(i->db, command, 0, 0, NULL) != SQLITE_OK) {
+        mx_strdel(&command);
+        return -1;
+    }
+    sprintf(command, "DELETE FROM room_user WHERE room_user.user_id=%d",
+            user_id);
+    if (sqlite3_exec(i->db, command, 0, 0, NULL) != SQLITE_OK) {
+        mx_strdel(&command);
         return -1;
     }
     mx_strdel(&command);
-    sprintf(command2, "DELETE FROM room_user WHERE room_user.user_id=%d", user_id);
-    if (sqlite3_exec(i->db, command2, 0, 0, NULL) != SQLITE_OK) {
-        return -1;
-    }
-    mx_strdel(&command2);
     return 1;
 }
-
-
-
-
-

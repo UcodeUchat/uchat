@@ -14,15 +14,12 @@ void mx_init_struct_mail(t_mail *mail, char *receiver, char *message) {
     mail->message = strdup(message);
 }
 
-void mx_send_format_tls(struct tls *tls, const char *text, ...) {
+void mx_send_format_tls(struct tls *tls, char *arg1, char *arg2,
+                        char *arg3) {
     char buffer[1024];
-    va_list args;
-    va_start(args, text);
-    vsprintf(buffer, text, args);
-    va_end(args);
 
-//    strcpy(buffer, text);
-//    strcpy(buffer + )
+    sprintf(buffer, "%s%s%s", arg1 ? arg1 : "",
+            arg2 ? arg2 : "",arg3 ? arg3 : "");
     tls_write(tls, buffer, strlen(buffer));
     printf("C: %s", buffer);
 }
