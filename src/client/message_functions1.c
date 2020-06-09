@@ -53,6 +53,7 @@ void mx_init_message (t_message *node, t_room *room,
     mes->room = room;
     mes->message = node;
     mes->audio = mx_init_struct_audio();
+//    mx_init_struct_audio2(mes);
     g_idle_add ((GSourceFunc)mx_add, mes);
     if (order == 2)
         g_idle_add ((GSourceFunc)mx_reorder, mes);

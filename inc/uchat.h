@@ -618,6 +618,7 @@ void mx_print_json_object(struct json_object *jobj, const char *msg);
 
 //audio
 t_a_play *mx_init_struct_audio(void);
+void mx_init_struct_audio2(t_mes *mes);
 int mx_play_sound_file(t_mes *mes, char *start_time, char *duration_t);
 
 #endif

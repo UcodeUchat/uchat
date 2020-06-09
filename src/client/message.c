@@ -17,10 +17,13 @@ void mx_play_cb(GtkWidget *widget, t_mes *mes) {
     (void)widget;
     pthread_t sound_play;
     int tc;
+    printf("aaaaa\n");
+    printf("mes->audio:%d\n", mes->audio ? 1 : 0);
+    printf(" mes->audio->play:%d\n", mes->audio->play ? 1 : 0);
 
-    if (mes->audio->play == FALSE) {
-        mes->audio->pause = FALSE;
-        mes->audio->play = TRUE;
+    if (mes->audio->play == 0) {
+        mes->audio->pause = 0;
+        mes->audio->play = 1;
         mx_load_file(mes);
         printf("%s\n", mx_strjoin("./Uchat_downloads/", mes->message->data));
         tc = pthread_create(&sound_play, NULL, play_sound_pthread, mes);
@@ -77,6 +80,7 @@ t_message *mx_create_message (t_client_info *info, t_room *room,
                 json_object *new_json, int order) {
     t_message *node =  (t_message *)malloc(sizeof(t_message));
     t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
+    mes->audio = mx_init_struct_audio();
     const char *login = mx_js_g_str(mx_js_o_o_get(new_json, "login"));
     const char *message = mx_js_g_str(mx_js_o_o_get(new_json, "data"));
 
