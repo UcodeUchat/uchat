@@ -25,17 +25,45 @@ void load_audio_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
         printf("pthread_create error = %s\n", strerror(tc));
 }
 
-void audio (t_mes *mes, t_message *node, const char *message) {
-    GtkWidget *label2 = gtk_label_new(message + 20);
+void mx_pause_cb(GtkWidget *widget, t_mes *mes) {
+    (void)widget;
+    (void)mes;
+    fprintf(stderr, "pause\n");
+}
 
-    node->message_box = gtk_event_box_new();
-    gtk_widget_show(node->message_box);
-    gtk_box_pack_start (GTK_BOX (node->central_box), node->message_box, FALSE, FALSE, 0);
-    gtk_widget_show(label2);
-    gtk_container_add (GTK_CONTAINER (node->message_box), label2);
-    gtk_widget_set_name(node->message_box, "file");
-    gtk_widget_add_events (node->message_box, GDK_BUTTON_PRESS_MASK);
-    g_signal_connect (G_OBJECT (node->message_box), "button_press_event", G_CALLBACK (load_audio_callback), mes);
+void mx_play_cb(GtkWidget *widget, t_mes *mes) {
+    (void)widget;
+    (void)mes;
+    fprintf(stderr, "play\n");
+}
+
+GtkWidget *mx_make_button(t_mes *mes, char *name, 
+                            void(*callback)(GtkWidget *widget, t_mes *mes) ) {
+    GtkWidget *button1 = gtk_button_new();
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale (name, 20, 20, TRUE, NULL);
+    GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
+
+    gtk_button_set_image(GTK_BUTTON(button1), image);
+    gtk_widget_show(image);
+    g_signal_connect(G_OBJECT(button1), "clicked", G_CALLBACK(callback), mes);
+    return button1;
+}
+
+void audio (t_mes *mes, t_message *node) {
+    GtkWidget *box_all = gtk_box_new(FALSE, 0);
+    GtkWidget *v_mess = gtk_label_new("Voice message:");
+    GtkWidget *box_butt = gtk_box_new(FALSE, 0);
+    GtkWidget *b_pause = mx_make_button(mes, "img/pause.png", mx_pause_cb);
+    GtkWidget *b_play = mx_make_button(mes, "img/play.png", mx_play_cb);
+
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(box_all), GTK_ORIENTATION_VERTICAL);
+    gtk_box_pack_start(GTK_BOX(node->central_box), box_all, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(box_all), v_mess, FALSE, FALSE, 0);
+
+    gtk_box_pack_start(GTK_BOX(box_all), box_butt, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(box_butt), b_pause, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(box_butt), b_play, FALSE, FALSE, 0);
+    gtk_widget_show_all(box_all);
 }
 
 static void choose_type (t_mes *mes, t_message *node, const char *message) {
@@ -48,7 +76,7 @@ static void choose_type (t_mes *mes, t_message *node, const char *message) {
     else if (node->add_info == 3)
         mx_sticker (node, message);
     else if (node->add_info == 4)
-        audio (mes, node, message);
+        audio (mes, node);
 }
 
 t_message *mx_create_message (t_client_info *info, t_room *room, 
