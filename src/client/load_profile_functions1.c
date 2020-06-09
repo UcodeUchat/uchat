@@ -1,7 +1,7 @@
 #include "uchat.h"
 
 void mx_show_login (t_client_info *info, json_object *new_json, GtkWidget *profile) {
-    const char *login = json_object_get_string(json_object_object_get(new_json, "login"));
+    const char *login = mx_js_g_str(mx_js_o_o_get(new_json, "login"));
     GtkWidget *box = gtk_box_new(FALSE, 5);
     GtkWidget *login_box = gtk_box_new(FALSE, 5);
 
@@ -40,7 +40,7 @@ static void show_email_settings(t_client_info *info, GtkWidget *email_box) {
 }
 
 void mx_show_email (t_client_info *info, int id, json_object *new_json, GtkWidget *profile) {
-    const char *email = json_object_get_string(json_object_object_get(new_json, "email"));
+    const char *email = mx_js_g_str(mx_js_o_o_get(new_json, "email"));
     GtkWidget *box = gtk_box_new(FALSE, 5);
     GtkWidget *email_box = gtk_box_new(FALSE, 5);
 

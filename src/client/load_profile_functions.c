@@ -5,24 +5,24 @@ static void save_settings_callback(GtkWidget *widget, t_client_info *info) {
     const char *json_string;
 
     (void)widget;
-    new_json = json_object_new_object();
-    json_object_object_add(new_json, "type", json_object_new_int(MX_EDIT_PROFILE_TYPE));
-    json_object_object_add(new_json, "add_info", json_object_new_int(1));
-    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
-    json_object_object_add(new_json, "visual_n", json_object_new_int(
+    new_json = mx_js_n_o();
+    mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_EDIT_PROFILE_TYPE));
+    mx_js_o_o_add(new_json, "add_info", mx_js_n_int(1));
+    mx_js_o_o_add(new_json, "user_id", mx_js_n_int(info->id));
+    mx_js_o_o_add(new_json, "visual_n", mx_js_n_int(
         gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(info->data->profile->visual))));
-    json_object_object_add(new_json, "audio_n", json_object_new_int(
+    mx_js_o_o_add(new_json, "audio_n", mx_js_n_int(
         gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(info->data->profile->audio))));
-    json_object_object_add(new_json, "email_n", json_object_new_int(
+    mx_js_o_o_add(new_json, "email_n", mx_js_n_int(
         gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(info->data->profile->email))));
-    json_string = json_object_to_json_string(new_json);
+    json_string = mx_js_o_to_js_str(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
 }
 
 static void init_check_boxes (t_client_info *info, json_object *new_json, GtkWidget *notifications_box) {
-    int visual_n = json_object_get_int(json_object_object_get(new_json, "visual_n"));
-    int audio_n = json_object_get_int(json_object_object_get(new_json, "audio_n"));
-    int email_n = json_object_get_int(json_object_object_get(new_json, "email_n"));
+    int visual_n = mx_js_g_int(mx_js_o_o_get(new_json, "visual_n"));
+    int audio_n = mx_js_g_int(mx_js_o_o_get(new_json, "audio_n"));
+    int email_n = mx_js_g_int(mx_js_o_o_get(new_json, "email_n"));
 
     info->data->profile->visual = gtk_check_button_new_with_label ("Visual");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(info->data->profile->visual), visual_n);
@@ -56,11 +56,11 @@ static void message_callback (GtkWidget *widget, t_client_info *info) {
     const char *json_string;
 
     (void)widget;
-    new_json = json_object_new_object();
-    json_object_object_add(new_json, "type", json_object_new_int(MX_DIRECT_MESSAGE_TYPE));
-    json_object_object_add(new_json, "first_id", json_object_new_int(info->id));
-    json_object_object_add(new_json, "second_id", json_object_new_int(info->data->profile->id));
-    json_string = json_object_to_json_string(new_json);
+    new_json = mx_js_n_o();
+    mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_DIRECT_MESSAGE_TYPE));
+    mx_js_o_o_add(new_json, "first_id", mx_js_n_int(info->id));
+    mx_js_o_o_add(new_json, "second_id", mx_js_n_int(info->data->profile->id));
+    json_string = mx_js_o_to_js_str(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
     gtk_widget_destroy(info->data->profile->main_box);
     free(info->data->profile);

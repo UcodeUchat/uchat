@@ -42,8 +42,8 @@ bool pick_file_to_send(t_client_info *info, FILE **file, json_object **obj) {
             if (!(file_stat.st_mode & S_IFDIR) && (file_stat.st_mode & S_IFREG)) {
                 if ((*file = fopen(file_path, "r")) != NULL) {
                     *obj = mx_create_basic_json_object(MX_FILE_SEND_TYPE);
-                    json_object_object_add(*obj, "file_name", json_object_new_string(file_name));
-                    json_object_object_add(*obj, "file_size", json_object_new_int(file_stat.st_size));
+                    mx_js_o_o_add(*obj, "file_name", mx_js_n_str(file_name));
+                    mx_js_o_o_add(*obj, "file_size", mx_js_n_int(file_stat.st_size));
                     return 0;
                 }
                 else
@@ -71,8 +71,8 @@ static bool open_file_to_send(FILE **file, json_object **obj, char *path) {
                 char *file_name = get_name(path);
 
                 *obj = mx_create_basic_json_object(MX_FILE_SEND_TYPE);
-                json_object_object_add(*obj, "file_name", json_object_new_string(file_name));
-                json_object_object_add(*obj, "file_size", json_object_new_int(file_stat.st_size));
+                mx_js_o_o_add(*obj, "file_name", mx_js_n_str(file_name));
+                mx_js_o_o_add(*obj, "file_size", mx_js_n_int(file_stat.st_size));
                 mx_strdel(&file_name);
                 return 0;
             }
@@ -121,25 +121,25 @@ void mx_send_file_from_client(t_client_info *info, char *file_name) {
     const char *json_string;
     char buffer[1024];
     json_object *data;
-    json_object_object_add(send_obj, "piece", json_object_new_int(1));
-    json_object_object_add(send_obj, "user_id", json_object_new_int(info->id));
-    json_object_object_add(send_obj, "room_id", json_object_new_int(info->data->current_room)); // need to know
-    json_string = json_object_to_json_string(send_obj);
+    mx_js_o_o_add(send_obj, "piece", mx_js_n_int(1));
+    mx_js_o_o_add(send_obj, "user_id", mx_js_n_int(info->id));
+    mx_js_o_o_add(send_obj, "room_id", mx_js_n_int(info->data->current_room)); // need to know
+    json_string = mx_js_o_to_js_str(send_obj);
     tls_send(info->tls_client, json_string, strlen(json_string));
     json_object_object_del(send_obj, "file_name");
     json_object_object_del(send_obj, "file_size");
-    json_object_set_int(json_object_object_get(send_obj, "piece"), 2);
-    data = json_object_new_string("");
-    json_object_object_add(send_obj, "data", data);
+    mx_js_s_int(mx_js_o_o_get(send_obj, "piece"), 2);
+    data = mx_js_n_str("");
+    mx_js_o_o_add(send_obj, "data", data);
     while(readed > 0 && !feof(file)) {
 //        printf("while %d\n", readed);
         readed = fread(buffer, 1, sizeof(buffer), file);
         json_object_set_string_len(data, buffer, readed);
         if (feof(file)) {
-            json_object_set_int(json_object_object_get(send_obj, "piece"), 3);
-            json_object_object_add(send_obj, "login", json_object_new_string(info->login));
+            mx_js_s_int(mx_js_o_o_get(send_obj, "piece"), 3);
+            mx_js_o_o_add(send_obj, "login", mx_js_n_str(info->login));
         }
-        json_string = json_object_to_json_string(send_obj);
+        json_string = mx_js_o_to_js_str(send_obj);
         tls_send(info->tls_client, json_string, strlen(json_string));
         // mx_print_json_object(send_obj, "send aiff");
     }

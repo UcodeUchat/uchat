@@ -27,7 +27,7 @@ static char *get_user_name(t_server_info *i, json_object *js) {
     char *login = NULL;
 
     ask[sprintf(ask, "SELECT * FROM users WHERE login='%s'",
-        json_object_get_string(json_object_object_get(js, "login")))] = '\0';
+        mx_js_g_str(mx_js_o_o_get(js, "login")))] = '\0';
     if (sqlite3_exec(i->db, ask, search_name, &login, 0) != SQLITE_OK)
         return NULL;
     return login;
@@ -44,7 +44,7 @@ static int get_user_id(void *p, int argc, char **argv, char **col_name) {
 }
 
 void mx_email_notify(t_server_info *i, json_object *js) {
-    int id = json_object_get_int(json_object_object_get(js, "user_id"));
+    int id = mx_js_g_int(mx_js_o_o_get(js, "user_id"));
     char *login = get_user_name(i, js);
     char *command = malloc(1024);
     char *email = NULL;
@@ -84,20 +84,20 @@ int mx_add_to_db(t_server_info *i, const char *l, const char *pa, int us_id) {
 int mx_registration(t_server_info *i, t_socket_list *csl, json_object *js) {
     const char *json_string = NULL;
 
-    if (mx_search_in_db(i, json_object_get_string(json_object_object_get(js, \
-        "login")), json_object_get_string(json_object_object_get(js,\
+    if (mx_search_in_db(i, mx_js_g_str(mx_js_o_o_get(js, \
+        "login")), mx_js_g_str(mx_js_o_o_get(js,\
         "password"))) == -1) {
-        json_object_set_int(json_object_object_get(js, "add_info"),\
+        mx_js_s_int(mx_js_o_o_get(js, "add_info"),\
                                                     MX_AUTH_TYPE_NV);
     }
     else{
-        mx_add_to_db(i, json_object_get_string(json_object_object_get(js,\
-        "login")), json_object_get_string(json_object_object_get(js,\
+        mx_add_to_db(i, mx_js_g_str(mx_js_o_o_get(js,\
+        "login")), mx_js_g_str(mx_js_o_o_get(js,\
         "password")), -1);
-        json_object_set_int(json_object_object_get(js, "add_info"),\
+        mx_js_s_int(mx_js_o_o_get(js, "add_info"),\
                                                     MX_AUTH_TYPE_V);
     }
-    json_string = json_object_to_json_string(js);
+    json_string = mx_js_o_to_js_str(js);
     mx_save_send(&csl->mutex, csl->tls_socket, json_string,\
                  strlen(json_string));
     return 1;

@@ -548,6 +548,17 @@ void mx_sticker (t_message *node, const char *message);
 int mx_notebook_prepend(t_note *note);
 int mx_add(t_mes *mes);
 int mx_reorder(t_mes *mes);
+void mx_direct_message_client(t_client_info *info, json_object *new_json);
+void mx_show_gif(char *gif, char *event, t_room *room, json_object *new_json);
+void mx_leave_room_client(t_client_info *info, json_object *new_json);
+int mx_notebook_detach(t_note *note);
+void mx_edit_profile_client(t_client_info *info, json_object *new_json);
+void mx_join_room_client(t_client_info *info, json_object *new_json);
+void mx_input_authentification(t_client_info *info, json_object *new_json);
+void mx_load_history_client(t_client_info *info, json_object *new_json);
+void mx_input_message(t_client_info *info, json_object *new_json);
+void mx_delete_message_client(t_client_info *info, json_object *new_json);
+void mx_edit_message_client(t_client_info *info, json_object *new_json);
 
 
 // functions
@@ -558,6 +569,7 @@ char *mx_curr_time(void);
 void mx_print_tid(const char *s);
 void mx_err_exit(const char *err_msg);  // вивести помилку
 int mx_err_return2(const char *err_msg, const char *err_msg2);
+int mx_err_return3(const char *err_msg, const char *err_msg2, int value);
 int mx_err_return(const char *err_msg);
 void mx_sha_hash_password(char *password);
 int addr_socet_info(int argc, char *argv[]);  // test adress
@@ -566,7 +578,21 @@ int mx_get_input2(char *buffer);
 void mx_report_tls(struct tls * tls_ctx, char * host);
 void mx_print_client_address(struct sockaddr_storage client_address, socklen_t client_len);
 char *mx_date_to_char(void);
-
+// json_short
+int mx_js_o_o_add(struct json_object *obj, const char *key,
+                  struct json_object *val);
+struct json_object *mx_js_o_o_get(const struct json_object *obj,
+                                  const char *key);
+json_bool mx_js_o_o_get_ex(const struct json_object *obj, const char *key,
+                           struct json_object **value);
+const char *mx_js_g_str(json_object *jso);
+int mx_js_g_str_len(const struct json_object *obj);
+int32_t mx_js_g_int(const struct json_object *obj);
+struct json_object *mx_js_n_int(int32_t i);
+int mx_js_s_int(struct json_object *obj, int new_value);
+struct json_object *mx_js_n_o();
+struct json_object *mx_js_n_str(const char *s);
+const char *mx_js_o_to_js_str(struct json_object *obj);
 
 // crypto funcs
 // char *mx_encrypt_EVP(char *str);

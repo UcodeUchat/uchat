@@ -4,13 +4,13 @@ static void update_profile (char *type, char *data, t_client_info *info) {
     json_object *new_json;
     const char *json_string;
 
-    new_json = json_object_new_object();
-    json_object_object_add(new_json, "type", json_object_new_int(MX_EDIT_PROFILE_TYPE));
-    json_object_object_add(new_json, "add_info", json_object_new_int(0));
-    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
-    json_object_object_add(new_json, "column", json_object_new_string(type));
-    json_object_object_add(new_json, "data", json_object_new_string (data));
-    json_string = json_object_to_json_string(new_json);
+    new_json = mx_js_n_o();
+    mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_EDIT_PROFILE_TYPE));
+    mx_js_o_o_add(new_json, "add_info", mx_js_n_int(0));
+    mx_js_o_o_add(new_json, "user_id", mx_js_n_int(info->id));
+    mx_js_o_o_add(new_json, "column", mx_js_n_str(type));
+    mx_js_o_o_add(new_json, "data", mx_js_n_str (data));
+    json_string = mx_js_o_to_js_str(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
 }
 

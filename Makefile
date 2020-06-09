@@ -40,6 +40,7 @@ INCS = inc/uchat.h
 SRC_SERVER = main_server.c \
 	start_server.c \
 	start_server2.c \
+	start_server3.c \
 	set_daemon.c \
 	server_worker.c \
 	work_with_db.c \
@@ -72,6 +73,10 @@ SRC_CLIENT = main_client.c \
 	save_file_in_client.c \
 	send_file_from_client.c \
 	input_from_server.c \
+	run_functions_type.c \
+	run_functions_type1.c \
+	run_functions_type2.c \
+	run_functions_type3.c \
 	gui.c \
 	login.c \
 	reg.c \
@@ -111,6 +116,7 @@ SRC_CLIENT = main_client.c \
 	callbacks9.c \
 	callbacks10.c \
 	callbacks11.c \
+	callbacks12.c \
 	work_with_files_list_in_client.c \
 	record_audio.c \
 	play_audio.c \
@@ -120,7 +126,10 @@ SRC_CLIENT = main_client.c \
 SRC_HELP = err_exit.c \
 	functions.c \
 	crypto.c \
-	json_functions.c
+	json_functions.c \
+	json_short.c \
+	json_short2.c \
+	json_short3.c
 	
 BD = src/functions/create_bd.c
 SRCS_SERVER = $(addprefix $(SRCD)/server/, $(SRC_SERVER))

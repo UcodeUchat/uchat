@@ -20,14 +20,14 @@ void mx_focus1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
 
 void mx_delete_callback (GtkWidget *widget, t_mes *mes) {
     t_message *message = mx_find_message(mes->room->messages, mes->id);
-    json_object  *new_json = json_object_new_object();
+    json_object  *new_json = mx_js_n_o();
     const char *json_str = NULL;
 
-    json_object_object_add(new_json, "type", json_object_new_int(MX_DELETE_MESSAGE_TYPE));
-    json_object_object_add(new_json, "message_id", json_object_new_int(message->id));
-    json_object_object_add(new_json, "room_id", json_object_new_int(mes->room->id));
+    mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_DELETE_MESSAGE_TYPE));
+    mx_js_o_o_add(new_json, "message_id", mx_js_n_int(message->id));
+    mx_js_o_o_add(new_json, "room_id", mx_js_n_int(mes->room->id));
     mx_print_json_object(new_json, "delete message");
-    json_str = json_object_to_json_string(new_json);
+    json_str = mx_js_o_to_js_str(new_json);
     tls_send(mes->info->tls_client, json_str, strlen(json_str));
     (void)widget;
 }
