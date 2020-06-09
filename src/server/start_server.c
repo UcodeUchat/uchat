@@ -73,12 +73,14 @@ static void server_loop(t_server_info *info, int server, struct tls *tls) {
             printf("error = %s\n", strerror(errno));
             break;
         }
-        if (new_ev.ident == (uintptr_t) server)  // if new con - add new clt
+        if (new_ev.ident == (uintptr_t) server) {// if new con - add new clt
             if ((add_new_client(info, tls, server)) != 0)
                 break;
-        else  // if read from client
+        }
+        else {// if read from client
             if ((work_with_client(info, new_ev)) != 0)
                 break;
+        }
     }
 }
 
