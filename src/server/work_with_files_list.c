@@ -3,18 +3,18 @@
 t_file_list *mx_new_file_list_elem(json_object *obj) {
     t_file_list *new_file = (t_file_list *)malloc(sizeof(t_file_list));
     char *full_filename = mx_strjoin(MX_SAVE_FOLDER_IN_SERVER,
-        json_object_get_string(json_object_object_get(obj, "file_name")));
+        mx_js_g_str(mx_js_o_o_get(obj, "file_name")));
 
     mx_memset(new_file, 0, sizeof(t_file_list));
     new_file->file = fopen(full_filename, "w+");
     mx_strdel(&full_filename);
     if (new_file->file != NULL) {
-        new_file->id = json_object_get_int(json_object_object_get(obj,\
+        new_file->id = mx_js_g_int(mx_js_o_o_get(obj,\
                                             "user_id"));
-        new_file->file_size = json_object_get_int(json_object_object_get(obj,\
+        new_file->file_size = mx_js_g_int(mx_js_o_o_get(obj,\
                                                     "file_size"));
-        new_file->file_name = mx_strdup(json_object_get_string(\
-                                    json_object_object_get(obj, "file_name")));
+        new_file->file_name = mx_strdup(mx_js_g_str(\
+                                    mx_js_o_o_get(obj, "file_name")));
     }
     else {
         free(new_file);

@@ -15,8 +15,8 @@ int mx_reconnection(t_server_info *info, t_socket_list *csl) {
     const char *password = NULL;
     char command[1024];
 
-    login = json_object_get_string(json_object_object_get(csl->obj,"login"));
-    password = json_object_get_string(json_object_object_get(csl->obj,
+    login = mx_js_g_str(mx_js_o_o_get(csl->obj,"login"));
+    password = mx_js_g_str(mx_js_o_o_get(csl->obj,
         "password"));
     command[sprintf(command, "SELECT id FROM users WHERE login='%s' \
                     AND password='%s'", login, password)] = 0;

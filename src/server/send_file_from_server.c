@@ -20,7 +20,7 @@ int is_file_exist(char *file_name, t_file_tmp *vars) {
 
 void start_sending(FILE *file, t_file_tmp *vars) {
     json_object *send_obj = mx_create_basic_json_object(MX_FILE_DOWNLOAD_TYPE);
-    json_object *data = json_object_new_string("");
+    json_object *data = mx_js_n_str("");
     const char *json_string;
     int readed = 1;
     char buffer[2048];
@@ -33,24 +33,24 @@ void start_sending(FILE *file, t_file_tmp *vars) {
         free(tmp); 
     }
     if (strcmp(extention, "jpg") == 0 || strcmp(extention, "png") == 0 || strcmp(extention, "gif") == 0)
-        json_object_object_add(send_obj, "add_info", json_object_new_int(2));
+        mx_js_o_o_add(send_obj, "add_info", mx_js_n_int(2));
     else
-        json_object_object_add(send_obj, "add_info", json_object_new_int(1));
-    json_object_object_add(send_obj, "piece", json_object_new_int(1));
-    json_object_object_add(send_obj, "file_size", json_object_new_int(vars->size));
-    json_object_object_add(send_obj, "file_id", json_object_new_int(vars->file_id));
-    json_object_object_add(send_obj, "file_name", json_object_new_string(vars->file_name + strlen(MX_SAVE_FOLDER_IN_SERVER)));
-    json_object_object_add(send_obj, "room_id", json_object_new_int(vars->room_id));
-    json_string = json_object_to_json_string(send_obj);
+        mx_js_o_o_add(send_obj, "add_info", mx_js_n_int(1));
+    mx_js_o_o_add(send_obj, "piece", mx_js_n_int(1));
+    mx_js_o_o_add(send_obj, "file_size", mx_js_n_int(vars->size));
+    mx_js_o_o_add(send_obj, "file_id", mx_js_n_int(vars->file_id));
+    mx_js_o_o_add(send_obj, "file_name", mx_js_n_str(vars->file_name + strlen(MX_SAVE_FOLDER_IN_SERVER)));
+    mx_js_o_o_add(send_obj, "room_id", mx_js_n_int(vars->room_id));
+    json_string = mx_js_o_to_js_str(send_obj);
     mx_save_send(vars->mutex, vars->tls, json_string, strlen(json_string));
     json_object_object_del(send_obj, "file_size");
-    json_object_set_int(json_object_object_get(send_obj, "piece"), 2);
-    json_object_object_add(send_obj, "data", data);
+    mx_js_s_int(mx_js_o_o_get(send_obj, "piece"), 2);
+    mx_js_o_o_add(send_obj, "data", data);
     while(readed > 0 && !feof(file)) {
         readed = fread(buffer, 1, sizeof(buffer), file);
         json_object_set_string_len(data, buffer, readed);
-        feof(file) ? json_object_set_int(json_object_object_get(send_obj, "piece"), 3) : 0;
-        json_string = json_object_to_json_string(send_obj);
+        feof(file) ? mx_js_s_int(mx_js_o_o_get(send_obj, "piece"), 3) : 0;
+        json_string = mx_js_o_to_js_str(send_obj);
         mx_save_send(vars->mutex, vars->tls, json_string, strlen(json_string));
     }
     json_object_put(send_obj);

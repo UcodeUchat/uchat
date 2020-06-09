@@ -34,7 +34,7 @@ static void show_name_settings(t_client_info *info, GtkWidget *name_box) {
 }
 
 void mx_show_name (t_client_info *info, int id, json_object *new_json, GtkWidget *profile) {
-    const char *name = json_object_get_string(json_object_object_get(new_json, "name"));
+    const char *name = mx_js_g_str(mx_js_o_o_get(new_json, "name"));
     GtkWidget *box = gtk_box_new(FALSE, 5);
     GtkWidget *name_box = gtk_box_new(FALSE, 5);
 

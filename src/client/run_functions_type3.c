@@ -19,8 +19,8 @@ static int notebook_reorder(t_note *note) {
 }
 
 void mx_delete_message_client(t_client_info *info, json_object *new_json) { 
-    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
-    int message_id = json_object_get_int(json_object_object_get(new_json, "message_id"));
+    int room_id = mx_js_g_int(mx_js_o_o_get(new_json, "room_id"));
+    int message_id = mx_js_g_int(mx_js_o_o_get(new_json, "message_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
     if (message_id >= room->messages->id) {
@@ -32,7 +32,7 @@ void mx_delete_message_client(t_client_info *info, json_object *new_json) {
 }
 
 void mx_input_message(t_client_info *info, json_object *new_json) {
-    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+    int room_id = mx_js_g_int(mx_js_o_o_get(new_json, "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
     mx_push_message(info, room, new_json);

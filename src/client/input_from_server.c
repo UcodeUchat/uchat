@@ -47,7 +47,7 @@ static void part2 (int type, json_object *obj, t_client_info *info) {
 }
 
 static int run_function_type_in_client(t_client_info *info, json_object *obj) {
-    int type = json_object_get_int(json_object_object_get(obj, "type"));
+    int type = mx_js_g_int(mx_js_o_o_get(obj, "type"));
     // if (type != MX_FILE_DOWNLOAD_TYPE) mx_print_json_object(obj, "mx_process_input_from_server");
 
     part1(type, obj, info);

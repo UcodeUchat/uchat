@@ -1,7 +1,7 @@
 #include "uchat.h"
 
 static void show_room_name (json_object *room_data, GtkWidget *h_box) {
-    const char *name = name = json_object_get_string(json_object_object_get(room_data, "name"));
+    const char *name = name = mx_js_g_str(mx_js_o_o_get(room_data, "name"));
     GtkWidget *label = gtk_label_new(name);
     
     gtk_box_pack_start (GTK_BOX (h_box), label, FALSE, FALSE, 0);
@@ -20,15 +20,15 @@ static void show_room_access (int acces, GtkWidget *button, GtkWidget *h_box, t_
 }
 
 static void show_room_data (json_object *room_data, GtkWidget *h_box, t_client_info *info) {
-    int id = json_object_get_int(json_object_object_get(room_data, "id"));
-    int acces = json_object_get_int(json_object_object_get(room_data, "acces"));
+    int id = mx_js_g_int(mx_js_o_o_get(room_data, "id"));
+    int acces = mx_js_g_int(mx_js_o_o_get(room_data, "acces"));
     t_all *data = (t_all *)malloc(sizeof(t_all));
     t_room *room = mx_find_room(info->data->rooms, id);
     GtkWidget *button = NULL;
 
     data->info = info;
     data->room_id = id;
-    data->room_name = strdup(json_object_get_string(json_object_object_get(room_data, "name")));
+    data->room_name = strdup(mx_js_g_str(mx_js_o_o_get(room_data, "name")));
     if (room) {
         button = gtk_label_new ("Already joined");
         gtk_box_pack_end (GTK_BOX (h_box), button, FALSE, FALSE, 0);

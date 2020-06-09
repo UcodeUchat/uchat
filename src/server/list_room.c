@@ -1,16 +1,16 @@
 #include "uchat.h"
 
 static int get_rooms(void *array, int argc, char **argv, char **col_name) {
-	json_object *room = json_object_new_object();
-	json_object *id = json_object_new_int(atoi(argv[1]));
-	json_object *name = json_object_new_string(argv[2]);
-	json_object *access = json_object_new_int(atoi(argv[3]));
+	json_object *room = mx_js_n_o();
+	json_object *id = mx_js_n_int(atoi(argv[1]));
+	json_object *name = mx_js_n_str(argv[2]);
+	json_object *access = mx_js_n_int(atoi(argv[3]));
 
 	(void)argc;
 	(void)col_name;
-	json_object_object_add(room, "room_id", id);
-	json_object_object_add(room, "name", name);
-	json_object_object_add(room, "access", access);
+	mx_js_o_o_add(room, "room_id", id);
+	mx_js_o_o_add(room, "name", name);
+	mx_js_o_o_add(room, "access", access);
 	json_object_array_add((struct json_object *)array, room);
 	return 0;
 }
@@ -24,47 +24,47 @@ static void set_file(json_object **add_info, json_object **data, char **argv) {
 	}
 	if (strcmp(ext, "jpg") == 0 || strcmp(ext, "png") == 0
 		|| strcmp(ext, "gif") == 0) {
-		*data = json_object_new_string(argv[3]);
-		*add_info = json_object_new_int(2);
+		*data = mx_js_n_str(argv[3]);
+		*add_info = mx_js_n_int(2);
 	}
 	else if (strcmp(ext, "aif") == 0) {
-		*data = json_object_new_string(argv[3]);
-		*add_info = json_object_new_int(4);
+		*data = mx_js_n_str(argv[3]);
+		*add_info = mx_js_n_int(4);
 	}
 	else {
-		*data = json_object_new_string(argv[3] /*+ 20*/);
-		*add_info = json_object_new_int(1);
+		*data = mx_js_n_str(argv[3] /*+ 20*/);
+		*add_info = mx_js_n_int(1);
 	}
 }
 
 static void set_msg(json_object **add_info, json_object **data, char **argv) {
 	if (strcmp(argv[4], "mes") == 0)
-		*add_info = json_object_new_int(0);
+		*add_info = mx_js_n_int(0);
 	else if (strcmp(argv[4], "stik") == 0)
-		*add_info = json_object_new_int(3);
-	*data = json_object_new_string(argv[3]);
+		*add_info = mx_js_n_int(3);
+	*data = mx_js_n_str(argv[3]);
 }
 
 static void set_data_to_room_json(json_object **message, json_object **id,
 						   json_object **user_id, json_object **data) {
-	json_object_object_add(*message, "id", *id);
-	json_object_object_add(*message, "user_id", *user_id);
-	json_object_object_add(*message, "data", *data);
+	mx_js_o_o_add(*message, "id", *id);
+	mx_js_o_o_add(*message, "user_id", *user_id);
+	mx_js_o_o_add(*message, "data", *data);
 }
 
 static void set_data_to_room_json_2(json_object **message, json_object **login,
 							 json_object **add_info, void **messages) {
-	json_object_object_add(*message, "login", *login);
-	json_object_object_add(*message, "add_info", *add_info);
+	mx_js_o_o_add(*message, "login", *login);
+	mx_js_o_o_add(*message, "add_info", *add_info);
 	json_object_array_add(*(struct json_object **)messages, *message);
 }
 
 int mx_get_rooms_data(void *messages, int argc, char **argv, char **col_name) {
-	json_object *message = json_object_new_object();
-	json_object *id = json_object_new_int(atoi(argv[0]));
-	json_object *user_id = json_object_new_int(atoi(argv[1]));
+	json_object *message = mx_js_n_o();
+	json_object *id = mx_js_n_int(atoi(argv[0]));
+	json_object *user_id = mx_js_n_int(atoi(argv[1]));
 	json_object *data = NULL;
-	json_object *login = json_object_new_string(argv[8]);
+	json_object *login = mx_js_n_str(argv[8]);
 	json_object *add_info = NULL;
 
 	if (argv[0] == NULL)
@@ -83,11 +83,11 @@ int mx_get_rooms_data(void *messages, int argc, char **argv, char **col_name) {
 
 void mx_get_rooms(t_server_info *info, json_object *js) {
 	char *req = mx_strnew(1024);
-	int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
+	int user_id = mx_js_g_int(mx_js_o_o_get(js, "user_id"));
 	json_object *array = json_object_new_array();
 	int n_rooms;
 
-	json_object_object_add(js, KEY10, array);
+	mx_js_o_o_add(js, KEY10, array);
     sprintf(req, "select distinct user_id, rooms.id, rooms.name, rooms.access from room_user, rooms \
     			where rooms.id=room_user.room_id and user_id=%d;", user_id);
     if (sqlite3_exec(info->db, req, get_rooms, array, 0) != SQLITE_OK)
@@ -96,10 +96,10 @@ void mx_get_rooms(t_server_info *info, json_object *js) {
     for (int i = 0; i < n_rooms; i++) {
         json_object *room_data = json_object_array_get_idx(array, i);
         json_object *messages = json_object_new_array();
-        int room_id = json_object_get_int(json_object_object_get(room_data, "room_id"));
+        int room_id = mx_js_g_int(mx_js_o_o_get(room_data, "room_id"));
         char *req1 = mx_strnew(1024);
 
-        json_object_object_add(room_data, "messages", messages);
+        mx_js_o_o_add(room_data, "messages", messages);
         sprintf(req1, "SELECT *  FROM msg_history, users \
         		where room_id = %d and users.id = msg_history.user_id order by msg_history.id desc limit 5;", room_id);
         if (sqlite3_exec(info->db, req1, mx_get_rooms_data, messages, 0) != SQLITE_OK) {

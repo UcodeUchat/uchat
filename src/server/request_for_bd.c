@@ -55,7 +55,7 @@ int mx_drop_socket(t_server_info *i, int client_sock) {
 }
 
 int mx_delete_acc(t_server_info *i, json_object *j) {
-    int user_id = json_object_get_int(json_object_object_get(j, "user_id"));
+    int user_id = mx_js_g_int(mx_js_o_o_get(j, "user_id"));
     char *command = malloc(1024);
 
     sprintf(command, "DELETE FROM users WHERE users.id=%d", user_id);

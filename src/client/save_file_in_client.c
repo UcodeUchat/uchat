@@ -4,9 +4,9 @@
 
 int start_downloading_file_in_client(t_client_info *info, json_object *obj) {
     if (mx_add_file_to_list_in_client(&(info->input_files),
-        json_object_get_int(json_object_object_get(obj, "file_id")),
-        (char *)json_object_get_string(json_object_object_get(obj, "file_name")),
-        json_object_get_int(json_object_object_get(obj, "file_size"))) == 0) {
+        mx_js_g_int(mx_js_o_o_get(obj, "file_id")),
+        (char *)mx_js_g_str(mx_js_o_o_get(obj, "file_name")),
+        mx_js_g_int(mx_js_o_o_get(obj, "file_size"))) == 0) {
         return 0;
     }
     else
@@ -15,11 +15,11 @@ int start_downloading_file_in_client(t_client_info *info, json_object *obj) {
 }
 
 int add_data_to_file_client(t_file_list *list, json_object *obj) {
-    t_file_list *add_to = mx_find_file_in_list(list, json_object_get_int(json_object_object_get(obj, "file_id")));
-    const char *data = json_object_get_string(json_object_object_get(obj, "data"));
+    t_file_list *add_to = mx_find_file_in_list(list, mx_js_g_int(mx_js_o_o_get(obj, "file_id")));
+    const char *data = mx_js_g_str(mx_js_o_o_get(obj, "data"));
 
     if (add_to) {
-        fwrite(data, 1,json_object_get_string_len(json_object_object_get(obj, "data")), add_to->file);
+        fwrite(data, 1,mx_js_g_str_len(mx_js_o_o_get(obj, "data")), add_to->file);
         return 0;
     }
     return 1;
@@ -31,21 +31,21 @@ int show_image(GtkWidget *image) {
 }
 
 int final_file_input_client(t_file_list **list, json_object *obj, t_client_info *info) {
-    t_file_list *add_to = mx_find_file_in_list(*list, json_object_get_int(json_object_object_get(obj, "file_id")));
-    const char *data = json_object_get_string(json_object_object_get(obj, "data"));
+    t_file_list *add_to = mx_find_file_in_list(*list, mx_js_g_int(mx_js_o_o_get(obj, "file_id")));
+    const char *data = mx_js_g_str(mx_js_o_o_get(obj, "data"));
 
     if (add_to) {
         int file_size;
 
-        fwrite(data, 1, json_object_get_string_len(json_object_object_get(obj, "data")), add_to->file);
+        fwrite(data, 1, mx_js_g_str_len(mx_js_o_o_get(obj, "data")), add_to->file);
         file_size = ftell(add_to->file);
         fclose(add_to->file);
         
         if (file_size == add_to->file_size) {
             printf("FILE SIZE IS OK\n");
             mx_pop_file_list_in_client(list, add_to->id);
-            if (json_object_get_int(json_object_object_get(obj, "add_info")) == 2) {
-                const char *file_name = json_object_get_string(json_object_object_get(obj, "file_name"));
+            if (mx_js_g_int(mx_js_o_o_get(obj, "add_info")) == 2) {
+                const char *file_name = mx_js_g_str(mx_js_o_o_get(obj, "file_name"));
                 char *extention = strdup(file_name);
 
                 while (mx_get_char_index(extention, '.') >= 0) {
@@ -56,8 +56,8 @@ int final_file_input_client(t_file_list **list, json_object *obj, t_client_info 
                 }
 
                 char *file_path = mx_strjoin("./Uchat_downloads/", file_name);
-                int file_id = json_object_get_int(json_object_object_get(obj, "file_id"));
-                int room_id = json_object_get_int(json_object_object_get(obj, "room_id"));
+                int file_id = mx_js_g_int(mx_js_o_o_get(obj, "file_id"));
+                int room_id = mx_js_g_int(mx_js_o_o_get(obj, "room_id"));
                 t_room *room = mx_find_room(info->data->rooms, room_id);
                 t_message *message = mx_find_message(room->messages, file_id);
                 GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale (file_path, 350, 290, TRUE, NULL);
@@ -84,7 +84,7 @@ int final_file_input_client(t_file_list **list, json_object *obj, t_client_info 
 }
 
 int mx_save_file_in_client(t_client_info *info, json_object *obj) {
-    int piece = json_object_get_int(json_object_object_get(obj, "piece"));
+    int piece = mx_js_g_int(mx_js_o_o_get(obj, "piece"));
 
     if (piece == 1) {
         return start_downloading_file_in_client(info, obj);
@@ -96,7 +96,7 @@ int mx_save_file_in_client(t_client_info *info, json_object *obj) {
         return final_file_input_client(&(info->input_files), obj, info);
     }
     else if (piece == -1) {
-        fprintf(stderr, "file now is not exist. id:%d\n", json_object_get_int(json_object_object_get(obj, "file_id")));
+        fprintf(stderr, "file now is not exist. id:%d\n", mx_js_g_int(mx_js_o_o_get(obj, "file_id")));
     }
     return 0;
 }
@@ -121,10 +121,10 @@ int mx_load_file(t_mes *msg) {
         json_object *send_obj = mx_create_basic_json_object(MX_FILE_DOWNLOAD_TYPE);
         const char *send_str;
 
-        json_object_object_add(send_obj, "file_id", json_object_new_int(msg->id));
-        json_object_object_add(send_obj, "user_id", json_object_new_int(msg->info->id));
-        json_object_object_add(send_obj, "room_id", json_object_new_int(msg->room->id));
-        send_str = json_object_to_json_string(send_obj);
+        mx_js_o_o_add(send_obj, "file_id", mx_js_n_int(msg->id));
+        mx_js_o_o_add(send_obj, "user_id", mx_js_n_int(msg->info->id));
+        mx_js_o_o_add(send_obj, "room_id", mx_js_n_int(msg->room->id));
+        send_str = mx_js_o_to_js_str(send_obj);
         tls_send(msg->info->tls_client, send_str, strlen(send_str));
         json_object_put(send_obj);
         printf("Sended\n");
@@ -134,10 +134,10 @@ int mx_load_file(t_mes *msg) {
             json_object *send_obj = mx_create_basic_json_object(MX_FILE_DOWNLOAD_TYPE);
             const char *send_str;
 
-            json_object_object_add(send_obj, "file_id", json_object_new_int(msg->id));
-            json_object_object_add(send_obj, "user_id", json_object_new_int(msg->info->id));
-            json_object_object_add(send_obj, "room_id", json_object_new_int(msg->room->id));
-            send_str = json_object_to_json_string(send_obj);
+            mx_js_o_o_add(send_obj, "file_id", mx_js_n_int(msg->id));
+            mx_js_o_o_add(send_obj, "user_id", mx_js_n_int(msg->info->id));
+            mx_js_o_o_add(send_obj, "room_id", mx_js_n_int(msg->room->id));
+            send_str = mx_js_o_to_js_str(send_obj);
             tls_send(msg->info->tls_client, send_str, strlen(send_str));
             json_object_put(send_obj);
             printf("Sended\n");

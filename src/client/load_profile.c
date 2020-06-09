@@ -44,7 +44,7 @@ static void init_close_event (t_client_info *info, GtkWidget *box) {
 }
 
 void mx_load_user_profile(t_client_info *info, json_object *new_json) {
-    int id = json_object_get_int(json_object_object_get(new_json, "id"));
+    int id = mx_js_g_int(mx_js_o_o_get(new_json, "id"));
     GtkWidget *box = gtk_box_new(FALSE, 0);
 
     if (info->data->profile != NULL) {

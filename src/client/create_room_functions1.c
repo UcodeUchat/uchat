@@ -3,7 +3,7 @@
 
 void mx_load_room_history (t_all *data) {
     struct json_object *messages;
-    json_object_object_get_ex(data->room_data, "messages", &messages);
+    mx_js_o_o_get_ex(data->room_data, "messages", &messages);
     int n_msg = json_object_array_length(messages);
     for (int j = 0; j < n_msg; j++) {
         json_object *msg_data = json_object_array_get_idx(messages, j);
@@ -15,9 +15,9 @@ void mx_load_room_history (t_all *data) {
 }
 
 void mx_init_room (t_client_info *info ,t_room *room, int position, json_object *room_data) {
-    char *name = strdup(json_object_get_string(json_object_object_get(room_data, "name")));
-    int id = json_object_get_int(json_object_object_get(room_data, "room_id"));
-    int access = json_object_get_int(json_object_object_get(room_data, "access"));
+    char *name = strdup(mx_js_g_str(mx_js_o_o_get(room_data, "name")));
+    int id = mx_js_g_int(mx_js_o_o_get(room_data, "room_id"));
+    int access = mx_js_g_int(mx_js_o_o_get(room_data, "access"));
 
     if (access == 3)
         room->name = mx_replace_substr (name, info->login, "");

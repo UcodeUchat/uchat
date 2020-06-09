@@ -8,14 +8,14 @@ static void init_direect_message(t_client_info *info, json_object *new_json) {
         head->position = head->position + 1;
         head = head->next;
     }
-    json_object_deep_copy(json_object_object_get(new_json, "room_data"), &room_data, NULL);
+    json_object_deep_copy(mx_js_o_o_get(new_json, "room_data"), &room_data, NULL);
     mx_push_room(info, room_data, 0);
 }
 
 void mx_direct_message_client(t_client_info *info, json_object *new_json) {
-    int exist = json_object_get_int(json_object_object_get(new_json, 
+    int exist = mx_js_g_int(mx_js_o_o_get(new_json, 
                                                             "exist"));
-    int room_id = json_object_get_int(json_object_object_get(new_json, 
+    int room_id = mx_js_g_int(mx_js_o_o_get(new_json, 
                                                             "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
@@ -61,8 +61,8 @@ static void exit_room(t_client_info *info, t_room *room, int room_id) {
 }
 
 void mx_leave_room_client(t_client_info *info, json_object *new_json) {
-    int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
-    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+    int user_id = mx_js_g_int(mx_js_o_o_get(new_json, "user_id"));
+    int room_id = mx_js_g_int(mx_js_o_o_get(new_json, "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
     if (room != NULL) {

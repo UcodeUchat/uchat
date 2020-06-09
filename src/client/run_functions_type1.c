@@ -8,13 +8,13 @@ static void add_room(t_client_info *info, json_object *new_json) {
         head->position = head->position + 1;
         head = head->next;
     }  
-    json_object_deep_copy(json_object_object_get(new_json, "room_data"), &room_data, NULL);
+    json_object_deep_copy(mx_js_o_o_get(new_json, "room_data"), &room_data, NULL);
     mx_push_room(info, room_data, 0);
 }
 
 void mx_join_room_client(t_client_info *info, json_object *new_json) {
-    int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
-    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+    int user_id = mx_js_g_int(mx_js_o_o_get(new_json, "user_id"));
+    int room_id = mx_js_g_int(mx_js_o_o_get(new_json, "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
     if (user_id == info->id) {
@@ -38,18 +38,18 @@ int mx_notebook_detach(t_note *note) {
 
 
 void mx_edit_profile_client(t_client_info *info, json_object *new_json) {
-    int confirmation = json_object_get_int(json_object_object_get(new_json, "confirmation"));
+    int confirmation = mx_js_g_int(mx_js_o_o_get(new_json, "confirmation"));
 
     if (confirmation) {
-        info->audio = json_object_get_int(json_object_object_get(new_json, "audio_n"));
-        info->visual = json_object_get_int(json_object_object_get(new_json, "visual_n"));
+        info->audio = mx_js_g_int(mx_js_o_o_get(new_json, "audio_n"));
+        info->visual = mx_js_g_int(mx_js_o_o_get(new_json, "visual_n"));
     }
 }
 
 void mx_show_gif(char *gif, char *event, t_room *room, json_object *new_json) {
     GtkWidget *h_box = gtk_box_new(FALSE, 5);
-    char *label = mx_strjoin(json_object_get_string(
-                            json_object_object_get(new_json, "login")), event);
+    char *label = mx_strjoin(mx_js_g_str(
+                            mx_js_o_o_get(new_json, "login")), event);
     GtkWidget *login = gtk_label_new(label);
     GtkWidget *image_box = gtk_box_new(FALSE, 0);
     GtkWidget *image = gtk_image_new_from_file(gif);

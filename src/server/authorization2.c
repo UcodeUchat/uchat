@@ -3,9 +3,9 @@
 static void auth_not_valid(t_socket_list *csl, json_object *js) {
     const char *json_string = NULL;
 
-    json_object_set_int(json_object_object_get(js, "type"),
+    mx_js_s_int(mx_js_o_o_get(js, "type"),
                         MX_AUTH_TYPE_NV);
-    json_string = json_object_to_json_string(js);
+    json_string = mx_js_o_to_js_str(js);
     mx_save_send(&csl->mutex, csl->tls_socket, json_string,
                  strlen(json_string));
 }
@@ -24,11 +24,11 @@ int mx_authorization(t_server_info *i, t_socket_list *csl, json_object *js) {
     int valid = mx_check_client(i, js, csl->socket);
     
     if (valid == 1) {
-        json_object_set_int(json_object_object_get(js, "type"),
+        mx_js_s_int(mx_js_o_o_get(js, "type"),
                             MX_AUTH_TYPE_V);
-        json_object_object_add(js, "room_id", json_object_new_int(0));
+        mx_js_o_o_add(js, "room_id", mx_js_n_int(0));
         mx_get_rooms(i, js);
-        json_string = json_object_to_json_string(js);
+        json_string = mx_js_o_to_js_str(js);
         mx_save_send(&csl->mutex, csl->tls_socket, json_string,
                      strlen(json_string));
         mx_email_notify(i, js);      

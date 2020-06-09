@@ -13,12 +13,12 @@ static void authentification(t_client_info *info) {
     json_object *js;
     const char *json_string = NULL;
 
-    js = json_object_new_object();
-    json_object_object_add(js, "type", json_object_new_int(MX_AUTH_TYPE));
-    json_object_object_add(js, "login", json_object_new_string(info->login));
-    json_object_object_add(js, "password", json_object_new_string(info->password));
+    js = mx_js_n_o();
+    mx_js_o_o_add(js, "type", mx_js_n_int(MX_AUTH_TYPE));
+    mx_js_o_o_add(js, "login", mx_js_n_str(info->login));
+    mx_js_o_o_add(js, "password", mx_js_n_str(info->password));
     mx_print_json_object(js, "login authentification");
-    json_string = json_object_to_json_string(js);
+    json_string = mx_js_o_to_js_str(js);
     tls_send(info->tls_client, json_string, strlen(json_string));
     while (info->responce == 0) {
         (void)info;
@@ -50,12 +50,12 @@ void mx_search_callback (GtkWidget *widget, t_client_info *info) {
     const char *json_string = NULL;
 
     gtk_widget_hide(info->data->search_box);
-    new_json = json_object_new_object();
-    json_object_object_add(new_json, "type", json_object_new_int(MX_SEARCH_ALL_TYPE));
-    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
-    json_object_object_add(new_json, "query", json_object_new_string 
+    new_json = mx_js_n_o();
+    mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_SEARCH_ALL_TYPE));
+    mx_js_o_o_add(new_json, "user_id", mx_js_n_int(info->id));
+    mx_js_o_o_add(new_json, "query", mx_js_n_str 
                             (gtk_entry_get_text(GTK_ENTRY(info->data->search_entry))));
-    json_string = json_object_to_json_string(new_json);
+    json_string = mx_js_o_to_js_str(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
     gtk_entry_set_text(GTK_ENTRY(info->data->search_entry), "");
     (void)widget;

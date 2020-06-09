@@ -24,12 +24,12 @@ void mx_close_menu_callback (GtkWidget *widget, GdkEventButton *event, t_client_
 static void delete_account(t_client_info *info) {
     json_object *new_json;
 
-    new_json = json_object_new_object();
-    json_object_object_add(new_json, "type", json_object_new_int(MX_DELETE_ACCOUNT_TYPE));
-    json_object_object_add(new_json, "login", json_object_new_string(info->login));
-    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
+    new_json = mx_js_n_o();
+    mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_DELETE_ACCOUNT_TYPE));
+    mx_js_o_o_add(new_json, "login", mx_js_n_str(info->login));
+    mx_js_o_o_add(new_json, "user_id", mx_js_n_int(info->id));
     mx_print_json_object(new_json, "delete_account");
-    const char *json_string = json_object_to_json_string(new_json);
+    const char *json_string = mx_js_o_to_js_str(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
 }
 

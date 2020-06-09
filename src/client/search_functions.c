@@ -53,8 +53,8 @@ void mx_show_users_result (GtkWidget *room_box, int n_users,
 
     for (int i = 0; i < n_users; i++) {
         user_data = json_object_array_get_idx(users, i);
-        login = json_object_get_string(json_object_object_get(user_data, "login"));
-        id = json_object_get_int(json_object_object_get(user_data, "id"));
+        login = mx_js_g_str(mx_js_o_o_get(user_data, "login"));
+        id = mx_js_g_int(mx_js_o_o_get(user_data, "id"));
 
         if (id != info->id) {
             h_box = mx_init_search_h_box(room_box);
