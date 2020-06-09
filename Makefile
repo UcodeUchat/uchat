@@ -40,6 +40,7 @@ INCS = inc/uchat.h
 SRC_SERVER = main_server.c \
 	start_server.c \
 	start_server2.c \
+	start_server3.c \
 	set_daemon.c \
 	server_worker.c \
 	work_with_db.c \

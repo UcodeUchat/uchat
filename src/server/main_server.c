@@ -24,14 +24,9 @@ static void zero_sockets(t_server_info *info) {
     sqlite3_exec(info->db, command, NULL, NULL, NULL);
 }
 
-int main(int argc, char **argv) {
-    t_server_info *info = NULL;
+static void init_server_info(int argc, char **argv, t_server_info *info) {
     struct servent *servent;
 
-    if (argc != 2)
-        mx_err_exit("usage: chat_server [port]\n");
-    info = (t_server_info *)malloc(sizeof(t_server_info));
-    memset(info, 0, sizeof(t_server_info));
     (*info).argc = argc;
     (*info).argv = argv;
     (*info).port = (uint16_t) atoi(argv[1]);
@@ -40,22 +35,24 @@ int main(int argc, char **argv) {
     if ((servent = getservbyport((*info).port, "tcp")) != NULL
         || (servent = getservbyport((*info).port, "udp")) != NULL)
         mx_err_exit("port was taken by another process\n");
+}
+
+int main(int argc, char **argv) {
+    t_server_info *info = NULL;
+
+    if (argc != 2)
+        mx_err_exit("usage: chat_server [port]\n");
+    info = (t_server_info *)malloc(sizeof(t_server_info));
+    memset(info, 0, sizeof(t_server_info));
+    init_server_info(argc, argv, info);
     pthread_mutex_init(&((*info).mutex), NULL);
-    printf("Configuring .\n");
-    // if (mx_set_daemon(info) == -1) {
-    //     printf("error = %s\n", strerror(errno));
-    //     return -1;
-    // }
-    printf("Configuring demon ++...\n");
+     if (mx_set_daemon(info) == -1)
+         mx_err_return3("error: ", strerror(errno), -1);
     init_db(info);
     zero_sockets(info);
     create_download_folder();
-    if (mx_start_server(info) == -1) {
-        printf("error = %s\n", strerror(errno));
-        return -1;
-    }
+    if (mx_start_server(info) == -1)
+        mx_err_return3("error: ", strerror(errno), -1);
     sqlite3_close(info->db);
     return 0;
 }
-
-

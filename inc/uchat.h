@@ -569,6 +569,7 @@ char *mx_curr_time(void);
 void mx_print_tid(const char *s);
 void mx_err_exit(const char *err_msg);  // вивести помилку
 int mx_err_return2(const char *err_msg, const char *err_msg2);
+int mx_err_return3(const char *err_msg, const char *err_msg2, int value);
 int mx_err_return(const char *err_msg);
 void mx_sha_hash_password(char *password);
 int addr_socet_info(int argc, char *argv[]);  // test adress

@@ -1,0 +1,62 @@
+log_file fd  0
+bind error = Address already in use
+server new client socket 6
+New connection from 127.0.0.1 57306
+client_sock = 6
+
+
+Client connected successfully
+			work with client 6
+
+js_in_room: 
+---
+{ "type": 4, "login": "neo", "password": "1", "user_id": 5, "visual": 0, "audio": 0, "room_id": 0, "rooms": [ { "room_id": 0, "name": "General", "access": 1, "messages": [ { "id": 156, "user_id": 5, "data": "b", "login": "neo", "add_info": 0 }, { "id": 155, "user_id": 5, "data": "fg", "login": "neo", "add_info": 0 }, { "id": 154, "user_id": 5, "data": "gb", "login": "neo", "add_info": 0 }, { "id": 153, "user_id": 5, "data": "b", "login": "neo", "add_info": 0 }, { "id": 152, "user_id": 5, "data": "bfg", "login": "neo", "add_info": 0 } ] }, { "room_id": 1, "name": "First", "access": 1, "messages": [ ] }, { "room_id": 2, "name": "Second", "access": 1, "messages": [ { "id": 148, "user_id": 5, "data": "fggf", "login": "neo", "add_info": 0 }, { "id": 122, "user_id": 5, "data": "d", "login": "neo", "add_info": 0 }, { "id": 121, "user_id": 5, "data": "s", "login": "neo", "add_info": 0 }, { "id": 120, "user_id": 5, "data": "s", "login": "neo", "add_info": 0 }, { "id": 119, "user_id": 5, "data": "d", "login": "neo", "add_info": 0 } ] } ] }
+---
+server new client socket 7
+New connection from 127.0.0.1 57308
+client_sock = 7
+
+
+Client connected successfully
+			work with client 7
+
+js_in_room: 
+---
+{ "type": 4, "login": "snikolayen", "password": "123123", "user_id": 3, "visual": 0, "audio": 0, "room_id": 0, "rooms": [ { "room_id": 0, "name": "General", "access": 1, "messages": [ { "id": 156, "user_id": 5, "data": "b", "login": "neo", "add_info": 0 }, { "id": 155, "user_id": 5, "data": "fg", "login": "neo", "add_info": 0 }, { "id": 154, "user_id": 5, "data": "gb", "login": "neo", "add_info": 0 }, { "id": 153, "user_id": 5, "data": "b", "login": "neo", "add_info": 0 }, { "id": 152, "user_id": 5, "data": "bfg", "login": "neo", "add_info": 0 } ] } ] }
+---
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 6
+			work with client 7
+			work with client 7
+Client 7 disconnected
+id	socket	login		password	name
+1	0	mmasniy		123123		
+2	0	vkmetyk		123123		
+3	0	snikolayen	123123		
+4	0	mlibovych	123123		
+5	6	neo		1		
+			work with client 6
+Client 6 disconnected
+id	socket	login		password	name
+1	0	mmasniy		123123		
+2	0	vkmetyk		123123		
+3	0	snikolayen	123123		
+4	0	mlibovych	123123		
+5	0	neo		1		
