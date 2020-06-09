@@ -20,7 +20,8 @@ void load_audio_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
     printf("%s\n", mx_strjoin("./Uchat_downloads/", mes->message->data));
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED); // #
-    tc = pthread_create(&sound_play, &attr, play_sound_pthread, mes->message->data);
+    tc = pthread_create(&sound_play, &attr, play_sound_pthread, \
+                        mes->message->data);
     if (tc != 0)
         printf("pthread_create error = %s\n", strerror(tc));
 }
@@ -40,7 +41,8 @@ void mx_play_cb(GtkWidget *widget, t_mes *mes) {
 GtkWidget *mx_make_button(t_mes *mes, char *name, 
                             void(*callback)(GtkWidget *widget, t_mes *mes) ) {
     GtkWidget *button1 = gtk_button_new();
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale (name, 20, 20, TRUE, NULL);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale (name, 20, 20, TRUE,\
+                                                            NULL);
     GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
 
     gtk_button_set_image(GTK_BUTTON(button1), image);
@@ -56,7 +58,8 @@ void audio (t_mes *mes, t_message *node) {
     GtkWidget *b_pause = mx_make_button(mes, "img/pause.png", mx_pause_cb);
     GtkWidget *b_play = mx_make_button(mes, "img/play.png", mx_play_cb);
 
-    gtk_orientable_set_orientation (GTK_ORIENTABLE(box_all), GTK_ORIENTATION_VERTICAL);
+    gtk_orientable_set_orientation(GTK_ORIENTABLE(box_all),\
+                                    GTK_ORIENTATION_VERTICAL);
     gtk_box_pack_start(GTK_BOX(node->central_box), box_all, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(box_all), v_mess, FALSE, FALSE, 0);
 
