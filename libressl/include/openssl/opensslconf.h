@@ -1,4 +1,4 @@
-#include <openssl/opensslfeatures.h>
+#include <../../libressl/include/openssl/opensslfeatures.h>
 /* crypto/opensslconf.h.in */
 
 #if defined(_MSC_VER) && !defined(__attribute__)

@@ -112,17 +112,17 @@
 #ifndef HEADER_ERR_H
 #define HEADER_ERR_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl/include/openssl/opensslconf.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <openssl/ossl_typ.h>
+#include <../../libressl/include/openssl/ossl_typ.h>
 #ifndef OPENSSL_NO_BIO
-#include <openssl/bio.h>
+#include <../../libressl/include/openssl/bio.h>
 #endif
 #ifndef OPENSSL_NO_LHASH
-#include <openssl/lhash.h>
+#include <../../libressl/include/openssl/lhash.h>
 #endif
 
 #ifdef	__cplusplus

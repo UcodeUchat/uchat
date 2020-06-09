@@ -59,8 +59,8 @@
 #ifndef  HEADER_CONF_API_H
 #define HEADER_CONF_API_H
 
-#include <openssl/lhash.h>
-#include <openssl/conf.h>
+#include <../../libressl/include/openssl/lhash.h>
+#include <../../libressl/include/openssl/conf.h>
 
 #ifdef  __cplusplus
 extern "C" {

@@ -12,7 +12,6 @@ typedef struct
 
 
 /*
-
 static int playCallback( const void *inputBuffer, void *outputBuffer,
                          unsigned long framesPerBuffer,
                          const PaStreamCallbackTimeInfo* timeInfo,

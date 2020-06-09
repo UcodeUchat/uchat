@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sqlite3.h>
-#include <stdarg.h>
+#include <stdarg.h> 
 #include <stdint.h>
 #include <syslog.h>
 #include <sys/event.h>
@@ -37,11 +37,11 @@
 #include "../libportaudio/include/portaudio.h"
 
 #include "../libmx/inc/libmx.h"
-#include "../libressl_3/include/tls.h"
-#include "../libressl_3/include/openssl/evp.h"
-#include "../libressl_3/include/openssl/sha.h"
-#include "../libressl_3/include/openssl/aes.h"
-#include "../libressl_3/include/openssl/conf.h"
+#include "../libressl/include/tls.h"
+#include "../libressl/include/openssl/evp.h"
+#include "../libressl/include/openssl/sha.h"
+#include "../libressl/include/openssl/aes.h"
+#include "../libressl/include/openssl/conf.h"
 #include "../libjson/json.h"
 
 #include <gtk/gtk.h>
@@ -185,6 +185,7 @@ typedef struct  s_client_info {  //struct client
     int can_load;
     int editing;
     int editing_room;
+    char *record_file;
     struct s_file_list *input_files;
     struct json_object *rooms;
     int input;
@@ -319,7 +320,7 @@ typedef struct s_mes {
 }               t_mes;
 
 // server
-void email_notify(t_server_info *i, json_object *js);
+void mx_email_notify(t_server_info *i, json_object *js);
 int mx_reconnection(t_server_info *info, t_socket_list *csl);
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
@@ -355,13 +356,11 @@ int mx_create_server_socket(t_server_info *info);
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);
 
-char *check_file_in_db_and_user_access(t_server_info *info, json_object *obj);
-int get_result(void *arg, int argc, char **argv, char **col_name);
-int res(void *arg, int argc, char **argv, char **col_name);
-int check_is_object_valid(json_object *obj);
-t_file_tmp *set_variables(t_socket_list *csl);
-void file_is_not_exist(t_file_tmp *vars);
-void *send_file(void *arg);
+char *mx_check_file_in_db_user_access(t_server_info *info, json_object *obj);
+int mx_check_is_object_valid(json_object *obj);
+t_file_tmp *mx_set_variables(t_socket_list *csl);
+void mx_file_is_not_exist(t_file_tmp *vars);
+void *mx_sd_fl(void *arg);
 void start_sending(FILE *file, t_file_tmp *vars);
 int mx_send_file_from_server(t_server_info *info, t_socket_list *csl);
 
@@ -400,19 +399,19 @@ int mx_registration(t_server_info *i, t_socket_list *csl, json_object *js);
 int mx_add_to_db(t_server_info *i, const char *l, const char *pa, int us_id);
 int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
 
+
+
+
 // client
 int mx_start_client(t_client_info *info);
-
 int mx_reconnect_client(t_client_info *info);
 int mx_connect_client(t_client_info *info);
 int mx_tls_config_client(t_client_info *info);
 int mx_make_tls_connect_client(t_client_info *info);
-
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_process_message_in_client(t_client_info *info);
-void authentification(t_client_info *info);
 void *mx_process_input_from_server(void *taken_info);
-void sleep_ms (int milliseconds);
+void mx_sleep_ms (int milliseconds);
 t_message *mx_find_message(t_message *messages, int id);
 t_room *mx_find_room(t_room *rooms, int id);
 void mx_load_profile_client(t_client_info *info, int id);
@@ -422,19 +421,134 @@ int mx_show_widget(GtkWidget *widget);
 int mx_destroy_widget(GtkWidget *widget);
 void mx_push_message(t_client_info *info, t_room *room, json_object *new_json);
 t_message *mx_create_message(t_client_info *info, t_room *room, json_object *new_json, int order);
-t_room *mx_create_room(t_client_info *info,  json_object *room_data, int position);
 void mx_push_room(t_client_info *info, json_object *room_data, int position);
 void mx_create (t_client_info *info);
 void mx_send_empty_json(struct tls *tls_socket);
-
 //void mx_send_file_from_client(t_client_info *info);
 void mx_send_file_from_client(t_client_info *info, char *file_name);
 int mx_load_file(t_mes *msg);
 int mx_save_file_in_client(t_client_info *info, json_object *obj);
-
 t_file_list *mx_find_file_in_list(t_file_list *list, int id);
 int mx_add_file_to_list_in_client(t_file_list **list, int id, char *name, int file_size);
 void mx_pop_file_list_in_client(t_file_list **list, int id);
+
+void mx_init_login(t_client_info *info);
+void mx_init_main_title(t_client_info *info, GtkWidget *screen);
+void mx_enter_callback (GtkWidget *widget, t_client_info *info);
+void mx_reg_callback (GtkWidget *widget, t_client_info *info);
+
+void mx_init_reg(t_client_info *info);
+void mx_cancel_callback (GtkWidget *widget, t_client_info *info);
+void mx_send_data_callback (GtkWidget *widget, t_client_info *info);
+
+void mx_init_general (t_client_info *info);
+void mx_choose_file_callback(GtkWidget *widget, t_client_info *info);
+void mx_send_callback (GtkWidget *widget, t_client_info *info);
+void mx_edit_cancel_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info);
+void mx_record_callback (GtkWidget *widget, t_client_info *info);
+void mx_show_search_callback (GtkWidget *widget, t_client_info *info);
+void mx_menu_callback (GtkWidget *widget, t_client_info *info);
+void mx_init_notebook (t_client_info *info, GtkWidget *box);
+void mx_init_general_button (t_client_info *info, char *i_name, GtkWidget *box,
+                        void (*callback) (GtkWidget *widget, t_client_info *info));
+void mx_init_general_button_text (t_client_info *info, char *text, GtkWidget *box,
+                        void (*callback) (GtkWidget *widget, t_client_info *info));
+void mx_init_message_box (t_client_info *info, GtkWidget *box, 
+                    void (*callback) (GtkWidget *widget, t_client_info *info));
+
+void mx_init_menu (t_client_info *info);
+void mx_profile_callback (GtkWidget *widget, t_client_info *info);
+void mx_create_callback (GtkWidget *widget, t_client_info *info);
+void mx_logout_callback (GtkWidget *widget, t_client_info *info);
+void mx_delete_acc_callback(GtkWidget *widget, GtkWidget *answer_menu);
+void mx_close_menu_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info);
+void mx_yep_callback(GtkWidget *widget, t_client_info *info);
+GtkWidget *mx_init_menu_main_box (t_client_info *info, GtkWidget *parent, char *style);
+GtkWidget *mx_init_menu_fixed (GtkWidget *main_box);
+GtkWidget *mx_init_menu_box (GtkWidget *fixed, int size);
+GtkWidget *mx_init_menu_exit_box (t_client_info *info, GtkWidget *parent,
+                        void (*callback) (GtkWidget *widget, GdkEventButton *event, t_client_info *info));
+void mx_create_room_callback (GtkWidget *widget, t_client_info *info);
+void mx_close_creation_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info);
+void mx_close_creation_callback1 (GtkWidget *widget, t_client_info *info);
+
+void mx_init_create (t_client_info *info);
+
+void mx_init_stickers (t_client_info *info, GtkWidget *box);
+
+void mx_init_search (t_client_info *info);
+void mx_search_callback (GtkWidget *widget, t_client_info *info);
+
+void mx_scroll_callback (GtkWidget *widget, t_all *data);
+void mx_leave_callback (GtkWidget *widget, t_all *data);
+void mx_room_menu_callback(GtkWidget *widget, GdkEventButton *event, GtkWidget *menu);
+
+t_room *mx_find_room_position(t_room *rooms, int position);
+void mx_init_room_data (t_client_info *info, t_room *room, json_object *room_data, t_all *data);
+void mx_init_room_box (t_room *room);
+void mx_init_room_header (t_room *room);
+void mx_init_room_window (t_room *room);
+void mx_init_room_messsage_box (t_room *room);
+void mx_load_room_history (t_all *data);
+void mx_init_room (t_client_info *info ,t_room *room, int position, json_object *room_data);
+void mx_init_room_menu(t_room *room, t_all *data);
+
+void mx_item_callback (GtkWidget *widget, t_stik *stik);
+void mx_choose_sticker_callback(GtkWidget *widget, GtkWidget *menu);
+void mx_url_callback (GtkWidget *widget, GdkEventButton *event, void *data);
+void mx_logout_client(t_client_info *info);
+
+void mx_show_etc (t_client_info *info, json_object *new_json, GtkWidget *profile);
+void mx_show_global_settings (t_client_info *info, json_object *new_json, GtkWidget *profile);
+void mx_show_title (const char *title, GtkWidget *box);
+void mx_show_login (t_client_info *info, json_object *new_json, GtkWidget *profile);
+void mx_show_email (t_client_info *info, int id, json_object *new_json, GtkWidget *profile);
+void mx_show_id (t_client_info *info, int id, GtkWidget *profile);
+void mx_show_name (t_client_info *info, int id, json_object *new_json, GtkWidget *profile);
+void mx_show_exit (t_client_info *info,  GtkWidget *profile);
+void mx_edit_name_callback (GtkWidget *widget, t_client_info *info);
+void mx_save_name_callback (GtkWidget *widget, t_client_info *info);
+void mx_edit_email_callback (GtkWidget *widget, t_client_info *info);
+void mx_save_email_callback (GtkWidget *widget, t_client_info *info);
+void mx_close_profile_callback1 (GtkWidget *widget, 
+    GdkEventButton *event, t_client_info *info);
+void mx_close_profile_callback (GtkWidget *widget, t_client_info *info);
+void mx_show_empty_result (GtkWidget *room_box, char *title);
+void mx_show_users_result (GtkWidget *room_box, int n_users, 
+                        json_object *users, t_client_info *info);
+void mx_show_rooms_result (GtkWidget *room_box, int n_rooms, 
+                        json_object *rooms, t_client_info *info);
+GtkWidget *mx_init_search_h_box (GtkWidget *room_box);
+void mx_join_callback (GtkWidget *widget, t_all *data);
+GtkWidget *mx_init_content_box (GtkWidget *v_box, char *title);
+
+
+void mx_init_message_data (t_client_info *info, t_room *room, 
+                            json_object *new_json, t_mes *mes);
+void mx_init_message (t_message *node, t_room *room, 
+                        json_object *new_json, int order);
+void mx_init_main_message (t_message *node, t_mes *mes);
+void mx_focus1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes);
+void mx_focus_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes);
+void mx_init_message_login (t_message *node, t_mes *mes, const char *login);
+void mx_init_message_menu (t_message *node, t_mes *mes);
+void mx_delete_callback (GtkWidget *widget, t_mes *mes);
+void mx_edit_callback (GtkWidget *widget, t_mes *mes);
+void mx_focus_menu_callback(GtkWidget *widget, 
+                    GdkEventButton *event, GtkWidget *menu);
+void mx_open_menu_callback(GtkWidget *widget, 
+                    GdkEventButton *event, GtkWidget *menu);
+void mx_load_profile_callback(GtkWidget *widget, t_mes *mes);
+void mx_choose_side (t_client_info *info, t_message *node, 
+                    t_room *room, int order);
+void mx_simple_message (t_message *node, const char *message);
+void mx_file (t_mes *mes, t_message *node, const char *message);
+void mx_image (t_message *node);
+void mx_sticker (t_message *node, const char *message);
+int mx_notebook_prepend(t_note *note);
+int mx_add(t_mes *mes);
+int mx_reorder(t_mes *mes);
+
 
 // functions
 int mx_detect_file_extention(char *filename);
@@ -462,7 +576,7 @@ char *mx_decrypt(char *str);
 
 // krivoy dizayn
 int mx_login (t_client_info *info);
-void append_message(t_client_info *info, t_room *room, json_object *new_json);
+void mx_append_message(t_client_info *info, t_room *room, json_object *new_json);
 
 //json
 json_object *mx_create_basic_json_object(int type);

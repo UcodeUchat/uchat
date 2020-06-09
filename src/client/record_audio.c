@@ -265,7 +265,6 @@ int mx_process_stream_ext(PaStream *stream, t_audio *data,
         double test = difftime(time(&silence), talking);
         if (test >= 1.5 && test <= 10 && data->rec_samples && i >= MIN_TALKING_BUFFERS){
             if (sample_complete) *sample_complete = true;
-            printf("ssssssss\n");
             // char buffer[100];
             //snprintf(buffer, 100, "file:%d.flac", i);
             mx_save_audio(data);

@@ -13,6 +13,7 @@
 #define FRAMES_PER_BUFFER   (1024)
 #define SAMPLE_SILENCE  (0.0f)
 #define NUM_SECONDS     (5)
+#define NUM_CHANNELS (2)
 
 /* Select sample format. */
 #if 1
