@@ -37,11 +37,12 @@ void mx_send_callback (GtkWidget *widget, t_client_info *info) {
 }
 
 void mx_choose_file_callback(GtkWidget *widget, t_client_info *info) {
-    (void)widget;
     int position = gtk_notebook_get_current_page(GTK_NOTEBOOK(info->data->notebook));
     t_room *room = mx_find_room_position(info->data->rooms, position);
+
     info->data->current_room = room->id;
     mx_send_file_from_client(info, NULL);
+    (void)widget;
 }
 
 void mx_choose_sticker_callback(GtkWidget *widget, GtkWidget *menu) {

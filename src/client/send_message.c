@@ -14,9 +14,7 @@ void mx_process_message_in_client(t_client_info *info) {
     message = strdup((char *)gtk_entry_get_text(GTK_ENTRY(info->data->message_entry)));
     json_object_object_add(obj, "data", json_object_new_string(message));
     json_string = json_object_to_json_string(obj);
-
     tls_send(info->tls_client, json_string, strlen(json_string));
-
     mx_strdel(&message);
     json_object_put(obj);
 }
