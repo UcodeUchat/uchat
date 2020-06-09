@@ -11,7 +11,8 @@ static void create_item (GtkWidget *menu, t_mes *mes, char *title,
 }
 
 void mx_init_message_menu (t_message *node, t_mes *mes) {
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/options.png", 20, 40, TRUE, NULL);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/options.png", 
+                                                            20, 40, TRUE, NULL);
     GtkWidget *menu  = gtk_menu_new ();
 
     node->menu_event = gtk_event_box_new();
@@ -22,8 +23,10 @@ void mx_init_message_menu (t_message *node, t_mes *mes) {
         create_item (menu, mes, "Edit", mx_edit_callback);
     gtk_widget_add_events (node->menu_event, GDK_ENTER_NOTIFY_MASK);
     gtk_widget_add_events (node->menu_event, GDK_BUTTON_PRESS_MASK);
-    g_signal_connect (G_OBJECT (node->menu_event), "enter_notify_event", G_CALLBACK (mx_focus_menu_callback), node->menu);
-    g_signal_connect (G_OBJECT (node->menu_event), "button_press_event", G_CALLBACK (mx_open_menu_callback), G_OBJECT (menu));
+    g_signal_connect (G_OBJECT (node->menu_event), "enter_notify_event", 
+                        G_CALLBACK (mx_focus_menu_callback), node->menu);
+    g_signal_connect (G_OBJECT (node->menu_event), "button_press_event", 
+                        G_CALLBACK (mx_open_menu_callback), G_OBJECT (menu));
     gtk_widget_show(node->menu_event);
 }
 

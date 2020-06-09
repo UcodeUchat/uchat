@@ -8,6 +8,7 @@ int mx_add(t_mes *mes) {
 }
 
 int mx_reorder(t_mes *mes) {
-    gtk_box_reorder_child (GTK_BOX (mes->room->message_box), mes->message->h_box, 0);
+    gtk_box_reorder_child (GTK_BOX (mes->room->message_box), 
+    						mes->message->h_box, 0);
     return 0;
 }

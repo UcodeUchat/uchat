@@ -13,10 +13,8 @@ static void init_direect_message(t_client_info *info, json_object *new_json) {
 }
 
 void mx_direct_message_client(t_client_info *info, json_object *new_json) {
-    int exist = mx_js_g_int(mx_js_o_o_get(new_json, 
-                                                            "exist"));
-    int room_id = mx_js_g_int(mx_js_o_o_get(new_json, 
-                                                            "room_id"));
+    int exist = mx_js_g_int(mx_js_o_o_get(new_json,"exist"));
+    int room_id = mx_js_g_int(mx_js_o_o_get(new_json,"room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
 
     if (exist && room != NULL) {

@@ -33,7 +33,8 @@ void mx_init_main_title(t_client_info *info, GtkWidget *screen)  {
     gtk_grid_attach (GTK_GRID (table), title1, 0, 0, 1, 1);
     gtk_widget_set_name(title2, "title2");
     gtk_grid_attach (GTK_GRID (table), title2, 1, 0, 1, 1);
-    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width 
+                                    (info->data->window), -1);
     gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
     gtk_fixed_put (GTK_FIXED (screen), box, 0, 125);
     gtk_container_add (GTK_CONTAINER (event_box), table);

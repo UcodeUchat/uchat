@@ -15,7 +15,8 @@ void mx_reg_callback (GtkWidget *widget, t_client_info *info) {
     gtk_widget_show (info->data->register_box);
 }
 
-void mx_close_menu_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info) {
+void mx_close_menu_callback (GtkWidget *widget, 
+            GdkEventButton *event, t_client_info *info) {
     (void)widget;
     (void)event;
     gtk_widget_hide(info->data->menu);

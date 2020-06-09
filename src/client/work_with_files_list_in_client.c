@@ -31,7 +31,8 @@ t_file_list *mx_find_file_in_list(t_file_list *list, int id) {
     return NULL;
 }
 
-int mx_add_file_to_list_in_client(t_file_list **list, int id, char *name, int file_size) {
+int mx_add_file_to_list_in_client(t_file_list **list, int id, 
+                                  char *name, int file_size) {
     t_file_list *tmp = *list;
 
     if (mx_find_file_in_list(*list, id) == NULL) {

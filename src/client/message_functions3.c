@@ -1,7 +1,8 @@
 #include "uchat.h"
 
 
-static void file_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+static void file_callback(GtkWidget *widget, GdkEventButton *event, 
+                            t_mes *mes) {
     (void)widget;
     (void)event;
     (void)mes;
@@ -10,14 +11,16 @@ static void file_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) 
         mx_load_file(mes);
 }
 
-static void file1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+static void file1_callback(GtkWidget *widget, GdkEventButton *event, 
+                            t_mes *mes) {
     (void)widget;
     (void)event;
     (void)mes;
     gtk_widget_set_name(widget, "file_hover");
 }
 
-static void file_notify_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+static void file_notify_callback(GtkWidget *widget, GdkEventButton *event, 
+                                t_mes *mes) {
     (void)widget;
     (void)event;
     (void)mes;
@@ -29,7 +32,8 @@ static void file_notify_callback(GtkWidget *widget, GdkEventButton *event, t_mes
     }  
 }
 
-static void file_notify1_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+static void file_notify1_callback(GtkWidget *widget, GdkEventButton *event, 
+                                    t_mes *mes) {
     (void)widget;
     (void)event;
     (void)mes;

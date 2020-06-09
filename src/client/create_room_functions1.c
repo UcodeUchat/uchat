@@ -10,11 +10,12 @@ void mx_load_room_history (t_all *data) {
         mx_append_message(data->info, data->room, msg_data);
     }
     gtk_adjustment_set_value(data->room->Adjust, 
-                            gtk_adjustment_get_upper(data->room->Adjust) - 
-                            gtk_adjustment_get_page_size(data->room->Adjust) + 2.0);
+                        gtk_adjustment_get_upper(data->room->Adjust) - 
+                        gtk_adjustment_get_page_size(data->room->Adjust) + 2.0);
 }
 
-void mx_init_room (t_client_info *info ,t_room *room, int position, json_object *room_data) {
+void mx_init_room (t_client_info *info ,t_room *room, 
+                    int position, json_object *room_data) {
     char *name = strdup(mx_js_g_str(mx_js_o_o_get(room_data, "name")));
     int id = mx_js_g_int(mx_js_o_o_get(room_data, "room_id"));
     int access = mx_js_g_int(mx_js_o_o_get(room_data, "access"));
@@ -39,13 +40,15 @@ void mx_init_room_menu(t_room *room, t_all *data) {
     history = gtk_menu_item_new_with_label ("Load history");
     gtk_widget_show(history);
     gtk_menu_shell_append (GTK_MENU_SHELL (room->room_menu), history);
-    g_signal_connect (G_OBJECT (history), "activate", G_CALLBACK (mx_scroll_callback), data);
+    g_signal_connect (G_OBJECT (history), "activate", 
+                        G_CALLBACK (mx_scroll_callback), data);
     
     if (room->id != 0 && room->access != 3) {
         leave = gtk_menu_item_new_with_label ("Leave room");
         gtk_widget_show(leave);
         gtk_menu_shell_append (GTK_MENU_SHELL (room->room_menu), leave);
-        g_signal_connect (G_OBJECT (leave), "activate", G_CALLBACK (mx_leave_callback), data);
+        g_signal_connect (G_OBJECT (leave), "activate", 
+                            G_CALLBACK (mx_leave_callback), data);
     }
 }
 

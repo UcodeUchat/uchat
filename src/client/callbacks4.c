@@ -1,6 +1,7 @@
 #include "uchat.h"
 
-void mx_close_creation_callback (GtkWidget *widget, GdkEventButton *event, t_client_info *info) {
+void mx_close_creation_callback (GtkWidget *widget, 
+                GdkEventButton *event, t_client_info *info) {
     (void)widget;
     (void)event;
     gtk_widget_hide(info->data->create_room->main_box);
@@ -17,19 +18,19 @@ static void init_room_json (json_object *new_json, t_client_info *info) {
 
     mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_CREATE_ROOM_TYPE));
     mx_js_o_o_add(new_json, "user_id", mx_js_n_int(info->id));
-    mx_js_o_o_add(new_json, "name", mx_js_n_str 
-                            (gtk_entry_get_text(GTK_ENTRY(info->data->create_room->name_entry))));
-    mx_js_o_o_add(new_json, "acces", mx_js_n_int 
-                            (gtk_combo_box_get_active (GTK_COMBO_BOX(info->data->create_room->selection)) + 1));
+    mx_js_o_o_add(new_json, "name", mx_js_n_str (gtk_entry_get_text
+                        (GTK_ENTRY(info->data->create_room->name_entry))));
+    mx_js_o_o_add(new_json, "acces", mx_js_n_int (gtk_combo_box_get_active 
+                        (GTK_COMBO_BOX(info->data->create_room->selection)) + 1));
     mx_js_o_o_add(room_data, "messages", messages);
-    mx_js_o_o_add(room_data, "name", mx_js_n_str 
-                            (gtk_entry_get_text(GTK_ENTRY(info->data->create_room->name_entry))));
+    mx_js_o_o_add(room_data, "name", mx_js_n_str(gtk_entry_get_text
+                        (GTK_ENTRY(info->data->create_room->name_entry))));
     mx_js_o_o_add(new_json, "room_data", room_data);
 }
 
 void mx_create_room_callback (GtkWidget *widget, t_client_info *info) {
-    if (strcmp ("", gtk_entry_get_text(
-                GTK_ENTRY(info->data->create_room->name_entry))) != 0) {
+    if (strcmp ("", gtk_entry_get_text
+                (GTK_ENTRY(info->data->create_room->name_entry))) != 0) {
         json_object *new_json = mx_js_n_o();
         const char *json_string = NULL;
 

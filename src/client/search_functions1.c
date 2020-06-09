@@ -7,10 +7,12 @@ static void show_room_name (json_object *room_data, GtkWidget *h_box) {
     gtk_box_pack_start (GTK_BOX (h_box), label, FALSE, FALSE, 0);
 }
 
-static void show_room_access (int acces, GtkWidget *button, GtkWidget *h_box, t_all *data) {
+static void show_room_access (int acces, GtkWidget *button, 
+                                GtkWidget *h_box, t_all *data) {
     if (acces == 1) {
         button = gtk_button_new_with_label("Join room");
-        g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (mx_join_callback), data);
+        g_signal_connect (G_OBJECT (button), "clicked", 
+                        G_CALLBACK (mx_join_callback), data);
         gtk_box_pack_end (GTK_BOX (h_box), button, FALSE, FALSE, 0);
     }
     else {
@@ -19,7 +21,8 @@ static void show_room_access (int acces, GtkWidget *button, GtkWidget *h_box, t_
     }
 }
 
-static void show_room_data (json_object *room_data, GtkWidget *h_box, t_client_info *info) {
+static void show_room_data (json_object *room_data, 
+                            GtkWidget *h_box, t_client_info *info) {
     int id = mx_js_g_int(mx_js_o_o_get(room_data, "id"));
     int acces = mx_js_g_int(mx_js_o_o_get(room_data, "acces"));
     t_all *data = (t_all *)malloc(sizeof(t_all));

@@ -40,5 +40,6 @@ void mx_init_search (t_client_info *info) {
     gtk_box_pack_start (GTK_BOX (v_box), h_box, FALSE, FALSE, 0);  
     gtk_box_pack_start (GTK_BOX (h_box), info->data->search_entry, FALSE, FALSE, 0);
     gtk_widget_set_name(info->data->search_entry, "entry");
-    g_signal_connect(G_OBJECT(info->data->search_entry),"activate", G_CALLBACK(mx_search_callback), info);
+    g_signal_connect(G_OBJECT(info->data->search_entry),"activate", 
+                     G_CALLBACK(mx_search_callback), info);
 }

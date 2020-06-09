@@ -15,31 +15,37 @@ static void update_profile (char *type, char *data, t_client_info *info) {
 }
 
 void mx_edit_name_callback (GtkWidget *widget, t_client_info *info) {
-    gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->name_entry), TRUE);
+    gtk_editable_set_editable (GTK_EDITABLE 
+            (info->data->profile->name_entry), TRUE);
     gtk_widget_hide(widget);
     gtk_widget_show(info->data->profile->name_button2);
 }
 
 void mx_save_name_callback (GtkWidget *widget, t_client_info *info) {
-    char *name = strdup(gtk_entry_get_text(GTK_ENTRY(info->data->profile->name_entry)));
+    char *name = strdup(gtk_entry_get_text
+        (GTK_ENTRY(info->data->profile->name_entry)));
     
     update_profile("name", name, info);
-    gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->name_entry), FALSE);
+    gtk_editable_set_editable
+            (GTK_EDITABLE (info->data->profile->name_entry), FALSE);
     gtk_widget_hide(widget);
     gtk_widget_show(info->data->profile->name_button1);
 }
 
 void mx_edit_email_callback (GtkWidget *widget, t_client_info *info) {
-    gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->email_entry), TRUE);
+    gtk_editable_set_editable
+            (GTK_EDITABLE (info->data->profile->email_entry), TRUE);
     gtk_widget_hide(widget);
     gtk_widget_show(info->data->profile->email_button2);
 }
 
 void mx_save_email_callback (GtkWidget *widget, t_client_info *info) {
-    char *email = strdup(gtk_entry_get_text(GTK_ENTRY(info->data->profile->email_entry)));
+    char *email = strdup(gtk_entry_get_text
+        (GTK_ENTRY(info->data->profile->email_entry)));
  
     update_profile("email", email, info);
-    gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->email_entry), FALSE);
+    gtk_editable_set_editable (GTK_EDITABLE
+                    (info->data->profile->email_entry), FALSE);
     gtk_widget_hide(widget);
     gtk_widget_show(info->data->profile->email_button1);
 }

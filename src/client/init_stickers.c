@@ -13,7 +13,8 @@ static char *get_extention (char *path) {
     return extention;
 }
 
-static void init_sticker_item (t_client_info *info, char *path, struct dirent  *ds1, GtkWidget *sub_menu) {
+static void init_sticker_item (t_client_info *info, char *path, 
+                                struct dirent  *ds1, GtkWidget *sub_menu) {
     GtkWidget *item = gtk_menu_item_new();
     char *name = mx_strjoin(path, "/");
     char *tmp = mx_strjoin(name, ds1->d_name);
@@ -32,10 +33,12 @@ static void init_sticker_item (t_client_info *info, char *path, struct dirent  *
     t_stik *stik = (t_stik *)(malloc)(sizeof(t_stik));
     stik->info = info;
     stik->name = strdup(name);
-    g_signal_connect (G_OBJECT (item), "activate", G_CALLBACK (mx_item_callback), stik);
+    g_signal_connect (G_OBJECT (item), "activate", 
+                      G_CALLBACK (mx_item_callback), stik);
 }
 
-static void init_sticker_pack (t_client_info *info, char *path, struct dirent  *ds, GtkWidget *menu) {
+static void init_sticker_pack (t_client_info *info, char *path, 
+                                struct dirent  *ds, GtkWidget *menu) {
     DIR *sub_dir = opendir(path);
     char *extention = NULL;
     GtkWidget *sub_menu = NULL;
@@ -59,11 +62,13 @@ static void init_sticker_pack (t_client_info *info, char *path, struct dirent  *
 
 static void show_sticker_button (GtkWidget *menu, GtkWidget *box) {
     GtkWidget *button = gtk_button_new();
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/smile.png", 20, 20, TRUE, NULL);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale 
+                        ("img/smile.png", 20, 20, TRUE, NULL);
     GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
     
     gtk_button_set_image(GTK_BUTTON(button), image);
-    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(mx_choose_sticker_callback), menu);
+    g_signal_connect(G_OBJECT(button), "clicked", 
+                     G_CALLBACK(mx_choose_sticker_callback), menu);
     gtk_box_pack_start (GTK_BOX (box), button, FALSE, FALSE, 0);
     gtk_widget_set_name(button, "entry");
     gtk_widget_show(button);

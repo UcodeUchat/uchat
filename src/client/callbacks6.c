@@ -33,16 +33,22 @@ static void sever_register (char *login, char *password, t_client_info *info) {
     json_str = mx_js_o_to_js_str(json_obj);
     tls_send(info->tls_client, json_str, strlen(json_str));
     gtk_widget_hide(info->data->register_box);
-    gtk_entry_set_text(GTK_ENTRY(info->data->registration->login_entry), "");
-    gtk_entry_set_text(GTK_ENTRY(info->data->registration->password_entry), "");
-    gtk_entry_set_text(GTK_ENTRY(info->data->registration->repeat_password_entry), "");
+    gtk_entry_set_text(GTK_ENTRY
+                (info->data->registration->login_entry), "");
+    gtk_entry_set_text(GTK_ENTRY
+                (info->data->registration->password_entry), "");
+    gtk_entry_set_text(GTK_ENTRY
+                (info->data->registration->repeat_password_entry), "");
     gtk_widget_show(info->data->login_box);
 }
 
 void mx_send_data_callback (GtkWidget *widget, t_client_info *info) {
-    char *login = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->registration->login_entry));
-    char *password = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->registration->password_entry));
-    char *repeat = (char *)gtk_entry_get_text(GTK_ENTRY(info->data->registration->repeat_password_entry));
+    char *login = (char *)gtk_entry_get_text(
+                            GTK_ENTRY(info->data->registration->login_entry));
+    char *password = (char *)gtk_entry_get_text(
+                            GTK_ENTRY(info->data->registration->password_entry));
+    char *repeat = (char *)gtk_entry_get_text(
+                        GTK_ENTRY(info->data->registration->repeat_password_entry));
 
     if (validation(login, password, repeat)) {
         sever_register (login, password, info);
@@ -59,8 +65,11 @@ void mx_cancel_callback (GtkWidget *widget, t_client_info *info) {
     (void)widget;
     gtk_window_set_title(GTK_WINDOW(info->data->window), "Sign in");
     gtk_widget_hide(info->data->register_box);
-    gtk_entry_set_text(GTK_ENTRY(info->data->registration->login_entry), "");
-    gtk_entry_set_text(GTK_ENTRY(info->data->registration->password_entry), "");
-    gtk_entry_set_text(GTK_ENTRY(info->data->registration->repeat_password_entry), "");
+    gtk_entry_set_text(GTK_ENTRY
+        (info->data->registration->login_entry), "");
+    gtk_entry_set_text(GTK_ENTRY
+        (info->data->registration->password_entry), "");
+    gtk_entry_set_text(GTK_ENTRY
+        (info->data->registration->repeat_password_entry), "");
     gtk_widget_show(info->data->login_box);
 }

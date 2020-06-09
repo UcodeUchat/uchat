@@ -19,7 +19,8 @@ GtkWidget *mx_init_content_box (GtkWidget *v_box, char *title) {
                                 GTK_POLICY_ALWAYS);
     gtk_box_pack_start (GTK_BOX (v_box), scrolled_window, FALSE, FALSE, 0);
     gtk_widget_set_name(scrolled_window, "rooms_w");
-    gtk_orientable_set_orientation (GTK_ORIENTABLE(room_box), GTK_ORIENTATION_VERTICAL);
+    gtk_orientable_set_orientation (GTK_ORIENTABLE(room_box), 
+                                    GTK_ORIENTATION_VERTICAL);
     gtk_container_add (GTK_CONTAINER (scrolled_window), room_box);
     return room_box;
 }

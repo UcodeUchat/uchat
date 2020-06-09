@@ -1,28 +1,33 @@
 #include "uchat.h"
 
 static void init_auth_fail(t_client_info *info, GtkWidget *screen) {
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/stop2.png", 600, 520, TRUE, NULL);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale ("img/stop2.png", 
+                                                    600, 520, TRUE, NULL);
+
     info->data->stop = gtk_image_new_from_pixbuf(pixbuf);
     gtk_fixed_put(GTK_FIXED(screen), info->data->stop, 176, 106);
-
     info->data->login_msg = gtk_label_new("Your login or password is invalid");
     gtk_widget_set_name (info->data->login_msg, "auth_fail1");
     GtkWidget *box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width 
+                                (info->data->window), -1);
     gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
     gtk_fixed_put (GTK_FIXED (screen), box, 0, 180);
     gtk_box_pack_start (GTK_BOX (box), info->data->login_msg, TRUE, FALSE, 0);
     gtk_widget_show (box);
 }
 
-static void init_login_entry (t_client_info *info, GtkWidget **entry, char *placeholder, int heigth) {
+static void init_login_entry (t_client_info *info, GtkWidget **entry, 
+                                char *placeholder, int heigth) {
     *entry = gtk_entry_new ();
+    GtkWidget *box = gtk_box_new(FALSE, 0);
+
     gtk_entry_set_max_length (GTK_ENTRY (*entry), 50);
     gtk_entry_set_placeholder_text (GTK_ENTRY (*entry), placeholder);
     gtk_editable_select_region (GTK_EDITABLE (*entry),
                                 0, gtk_entry_get_text_length (GTK_ENTRY (*entry)));
-    GtkWidget *box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width 
+                                (info->data->window), -1);
     gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
     gtk_fixed_put (GTK_FIXED (info->data->login_box), box, 0, heigth);
     gtk_box_pack_start (GTK_BOX (box), *entry, TRUE, FALSE, 0);
@@ -32,11 +37,14 @@ static void init_login_entry (t_client_info *info, GtkWidget **entry, char *plac
 }
 
 static void init_login_button (t_client_info *info, char *placeholder, int heigth, 
-                        void (*callback) (GtkWidget *widget, t_client_info *info) ) {
+                        void (*callback) (GtkWidget *widget, 
+                                            t_client_info *info) ) {
     GtkWidget *button = gtk_button_new_with_label(placeholder);
-    g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (callback), info);
     GtkWidget *box = gtk_box_new(FALSE, 0);
-    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width (info->data->window), -1);
+    g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (callback), info);
+
+    gtk_widget_set_size_request(box, gtk_widget_get_allocated_width 
+                                (info->data->window), -1);
     gtk_widget_set_halign (box, GTK_ALIGN_CENTER);
     gtk_fixed_put (GTK_FIXED (info->data->login_box), box, 0, heigth);
     gtk_box_pack_start (GTK_BOX (box), button, TRUE, FALSE, 0);

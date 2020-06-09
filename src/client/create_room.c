@@ -1,9 +1,12 @@
 #include "uchat.h"
 
 int mx_notebook_prepend(t_note *note) {
-    gtk_notebook_append_page(GTK_NOTEBOOK(note->notebook), note->box, note->label);
-    gtk_notebook_reorder_child(GTK_NOTEBOOK(note->notebook), note->box, note->position);
-    gtk_notebook_set_current_page (GTK_NOTEBOOK(note->notebook), note->position);
+    gtk_notebook_append_page(GTK_NOTEBOOK
+                (note->notebook), note->box, note->label);
+    gtk_notebook_reorder_child(GTK_NOTEBOOK
+                (note->notebook), note->box, note->position);
+    gtk_notebook_set_current_page (GTK_NOTEBOOK
+                (note->notebook), note->position);
     return 0;
 }
 
@@ -35,7 +38,8 @@ static void show_room (t_client_info *info, t_room *room, int position) {
     g_idle_add ((GSourceFunc)mx_notebook_prepend, note);
 }
 
-static t_room *create_room (t_client_info *info, json_object *room_data, int position) {
+static t_room *create_room (t_client_info *info, 
+                            json_object *room_data, int position) {
     t_room *room =  (t_room *)malloc(sizeof(t_room));
     t_all *data = (t_all *)malloc(sizeof(t_all));
 

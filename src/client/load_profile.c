@@ -10,7 +10,8 @@ void mx_show_title (const char *title, GtkWidget *box) {
     gtk_widget_show(title_box);
 }
 
-static void init_profile (t_client_info *info, GtkWidget *box, int id, json_object *new_json) {
+static void init_profile (t_client_info *info, GtkWidget *box, 
+                            int id, json_object *new_json) {
     GtkWidget *profile = gtk_box_new(FALSE, 5);
 
     gtk_box_pack_start (GTK_BOX (box), profile, FALSE, FALSE, 0);

@@ -1,6 +1,7 @@
 #include "uchat.h"
 
-static void open_menu_callback1(GtkWidget *widget, GdkEventButton *event, GtkWidget *menu) {
+static void open_menu_callback1(GtkWidget *widget, 
+                                GdkEventButton *event, GtkWidget *menu) {
     (void)widget;
     (void)event;
     gtk_menu_popup_at_pointer (GTK_MENU(menu), NULL);
@@ -11,7 +12,8 @@ static void load_profile_callback1(GtkWidget *widget, t_mes *mes) {
     mx_load_profile_client(mes->info, mes->user_id);
 }
 
-static GtkWidget *init_login_event (GtkWidget *h_box, t_client_info *info, int id,  const char *login) {
+static GtkWidget *init_login_event (GtkWidget *h_box, t_client_info *info, 
+                                    int id,  const char *login) {
     GtkWidget *login_event = gtk_event_box_new();
     GtkWidget *login_menu  = gtk_menu_new ();
     GtkWidget *view = gtk_menu_item_new_with_label("View profile");
@@ -22,7 +24,8 @@ static GtkWidget *init_login_event (GtkWidget *h_box, t_client_info *info, int i
     gtk_menu_shell_append (GTK_MENU_SHELL (login_menu), view);
     mes->info = info;
     mes->user_id = id;
-    g_signal_connect (G_OBJECT (view), "activate", G_CALLBACK (load_profile_callback1), mes);
+    g_signal_connect (G_OBJECT (view), "activate", 
+                    G_CALLBACK (load_profile_callback1), mes);
     gtk_widget_add_events (login_event, GDK_BUTTON_PRESS_MASK);
     g_signal_connect (G_OBJECT (login_event), "button_press_event", 
                         G_CALLBACK (open_menu_callback1), G_OBJECT(login_menu));
