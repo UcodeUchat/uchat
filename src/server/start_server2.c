@@ -53,18 +53,32 @@ int mx_make_tls_connect(struct tls *tls, struct tls **tls_sock,
     return 0;
 }
 
-int mx_create_server_socket(t_server_info *info) {
+
+static server_bind_addr(t_server_info *info, struct addrinfo **bind_address) {
     struct addrinfo hints;
-    struct addrinfo *bind_address;
-    struct sockaddr_in serv_addr;
-    int server_socket;
-    int reuse = 1;
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     getaddrinfo(0, info->argv[1], &hints, &bind_address);
+}
+
+
+int mx_create_server_socket(t_server_info *info) {
+//    struct addrinfo hints;
+    struct addrinfo *bind_address;
+    struct sockaddr_in serv_addr;
+    int server_socket;
+    int reuse = 1;
+
+    server_bind_addr(info, &bind_address);
+//    memset(&hints, 0, sizeof(hints));
+//    hints.ai_family = AF_INET;
+//    hints.ai_socktype = SOCK_STREAM;
+//    hints.ai_flags = AI_PASSIVE;
+//    getaddrinfo(0, info->argv[1], &hints, &bind_address);
+
     server_socket = socket(bind_address->ai_family,
                            bind_address->ai_socktype, bind_address->ai_protocol);
     if (server_socket == -1) {

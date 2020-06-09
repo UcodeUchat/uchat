@@ -73,22 +73,18 @@ static void server_loop(t_server_info *info, int server, struct tls *tls) {
             printf("error = %s\n", strerror(errno));
             break;
         }
-        if (new_ev.ident == (uintptr_t) server) {  // if new con - add new clt
+        if (new_ev.ident == (uintptr_t) server)  // if new con - add new clt
             if ((add_new_client(info, tls, server)) != 0)
                 break;
-        }
-        else {  // if read from client
+        else  // if read from client
             if ((work_with_client(info, new_ev)) != 0)
                 break;
-        }
     }
 }
 
 int mx_start_server(t_server_info *info) {
     int server_soc;
     struct tls *tls = NULL;
-//    struct kevent new_ev;
-//    int event;
 
     if ((mx_create_tls_configuration(&tls)) != 0)
         return -1;
@@ -104,29 +100,6 @@ int mx_start_server(t_server_info *info) {
         return -1;
     }
     server_loop(info, server_soc, tls);
-    /*
-    struct timespec timeout;
-    timeout.tv_sec = 1;  // seconds
-    timeout.tv_nsec = 0;  // nanoseconds
-
-    while (1) {
-        event = kevent(info->kq, NULL, 0, &new_ev, 1, &timeout);
-        if (event == 0)  // check new event
-            continue;
-        if (event == -1) {
-            printf("error = %s\n", strerror(errno));
-            break;
-        }
-        if (new_ev.ident == (uintptr_t) server) {  // if new connect - add new client
-            if ((add_new_client(info, tls, server)) != 0)
-                break;
-        }
-        else {  // if read from client
-            if ((work_with_client(info, new_ev)) != 0)
-                break;
-        }
-    }
-     */
     close(info->kq);
     close(server_soc);
     return 0;
