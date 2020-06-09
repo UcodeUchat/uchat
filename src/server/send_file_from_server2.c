@@ -15,7 +15,7 @@ static int get_result(void *arg, int argc, char **argv, char **col_name) {
     (void)col_name;
     (void)argc;
     if (argv[0]) {
-        json_object_object_add(obj, "name", json_object_new_string(argv[3]));
+        mx_js_o_o_add(obj, "name", mx_js_n_str(argv[3]));
         return MX_OK;
     }
     return 1;
@@ -26,24 +26,24 @@ t_file_tmp *mx_set_variables(t_socket_list *csl) {
 
     new->tls = csl->tls_socket;
     new->mutex = &csl->mutex;
-    new->file_id = json_object_get_int(json_object_object_get(csl->obj,\
+    new->file_id = mx_js_g_int(mx_js_o_o_get(csl->obj,\
                                         "file_id"));
-    new->room_id = json_object_get_int(json_object_object_get(csl->obj,\
+    new->room_id = mx_js_g_int(mx_js_o_o_get(csl->obj,\
                                         "room_id"));
     return new;
 }
 
 int mx_check_is_object_valid(json_object *obj) {
-    if (json_object_object_get(obj, "room_id")
-        && json_object_object_get(obj, "user_id")
-        && json_object_object_get(obj, "file_id"))
+    if (mx_js_o_o_get(obj, "room_id")
+        && mx_js_o_o_get(obj, "user_id")
+        && mx_js_o_o_get(obj, "file_id"))
         return MX_OK;
     else
         return 1;
 }
 
 char *mx_check_file_in_db_user_access(t_server_info *info, json_object *obj) {
-    int file_id = json_object_get_int(json_object_object_get(obj, "file_id"));
+    int file_id = mx_js_g_int(mx_js_o_o_get(obj, "file_id"));
     char command[1024];
 
     command[sprintf(command, "select * from msg_history where id='%d'",
@@ -52,11 +52,11 @@ char *mx_check_file_in_db_user_access(t_server_info *info, json_object *obj) {
 		return NULL;
     }
     command[sprintf(command, "select * from room_user where user_id='%d' & \
-            room_id='%d'", json_object_get_int(json_object_object_get(obj,
-            "user_id")), json_object_get_int(json_object_object_get(obj,
+            room_id='%d'", mx_js_g_int(mx_js_o_o_get(obj,
+            "user_id")), mx_js_g_int(mx_js_o_o_get(obj,
             "room_id")))] = '\0';
     if (sqlite3_exec(info->db, command, res, NULL, NULL) != SQLITE_OK) {
 		return NULL;
     }
-    return strdup(json_object_get_string(json_object_object_get(obj, "name")));
+    return strdup(mx_js_g_str(mx_js_o_o_get(obj, "name")));
 }

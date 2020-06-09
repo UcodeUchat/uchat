@@ -5,29 +5,29 @@ void mx_scroll_callback (GtkWidget *widget, t_all *data) {
     if (gtk_adjustment_get_value(data->room->Adjust) == 
         gtk_adjustment_get_lower(data->room->Adjust) && data->info->can_load == 1 
         && data->room->messages != NULL) {
-        json_object  *new_json = json_object_new_object();
+        json_object  *new_json = mx_js_n_o();
 
         data->info->can_load = 0;
-        json_object_object_add(new_json, "type", json_object_new_int(MX_LOAD_MORE_TYPE));
-        json_object_object_add(new_json, "room_id", json_object_new_int(data->room->id));
-        json_object_object_add(new_json, "last_id", json_object_new_int(data->room->messages->id));
+        mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_LOAD_MORE_TYPE));
+        mx_js_o_o_add(new_json, "room_id", mx_js_n_int(data->room->id));
+        mx_js_o_o_add(new_json, "last_id", mx_js_n_int(data->room->messages->id));
         mx_print_json_object(new_json, "load 15 more");
-        const char *json_str = json_object_to_json_string(new_json);
+        const char *json_str = mx_js_o_to_js_str(new_json);
         tls_send(data->info->tls_client, json_str, strlen(json_str));
     }
 }
 
 
 void mx_leave_callback (GtkWidget *widget, t_all *data) {
-    json_object  *new_json = json_object_new_object();
+    json_object  *new_json = mx_js_n_o();
     const char *json_str = NULL;
 
-    json_object_object_add(new_json, "type", json_object_new_int(MX_LEAVE_ROOM_TYPE));
-    json_object_object_add(new_json, "room_id", json_object_new_int(data->room->id));
-    json_object_object_add(new_json, "access", json_object_new_int(data->room->access));
-    json_object_object_add(new_json, "user_id", json_object_new_int(data->info->id));
-    json_object_object_add(new_json, "login", json_object_new_string(data->info->login));
-    json_str = json_object_to_json_string(new_json);
+    mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_LEAVE_ROOM_TYPE));
+    mx_js_o_o_add(new_json, "room_id", mx_js_n_int(data->room->id));
+    mx_js_o_o_add(new_json, "access", mx_js_n_int(data->room->access));
+    mx_js_o_o_add(new_json, "user_id", mx_js_n_int(data->info->id));
+    mx_js_o_o_add(new_json, "login", mx_js_n_str(data->info->login));
+    json_str = mx_js_o_to_js_str(new_json);
     tls_send(data->info->tls_client, json_str, strlen(json_str));
     (void)widget;
 }
@@ -42,11 +42,11 @@ void mx_logout_client(t_client_info *info) {
     json_object *new_json;
     const char *json_string = NULL;
 
-    new_json = json_object_new_object();
-    json_object_object_add(new_json, "type", json_object_new_int(MX_LOGOUT_TYPE));
-    json_object_object_add(new_json, "user_id", json_object_new_int(info->id));
+    new_json = mx_js_n_o();
+    mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_LOGOUT_TYPE));
+    mx_js_o_o_add(new_json, "user_id", mx_js_n_int(info->id));
     mx_print_json_object(new_json, "logout");
-    json_string = json_object_to_json_string(new_json);
+    json_string = mx_js_o_to_js_str(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
 }
 

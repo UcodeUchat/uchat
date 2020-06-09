@@ -28,9 +28,9 @@ static void sever_register (char *login, char *password, t_client_info *info) {
     json_object *json_obj = mx_create_basic_json_object(MX_REG_TYPE);
     const char *json_str;
 
-    json_object_object_add(json_obj, "login", json_object_new_string(login));
-    json_object_object_add(json_obj, "password", json_object_new_string(password));
-    json_str = json_object_to_json_string(json_obj);
+    mx_js_o_o_add(json_obj, "login", mx_js_n_str(login));
+    mx_js_o_o_add(json_obj, "password", mx_js_n_str(password));
+    json_str = mx_js_o_to_js_str(json_obj);
     tls_send(info->tls_client, json_str, strlen(json_str));
     gtk_widget_hide(info->data->register_box);
     gtk_entry_set_text(GTK_ENTRY(info->data->registration->login_entry), "");

@@ -1,9 +1,9 @@
 #include "uchat.h"
 
 void mx_edit_message_client(t_client_info *info, json_object *new_json) { 
-    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
-    int message_id = json_object_get_int(json_object_object_get(new_json, "message_id"));
-    const char *data = json_object_get_string(json_object_object_get(new_json, "data"));
+    int room_id = mx_js_g_int(mx_js_o_o_get(new_json, "room_id"));
+    int message_id = mx_js_g_int(mx_js_o_o_get(new_json, "message_id"));
+    const char *data = mx_js_g_str(mx_js_o_o_get(new_json, "data"));
     t_room *room = mx_find_room(info->data->rooms, room_id);
     t_message *node = NULL;
 
@@ -23,10 +23,10 @@ void mx_edit_message_client(t_client_info *info, json_object *new_json) {
 }
 
 void mx_input_authentification(t_client_info *info, json_object *new_json) {
-    int type = json_object_get_int(json_object_object_get(new_json, "type"));
-    int user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
-    int visual = json_object_get_int(json_object_object_get(new_json, "visual"));
-    int audio = json_object_get_int(json_object_object_get(new_json, "audio"));
+    int type = mx_js_g_int(mx_js_o_o_get(new_json, "type"));
+    int user_id = mx_js_g_int(mx_js_o_o_get(new_json, "user_id"));
+    int visual = mx_js_g_int(mx_js_o_o_get(new_json, "visual"));
+    int audio = mx_js_g_int(mx_js_o_o_get(new_json, "audio"));
 
     if ((*info).auth_client == 0) {
         if (type == 4) {
@@ -36,7 +36,7 @@ void mx_input_authentification(t_client_info *info, json_object *new_json) {
             (*info).auth_client = 1;
             json_object_put(info->rooms);
             json_object *rooms = NULL;
-            json_object_deep_copy(json_object_object_get(new_json, "rooms"), &rooms, NULL);
+            json_object_deep_copy(mx_js_o_o_get(new_json, "rooms"), &rooms, NULL);
             info->rooms = rooms;
         }
         else
@@ -46,11 +46,11 @@ void mx_input_authentification(t_client_info *info, json_object *new_json) {
 }
 
 void mx_load_history_client(t_client_info *info, json_object *new_json) {
-    int room_id = json_object_get_int(json_object_object_get(new_json, "room_id"));
+    int room_id = mx_js_g_int(mx_js_o_o_get(new_json, "room_id"));
     t_room *room = mx_find_room(info->data->rooms, room_id);           
     struct json_object *messages;
 
-    json_object_object_get_ex(new_json, "messages", &messages);
+    mx_js_o_o_get_ex(new_json, "messages", &messages);
     int n_msg = json_object_array_length(messages);
     for (int i = 0; i < n_msg; i++) {
         json_object *msg_data = json_object_array_get_idx(messages, i);
@@ -61,8 +61,8 @@ void mx_load_history_client(t_client_info *info, json_object *new_json) {
 
 static void additional_act1 (t_client_info *info, t_room *room, 
                             json_object *new_json, t_message *tmp) {
-    int id = json_object_get_int(json_object_object_get(new_json, "id"));
-    int add_info = json_object_get_int(json_object_object_get(new_json, "add_info"));
+    int id = mx_js_g_int(mx_js_o_o_get(new_json, "id"));
+    int add_info = mx_js_g_int(mx_js_o_o_get(new_json, "add_info"));
     if (add_info == 2) {
         t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
         mes->info = info;

@@ -41,13 +41,13 @@ void mx_init_main_message (t_message *node, t_mes *mes) {
 
 void mx_init_message (t_message *node, t_room *room, 
                         json_object *new_json, int order) {
-    node->id = json_object_get_int(json_object_object_get(new_json, "id"));
-    node->user_id = json_object_get_int(
-                        json_object_object_get(new_json, "user_id"));
-    node->add_info = json_object_get_int(
-                        json_object_object_get(new_json, "add_info"));
-    node->data = strdup (json_object_get_string(
-                        json_object_object_get(new_json, "data")));
+    node->id = mx_js_g_int(mx_js_o_o_get(new_json, "id"));
+    node->user_id = mx_js_g_int(
+                        mx_js_o_o_get(new_json, "user_id"));
+    node->add_info = mx_js_g_int(
+                        mx_js_o_o_get(new_json, "add_info"));
+    node->data = strdup (mx_js_g_str(
+                        mx_js_o_o_get(new_json, "data")));
     node->h_box = gtk_box_new(FALSE, 0);
     t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
     mes->room = room;
@@ -61,6 +61,6 @@ void mx_init_message_data (t_client_info *info, t_room *room,
                             json_object *new_json, t_mes *mes) {
     mes->info = info;
     mes->room = room;
-    mes->id = json_object_get_int(json_object_object_get(new_json, "id"));
-    mes->user_id = json_object_get_int(json_object_object_get(new_json, "user_id"));
+    mes->id = mx_js_g_int(mx_js_o_o_get(new_json, "id"));
+    mes->user_id = mx_js_g_int(mx_js_o_o_get(new_json, "user_id"));
 }

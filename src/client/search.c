@@ -15,7 +15,7 @@ static void init_rooms (t_client_info *info, json_object *new_json, GtkWidget *v
     int n_rooms;
     GtkWidget *room_box = mx_init_content_box(v_box, "Rooms:\n");
 
-    json_object_object_get_ex(new_json, "rooms", &rooms);
+    mx_js_o_o_get_ex(new_json, "rooms", &rooms);
     n_rooms = json_object_array_length(rooms);
     if (!n_rooms)
         mx_show_empty_result(room_box, "No users found");
@@ -28,7 +28,7 @@ static void init_users (t_client_info *info, json_object *new_json, GtkWidget *v
     int n_users;
     GtkWidget *room_box = mx_init_content_box(v_box, "Users:\n");
 
-    json_object_object_get_ex(new_json, "users", &users);
+    mx_js_o_o_get_ex(new_json, "users", &users);
     n_users = json_object_array_length(users);
     if (!n_users)
         mx_show_empty_result(room_box, "No users found");

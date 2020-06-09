@@ -125,7 +125,10 @@ SRC_CLIENT = main_client.c \
 SRC_HELP = err_exit.c \
 	functions.c \
 	crypto.c \
-	json_functions.c
+	json_functions.c \
+	json_short.c \
+	json_short2.c \
+	json_short3.c
 
 SRCS_SERVER = $(addprefix $(SRCD)/server/, $(SRC_SERVER))
 SRCS_CLIENT = $(addprefix $(SRCD)/client/, $(SRC_CLIENT))
