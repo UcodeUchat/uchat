@@ -16,7 +16,7 @@ static int get_user_sock(void *point, int argc, char **argv, char **col_name) {
     	return 1;
     wdb1->user_sock[(wdb1->i)] = atoi(argv[1]);
     wdb1->user_id[(wdb1->i)] = atoi(argv[2]);
-    wdb1->i++;
+    (wdb1->i)++;
     return 0;
 }
 
@@ -26,10 +26,7 @@ static void mx_get_users_sock(t_server_info **i, t_work *wdb, int room) {
     sprintf(command, "SELECT room_id, socket, users.id FROM room_user, users\
         WHERE room_id=%d and room_user.user_id=users.id and users.socket!=0;",\
             room);
-    if (sqlite3_exec((*i)->db, command, get_user_sock, wdb, 0) != SQLITE_OK) {
-        printf("Kомната пуста\n");
-        return ;
-    }
+    sqlite3_exec((*i)->db, command, get_user_sock, wdb, 0);
     mx_strdel(&command);
 }
 

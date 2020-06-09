@@ -59,13 +59,13 @@
 #ifndef HEADER_TXT_DB_H
 #define HEADER_TXT_DB_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl/include/openssl/opensslconf.h>
 
 #ifndef OPENSSL_NO_BIO
-#include <openssl/bio.h>
+#include <../../libressl/include/openssl/bio.h>
 #endif
-#include <openssl/stack.h>
-#include <openssl/lhash.h>
+#include <../../libressl/include/openssl/stack.h>
+#include <../../libressl/include/openssl/lhash.h>
 
 #define DB_ERROR_OK			0
 #define DB_ERROR_MALLOC			1

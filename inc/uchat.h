@@ -37,11 +37,11 @@
 #include "../libportaudio/include/portaudio.h"
 
 #include "../libmx/inc/libmx.h"
-#include "../libressl_3/include/tls.h"
-#include "../libressl_3/include/openssl/evp.h"
-#include "../libressl_3/include/openssl/sha.h"
-#include "../libressl_3/include/openssl/aes.h"
-#include "../libressl_3/include/openssl/conf.h"
+#include "../libressl/include/tls.h"
+#include "../libressl/include/openssl/evp.h"
+#include "../libressl/include/openssl/sha.h"
+#include "../libressl/include/openssl/aes.h"
+#include "../libressl/include/openssl/conf.h"
 #include "../libjson/json.h"
 
 #include <gtk/gtk.h>
@@ -185,6 +185,7 @@ typedef struct  s_client_info {  //struct client
     int can_load;
     int editing;
     int editing_room;
+    char *record_file;
     struct s_file_list *input_files;
     struct json_object *rooms;
     int input;
@@ -319,7 +320,7 @@ typedef struct s_mes {
 }               t_mes;
 
 // server
-void email_notify(t_server_info *i, json_object *js);
+void mx_email_notify(t_server_info *i, json_object *js);
 int mx_reconnection(t_server_info *info, t_socket_list *csl);
 int mx_start_server(t_server_info *info);
 int mx_set_daemon(t_server_info *info);
@@ -355,13 +356,11 @@ int mx_create_server_socket(t_server_info *info);
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);
 
-char *check_file_in_db_and_user_access(t_server_info *info, json_object *obj);
-int get_result(void *arg, int argc, char **argv, char **col_name);
-int res(void *arg, int argc, char **argv, char **col_name);
-int check_is_object_valid(json_object *obj);
-t_file_tmp *set_variables(t_socket_list *csl);
-void file_is_not_exist(t_file_tmp *vars);
-void *send_file(void *arg);
+char *mx_check_file_in_db_user_access(t_server_info *info, json_object *obj);
+int mx_check_is_object_valid(json_object *obj);
+t_file_tmp *mx_set_variables(t_socket_list *csl);
+void mx_file_is_not_exist(t_file_tmp *vars);
+void *mx_sd_fl(void *arg);
 void start_sending(FILE *file, t_file_tmp *vars);
 int mx_send_file_from_server(t_server_info *info, t_socket_list *csl);
 

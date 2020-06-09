@@ -19,7 +19,7 @@
 #define HEADER_SM3_H
 
 #include <stddef.h>
-#include <openssl/opensslconf.h>
+#include <../../libressl/include/openssl/opensslconf.h>
 
 #ifdef  __cplusplus
 extern "C" {

@@ -61,9 +61,9 @@
 #ifndef HEADER_RAND_H
 #define HEADER_RAND_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl/include/openssl/opensslconf.h>
 
-#include <openssl/ossl_typ.h>
+#include <../../libressl/include/openssl/ossl_typ.h>
 
 #ifdef  __cplusplus
 extern "C" {

@@ -52,14 +52,14 @@
 #ifndef HEADER_GOST_H
 #define HEADER_GOST_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl/include/openssl/opensslconf.h>
 
 #ifdef OPENSSL_NO_GOST
 #error GOST is disabled.
 #endif
 
-#include <openssl/asn1t.h>
-#include <openssl/ec.h>
+#include <../../libressl/include/openssl/asn1t.h>
+#include <../../libressl/include/openssl/ec.h>
 
 #ifdef __cplusplus
 extern "C" {

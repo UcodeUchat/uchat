@@ -1,5 +1,27 @@
 #include "uchat.h"
 
+static int response_loop(int socket, struct tls *tls) {
+    char response[MAXRESPONSE + 1];
+    char *p = response;
+    char *end = response + MAXRESPONSE;
+    int code = 0;
+    int bytes_received;
+
+    while (code == 0) {
+        bytes_received = socket ? recv(socket, p, end - p, 0)
+                                : tls_read(tls, p, end - p);
+        if (bytes_received < 1)
+            mx_err_return("Connection dropped.\n");
+        p += bytes_received;
+        *p = 0;
+        if (p == end)
+            return 1;
+        code = mx_check_response(response);
+    }
+    printf("S: %s", response);
+    return code;
+}
+
 int mx_connect_to_server(const char *hostname, const char *port) {
     struct addrinfo *peer_address;
     struct addrinfo hints;
@@ -42,40 +64,12 @@ struct tls *mx_create_tls(void) {
     return tls_c;
 }
 
-static int response_loop(int socket, struct tls *tls) {
-    char response[MAXRESPONSE + 1];
-    char *p = response;
-    char *end = response + MAXRESPONSE;
-    int code = 0;
-    int bytes_received;
-
-    while (code == 0) {
-        if (socket)
-            bytes_received = recv(socket, p, end - p, 0);
-        else
-            bytes_received = tls_read(tls, p, end - p);
-        if (bytes_received < 1)
-            mx_err_return("Connection dropped.\n");
-        p += bytes_received;
-        *p = 0;
-        if (p == end) {
-            fprintf(stderr, "Server response too large:\n");
-            fprintf(stderr, "%s", response);
-            return 1;
-        }
-        code = mx_check_response(response);
-    }
-    printf("S: %s", response);
-    return code;
-}
-
 int mx_wait_on_response(int socket, struct tls *tls, int reply_code) {
     int code;
 
     code = response_loop(socket, tls);
     if (code != reply_code) {
         fprintf(stderr, "Error from server:\n");
-//        fprintf(stderr, "%s", response);
         return 1;
     }
     return 0;

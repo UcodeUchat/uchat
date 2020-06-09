@@ -18,7 +18,7 @@
 #ifndef HEADER_POLY1305_H
 #define HEADER_POLY1305_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl/include/openssl/opensslconf.h>
 
 #if defined(OPENSSL_NO_POLY1305)
 #error Poly1305 is disabled.

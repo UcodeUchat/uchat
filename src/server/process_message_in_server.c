@@ -1,5 +1,24 @@
 #include "uchat.h"
 
+static int save_message(t_server_info *info, json_object *js) {
+    char command[1024];
+    int add_info = json_object_get_int(json_object_object_get(js, "add_info"));
+    int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
+    int room_id = json_object_get_int(json_object_object_get(js, "room_id"));
+    char *message = mx_replace_substr(json_object_get_string(\
+                            json_object_object_get(js, "data")), "'", "''");
+
+    command[sprintf(command, "INSERT INTO msg_history (user_id, room_id,\
+        message, addition_cont) VALUES ('%d', '%d', '%s', '%s'); SELECT\
+        last_insert_rowid()", user_id, room_id, message,
+        add_info == 0 ? "mes" : "stik")] = '\0';
+    mx_strdel(&message);
+    if (sqlite3_exec(info->db, command, mx_get_data, js, NULL) != SQLITE_OK) {
+        return -1;
+    }
+    return 1;
+}
+
 int mx_get_data(void *js, int argc, char **argv, char **col_name) {
     (void)argc;
     (void)col_name;
@@ -7,29 +26,6 @@ int mx_get_data(void *js, int argc, char **argv, char **col_name) {
         struct json_object *t = json_object_new_int(atoi(argv[0]));
         json_object_object_add((struct json_object*) js, "id", t);
         return 0;
-    }
-    return 1;
-}
-
-int save_message(t_server_info *info, json_object *js) {
-    char command[1024];
-    int add_info = json_object_get_int(json_object_object_get(js, "add_info"));
-    int user_id = json_object_get_int(json_object_object_get(js, "user_id"));
-    int room_id = json_object_get_int(json_object_object_get(js, "room_id"));
-    char *message = mx_replace_substr(json_object_get_string(\
-                            json_object_object_get(js, "data")), "'", "''");
-    char *type = NULL;
-
-    if (add_info == 0)
-        type = strdup("mes");
-    else
-        type = strdup("stik");
-    command[sprintf(command, "INSERT INTO msg_history (user_id, room_id,\
-        message, addition_cont) VALUES ('%d', '%d', '%s', '%s'); SELECT\
-        last_insert_rowid()", user_id, room_id, message, type)] = '\0';
-    mx_strdel(&message);
-    if (sqlite3_exec(info->db, command, mx_get_data, js, NULL) != SQLITE_OK) {
-        return -1;
     }
     return 1;
 }
