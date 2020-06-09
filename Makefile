@@ -72,6 +72,7 @@ SRC_CLIENT = main_client.c \
 	send_message.c \
 	save_file_in_client.c \
 	send_file_from_client.c \
+	send_file_from_client2.c \
 	input_from_server.c \
 	run_functions_type.c \
 	run_functions_type1.c \

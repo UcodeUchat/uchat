@@ -403,6 +403,7 @@ int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
 
 
 // client
+bool mx_pick_file_to_send(t_client_info *info, FILE **file, json_object **js);
 int mx_start_client(t_client_info *info);
 int mx_reconnect_client(t_client_info *info);
 int mx_connect_client(t_client_info *info);
@@ -410,7 +411,7 @@ int mx_tls_config_client(t_client_info *info);
 int mx_make_tls_connect_client(t_client_info *info);
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_process_message_in_client(t_client_info *info);
-void *mx_process_input_from_server(void *taken_info);
+void *mx_process_input_from_server(void *i);
 void mx_sleep_ms (int milliseconds);
 t_message *mx_find_message(t_message *messages, int id);
 t_room *mx_find_room(t_room *rooms, int id);
