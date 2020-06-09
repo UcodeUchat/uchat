@@ -37,11 +37,11 @@
 #include "../libportaudio/include/portaudio.h"
 
 #include "../libmx/inc/libmx.h"
-#include "../libressl_3/include/tls.h"
-#include "../libressl_3/include/openssl/evp.h"
-#include "../libressl_3/include/openssl/sha.h"
-#include "../libressl_3/include/openssl/aes.h"
-#include "../libressl_3/include/openssl/conf.h"
+#include "../libressl/include/tls.h"
+#include "../libressl/include/openssl/evp.h"
+#include "../libressl/include/openssl/sha.h"
+#include "../libressl/include/openssl/aes.h"
+#include "../libressl/include/openssl/conf.h"
 #include "../libjson/json.h"
 
 #include <gtk/gtk.h>

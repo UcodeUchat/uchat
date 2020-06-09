@@ -132,7 +132,7 @@ void mx_send_file_from_client(t_client_info *info, char *file_name) {
     data = json_object_new_string("");
     json_object_object_add(send_obj, "data", data);
     while(readed > 0 && !feof(file)) {
-        printf("while %d\n", readed);
+//        printf("while %d\n", readed);
         readed = fread(buffer, 1, sizeof(buffer), file);
         json_object_set_string_len(data, buffer, readed);
         if (feof(file)) {

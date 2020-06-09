@@ -151,9 +151,9 @@
 #ifndef HEADER_TLS1_H
 #define HEADER_TLS1_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl/include/openssl/opensslconf.h>
 
-#include <openssl/buffer.h>
+#include <../../libressl/include/openssl/buffer.h>
 
 #ifdef  __cplusplus
 extern "C" {

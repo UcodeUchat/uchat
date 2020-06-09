@@ -59,39 +59,39 @@
 #ifndef HEADER_TS_H
 #define HEADER_TS_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl/include/openssl/opensslconf.h>
 
 #ifndef OPENSSL_NO_BUFFER
-#include <openssl/buffer.h>
+#include <../../libressl/include/openssl/buffer.h>
 #endif
 #ifndef OPENSSL_NO_EVP
-#include <openssl/evp.h>
+#include <../../libressl/include/openssl/evp.h>
 #endif
 #ifndef OPENSSL_NO_BIO
-#include <openssl/bio.h>
+#include <../../libressl/include/openssl/bio.h>
 #endif
-#include <openssl/stack.h>
-#include <openssl/asn1.h>
-#include <openssl/safestack.h>
+#include <../../libressl/include/openssl/stack.h>
+#include <../../libressl/include/openssl/asn1.h>
+#include <../../libressl/include/openssl/safestack.h>
 
 #ifndef OPENSSL_NO_RSA
-#include <openssl/rsa.h>
+#include <../../libressl/include/openssl/rsa.h>
 #endif
 
 #ifndef OPENSSL_NO_DSA
-#include <openssl/dsa.h>
+#include <../../libressl/include/openssl/dsa.h>
 #endif
 
 #ifndef OPENSSL_NO_DH
-#include <openssl/dh.h>
+#include <../../libressl/include/openssl/dh.h>
 #endif
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
 
-#include <openssl/x509.h>
-#include <openssl/x509v3.h>
+#include <../../libressl/include/openssl/x509.h>
+#include <../../libressl/include/openssl/x509v3.h>
 
 /*
 MessageImprint ::= SEQUENCE  {
