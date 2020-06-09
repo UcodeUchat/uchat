@@ -59,7 +59,7 @@
 #ifndef HEADER_CAST_H
 #define HEADER_CAST_H
 
-#include <openssl/opensslconf.h>
+#include <../../libressl/include/openssl/opensslconf.h>
 
 #ifdef  __cplusplus
 extern "C" {

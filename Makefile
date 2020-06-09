@@ -132,17 +132,17 @@ OBJS_HELP = $(addprefix $(OBJD)/, $(SRC_HELP:%.c=%.o))
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -g -fsanitize=address
 
-LIBRESSL_A = ./libressl_3/tls/.libs/libtls.a \
-			 ./libressl_3/ssl/.libs/libssl.a \
-			 ./libressl_3/crypto/.libs/libcrypto.a
+LIBRESSL_A = ./libressl/tls/.libs/libtls.a \
+			 ./libressl/ssl/.libs/libssl.a \
+			 ./libressl/crypto/.libs/libcrypto.a
 
 LIBRESSL_H = \
-			-I ./libressl_3/include/tls.h \
-			-I ./libressl_3/include/openssl \
-			-I ./libressl_3/include/pqueue.h \
-			-I ./libressl_3/tls \
-			-I ./libressl_3/ssl \
-			-I ./libressl_3/crypto
+			-I ./libressl/include/tls.h \
+			-I ./libressl/include/openssl \
+			-I ./libressl/include/pqueue.h \
+			-I ./libressl/tls \
+			-I ./libressl/ssl \
+			-I ./libressl/crypto
 
 #AUDIOFLAGS = -lportaudio
 #TLSFLAGS =  -lcrypto -lssl -ltls
@@ -150,7 +150,7 @@ SQLFLAGS = -lsqlite3
 
 all: install
 
-server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBMX)
+server: $(NAME_S) #$(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
 

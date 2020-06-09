@@ -117,10 +117,10 @@
 #ifndef HEADER_SSL3_H
 #define HEADER_SSL3_H
 
-#include <openssl/opensslconf.h>
-#include <openssl/buffer.h>
-#include <openssl/evp.h>
-#include <openssl/ssl.h>
+#include <../../libressl/include/openssl/opensslconf.h>
+#include <../../libressl/include/openssl/buffer.h>
+#include <../../libressl/include/openssl/evp.h>
+#include <../../libressl/include/openssl/ssl.h>
 
 #ifdef  __cplusplus
 extern "C" {

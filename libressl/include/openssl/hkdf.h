@@ -16,7 +16,7 @@
 #ifndef OPENSSL_HEADER_HKDF_H
 #define OPENSSL_HEADER_HKDF_H
 
-#include <openssl/evp.h>
+#include <../../libressl/include/openssl/evp.h>
 
 #if defined(__cplusplus)
 extern "C" {

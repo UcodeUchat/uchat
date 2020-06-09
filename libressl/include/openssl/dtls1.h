@@ -70,8 +70,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <openssl/opensslconf.h>
-#include <openssl/buffer.h>
+#include <../../libressl/include/openssl/opensslconf.h>
+#include <../../libressl/include/openssl/buffer.h>
 
 #ifdef  __cplusplus
 extern "C" {

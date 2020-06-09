@@ -62,7 +62,7 @@
 #define __bounded__(x, y, z)
 #endif
 
-#include <openssl/ossl_typ.h>
+#include <../../libressl/include/openssl/ossl_typ.h>
 
 #ifdef  __cplusplus
 extern "C" {
