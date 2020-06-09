@@ -1,5 +1,15 @@
 #include "uchat.h"
 
+t_a_play *mx_init_struct_audio(void) {
+    t_a_play *audio = (t_a_play *)malloc(sizeof(t_a_play));
+
+    audio->play = FALSE;
+    audio->pause = FALSE;
+    audio->start = mx_strdup("0");
+    audio->duration = NULL;
+    audio->stop_poss = mx_strdup("0");
+    return audio;
+}
 
 static void create_item (GtkWidget *menu, t_mes *mes, char *title, 
             void (*callback) (GtkWidget *widget, t_mes *mes)) {

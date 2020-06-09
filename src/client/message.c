@@ -1,29 +1,10 @@
 #include "uchat.h"
 
-void *play_sound_pthread(void *taken_info) {
-    char *file = (char *)taken_info;
-    (void)file;
+void *play_sound_pthread(void *mes) {
+    t_mes *tmp = (t_mes *)mes;
 
-//    mx_play_sound_file("./audio/moby.aif", "0", NULL);
-    mx_play_sound_file(mx_strjoin("./Uchat_downloads/", file), "0", NULL);
+    mx_play_sound_file(tmp, "0", NULL);
     return 0;
-}
-
-void load_audio_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
-    (void)widget;
-    (void)event;
-    pthread_t sound_play;
-    pthread_attr_t attr;
-    int tc;
-
-    mx_load_file(mes);
-    printf("%s\n", mx_strjoin("./Uchat_downloads/", mes->message->data));
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED); // #
-    tc = pthread_create(&sound_play, &attr, play_sound_pthread, \
-                        mes->message->data);
-    if (tc != 0)
-        printf("pthread_create error = %s\n", strerror(tc));
 }
 
 void mx_pause_cb(GtkWidget *widget, t_mes *mes) {
@@ -34,8 +15,18 @@ void mx_pause_cb(GtkWidget *widget, t_mes *mes) {
 
 void mx_play_cb(GtkWidget *widget, t_mes *mes) {
     (void)widget;
-    (void)mes;
-    fprintf(stderr, "play\n");
+    pthread_t sound_play;
+    int tc;
+
+    if (mes->audio->play == FALSE) {
+        mes->audio->pause = FALSE;
+        mes->audio->play = TRUE;
+        mx_load_file(mes);
+        printf("%s\n", mx_strjoin("./Uchat_downloads/", mes->message->data));
+        tc = pthread_create(&sound_play, NULL, play_sound_pthread, mes);
+        if (tc != 0)
+            printf("pthread_create error = %s\n", strerror(tc));
+    }
 }
 
 GtkWidget *mx_make_button(t_mes *mes, char *name, 
@@ -104,7 +95,7 @@ t_message *mx_create_message (t_client_info *info, t_room *room,
 
 static void *sound_thread (void *data) {
     (void)data;
-    mx_play_sound_file("audio/message_receive.aiff", "0", "1");
+    mx_play_sound_file(NULL, "0", "1");
 //    mx_play_sound_file("audio/moby.aif", "0", "3");
     return 0;
 }

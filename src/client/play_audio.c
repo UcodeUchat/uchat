@@ -34,7 +34,7 @@ static int init_stream(PaStream** stream, SF_INFO s_info) {
     return Pa_StartStream(*stream);
 }
 
-int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
+int mx_play_sound_file(t_mes *mes, char *start_time, char *duration_t) {
     PaStream* stream = NULL;
     SNDFILE* a_file = NULL;
     SF_INFO s_info;
@@ -47,7 +47,12 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
     double duration = 0;
     sf_count_t read_count = 0;
     sf_count_t read_sum = 0;
+    char *file_name = NULL;
 
+    if (mes != NULL)
+        file_name = mx_strjoin("./Uchat_downloads/", mes->message->data);
+    else
+        file_name = mx_strdup("audio/message_receive.aiff");
 
     if ((err = Pa_Initialize()) != paNoError)
         return exit_program(err, "Pa_Initialize", a_file);

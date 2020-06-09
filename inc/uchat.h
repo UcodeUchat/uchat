@@ -310,11 +310,19 @@ typedef struct  s_file_list {
     struct s_file_list *next;
 }               t_file_list;
 
+typedef struct s_a_play {
+    bool    play;
+    bool    pause;
+    char    *start;
+    char    *duration;
+    char    *stop_poss;
+}               t_a_play;
 
 typedef struct s_mes {
     t_client_info *info;
     t_room *room;
     t_message *message;
+    t_a_play *audio;
     int user_id;
     int id;
 }               t_mes;
@@ -607,5 +615,9 @@ void mx_append_message(t_client_info *info, t_room *room, json_object *new_json)
 //json
 json_object *mx_create_basic_json_object(int type);
 void mx_print_json_object(struct json_object *jobj, const char *msg);
+
+//audio
+t_a_play *mx_init_struct_audio(void);
+int mx_play_sound_file(t_mes *mes, char *start_time, char *duration_t);
 
 #endif
