@@ -59,7 +59,8 @@ void mx_show_email (t_client_info *info, int id, json_object *new_json,
     gtk_box_pack_start (GTK_BOX (email_box), 
                         info->data->profile->email_entry, FALSE, FALSE, 0);
     gtk_widget_show(info->data->profile->email_entry);
-    gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->email_entry), FALSE);
+    gtk_editable_set_editable (GTK_EDITABLE (info->data->profile->email_entry),
+                                 FALSE);
     if (id == info->id)
         show_email_settings(info, email_box);
     gtk_widget_show(email_box);

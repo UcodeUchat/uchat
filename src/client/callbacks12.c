@@ -9,7 +9,7 @@ static void server_send (t_client_info *info) {
     new_json = mx_js_n_o();
     mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_EDIT_MESSAGE_TYPE));
     mx_js_o_o_add(new_json, "login", mx_js_n_str(info->login));
-    mx_js_o_o_add(new_json, "data", mx_js_n_str (message));
+    mx_js_o_o_add(new_json, "data", mx_js_n_str(message));
     mx_js_o_o_add(new_json, "user_id", mx_js_n_int(info->id));
     mx_js_o_o_add(new_json, "room_id", mx_js_n_int(info->editing_room));
     mx_js_o_o_add(new_json, "message_id", mx_js_n_int(info->editing));

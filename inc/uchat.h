@@ -352,6 +352,7 @@ int mx_make_tls_connect(struct tls *tls, struct tls **tls_sock,
 //struct tls *mx_create_tls_configuration(t_server_info *info);
 int mx_create_tls_configuration(struct tls **tls);
 int mx_create_server_socket(t_server_info *info);
+int mx_validation(json_object *js);
 
 int mx_save_send(pthread_mutex_t *mutex, struct tls *tls_socket,
                  const char *content, int size);
