@@ -549,6 +549,17 @@ void mx_sticker (t_message *node, const char *message);
 int mx_notebook_prepend(t_note *note);
 int mx_add(t_mes *mes);
 int mx_reorder(t_mes *mes);
+void mx_direct_message_client(t_client_info *info, json_object *new_json);
+void mx_show_gif(char *gif, char *event, t_room *room, json_object *new_json);
+void mx_leave_room_client(t_client_info *info, json_object *new_json);
+int mx_notebook_detach(t_note *note);
+void mx_edit_profile_client(t_client_info *info, json_object *new_json);
+void mx_join_room_client(t_client_info *info, json_object *new_json);
+void mx_input_authentification(t_client_info *info, json_object *new_json);
+void mx_load_history_client(t_client_info *info, json_object *new_json);
+void mx_input_message(t_client_info *info, json_object *new_json);
+void mx_delete_message_client(t_client_info *info, json_object *new_json);
+void mx_edit_message_client(t_client_info *info, json_object *new_json);
 
 
 // functions

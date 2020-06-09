@@ -71,6 +71,10 @@ SRC_CLIENT = main_client.c \
 	save_file_in_client.c \
 	send_file_from_client.c \
 	input_from_server.c \
+	run_functions_type.c \
+	run_functions_type1.c \
+	run_functions_type2.c \
+	run_functions_type3.c \
 	gui.c \
 	login.c \
 	reg.c \
