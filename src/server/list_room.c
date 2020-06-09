@@ -88,7 +88,7 @@ void mx_get_rooms(t_server_info *info, json_object *js) {
 	int n_rooms;
 
 	json_object_object_add(js, KEY10, array);
-    sprintf(req, "select distinct user_id, rooms.id, rooms.name, rooms.access from room_user, rooms \
+    sprintf(req, "select distinct room_user.user_id, rooms.id, rooms.name, rooms.access from room_user, rooms \
     			where rooms.id=room_user.room_id and user_id=%d;", user_id);
     if (sqlite3_exec(info->db, req, get_rooms, array, 0) != SQLITE_OK)
         return;

@@ -121,7 +121,8 @@ SRC_HELP = err_exit.c \
 	functions.c \
 	crypto.c \
 	json_functions.c
-
+	
+BD = src/functions/create_bd.c
 SRCS_SERVER = $(addprefix $(SRCD)/server/, $(SRC_SERVER))
 SRCS_CLIENT = $(addprefix $(SRCD)/client/, $(SRC_CLIENT))
 SRCS_HELP = $(addprefix $(SRCD)/functions/, $(SRC_HELP))
@@ -153,7 +154,8 @@ all: install
 server: $(NAME_S) #$(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
-
+	@clang -lsqlite3 -o create $(BD) && ./create server_db.bin
+	@rm -rf create
 	@make -sC $(LJSOND)
 	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
