@@ -58,3 +58,8 @@ void mx_item_callback (GtkWidget *widget, t_stik *stik) {
     tls_send(stik->info->tls_client, json_string, strlen(json_string));
     (void)widget;
 }
+
+void mx_show_search_callback (GtkWidget *widget, t_client_info *info) {
+    (void)widget;
+    gtk_widget_show_all(info->data->search_box);
+}
