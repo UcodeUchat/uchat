@@ -64,7 +64,12 @@ SRC_SERVER = main_server.c \
 	send_mail_notification2.c \
 	send_mail_notification3.c \
 	send_mail_notification4.c \
-	reconnection.c
+	reconnection.c \
+	validation.c \
+	check_json.c \
+	check_json2.c \
+	check_json3.c \
+	check_json4.c
 
 SRC_CLIENT = main_client.c \
 	start_client.c \
@@ -72,6 +77,7 @@ SRC_CLIENT = main_client.c \
 	send_message.c \
 	save_file_in_client.c \
 	send_file_from_client.c \
+	send_file_from_client2.c \
 	input_from_server.c \
 	run_functions_type.c \
 	run_functions_type1.c \

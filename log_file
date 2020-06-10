@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 log_file fd  0
 socket = 4
 listen fd = 4
@@ -106403,3 +106404,5 @@ js_in_room:
 data: 
 ---
 { "type": 12, "file_id": 1, "u
+=======
+>>>>>>> master
