@@ -1,33 +1,5 @@
 #include "uchat.h"
 
-static void load_user_data_2(char **argv, void **js) {
-    json_object *visual_n = mx_js_n_int(atoi(argv[9]));
-    json_object *audio_n = mx_js_n_int(atoi(argv[10]));
-    json_object *email_n = mx_js_n_int(atoi(argv[11]));
-
-    mx_js_o_o_add(*(struct json_object **)js, "visual_n", visual_n);
-    mx_js_o_o_add(*(struct json_object **)js, "audio_n", audio_n);
-    mx_js_o_o_add(*(struct json_object **)js, "email_n", email_n);
-}
-
-static int load_user_data(void *js, int argc, char **argv, char **col_name) {
-    json_object *name = NULL;
-    json_object *email = NULL;
-    json_object *login = mx_js_n_str(argv[2]);
-
-    (void)argc;
-    (void)col_name;
-    name = argv[4] ? mx_js_n_str(argv[4])
-                    : mx_js_n_str("");
-    email = argv[5] ? mx_js_n_str(argv[5])
-                    : mx_js_n_str("");
-    mx_js_o_o_add((struct json_object *)js, "login", login);
-    mx_js_o_o_add((struct json_object *)js, "name", name);
-    mx_js_o_o_add((struct json_object *)js, "email", email);
-    load_user_data_2(argv, &js);
-    return 0;
-}
-
 int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js) {
     int user_id = mx_js_g_int(mx_js_o_o_get(js, "user_id"));
     int room_id = mx_js_g_int(mx_js_o_o_get(js, "room_id"));
@@ -40,21 +12,6 @@ int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js) {
         mx_send_json_to_all_in_room(info, js);
         json_string = mx_js_o_to_js_str(js);
         mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
-    }
-    return 1;
-}
-
-int mx_load_profile (t_server_info *info, t_socket_list *csl, json_object *js) {
-    int id = mx_js_g_int(mx_js_o_o_get(js, "id"));
-    char cmd[1024];
-    const char *json_string = NULL;
-
-    sprintf(cmd, "SELECT * FROM users, user_notifications \
-            where users.id='%d' and user_notifications.user_id='%d';", id, id);
-    if (sqlite3_exec(info->db, cmd, load_user_data, js, NULL) == SQLITE_OK) {
-        json_string = mx_js_o_to_js_str(js);
-        mx_save_send(&csl->mutex, csl->tls_socket,
-                     json_string, strlen(json_string));
     }
     return 1;
 }
