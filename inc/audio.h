@@ -17,6 +17,13 @@
 
 #define BUFFER_LEN      1024
 
+
+typedef struct s_a_file {
+    sf_count_t length;  // length of file in frames
+    sf_count_t start_point;  // start_point of frames read
+    sf_count_t end_point;  // end point of frames playing
+}               t_a_file;
+
 typedef struct s_audio {
     uint16_t format_type;
     uint8_t number_channels;
@@ -37,5 +44,7 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block);
 int mx_exit_stream(t_audio *data, PaError err);
 long mx_save_audio(t_audio *data);
 void mx_print_s_info(SF_INFO s_info);
+int mx_exit_player(PaError err, const char *text, SNDFILE* a_file);
+
 
 #endif //UCHAT_AUDIO_H

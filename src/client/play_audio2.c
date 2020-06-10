@@ -10,4 +10,13 @@ void mx_print_s_info(SF_INFO s_info) {
 
 }
 
+int mx_exit_player(PaError err, const char *text, SNDFILE* a_file) {
+    printf("error in %s =%s\n", text, Pa_GetErrorText(err));
+    Pa_Terminate();
+    if (a_file)
+        sf_close(a_file);
+    return 1;
+}
+
+
 
