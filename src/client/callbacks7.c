@@ -13,6 +13,8 @@ static void *record_thread (void *data) {
     t_client_info *info = (t_client_info *)data;
 
     info->record_file = strdup(mx_record_audio(info));
+    if (info->record_file == NULL)
+        pthread_exit((void *) 0);
     pthread_cleanup_push(send_record_thread, info);
     if (data)
         pthread_exit((void *) 1);

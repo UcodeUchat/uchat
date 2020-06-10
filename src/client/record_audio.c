@@ -1,14 +1,5 @@
 #include "uchat.h"
 
-static t_audio * init_audio_data() {
-    t_audio *data = malloc(sizeof(t_audio));
-    data->format_type = paFloat32;
-    data->number_channels = 0;
-    data->sample_rate = SAMPLE_RATE;
-    data->size = 0;
-    data->rec_samples = NULL;
-    return data;
-}
 
 static int process_stream(PaStream *stream, t_audio *data,
                           t_a_snippet *sample_block, int *i) {
@@ -62,8 +53,7 @@ char *mx_record_audio(t_client_info *info) {
     PaStream *stream = NULL;
     printf(" start record\n");
     err = mx_init_stream(&stream, data, sample_block);
-    if (err){
-        fprintf(stderr, "%s\n", "error");
+    if (err) {
         return NULL;
     }
     err = record(stream, data, sample_block, info);
@@ -77,13 +67,22 @@ char *mx_record_audio(t_client_info *info) {
 
 
 
-/*
-static int number_channels() {
+static int init_stream_start(t_audio *data) {
+    PaError err;
+    const PaDeviceInfo *info;
 
+    err = Pa_Initialize();
+    if (err != paNoError)
+        return mx_exit_stream(data, err);
+    err = Pa_GetDeviceCount();
 
+    info = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice());
+    if (!info) {
+        fprintf(stdout, "%s\n", "Unable to find info on def input device.");
+        return 1;
+    }
+    return 0;
 }
-
-*/
 
 
 
@@ -95,38 +94,26 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
     const PaDeviceInfo* outputInfo;
     int numChannels;
 
-    const PaDeviceInfo *info;
     if (!stream || !data || !sample_block)
-        return -1;
-
-    printf("patest_read_write_wire.c\n"); fflush(stdout);
-    printf("sizeof(int) = %lu\n", sizeof(int)); fflush(stdout);
-    printf("sizeof(long) = %lu\n", sizeof(long)); fflush(stdout);
-
-    err = Pa_Initialize();
-    if (err != paNoError)
-        return mx_exit_stream(data, err);
-
-    err = Pa_GetDeviceCount();
-
-    info = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice());
-    if (!info) {
-        fprintf(stdout, "%s\n", "Unable to find info on default input device.");
-        return -1;
-    }
+        return 1;
+    if (init_stream_start(data))
+        return 1;
 
     input_parameters.device = Pa_GetDefaultInputDevice();
+
     printf( "Input device # %d.\n", input_parameters.device);
     inputInfo = Pa_GetDeviceInfo(input_parameters.device);
     printf( "    Name: %s\n", inputInfo->name );
     printf( "      LL: %g s\n", inputInfo->defaultLowInputLatency);
     printf( "      HL: %g s\n", inputInfo->defaultHighInputLatency);
-    if (input_parameters.device == paNoDevice) {
-        fprintf(stderr,"Error: No default input device.\n");
-        return -1;
 
+
+    if (input_parameters.device == paNoDevice) {
+        fprintf(stderr, "Error: No default input device.\n");
+        return -1;
     }
-    output_parameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
+    output_parameters.device = Pa_GetDefaultOutputDevice();  // default output device
+
     printf( "Output device # %d.\n", output_parameters.device);
     outputInfo = Pa_GetDeviceInfo( output_parameters.device);
     printf( "   Name: %s\n", outputInfo->name );
@@ -135,26 +122,26 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
 
     numChannels = inputInfo->maxInputChannels < outputInfo->maxOutputChannels
                   ? inputInfo->maxInputChannels : outputInfo->maxOutputChannels;
+
+
+
     printf( "Num channels = %d.\n", numChannels );
-
-
     data->number_channels = numChannels;
     input_parameters.channelCount = numChannels;
     input_parameters.sampleFormat = paFloat32;
     input_parameters.suggestedLatency = inputInfo->defaultLowInputLatency;
     input_parameters.hostApiSpecificStreamInfo = NULL;
-    err = Pa_OpenStream(stream, &input_parameters, NULL, data->sample_rate, FRAMES_PER_BUFFER, paClipOff, NULL, NULL);
+    err = Pa_OpenStream(stream, &input_parameters, NULL, data->sample_rate,
+                        FRAMES_PER_BUFFER, paClipOff, NULL, NULL);
     if (err)
         return mx_exit_stream(data, err);
     sample_block->size = FRAMES_PER_BUFFER * sizeof(float) * data->number_channels;  //number bytes
     sample_block->snippet = malloc(sample_block->size);
-
-    if( sample_block->snippet == NULL ) {
+    if(sample_block->snippet == NULL) {
         printf("Could not allocate record array.\n");
         return mx_exit_stream(data, err);
     }
     memset(sample_block->snippet, SAMPLE_SILENCE, sample_block->size);
-
     return Pa_StartStream(*stream);
 }
 

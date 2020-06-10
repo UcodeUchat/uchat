@@ -38,9 +38,10 @@ int mx_load_profile_validation(json_object *js) { // 14
 int mx_edit_profile_validation(json_object *js) { // 15
 	json_object *user_id = mx_js_o_o_get(js, "user_id");
 	json_object *add_info = mx_js_o_o_get(js, "add_info");
+	int add = mx_js_g_int(mx_js_o_o_get(js, "add_info"));
 
-	if (user_id) {
-		if (!add_info) {
+	if (user_id && add_info) {
+		if (!add) {
 			json_object *column = mx_js_o_o_get(js, "column");
 			json_object *data = mx_js_o_o_get(js, "data");
 

@@ -385,7 +385,7 @@ int mx_edit_profile (t_server_info *info, t_socket_list *csl,
                         json_object *js);
 int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js);
-int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_join_room (t_server_info *info, json_object *js);
 int mx_create_room_server (t_server_info *info, t_socket_list *csl, 
                         json_object *js);
 int mx_get_rooms_data (void *messages, int argc, char **argv, 
@@ -432,6 +432,8 @@ int mx_delete_acc(t_server_info *i, json_object *j);
 int mx_registration(t_server_info *i, t_socket_list *csl, json_object *js);
 int mx_add_to_db(t_server_info *i, const char *l, const char *pa, int us_id);
 int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
+int mx_get_room_id(void *js, int argc, char **argv, char **col_name);
+void mx_init_direct (t_server_info *info, json_object *js, char *name);
 
 /*Client*/
 bool mx_pick_file_to_send(t_client_info *info, FILE **file, json_object **js);

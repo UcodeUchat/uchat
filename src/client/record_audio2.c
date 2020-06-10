@@ -1,5 +1,15 @@
 #include "uchat.h"
 
+t_audio * init_audio_data(void) {
+    t_audio *data = malloc(sizeof(t_audio));
+    data->format_type = paFloat32;
+    data->number_channels = 0;
+    data->sample_rate = SAMPLE_RATE;
+    data->size = 0;
+    data->rec_samples = NULL;
+    return data;
+}
+
 int mx_exit_stream(t_audio *data, PaError err) {
     Pa_Terminate();
     if (data->rec_samples)
@@ -35,7 +45,4 @@ long mx_save_audio(t_audio *data) {
     data->file_name = strdup(file_name);
     return err;
 }
-
-
-
 

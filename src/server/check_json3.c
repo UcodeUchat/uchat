@@ -31,9 +31,8 @@ int mx_create_room_validation(json_object *js) { // 19
 	json_object *acces = mx_js_o_o_get(js, "acces");
 	json_object *name = mx_js_o_o_get(js, "name");
 	json_object *room_data = mx_js_o_o_get(js, "room_data");
-	json_object *room_id = mx_js_o_o_get(js, "room_id");
 
-	if (!user_id || !acces || !name || !room_data || !room_id)
+	if (!user_id || !acces || !name || !room_data)
 		return 1;
 	return MX_OK;
 }

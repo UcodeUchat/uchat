@@ -49,7 +49,7 @@ void audio (t_mes *mes, t_message *node) {
     GtkWidget *box_all = gtk_box_new(FALSE, 0);
     GtkWidget *v_mess = gtk_label_new("Voice message:");
     GtkWidget *box_butt = gtk_box_new(FALSE, 0);
-    GtkWidget *b_pause = mx_make_button(mes, "img/pause.png", mx_stop_cb);
+    GtkWidget *b_pause = mx_make_button(mes, "img/stop.png", mx_stop_cb);
     GtkWidget *b_play = mx_make_button(mes, "img/play.png", mx_play_cb);
 
     gtk_orientable_set_orientation(GTK_ORIENTABLE(box_all),\

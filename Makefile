@@ -61,6 +61,10 @@ SRC_SERVER = main_server.c \
 	list_room2.c \
 	logout.c \
 	logout2.c \
+	logout3.c \
+	logout4.c \
+	logout5.c \
+	logout6.c \
 	functions_for_server.c \
 	send_mail_notification.c \
 	send_mail_notification2.c \
@@ -172,7 +176,7 @@ SQLFLAGS = -lsqlite3
 
 all: install
 
-server: $(NAME_S) #$(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBMX)
+server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
 	@clang -lsqlite3 -o create $(BD) && ./create server_db.bin
@@ -228,7 +232,7 @@ $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 #$(LIBRESSL_TLSX): $(LIBRESSLD_TLSA)
 #	@make -sC $(LIBRESSLD)
 
-client: $(NAME_C) #$(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
+client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
 
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)

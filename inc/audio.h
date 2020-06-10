@@ -19,9 +19,11 @@
 
 
 typedef struct s_a_file {
+    char *file_name;
     sf_count_t length;  // length of file in frames
     sf_count_t start_point;  // start_point of frames read
     sf_count_t end_point;  // end point of frames playing
+    sf_count_t read_count;
 }               t_a_file;
 
 typedef struct s_audio {
@@ -45,6 +47,7 @@ int mx_exit_stream(t_audio *data, PaError err);
 long mx_save_audio(t_audio *data);
 void mx_print_s_info(SF_INFO s_info);
 int mx_exit_player(PaError err, const char *text, SNDFILE* a_file);
+t_audio * init_audio_data(void);
 
 
 #endif //UCHAT_AUDIO_H
