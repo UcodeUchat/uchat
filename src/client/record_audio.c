@@ -2,8 +2,8 @@
 
 static t_audio * init_audio_data() {
     t_audio *data = malloc(sizeof(t_audio));
-    data->format_type = paFloat32;  //r
-    data->number_channels = 0;   //remove
+    data->format_type = paFloat32;
+    data->number_channels = 0;
     data->sample_rate = SAMPLE_RATE;
     data->size = 0;
     data->rec_samples = NULL;
@@ -31,13 +31,15 @@ static int process_stream(PaStream *stream, t_audio *data,
     return 0;
 }
 
-static int record(PaStream *stream, t_audio *data, t_a_snippet *sample_block, t_client_info *info) {
+static int record(PaStream *stream, t_audio *data, t_a_snippet *sample_block,
+                  t_client_info *info) {
     int err = 0;
     int j = 0;
+    int i;
 
     printf("Wire on. Will run %d seconds.\n", NUM_SECONDS);
     fflush(stdout);
-    for (int i = 0; i < (NUM_SECONDS * SAMPLE_RATE) / FRAMES_PER_BUFFER; ++i) {
+    for (i = 0; i < (NUM_SECONDS * SAMPLE_RATE) / FRAMES_PER_BUFFER; ++i) {
         if (info->can_record == 1)
             break;
         err = process_stream(stream, data, sample_block, &j);
@@ -58,7 +60,6 @@ char *mx_record_audio(t_client_info *info) {
     sample_block->snippet = NULL;
     sample_block->size = 0;
     PaStream *stream = NULL;
-//    bool sample_complete = false;
     printf(" start record\n");
     err = mx_init_stream(&stream, data, sample_block);
     if (err){
@@ -74,6 +75,18 @@ char *mx_record_audio(t_client_info *info) {
     return data->file_name;
 }
 
+
+
+/*
+static int number_channels() {
+
+
+}
+
+*/
+
+
+
 int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) {
     PaError err;
     PaStreamParameters input_parameters;
@@ -82,7 +95,7 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
     const PaDeviceInfo* outputInfo;
     int numChannels;
 
-//    const PaDeviceInfo *info;
+    const PaDeviceInfo *info;
     if (!stream || !data || !sample_block)
         return -1;
 
@@ -93,23 +106,25 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
     err = Pa_Initialize();
     if (err != paNoError)
         return mx_exit_stream(data, err);
+
     err = Pa_GetDeviceCount();
-//    info = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice());
-//    if (!info) {
-//        fprintf(stdout, "%s\n", "Unable to find info on default input device.");
-//        return -1;
-//    }
+
+    info = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice());
+    if (!info) {
+        fprintf(stdout, "%s\n", "Unable to find info on default input device.");
+        return -1;
+    }
+
     input_parameters.device = Pa_GetDefaultInputDevice();
     printf( "Input device # %d.\n", input_parameters.device);
     inputInfo = Pa_GetDeviceInfo(input_parameters.device);
     printf( "    Name: %s\n", inputInfo->name );
     printf( "      LL: %g s\n", inputInfo->defaultLowInputLatency);
     printf( "      HL: %g s\n", inputInfo->defaultHighInputLatency);
-
     if (input_parameters.device == paNoDevice) {
         fprintf(stderr,"Error: No default input device.\n");
         return -1;
-//        mx_exit_stream(data);
+
     }
     output_parameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
     printf( "Output device # %d.\n", output_parameters.device);
@@ -122,12 +137,11 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
                   ? inputInfo->maxInputChannels : outputInfo->maxOutputChannels;
     printf( "Num channels = %d.\n", numChannels );
 
+
     data->number_channels = numChannels;
-//    data->number_channels = 1;
     input_parameters.channelCount = numChannels;
     input_parameters.sampleFormat = paFloat32;
     input_parameters.suggestedLatency = inputInfo->defaultLowInputLatency;
-//            Pa_GetDeviceInfo(input_parameters.device)->defaultLowInputLatency;
     input_parameters.hostApiSpecificStreamInfo = NULL;
     err = Pa_OpenStream(stream, &input_parameters, NULL, data->sample_rate, FRAMES_PER_BUFFER, paClipOff, NULL, NULL);
     if (err)
@@ -144,124 +158,5 @@ int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block) 
     return Pa_StartStream(*stream);
 }
 
-int mx_exit_stream(t_audio *data, PaError err) {
-//    PaError             err = paNoError;
-    Pa_Terminate();
-    if (data->rec_samples)
-        free (data->rec_samples);
-    if (err != paNoError) {
-        fprintf(stderr, "An error occured while using the portaudio stream\n" );
-        fprintf(stderr, "Error number: %d\n", err);
-        fprintf(stderr, "Error message: %s\n", Pa_GetErrorText( err ));
-        err = 1; // Always return 0 or 1, but no other return codes.
-    }
-    return err;
-}
 
 
-long mx_save_audio(t_audio *data) {
-    uint8_t err = SF_ERR_NO_ERROR;
-    SF_INFO sfinfo ={
-            .channels = data->number_channels,
-            .samplerate = data->sample_rate,
-            .format = SF_FORMAT_AIFF | SF_FORMAT_FLOAT
-    };
-    char file_name[100];
-
-    snprintf(file_name, 100, "./Uchat_downloads/rec_massage%d.aif", rand());  //rand -> replace by message id
-    printf("start save audio\n");
-    SNDFILE *outfile = sf_open(file_name, SFM_WRITE, &sfinfo);
-    if (!outfile) {
-        printf("error outfile =%d\n", sf_error(outfile));
-        return -1;
-    }
-    long wr = sf_writef_float(outfile, data->rec_samples, data->size / 8);
-    err = data->size - wr;
-    printf("data to write to file =%zu\n", data->size);
-    sf_write_sync(outfile);
-    sf_close(outfile);
-    data->file_name = strdup(file_name);
-    return err;
-}
-
-
-float mx_change_threshold(float talking_threshold, float talking_ntensity) {
-    return TALKING_THRESHOLD_WEIGHT * talking_threshold +
-           (1 - TALKING_THRESHOLD_WEIGHT) * talking_ntensity /
-           TALKING_TRIGGER_RATIO;
-}
-
-float mx_rms(float *data, size_t len) {
-    // RMS (Root Mean Square) – это среднеквадратическое значение
-    // громкостей всех семплов дорожки.
-    double sum = 0.0;
-    for (size_t i = 0; i < len; ++i) {
-        sum += pow(data[i], 2);
-    }
-    return sqrt(sum / len);
-}
-
-// now not useds
-int mx_process_stream_ext(PaStream *stream, t_audio *data,
-                          t_a_snippet *sample_block, const char *fileName,
-                          bool *sample_complete) {
-
-    if (!stream || !data || !sample_block || !sample_complete)
-        return -1;
-    (void) fileName;
-    static int i = 0;
-    time_t talking = 0;
-    time_t silence = 0;
-    float talking_threshold = 0.000750;
-    bool was_talking = false;
-    PaError err = 0;
-    Pa_ReadStream(stream, sample_block->snippet, FRAMES_PER_BUFFER);
-    float talking_intensity = mx_rms(sample_block->snippet, FRAMES_PER_BUFFER);
-    if (err) {
-        return err;
-    }
-    if (talking_intensity > talking_threshold) {
-        if (!was_talking) {
-            was_talking = true;
-            talking_threshold /= TALKING_TRIGGER_RATIO;  // уменьшаем порог чуствительность записи
-        }
-
-        talking_threshold = mx_change_threshold(talking_threshold, talking_intensity);
-        printf("Listening: %d\n", i);
-        i++;
-        time(&talking);
-        data->rec_samples = realloc(data->rec_samples, sample_block->size * i);
-        data->size = sample_block->size * i;
-        if (data->rec_samples){
-            size_t next_ndex = (i - 1) * sample_block->size;
-            char *destination = (char*)data->rec_samples + next_ndex;
-            memcpy(destination, sample_block->snippet, sample_block->size);
-        }
-        else{
-            free(data->rec_samples);
-            data->rec_samples = NULL;
-            data->size = 0;
-        }
-    } else {
-        if (was_talking) {
-            was_talking = false;
-            talking_threshold *= TALKING_TRIGGER_RATIO;
-        }
-        talking_threshold = mx_change_threshold(talking_threshold,talking_intensity);
-        double test = difftime(time(&silence), talking);
-        if (test >= 1.5 && test <= 10 && data->rec_samples && i >= MIN_TALKING_BUFFERS){
-            if (sample_complete) *sample_complete = true;
-            // char buffer[100];
-            //snprintf(buffer, 100, "file:%d.flac", i);
-            mx_save_audio(data);
-            talking = 0;
-            free(data->rec_samples);
-            data->rec_samples = NULL;
-            data->size = 0;
-            i = 0;
-        }
-    }
-    return err;
-//    free (sample_block->snippet);
-//    Pa_Terminate();
-}

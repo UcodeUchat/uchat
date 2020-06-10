@@ -36,10 +36,6 @@ typedef struct s_a_snippet {
 int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block);
 int mx_exit_stream(t_audio *data, PaError err);
 long mx_save_audio(t_audio *data);
-int mx_process_stream_ext(PaStream *stream, t_audio *data,
-                          t_a_snippet *sample_block, const char *fileName,
-                          bool *sample_complete);
-float mx_rms(float *data, size_t len);
-float mx_change_threshold(float talking_threshold, float talking_ntensity);
+void mx_print_s_info(SF_INFO s_info);
 
 #endif //UCHAT_AUDIO_H

@@ -1,14 +1,5 @@
 #include "uchat.h"
 
-static void print_s_info(SF_INFO s_info) {
-    printf ("frames = %lld\n", s_info.frames);
-    printf ("samplerate = %d\n", s_info.samplerate);
-    printf ("channels = %d\n", s_info.channels);
-    printf ("format = %d\n", s_info.format);
-    printf ("sections = %d\n", s_info.sections);
-    printf ("seekable = %d\n", s_info.seekable);
-
-}
 
 static int exit_program(PaError err, const char *text, SNDFILE* a_file) {
     printf("error in %s =%s\n", text, Pa_GetErrorText(err));
@@ -34,11 +25,15 @@ static int init_stream(PaStream** stream, SF_INFO s_info) {
     return Pa_StartStream(*stream);
 }
 
+
+
 int mx_play_sound_file(t_mes *mes, char *start_time, char *duration_t) {
     PaStream* stream = NULL;
     SNDFILE* a_file = NULL;
     SF_INFO s_info;
     PaError err;
+
+
     sf_count_t length;	// length of file in frames
     sf_count_t start_point; // start_point of frames read
     sf_count_t end_point; // end point of frames playing
@@ -67,10 +62,8 @@ int mx_play_sound_file(t_mes *mes, char *start_time, char *duration_t) {
         Pa_Terminate();
         return 1;
     }
-//    if (s_info.channels > 1)
-//        return 1;
-    print_s_info(s_info);
-    printf("play 2\n");
+    mx_print_s_info(s_info);
+
     length = s_info.frames;
     if (start_time) {
         starttime = atof(start_time);
