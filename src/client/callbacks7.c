@@ -12,7 +12,7 @@ static void send_record_thread (void *data) {
 static void *record_thread (void *data) {
     t_client_info *info = (t_client_info *)data;
 
-    info->record_file = strdup(mx_record_audio());
+    info->record_file = strdup(mx_record_audio(info));
     pthread_cleanup_push(send_record_thread, info);
     if (data)
         pthread_exit((void *) 1);
@@ -22,20 +22,29 @@ static void *record_thread (void *data) {
 }
 
 void mx_record_callback (GtkWidget *widget, t_client_info *info) {
-    pthread_t thread_record;
-    pthread_attr_t attr;
-    int tc;
+    if (info->can_record == 1) {
+        printf("Play\n");
+        info->can_record = 0;
+        pthread_t thread_record;
+        pthread_attr_t attr;
+        int tc;
 
-    info->record_file = NULL;
-    pthread_attr_init(&attr);
-    tc = pthread_create(&thread_record, &attr, record_thread, info);
-    if (tc != 0)
-        printf("pthread_create error = %s\n", strerror(tc));
+        info->record_file = NULL;
+        pthread_attr_init(&attr);
+        tc = pthread_create(&thread_record, &attr, record_thread, info);
+        if (tc != 0)
+            printf("pthread_create error = %s\n", strerror(tc));
 
-    int position = gtk_notebook_get_current_page
-            (GTK_NOTEBOOK(info->data->notebook));
-    t_room *room = mx_find_room_position(info->data->rooms, position);
-    info->data->current_room = room->id;
+        int position = gtk_notebook_get_current_page
+                (GTK_NOTEBOOK(info->data->notebook));
+        t_room *room = mx_find_room_position(info->data->rooms, position);
+        info->data->current_room = room->id;
+    }
+    else {
+        printf("Stop\n");
+        info->can_record = 1;
+        mx_sleep_ms(300);
+    }
     (void)widget;
 }
 

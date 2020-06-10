@@ -32,8 +32,7 @@ typedef struct s_a_snippet {
 }           t_a_snippet;
 
 
-//int mx_record_audio(void);
-char *mx_record_audio(void);
+//int mx_record_audio(void)
 int mx_init_stream(PaStream **stream, t_audio *data, t_a_snippet *sample_block);
 int mx_exit_stream(t_audio *data, PaError err);
 long mx_save_audio(t_audio *data);

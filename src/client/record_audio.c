@@ -31,16 +31,17 @@ static int process_stream(PaStream *stream, t_audio *data,
     return 0;
 }
 
-static int record(PaStream *stream, t_audio *data, t_a_snippet *sample_block) {
+static int record(PaStream *stream, t_audio *data, t_a_snippet *sample_block, t_client_info *info) {
     int err = 0;
     int j = 0;
 
     printf("Wire on. Will run %d seconds.\n", NUM_SECONDS);
     fflush(stdout);
     for (int i = 0; i < (NUM_SECONDS * SAMPLE_RATE) / FRAMES_PER_BUFFER; ++i) {
+        if (info->can_record == 1)
+            break;
         err = process_stream(stream, data, sample_block, &j);
     }
-
     mx_save_audio(data);
     printf("Wire off.\n"); fflush(stdout);
     err = Pa_StopStream(stream);
@@ -49,7 +50,7 @@ static int record(PaStream *stream, t_audio *data, t_a_snippet *sample_block) {
     return err;
 }
 
-char *mx_record_audio(void) {
+char *mx_record_audio(t_client_info *info) {
     t_audio *data = init_audio_data();
     t_a_snippet *sample_block = malloc(sizeof(t_a_snippet));
     PaError err = paNoError;
@@ -64,11 +65,12 @@ char *mx_record_audio(void) {
         fprintf(stderr, "%s\n", "error");
         return NULL;
     }
-    err = record(stream, data, sample_block);
+    err = record(stream, data, sample_block, info);
     if (err != 0)
         printf("err =%d\n", err);
     printf(" exit record\n");
     printf("record to file->%s\n", data->file_name);
+    info->can_record = 1;
     return data->file_name;
 }
 

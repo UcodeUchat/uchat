@@ -15,6 +15,7 @@ static void init_info(t_client_info *info, int argc, char **argv) {
     (*info).port = (uint16_t) atoi(argv[2]);
     (*info).tls_client = NULL;
     (*info).responce = 0;
+    (*info).can_record = 1;
 }
 
 int main(int argc, char **argv) {

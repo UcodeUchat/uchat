@@ -218,6 +218,7 @@ typedef struct  s_client_info {
     struct s_file_list *input_files;
     struct json_object *rooms;
     int input;
+    int can_record;
 }               t_client_info;
 
 typedef struct s_all {
@@ -610,5 +611,29 @@ char *mx_encrypt(char *str);
 char *mx_decrypt(char *str);
 json_object *mx_create_basic_json_object(int type);
 void mx_print_json_object(struct json_object *jobj, const char *msg);
+
+
+char *mx_record_audio(t_client_info *info);
+
+typedef struct s_mail {
+    char *hostname;
+    char *sender;
+    char *receiver;
+    char *subject;
+    char *message;
+    char *user;
+}           t_mail;
+
+
+void *mx_send_mail(char *login, char *receiver, char *message);
+int mx_mail_data_sending(struct tls *tls_c, t_mail *mail);
+void mx_send_format(int socket, const char *text);
+void mx_send_format_tls(struct tls *tls, char *arg1, char *arg2,
+                        char *arg3);
+void mx_init_struct_mail(t_mail *mail, char *receiver, char *message);
+int mx_connect_to_server(const char *hostname, const char *port);
+struct tls *mx_create_tls(void);
+int mx_check_response(const char *response);
+int mx_wait_on_response(int socket, struct tls *tls, int reply_code);
 
 #endif

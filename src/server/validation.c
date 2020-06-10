@@ -1,9 +1,8 @@
 #include "uchat.h"
 
 int validation_4(json_object *js, int type) {
-	(void)js;
 	if (type == MX_REG_TYPE)
-		return mx_reg_validation();
+		return mx_reg_validation(js);
 	else if (type >= 4 && type <= 8)
 		return MX_OK;
 	else
