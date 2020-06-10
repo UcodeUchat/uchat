@@ -1,6 +1,6 @@
 #include "uchat.h"
 
-void create_download_folder() {
+static void create_download_folder() {
     struct stat st;
 
     if (stat(MX_SAVE_FOLDER_IN_SERVER, &st) == -1) {

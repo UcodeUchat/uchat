@@ -245,6 +245,9 @@ typedef struct  s_server_info {  // struct server
     struct s_work *wdb;
 }               t_server_info;
 
+#define MX_EMAIL_POS 8613
+#define MX_EMAIL_POS_2 348
+
 #define KEY10 "rooms"
 
 #define MX_MAX_FILE_SIZE 300000000

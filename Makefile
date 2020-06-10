@@ -58,7 +58,9 @@ SRC_SERVER = main_server.c \
 	work_with_files_list.c \
 	request_for_rooms.c \
 	list_room.c \
+	list_room2.c \
 	logout.c \
+	logout2.c \
 	functions_for_server.c \
 	send_mail_notification.c \
 	send_mail_notification2.c \
@@ -69,7 +71,9 @@ SRC_SERVER = main_server.c \
 	check_json.c \
 	check_json2.c \
 	check_json3.c \
-	check_json4.c
+	check_json4.c \
+	email_notify.c \
+	delete.c
 
 SRC_CLIENT = main_client.c \
 	start_client.c \
