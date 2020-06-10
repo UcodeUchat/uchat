@@ -1,18 +1,5 @@
 #include "uchat.h"
 
-int mx_delete_message (t_server_info *info,
-                       t_socket_list *csl, json_object *js) {
-    int msg_id = mx_js_g_int(mx_js_o_o_get(js, "message_id"));
-    char command[1024];
-
-    (void)csl;
-    sprintf(command, "DELETE FROM msg_history where id = %d;", msg_id);
-    if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) {
-        mx_send_json_to_all_in_room(info, js);
-    }
-    return 1;
-}
-
 static void load_user_data_2(char **argv, void **js) {
     json_object *visual_n = mx_js_n_int(atoi(argv[9]));
     json_object *audio_n = mx_js_n_int(atoi(argv[10]));
@@ -70,38 +57,6 @@ static void get_name(t_server_info *info, char **name, int first_id, int id2) {
     sprintf(command, "SELECT login FROM users WHERE id='%d' OR id='%d';",
             first_id, id2);
     sqlite3_exec(info->db, command, get_logins, name, NULL);
-}
-
-static int search_rooms(void *array, int argc, char **argv, char **col_name) {
-    (void)argc;
-    (void)col_name;
-    if (argv[0]) {
-        json_object *room = mx_js_n_o();
-        json_object *id = mx_js_n_int(atoi(argv[0]));
-        json_object *name = mx_js_n_str(argv[1]);
-        json_object *acces = mx_js_n_int(atoi(argv[2]));
-
-        mx_js_o_o_add(room, "id", id);
-        mx_js_o_o_add(room, "name", name);
-        mx_js_o_o_add(room, "acces", acces);
-        json_object_array_add((struct json_object *)array, room);
-    }
-    return 0;
-}
-
-static int search_users(void *array, int argc, char **argv, char **col_name) {
-    (void)argc;
-    (void)col_name;
-    if (argv[0]) {
-        json_object *user = mx_js_n_o();
-        json_object *id = mx_js_n_int(atoi(argv[0]));
-        json_object *login = mx_js_n_str(argv[2]);
-
-        mx_js_o_o_add(user, "id", id);
-        mx_js_o_o_add(user, "login", login);
-        json_object_array_add((struct json_object *)array, user);
-    }
-    return 0;
 }
 
 int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js) {
@@ -216,34 +171,6 @@ int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js) {
             mx_strdel(&command);
         }
     }
-    return 1;
-}
-
-int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js) {
-    const char *query = mx_js_g_str(mx_js_o_o_get(js, "query"));
-    char *command = malloc(1024);
-    char *command1 = malloc(1024);
-    const char *json_string = NULL;
-    json_object *array_rooms = json_object_new_array();
-    json_object *array_users = json_object_new_array();
-
-    mx_js_o_o_add(js, "rooms", array_rooms);
-    mx_js_o_o_add(js, "users", array_users);
-    if (strcmp(query, "All") == 0) {
-        sprintf(command, "SELECT * FROM rooms;");
-        sprintf(command1, "SELECT * FROM users;");
-    }
-    else {
-        sprintf(command, "SELECT * FROM rooms WHERE name LIKE '%%%s%%' AND NOT access=3;", query);
-        sprintf(command1, "SELECT * FROM users WHERE login LIKE '%%%s%%';", query);
-    }
-    if (sqlite3_exec(info->db, command, search_rooms, array_rooms, NULL) != SQLITE_OK)
-        return 0;
-    if (sqlite3_exec(info->db, command1, search_users, array_users, NULL) != SQLITE_OK)
-        return 0;
-    json_string = mx_js_o_to_js_str(js);
-    mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
-    mx_strdel(&command);
     return 1;
 }
 

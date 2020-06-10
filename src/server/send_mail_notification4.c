@@ -1,8 +1,5 @@
 #include "uchat.h"
 
-#define MX_EMAIL_POS 8613
-#define MX_EMAIL_POS_2 348
-
 static int open_file_and_get_size(FILE **file, int *size,
                                   t_mail *mail, char **data) {
     if ((*file = fopen("./emails/universal.txt", "r")) != NULL) {

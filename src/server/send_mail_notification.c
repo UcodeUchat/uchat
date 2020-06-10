@@ -82,9 +82,9 @@ void *mx_send_mail(char *login, char *receiver, char *message) {
         return NULL;
     if (send_mail_autentification(tls_c))
        return NULL;
-    if (send_mail_massage(tls_c, mail)) // send massage
+    if (send_mail_massage(tls_c, mail))
         return NULL;
-    if (send_mail_quit(tls_c)) // send quit
+    if (send_mail_quit(tls_c))
         return NULL;
     close(server);
     tls_free(tls_c);
