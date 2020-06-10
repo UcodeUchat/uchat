@@ -63,6 +63,7 @@ SRC_SERVER = main_server.c \
 	logout2.c \
 	logout3.c \
 	logout4.c \
+	logout5.c \
 	functions_for_server.c \
 	send_mail_notification.c \
 	send_mail_notification2.c \

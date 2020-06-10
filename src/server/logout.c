@@ -28,26 +28,6 @@ static int load_user_data(void *js, int argc, char **argv, char **col_name) {
     return 0;
 }
 
-static int get_logins(void *name, int argc, char **argv, char **col_name) {
-    (void)argc;
-    (void)col_name;
-    char **str = (char  **)name;
-
-    if (argv[0]) {
-        *str = mx_strjoin(*str, argv[0]);
-        return 0;
-    }
-    return 1;
-}
-
-static void get_name(t_server_info *info, char **name, int first_id, int id2) {
-    char command[1024];
-
-    sprintf(command, "SELECT login FROM users WHERE id='%d' OR id='%d';",
-            first_id, id2);
-    sqlite3_exec(info->db, command, get_logins, name, NULL);
-}
-
 int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js) {
     int user_id = mx_js_g_int(mx_js_o_o_get(js, "user_id"));
     int room_id = mx_js_g_int(mx_js_o_o_get(js, "room_id"));
@@ -60,52 +40,6 @@ int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js) {
         mx_send_json_to_all_in_room(info, js);
         json_string = mx_js_o_to_js_str(js);
         mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
-    }
-    return 1;
-}
-
-int mx_direct_message (t_server_info *info, t_socket_list *csl, json_object *js) {
-    int first_id = mx_js_g_int(mx_js_o_o_get(js, "first_id"));
-    int second_id = mx_js_g_int(mx_js_o_o_get(js, "second_id"));
-    char *command = malloc(1024);
-    char *name = mx_strnew(1);
-    const char *json_string = NULL;
-
-    get_name(info, &name, first_id, second_id);
-    sprintf(command, "SELECT * FROM rooms INNER JOIN direct_rooms USING(id) \
-        WHERE access=3 AND ((first_id='%d' AND second_id='%d') OR (first_id='%d' AND second_id='%d'));",
-        first_id, second_id, second_id, first_id);
-    sqlite3_exec(info->db, command, mx_get_room_id, js, NULL);
-    if (mx_js_g_int(mx_js_o_o_get(js, "room_id")) != 0) {
-        mx_js_o_o_add(js, "exist", mx_js_n_int(1));
-        json_string = mx_js_o_to_js_str(js);
-        mx_save_send(&csl->mutex, csl->tls_socket, json_string, strlen(json_string));
-        mx_strdel(&command);
-    }
-    else {
-        char *command2 = malloc(1024);
-
-        sprintf(command2, "INSERT INTO rooms (name, access) VALUES ('%s', '3'); \
-        SELECT last_insert_rowid();" , name);
-        if (sqlite3_exec(info->db, command2, mx_get_room_id, js, NULL) == SQLITE_OK) {
-            int room_id = mx_js_g_int(mx_js_o_o_get(js, "room_id"));
-            char *command3 = malloc(1024);
-            sprintf(command3, "INSERT INTO room_user (room_id, user_id, role) VALUES ('%d', '%d', '0'); \
-                    INSERT INTO room_user (room_id, user_id, role) VALUES ('%d', '%d', '0'); \
-                    INSERT INTO direct_rooms (id, first_id, second_id) VALUES ('%d', '%d', '%d');" , 
-                    room_id, first_id, room_id, second_id, room_id, first_id, second_id);
-            if (sqlite3_exec(info->db, command3, NULL, NULL, NULL) == SQLITE_OK) {
-                json_object *room_data = mx_js_n_o();;
-                mx_js_o_o_add(room_data, "room_id", mx_js_n_int(room_id));
-                mx_js_o_o_add(room_data, "name", mx_js_n_str(name));
-                json_object *messages = json_object_new_array();
-                mx_js_o_o_add(room_data, "access", mx_js_n_int(3));
-                mx_js_o_o_add(room_data, "messages", messages);
-                mx_js_o_o_add(js, "room_data", room_data);
-                mx_js_o_o_add(js, "exist", mx_js_n_int(0));
-                mx_send_json_to_all_in_room(info, js);
-            }
-        }
     }
     return 1;
 }
