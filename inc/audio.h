@@ -12,7 +12,7 @@
 #define SAMPLE_RATE       (44100)  // в 1 секунде записи содержится 44100 семплов.
 #define FRAMES_PER_BUFFER   (1024)
 #define SAMPLE_SILENCE  (0.0f)
-#define NUM_SECONDS     (5)
+#define NUM_SECONDS     (15)
 
 
 #define BUFFER_LEN      1024
@@ -41,6 +41,5 @@ int mx_process_stream_ext(PaStream *stream, t_audio *data,
                           bool *sample_complete);
 float mx_rms(float *data, size_t len);
 float mx_change_threshold(float talking_threshold, float talking_ntensity);
-int mx_play_sound_file(char *file_name, char *start_time, char *duration_t);
 
 #endif //UCHAT_AUDIO_H

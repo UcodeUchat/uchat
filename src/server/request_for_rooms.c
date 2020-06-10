@@ -20,7 +20,7 @@ static int get_user_sock(void *point, int argc, char **argv, char **col_name) {
     return 0;
 }
 
-static void mx_get_users_sock(t_server_info **i, t_work *wdb, int room) {
+static void get_users_sock(t_server_info **i, t_work *wdb, int room) {
     char *command = malloc(1024);
 
     sprintf(command, "SELECT room_id, socket, users.id FROM room_user, users\
@@ -32,6 +32,6 @@ static void mx_get_users_sock(t_server_info **i, t_work *wdb, int room) {
 
 int *mx_get_users_sock_in_room(t_server_info **i, int room) {
 	init_work_for_db(i);
-    mx_get_users_sock(i, (*i)->wdb, room);
+    get_users_sock(i, (*i)->wdb, room);
     return ((*i)->wdb)->user_sock;
 }

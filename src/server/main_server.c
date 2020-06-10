@@ -1,6 +1,6 @@
 #include "uchat.h"
 
-void create_download_folder() {
+static void create_download_folder() {
     struct stat st;
 
     if (stat(MX_SAVE_FOLDER_IN_SERVER, &st) == -1) {
@@ -46,8 +46,8 @@ int main(int argc, char **argv) {
     memset(info, 0, sizeof(t_server_info));
     init_server_info(argc, argv, info);
     pthread_mutex_init(&((*info).mutex), NULL);
-    //  if (mx_set_daemon(info) == -1)
-    //      mx_err_return3("error: ", strerror(errno), -1);
+    // if (mx_set_daemon(info) == -1)
+    //     mx_err_return3("error: ", strerror(errno), -1);
     init_db(info);
     zero_sockets(info);
     create_download_folder();

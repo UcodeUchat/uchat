@@ -34,7 +34,7 @@ static int init_stream(PaStream** stream, SF_INFO s_info) {
     return Pa_StartStream(*stream);
 }
 
-int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
+int mx_play_sound_file(t_mes *mes, char *start_time, char *duration_t) {
     PaStream* stream = NULL;
     SNDFILE* a_file = NULL;
     SF_INFO s_info;
@@ -47,15 +47,23 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
     double duration = 0;
     sf_count_t read_count = 0;
     sf_count_t read_sum = 0;
+    char *file_name = NULL;
 
+    if (mes != NULL){
+        printf("Я смотрю на стрджойн!!\n");
+        file_name = mx_strjoin("./Uchat_downloads/", mes->message->data);
+        printf("file_name = %s\n", file_name);
+    }
+    else
+        file_name = mx_strdup("audio/message_receive.aiff");
 
     if ((err = Pa_Initialize()) != paNoError)
         return exit_program(err, "Pa_Initialize", a_file);
 
-    memset(&s_info, 0, sizeof(s_info));
+    // memset(&s_info, 0, sizeof(s_info));
 
     if (!(a_file = sf_open(file_name, SFM_READ, &s_info))) {
-        printf("error sf_info =%d\n", sf_error(a_file));
+        printf("error sf_info = %d\n", sf_error(a_file));
         Pa_Terminate();
         return 1;
     }
@@ -98,7 +106,7 @@ int mx_play_sound_file(char *file_name, char *start_time, char *duration_t) {
     double scale = 1.0;
     int m = 0;
     sf_seek(a_file, start_point, SEEK_SET);
-    while ((read_count = sf_read_float(a_file, data, BUFFER_LEN))) {
+    while ((read_count = sf_read_float(a_file, data, BUFFER_LEN)) && mes->audio->pause == 0) {
         if (subFormat == SF_FORMAT_FLOAT || subFormat == SF_FORMAT_DOUBLE) {
             for (m = 0 ; m < read_count ; ++m) {
                 data[m] *= scale;

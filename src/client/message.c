@@ -1,41 +1,35 @@
 #include "uchat.h"
 
-void *play_sound_pthread(void *taken_info) {
-    char *file = (char *)taken_info;
-    (void)file;
+void *play_sound_pthread(void *mes) {
+    t_mes *tmp = (t_mes *)mes;
 
-//    mx_play_sound_file("./audio/moby.aif", "0", NULL);
-    mx_play_sound_file(mx_strjoin("./Uchat_downloads/", file), "0", NULL);
+    mx_play_sound_file(tmp, "0", NULL);
+    tmp->info->cant_play = 1;
     return 0;
 }
 
-void load_audio_callback(GtkWidget *widget, GdkEventButton *event, t_mes *mes) {
+void mx_stop_cb(GtkWidget *widget, t_mes *mes) {
     (void)widget;
-    (void)event;
-    pthread_t sound_play;
-    pthread_attr_t attr;
-    int tc;
-
-    mx_load_file(mes);
-    printf("%s\n", mx_strjoin("./Uchat_downloads/", mes->message->data));
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED); // #
-    tc = pthread_create(&sound_play, &attr, play_sound_pthread, \
-                        mes->message->data);
-    if (tc != 0)
-        printf("pthread_create error = %s\n", strerror(tc));
-}
-
-void mx_pause_cb(GtkWidget *widget, t_mes *mes) {
-    (void)widget;
-    (void)mes;
     fprintf(stderr, "pause\n");
+    mes->audio->pause = 1;
+    mes->audio->play = 0;
 }
 
 void mx_play_cb(GtkWidget *widget, t_mes *mes) {
     (void)widget;
-    (void)mes;
-    fprintf(stderr, "play\n");
+    pthread_t sound_play;
+    int tc;
+
+    if (mes->audio->play == 0 && mes->info->cant_play == 1) {
+        mes->info->cant_play = 0;
+        mes->audio->pause = 0;
+        mes->audio->play = 1;
+        mx_load_file(mes);
+        tc = pthread_create(&sound_play, NULL, play_sound_pthread, mes);
+        if (tc != 0)
+            printf("pthread_create error = %s\n", strerror(tc));
+    }
+    mes->audio->play = 0;
 }
 
 GtkWidget *mx_make_button(t_mes *mes, char *name, 
@@ -55,7 +49,7 @@ void audio (t_mes *mes, t_message *node) {
     GtkWidget *box_all = gtk_box_new(FALSE, 0);
     GtkWidget *v_mess = gtk_label_new("Voice message:");
     GtkWidget *box_butt = gtk_box_new(FALSE, 0);
-    GtkWidget *b_pause = mx_make_button(mes, "img/pause.png", mx_pause_cb);
+    GtkWidget *b_pause = mx_make_button(mes, "img/pause.png", mx_stop_cb);
     GtkWidget *b_play = mx_make_button(mes, "img/play.png", mx_play_cb);
 
     gtk_orientable_set_orientation(GTK_ORIENTABLE(box_all),\
@@ -70,6 +64,7 @@ void audio (t_mes *mes, t_message *node) {
 }
 
 static void choose_type (t_mes *mes, t_message *node, const char *message) {
+    mes->info->cant_play = 1;
     if (node->add_info == 0)
         mx_simple_message (node, message);
     else if (node->add_info == 1) 
@@ -97,14 +92,14 @@ t_message *mx_create_message (t_client_info *info, t_room *room,
     mes->message = node;
     choose_type(mes, node, message);
     mx_choose_side (info, node, room, order);
-
+    mes->audio = mx_init_struct_audio();
     node->next = NULL;
     return node;
 }
 
 static void *sound_thread (void *data) {
     (void)data;
-    mx_play_sound_file("audio/message_receive.aiff", "0", "1");
+    mx_play_sound_file(NULL, "0", "1");
 //    mx_play_sound_file("audio/moby.aif", "0", "3");
     return 0;
 }

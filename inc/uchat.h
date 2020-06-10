@@ -61,6 +61,9 @@
 #define MX_MAX_FILE_SIZE 300000000
 #define MX_MAX_USERS_IN_ROOM 1024
 
+#define MX_EMAIL_POS 8613
+#define MX_EMAIL_POS_2 348
+
 #define MX_MSG_TYPE 1
 #define MX_FILE_SEND_TYPE 2
 #define MX_AUTH_TYPE 3
@@ -219,6 +222,7 @@ typedef struct  s_client_info {
     struct json_object *rooms;
     int input;
     int can_record;
+    bool cant_play;
 }               t_client_info;
 
 typedef struct s_all {
@@ -273,6 +277,7 @@ typedef struct  s_server_info {
     struct s_work *wdb;
 }               t_server_info;
 
+
 typedef struct  s_file_tmp {
     pthread_mutex_t *mutex;
     struct tls *tls;
@@ -307,14 +312,31 @@ typedef struct  s_file_list {
     struct s_file_list *next;
 }               t_file_list;
 
+typedef struct s_a_play {
+    bool    play;
+    bool    pause;
+    char    *start;
+    char    *duration;
+    char    *stop_poss;
+}           t_a_play;
 
 typedef struct s_mes {
     t_client_info *info;
     t_room *room;
     t_message *message;
+    t_a_play *audio;
     int user_id;
     int id;
 }               t_mes;
+
+typedef struct s_mail {
+    char *hostname;
+    char *sender;
+    char *receiver;
+    char *subject;
+    char *message;
+    char *user;
+}           t_mail;
 
 /*Server*/
 int mx_validation(json_object *js);
@@ -611,20 +633,7 @@ char *mx_encrypt(char *str);
 char *mx_decrypt(char *str);
 json_object *mx_create_basic_json_object(int type);
 void mx_print_json_object(struct json_object *jobj, const char *msg);
-
-
 char *mx_record_audio(t_client_info *info);
-
-typedef struct s_mail {
-    char *hostname;
-    char *sender;
-    char *receiver;
-    char *subject;
-    char *message;
-    char *user;
-}           t_mail;
-
-
 void *mx_send_mail(char *login, char *receiver, char *message);
 int mx_mail_data_sending(struct tls *tls_c, t_mail *mail);
 void mx_send_format(int socket, const char *text);
@@ -635,5 +644,10 @@ int mx_connect_to_server(const char *hostname, const char *port);
 struct tls *mx_create_tls(void);
 int mx_check_response(const char *response);
 int mx_wait_on_response(int socket, struct tls *tls, int reply_code);
+
+/*Audio*/
+t_a_play *mx_init_struct_audio(void);
+void mx_init_struct_audio2(t_mes *mes);
+int mx_play_sound_file(t_mes *mes, char *start_time, char *duration_t);
 
 #endif
