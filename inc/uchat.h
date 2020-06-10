@@ -385,7 +385,7 @@ int mx_edit_profile (t_server_info *info, t_socket_list *csl,
                         json_object *js);
 int mx_leave_room (t_server_info *info, t_socket_list *csl, json_object *js);
 int mx_search_all (t_server_info *info, t_socket_list *csl, json_object *js);
-int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js);
+int mx_join_room (t_server_info *info, json_object *js);
 int mx_create_room_server (t_server_info *info, t_socket_list *csl, 
                         json_object *js);
 int mx_get_rooms_data (void *messages, int argc, char **argv, 

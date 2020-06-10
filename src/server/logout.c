@@ -149,28 +149,34 @@ int mx_create_room_server (t_server_info *info, t_socket_list *csl, json_object 
     return 1;
 }
 
-int mx_join_room (t_server_info *info, t_socket_list *csl, json_object *js) {
+static void load_jroom_data (t_server_info *info, json_object *js, 
+                            int room_id) {
+    json_object *room_data = mx_js_o_o_get(js, "room_data");
+    json_object *messages = json_object_new_array();
+    char *command1 = mx_strnew(1024);
+
+    mx_js_o_o_add(room_data, "messages", messages);
+    sprintf(command1, "SELECT *  FROM msg_history, users \
+            where room_id = %d and users.id = msg_history.user_id \
+            order by msg_history.id desc limit 5;", room_id);
+    if (sqlite3_exec(info->db, command1, mx_get_rooms_data, messages, 0)
+         == SQLITE_OK) {
+        mx_send_json_to_all_in_room(info, js);
+    }
+    mx_strdel(&command1);
+}
+
+int mx_join_room (t_server_info *info, json_object *js) {
     int user_id = mx_js_g_int(mx_js_o_o_get(js, "user_id"));
     int room_id = mx_js_g_int(mx_js_o_o_get(js, "room_id"));
     char *command = malloc(1024);
 
-    (void)csl;
-    mx_print_json_object(js, "mx_process_input_from_server");
-    sprintf(command, "INSERT INTO room_user (user_id, room_id, role) VALUES ('%d', '%d', '%d');", user_id, room_id, 0);
+    sprintf(command, "INSERT INTO room_user (user_id, room_id, role) \
+            VALUES ('%d', '%d', '%d');", user_id, room_id, 0);
     if (sqlite3_exec(info->db, command, NULL, NULL, NULL) == SQLITE_OK) {
-        json_object *room_data = mx_js_o_o_get(js, "room_data");
-        json_object *messages = json_object_new_array();
-        char *command1 = mx_strnew(1024);
-
-        mx_js_o_o_add(room_data, "messages", messages);
-        sprintf(command1, "SELECT *  FROM msg_history, users \
-                where room_id = %d and users.id = msg_history.user_id order by msg_history.id desc limit 5;", room_id);
-        if (sqlite3_exec(info->db, command1, mx_get_rooms_data, messages, 0) == SQLITE_OK) {
-            mx_strdel(&command1);
-            mx_send_json_to_all_in_room(info, js);
-            mx_strdel(&command);
-        }
+        load_jroom_data (info, js, room_id);
     }
+    mx_strdel(&command);
     return 1;
 }
 
