@@ -596,6 +596,7 @@ void mx_edit_message_client(t_client_info *info, json_object *new_json);
 int mx_login (t_client_info *info);
 void mx_append_message(t_client_info *info, t_room *room, 
                        json_object *new_json);
+void mx_audio (t_mes *mes, t_message *node);
 
 /*Functions*/
 int mx_detect_file_extention(char *filename);

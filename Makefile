@@ -135,6 +135,7 @@ SRC_CLIENT = main_client.c \
 	record_audio.c \
 	play_audio.c \
 	send_empty_json.c \
+	mx_audio.c \
 
 # SRC_HELP = $(wildcard *.c)
 SRC_HELP = err_exit.c \
