@@ -28,6 +28,24 @@ static int create_s_sock(struct addrinfo *bind_address) {
     return server_socket;
 }
 
+static void set_ip_address(struct sockaddr_in *serv_addr) {
+    char hostbuffer[256]; 
+    char *ip; 
+    struct hostent *host_entry; 
+    int hostname; 
+
+    if ((hostname = gethostname(hostbuffer, sizeof(hostbuffer))) != -1) {
+        if ((host_entry = gethostbyname(hostbuffer)) != NULL) {
+            ip = inet_ntoa(*((struct in_addr*)host_entry->h_addr_list[0]));
+            inet_aton(ip, &((*serv_addr).sin_addr));
+            mx_strdel(&ip);
+            printf("ip: %s\n", ip);
+            return;
+        }
+    }
+    inet_aton("127.0.0.1", &((*serv_addr).sin_addr));
+    printf("ip: 127.0.0.1\n");
+}
 
 int mx_create_server_socket(t_server_info *info) {
     struct addrinfo *bind_address = NULL;
@@ -41,7 +59,7 @@ int mx_create_server_socket(t_server_info *info) {
     serv_addr.sin_port = htons(info->port);
 //    inet_aton("10.111.11.10", &serv_addr.sin_addr);
 
-    inet_aton("127.0.0.1", &serv_addr.sin_addr);
+    set_ip_address(&serv_addr);
     if (bind(server_socket, (struct sockaddr *) &serv_addr,
              sizeof(serv_addr)) != 0) {
         printf("bind error = %s\n", strerror(errno));
