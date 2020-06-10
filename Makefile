@@ -142,6 +142,9 @@ SRC_CLIENT = main_client.c \
 # SRC_HELP = $(wildcard *.c)
 SRC_HELP = err_exit.c \
 	functions.c \
+	functions2.c \
+	functions3.c \
+	functions4.c \
 	crypto.c \
 	json_functions.c \
 	json_short.c \

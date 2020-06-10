@@ -28,7 +28,7 @@ typedef struct s_a_file {
 
 typedef struct s_audio {
     uint16_t format_type;
-    uint8_t number_channels;
+    uint8_t n_channels;
     uint32_t sample_rate;
     size_t size;
     char *file_name;
@@ -48,6 +48,7 @@ long mx_save_audio(t_audio *data);
 void mx_print_s_info(SF_INFO s_info);
 int mx_exit_player(PaError err, const char *text, SNDFILE* a_file);
 t_audio * init_audio_data(void);
+
 
 
 #endif //UCHAT_AUDIO_H

@@ -1,0 +1,2 @@
+ip: 10.111.7.10
+bind error = Address already in use

@@ -609,7 +609,6 @@ int mx_err_return2(const char *err_msg, const char *err_msg2);
 int mx_err_return3(const char *err_msg, const char *err_msg2, int value);
 int mx_err_return(const char *err_msg);
 void mx_sha_hash_password(char *password);
-int addr_socet_info(int argc, char *argv[]);  // test adress
 void mx_get_input(char *buffer);
 int mx_get_input2(char *buffer);
 void mx_report_tls(struct tls * tls_ctx, char * host);
@@ -652,5 +651,9 @@ int mx_wait_on_response(int socket, struct tls *tls, int reply_code);
 t_a_play *mx_init_struct_audio(void);
 void mx_init_struct_audio2(t_mes *mes);
 int mx_play_sound_file(t_mes *mes, char *start_time, char *duration_t);
+int mx_record(PaStream *stream, t_audio *data, t_a_snippet *sample_block,
+              t_client_info *info);
+int mx_process_stream(PaStream *stream, t_audio *data,
+                      t_a_snippet *sample_block, int *i);
 
 #endif
