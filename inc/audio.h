@@ -12,7 +12,7 @@
 #define SAMPLE_RATE       (44100)  // в 1 секунде записи содержится 44100 семплов.
 #define FRAMES_PER_BUFFER   (1024)
 #define SAMPLE_SILENCE  (0.0f)
-#define NUM_SECONDS     (5)
+#define NUM_SECONDS     (15)
 
 
 #define BUFFER_LEN      1024

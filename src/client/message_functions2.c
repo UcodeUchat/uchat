@@ -1,6 +1,6 @@
 #include "uchat.h"
 
-t_a_play *mx_init_struct_audio() {
+t_a_play *mx_init_struct_audio(void) {
     t_a_play *audio = (t_a_play *)malloc(sizeof(t_a_play));
 
     audio->play = 0;

@@ -189,6 +189,7 @@ typedef struct  s_client_info {  //struct client
     struct s_file_list *input_files;
     struct json_object *rooms;
     int input;
+    bool cant_play;
 }               t_client_info;
 
 typedef struct s_all {
@@ -316,7 +317,7 @@ typedef struct s_a_play {
     char    *start;
     char    *duration;
     char    *stop_poss;
-}               t_a_play;
+}           t_a_play;
 
 typedef struct s_mes {
     t_client_info *info;

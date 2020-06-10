@@ -4,32 +4,32 @@ void *play_sound_pthread(void *mes) {
     t_mes *tmp = (t_mes *)mes;
 
     mx_play_sound_file(tmp, "0", NULL);
+    tmp->info->cant_play = 1;
     return 0;
 }
 
-void mx_pause_cb(GtkWidget *widget, t_mes *mes) {
+void mx_stop_cb(GtkWidget *widget, t_mes *mes) {
     (void)widget;
-    (void)mes;
     fprintf(stderr, "pause\n");
+    mes->audio->pause = 1;
+    mes->audio->play = 0;
 }
 
 void mx_play_cb(GtkWidget *widget, t_mes *mes) {
     (void)widget;
     pthread_t sound_play;
     int tc;
-    printf("aaaaa\n");
-    printf("mes->audio:%d\n", mes->audio ? 1 : 0);
-    printf(" mes->audio->play:%d\n", mes->audio->play ? 1 : 0);
 
-    if (mes->audio->play == 0) {
+    if (mes->audio->play == 0 && mes->info->cant_play == 1) {
+        mes->info->cant_play = 0;
         mes->audio->pause = 0;
         mes->audio->play = 1;
         mx_load_file(mes);
-        printf("%s\n", mx_strjoin("./Uchat_downloads/", mes->message->data));
         tc = pthread_create(&sound_play, NULL, play_sound_pthread, mes);
         if (tc != 0)
             printf("pthread_create error = %s\n", strerror(tc));
     }
+    mes->audio->play = 0;
 }
 
 GtkWidget *mx_make_button(t_mes *mes, char *name, 
@@ -49,7 +49,7 @@ void audio (t_mes *mes, t_message *node) {
     GtkWidget *box_all = gtk_box_new(FALSE, 0);
     GtkWidget *v_mess = gtk_label_new("Voice message:");
     GtkWidget *box_butt = gtk_box_new(FALSE, 0);
-    GtkWidget *b_pause = mx_make_button(mes, "img/pause.png", mx_pause_cb);
+    GtkWidget *b_pause = mx_make_button(mes, "img/pause.png", mx_stop_cb);
     GtkWidget *b_play = mx_make_button(mes, "img/play.png", mx_play_cb);
 
     gtk_orientable_set_orientation(GTK_ORIENTABLE(box_all),\
@@ -64,6 +64,7 @@ void audio (t_mes *mes, t_message *node) {
 }
 
 static void choose_type (t_mes *mes, t_message *node, const char *message) {
+    mes->info->cant_play = 1;
     if (node->add_info == 0)
         mx_simple_message (node, message);
     else if (node->add_info == 1) 
@@ -80,7 +81,6 @@ t_message *mx_create_message (t_client_info *info, t_room *room,
                 json_object *new_json, int order) {
     t_message *node =  (t_message *)malloc(sizeof(t_message));
     t_mes *mes = (t_mes *)malloc(sizeof(t_mes));
-    mes->audio = mx_init_struct_audio();
     const char *login = mx_js_g_str(mx_js_o_o_get(new_json, "login"));
     const char *message = mx_js_g_str(mx_js_o_o_get(new_json, "data"));
 
@@ -92,7 +92,7 @@ t_message *mx_create_message (t_client_info *info, t_room *room,
     mes->message = node;
     choose_type(mes, node, message);
     mx_choose_side (info, node, room, order);
-
+    mes->audio = mx_init_struct_audio();
     node->next = NULL;
     return node;
 }
