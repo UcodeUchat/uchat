@@ -248,7 +248,7 @@ typedef struct  s_server_info {  // struct server
 
 #define MX_MAX_FILE_SIZE 300000000
 #define MX_MAX_USERS_IN_ROOM 1024
-#define MX_EMPTY_JSON 1000
+
 #define MX_MSG_TYPE 1
 #define MX_FILE_SEND_TYPE 2
 #define MX_AUTH_TYPE 3
@@ -271,6 +271,7 @@ typedef struct  s_server_info {  // struct server
 #define MX_DIRECT_MESSAGE_TYPE 20
 #define MX_DELETE_ACCOUNT_TYPE 21
 #define MX_RECONNECTION_TYPE 22
+#define MX_EMPTY_JSON 23
 #define MX_PACKAGE_SIZE sizeof(t_package)
 
 #define MX_MAX_MSG_SIZE 200
@@ -320,6 +321,32 @@ typedef struct s_mes {
 }               t_mes;
 
 // server
+// validation
+int mx_validation(json_object *js);
+
+int mx_msg_validation (json_object *js);
+int mx_file_send_validation(json_object *js);
+int mx_auth_validation(json_object *js);
+int mx_logout_validation(json_object *js);
+int mx_load_more_validation(json_object *js);
+
+int mx_delete_msg_validation(json_object *js);
+int mx_file_download_validation(json_object *js);
+int mx_edit_message_validation(json_object *js);
+int mx_load_profile_validation(json_object *js);
+int mx_edit_profile_validation(json_object *js);
+
+int mx_leave_room_validation(json_object *js);
+int mx_search_all_validation(json_object *js);
+int mx_join_room_validation(json_object *js);
+int mx_create_room_validation(json_object *js);
+int mx_direct_message_validation(json_object *js);
+int mx_reg_validation(json_object *js);
+
+int mx_delete_acc_validation(json_object *js);
+int mx_reconnection_validation(json_object *js);
+//
+
 void mx_email_notify(t_server_info *i, json_object *js);
 int mx_reconnection(t_server_info *info, t_socket_list *csl);
 int mx_start_server(t_server_info *info);
@@ -404,6 +431,7 @@ int mx_search_in_db(t_server_info *i, const char *l, const char *pa);
 
 
 // client
+bool mx_pick_file_to_send(t_client_info *info, FILE **file, json_object **js);
 int mx_start_client(t_client_info *info);
 int mx_reconnect_client(t_client_info *info);
 int mx_connect_client(t_client_info *info);
@@ -411,7 +439,7 @@ int mx_tls_config_client(t_client_info *info);
 int mx_make_tls_connect_client(t_client_info *info);
 int mx_authorization_client(t_client_info *info, char **login_for_exit);
 void mx_process_message_in_client(t_client_info *info);
-void *mx_process_input_from_server(void *taken_info);
+void *mx_process_input_from_server(void *i);
 void mx_sleep_ms (int milliseconds);
 t_message *mx_find_message(t_message *messages, int id);
 t_room *mx_find_room(t_room *rooms, int id);
@@ -570,6 +598,7 @@ char *mx_curr_time(void);
 void mx_print_tid(const char *s);
 void mx_err_exit(const char *err_msg);  // вивести помилку
 int mx_err_return2(const char *err_msg, const char *err_msg2);
+int mx_err_return3(const char *err_msg, const char *err_msg2, int value);
 int mx_err_return(const char *err_msg);
 void mx_sha_hash_password(char *password);
 int addr_socet_info(int argc, char *argv[]);  // test adress

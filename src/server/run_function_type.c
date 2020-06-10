@@ -22,6 +22,14 @@ static void run3(t_server_info *info, t_socket_list *csl, int* return_value,
         *return_value = mx_delete_acc(info, csl->obj);
     else if (type == MX_RECONNECTION_TYPE)
         *return_value = mx_reconnection(info, csl);
+    else if (type == MX_AUTH_TYPE)
+        *return_value = mx_authorization(info, csl, csl->obj);
+    else if (type == MX_REG_TYPE)
+        *return_value = mx_registration(info, csl, csl->obj);
+    else if (type == MX_LOGOUT_TYPE)
+        *return_value = mx_logout(info, csl, csl->obj);
+    else if (type == MX_LOAD_MORE_TYPE)
+        *return_value = mx_load_history(info, csl, csl->obj);
 }
 
 static void run2(t_server_info *info, t_socket_list *csl, int* return_value,
@@ -50,7 +58,8 @@ static void run2(t_server_info *info, t_socket_list *csl, int* return_value,
 
 int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
     int validation = mx_validation(csl->obj);
-    if (!validation) {
+
+    if (validation == MX_OK) {
         int return_value = -1;
         int type = mx_js_g_int(mx_js_o_o_get(csl->obj, "type"));
 
@@ -60,14 +69,6 @@ int mx_run_function_type(t_server_info *info, t_socket_list *csl) {
             return mx_save_file_in_server(info, csl);
         else if (type == MX_FILE_DOWNLOAD_TYPE)
             return mx_send_file_from_server(info, csl);
-        else if (type == MX_AUTH_TYPE)
-        	return mx_authorization(info, csl, csl->obj);
-        else if (type == MX_REG_TYPE)
-            return mx_registration(info, csl, csl->obj);
-        else if (type == MX_LOGOUT_TYPE)
-            return mx_logout(info, csl, csl->obj);
-        else if (type == MX_LOAD_MORE_TYPE)
-            return mx_load_history(info, csl, csl->obj);
         else
             run2(info, csl, &return_value, type);
         return type == MX_EMPTY_JSON ? 0 : return_value;

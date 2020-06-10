@@ -40,6 +40,7 @@ INCS = inc/uchat.h
 SRC_SERVER = main_server.c \
 	start_server.c \
 	start_server2.c \
+	start_server3.c \
 	set_daemon.c \
 	server_worker.c \
 	work_with_db.c \
@@ -65,6 +66,10 @@ SRC_SERVER = main_server.c \
 	send_mail_notification4.c \
 	reconnection.c \
 	validation.c \
+	check_json.c \
+	check_json2.c \
+	check_json3.c \
+	check_json4.c \
 
 SRC_CLIENT = main_client.c \
 	start_client.c \
@@ -72,6 +77,7 @@ SRC_CLIENT = main_client.c \
 	send_message.c \
 	save_file_in_client.c \
 	send_file_from_client.c \
+	send_file_from_client2.c \
 	input_from_server.c \
 	run_functions_type.c \
 	run_functions_type1.c \
@@ -130,7 +136,8 @@ SRC_HELP = err_exit.c \
 	json_short.c \
 	json_short2.c \
 	json_short3.c
-
+	
+BD = src/functions/create_bd.c
 SRCS_SERVER = $(addprefix $(SRCD)/server/, $(SRC_SERVER))
 SRCS_CLIENT = $(addprefix $(SRCD)/client/, $(SRC_CLIENT))
 SRCS_HELP = $(addprefix $(SRCD)/functions/, $(SRC_HELP))
@@ -162,7 +169,8 @@ all: install
 server: $(NAME_S) #$(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBMX)
 
 $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
-
+	@clang -lsqlite3 -o create $(BD) && ./create server_db.bin
+	@rm -rf create
 	@make -sC $(LJSOND)
 	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"

@@ -1,23 +1,59 @@
 #include "uchat.h"
 
-int msg_valigation (json_object *js) {
-	json_object *login = mx_js_o_o_get(js, "login");
-	json_object *data = mx_js_o_o_get(js, "data");
-	json_object *user_id = mx_js_o_o_get(js, "user_id");
-	json_object *room_id = mx_js_o_o_get(js, "room_id");
-	json_object *add_info = mx_js_o_o_get(js, "add_info");
+int validation_4(json_object *js, int type) {
+	(void)js;
+	if (type == MX_REG_TYPE)
+		return mx_reg_validation();
+	else if (type >= 4 && type <= 8)
+		return MX_OK;
+	else
+		return 1;
+}
 
-	if (!login)
-		return 1;
-	if (!data)
-		return 1;
-	if (!user_id)
-		return 1;
-	if (!room_id)
-		return 1;
-	if (!add_info)
-		return 1;
-	return 0;
+int validation_3(json_object *js, int type) {
+	if (type == MX_EDIT_PROFILE_TYPE)
+		return mx_edit_profile_validation(js);
+	else if (type == MX_LEAVE_ROOM_TYPE)
+		return mx_leave_room_validation(js);
+	else if (type == MX_SEARCH_ALL_TYPE)
+		return mx_search_all_validation(js);
+	else if (type == MX_JOIN_ROOM_TYPE)
+		return mx_join_room_validation(js);
+	else if (type == MX_CREATE_ROOM_TYPE)
+		return mx_create_room_validation(js);
+	else if (type == MX_DIRECT_MESSAGE_TYPE)
+		return mx_direct_message_validation(js);
+	else if (type == MX_DELETE_ACCOUNT_TYPE)
+		return mx_delete_acc_validation(js);
+	else if (type == MX_RECONNECTION_TYPE)
+		return mx_reconnection_validation(js);
+	else if (type == MX_EMPTY_JSON)
+		return 0;
+	else
+		return validation_4(js, type);
+}
+
+int validation_2(json_object *js, int type) {
+	if (type == MX_MSG_TYPE)
+		return mx_msg_validation(js);
+	else if (type == MX_FILE_SEND_TYPE)
+		return mx_file_send_validation(js);
+	else if (type == MX_AUTH_TYPE)
+		return mx_auth_validation(js);
+	else if (type == MX_LOGOUT_TYPE)
+		return mx_logout_validation(js);
+	else if (type == MX_LOAD_MORE_TYPE)
+		return mx_load_more_validation(js);
+	else if (type == MX_DELETE_MESSAGE_TYPE)
+		return mx_delete_msg_validation(js);
+	else if (type == MX_FILE_DOWNLOAD_TYPE)
+		return mx_file_download_validation(js);
+	else if (type == MX_EDIT_MESSAGE_TYPE)
+		return mx_edit_message_validation(js);
+	else if (type == MX_LOAD_PROFILE_TYPE)
+		return mx_load_profile_validation(js);
+	else
+		return validation_3(js, type);
 }
 
 int mx_validation(json_object *js) {
@@ -29,14 +65,11 @@ int mx_validation(json_object *js) {
 		js1_type = json_object_get_type(js_type);
 		if (js1_type == 3) {
 			type = json_object_get_int(js_type);
-			if (type == MX_MSG_TYPE)
-				return msg_valigation(js);
-			else return 0;
+			//printf("type = %d\n", type);
+			return validation_2(js, type);
 		}
-		else {
-			printf("type != int\n");
+		else
 			return 1;
-		}
 	}
 	else { 
 		printf("not exists type\n");
