@@ -1,4 +1,4 @@
-#include "./inc/uchat.h"
+#include "uchat.h"
 
 int main(int argc, const char **argv) {
     if (argc < 3) {

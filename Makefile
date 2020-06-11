@@ -6,30 +6,30 @@ INC = uchat.h
 
 SRC_SERVER = main_server.c \
              mx_server_worker.c \
-	     functions.c
+	     	functions.c
 
 SRC_CLIENT = main_client.c
 
 OBJ_SERVER = main_server.o \
              mx_server_worker.o \
-	     functions.o
+	     	functions.o
 
 OBJ_CLIENT = main_client.o
 
 #CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic
 CFLAGS = -std=c11
 
-LIBRESSL_A = ./libressl_3/tls/.libs/libtls.a \
-			 ./libressl_3/ssl/.libs/libssl.a \
-			 ./libressl_3/crypto/.libs/libcrypto.a
+LIBRESSL_A = ./libressl/tls/.libs/libtls.a \
+			 ./libressl/ssl/.libs/libssl.a \
+			 ./libressl/crypto/.libs/libcrypto.a
 
 LIBRESSL_H = \
-			-I ./libressl_3/include/tls.h \
-			-I ./libressl_3/include/openssl \
-			-I ./libressl_3/include/pqueue.h \
-			-I ./libressl_3/tls \
-			-I ./libressl_3/ssl \
-			-I ./libressl_3/crypto
+			-I ./libressl/include/tls.h \
+			-I ./libressl/include/openssl \
+			-I ./libressl/include/pqueue.h \
+			-I ./libressl/tls \
+			-I ./libressl/ssl \
+			-I ./libressl/crypto
 
 all: install clean clean
 
@@ -38,10 +38,10 @@ install:
 	@cp $(addprefix inc/, $(INC)) .
 	@cp $(addprefix src/server/, $(SRC_SERVER)) .
 	@cp $(addprefix src/client/, $(SRC_CLIENT)) .
-	@clang $(CFLAGS) -c $(SRC_SERVER) -I $(INC)
-	@clang $(CFLAGS) -c $(SRC_CLIENT) -I $(INC)
-	@clang $(CFLAGS) libmx/libmx.a $(OBJ_SERVER) -o $(NAME_S)  $(LIBRESSL_H) $(LIBRESSL_A)
-	@clang $(CFLAGS) libmx/libmx.a $(OBJ_CLIENT) -o $(NAME_C) -$(LIBRESSL_H) $(LIBRESSL_A)
+	@clang $(CFLAGS)  $(LIBRESSL_H) $(LIBRESSL_A) $(SRC_SERVER)  -I $(INC)
+	@clang $(CFLAGS)  $(LIBRESSL_H) $(LIBRESSL_A) $(SRC_CLIENT)  -I $(INC)
+	@clang $(CFLAGS) libmx/libmx.a  $(OBJ_SERVER) -o $(NAME_S)
+	@clang $(CFLAGS) libmx/libmx.a   $(OBJ_CLIENT)  -o $(NAME_C)
 	@mkdir -p obj
 	@mv $(OBJ_SERVER) $(OBJ_CLIENT) ./obj
 

@@ -54,30 +54,3 @@ void *mx_worker(void *arg) {
     close(client_sock);
     return NULL;
 }
-
-
-void mx_worker_ssl(SSL* ssl) {  // Serve the connection -- threadable
-    char buf[1024];
-//    char reply[1024];
-    int sd, rc;
-//    const char* HTMLecho="<html><body><pre>%s</pre></body></html>\n\n";
-
-    if (SSL_accept(ssl) < 0 )					/* do SSL-protocol accept */
-        ERR_print_errors_fp(stderr);
-        printf("SSL/TLS using %s\n", SSL_get_cipher(ssl));
-//        mx_show_certs(ssl);							// get any certificates
-    while(1) {
-        rc = SSL_read(ssl, buf, sizeof(buf));	// get request
-        if (rc > 0 ) {
-            buf[rc] = 0;
-            printf("Client msg: \"%s\"\n", buf);
-//            sprintf(reply, HTMLecho, buf);			// construct reply
-            SSL_write(ssl, buf, strlen(buf));	// send reply
-        }
-//        else
-//            ERR_print_errors_fp(stderr);
-    }
-    sd = SSL_get_fd(ssl);							/* get socket connection */
-    SSL_free(ssl);									/* release SSL state */
-    close(sd);										/* close connection */
-}

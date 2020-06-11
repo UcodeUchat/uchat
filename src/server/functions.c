@@ -1,5 +1,11 @@
 #include "uchat.h"
 
+
+void mx_printerr(const char *s) {
+    write(2, s, strlen(s));
+}
+
+
 int mx_set_demon(const char *log_file) {
     int fd;
     pid_t pid;
