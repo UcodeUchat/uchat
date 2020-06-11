@@ -361,7 +361,7 @@ int mx_reconnection_validation(json_object *js);
 void mx_email_notify(t_server_info *i, json_object *js);
 int mx_reconnection(t_server_info *info, t_socket_list *csl);
 int mx_start_server(t_server_info *info);
-int mx_set_daemon(t_server_info *info);
+int mx_set_daemon(void);
 int mx_tls_worker(t_socket_list *client_socket_list, t_server_info *info);
 int mx_sign_in(t_server_info *i, json_object *js, int sock);
 int mx_update_socket(t_server_info *i, int client_sock, const char *login);

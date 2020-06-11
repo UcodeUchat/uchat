@@ -212,12 +212,10 @@ $(LIBSNDFX): $(LIBSNDFA)
 	@make -sC $(LIBSNDFD)
 
 $(LIBPORTAUDIOA):
-# 	(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
 	@make -sC $(LIBPORTAUDIOD)
 
 $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 	@make -sC $(LIBPORTAUDIOD)
-
 
 client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBMX)
 
@@ -226,11 +224,9 @@ $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
 	       $(LIBPORTAUDIOA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_CLIENT) $(OBJS_HELP) -o $@
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
 
-
 $(OBJD)/%.o: src/client/%.c $(INCS)
 	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
 	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
-
 
 $(OBJD)/%.o: src/functions/%.c $(INCS)
 	@clang $(CFLAGS) `pkg-config --cflags gtk+-3.0` -o $@ -c $< -I$(INCD) -I$(LMXI)
@@ -241,13 +237,10 @@ $(OBJS_CLIENT): | $(OBJD)
 install: server client
 
 clean:
-# 	@make -sC $(LBMXD) clean
 	@rm -rf $(OBJD)
 	@printf "$(OBJD)\t\t   \033[31;1mdeleted\033[0m\n"
 
 uninstall: clean
-
-# 	@make -sC $(LBMXD) uninstall
 	@rm -rf $(NAME_S) $(NAME_C)
 	@printf "$(NAME_S)\t   \033[31;1muninstalled\033[0m\n"
 	@printf "$(NAME_C)\t\t   \033[31;1muninstalled\033[0m\n"
