@@ -68,7 +68,7 @@ void mx_leave_room_client(t_client_info *info, json_object *new_json) {
             exit_room (info, room, room_id);
         }
         else {
-            mx_show_gif ("img/leave.gif", " lrgt room", room, new_json);
+            mx_show_gif ("img/leave.gif", " leave room", room, new_json);
         }
     }
 }
