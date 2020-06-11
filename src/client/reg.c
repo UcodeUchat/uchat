@@ -63,8 +63,8 @@ void mx_init_reg(t_client_info *info) {
     gtk_fixed_put (GTK_FIXED (info->data->register_box), image, 300, 150);
     gtk_widget_show(image);
     init_reg_fail(info);
-    init_reg_entry(info, &info->data->registration->login_entry, "login", 200);
-    init_reg_entry(info, &info->data->registration->password_entry, "password", 250);
+    init_reg_entry(info, &info->data->registration->login_entry, "login (6+)", 200);
+    init_reg_entry(info, &info->data->registration->password_entry, "password (6+)", 250);
     init_reg_entry(info, &info->data->registration->repeat_password_entry, 
                     "repeat password", 300);
     init_reg_button(info, "Register", 350, mx_send_data_callback);  
