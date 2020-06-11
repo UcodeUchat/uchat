@@ -26,12 +26,15 @@ static void zero_sockets(t_server_info *info) {
 
 static void init_server_info(int argc, char **argv, t_server_info *info) {
     struct servent *servent;
+    long int port_1 = atof(argv[1]);
 
+    if (port_1 > 65535 || port_1 < 1024) {
+        printf("port==%ld\n", port_1);
+        mx_err_exit("port id must be minimum 1024 and max 65535\n");
+    }
     (*info).argc = argc;
     (*info).argv = argv;
-    (*info).port = (uint16_t) atoi(argv[1]);
-    if ((*info).port < 1024)
-        mx_err_exit("port id must be minimum 1024\n");
+    (*info).port = port_1;
     if ((servent = getservbyport((*info).port, "tcp")) != NULL
         || (servent = getservbyport((*info).port, "udp")) != NULL)
         mx_err_exit("port was taken by another process\n");

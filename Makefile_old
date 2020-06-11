@@ -168,9 +168,9 @@ SQLFLAGS = -lsqlite3
 
 all: install
 
-server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) 
+server: $(NAME_S) $(LJSONX) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBMX)
 
-$(NAME_S): $(LMXA) $(OBJS_SERVER) $(OBJS_HELP)
+$(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
 	@clang -lsqlite3 -o create $(BD) && ./create server_db.bin
 	@rm -rf create
 	@make -sC $(LJSOND)
@@ -193,10 +193,10 @@ $(OBJD):
 	@mkdir -pv $@
 
 $(LMXA):
-	@make -sC ./libmx/
+	@make -sC $(LBMXD)
 
-# $(LIBMX): $(LMXA)
-# 	@make -sC $(LBMXD)
+$(LIBMX): $(LMXA)
+	@make -sC $(LBMXD)
 
 $(LJSONA):
 	@make -sC $(LJSOND)
@@ -216,9 +216,9 @@ $(LIBPORTAUDIOA):
 $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 	@make -sC $(LIBPORTAUDIOD)
 
-client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX)
+client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBMX)
 
-$(NAME_C): $(LMXA) $(OBJS_CLIENT) $(OBJS_HELP)
+$(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
 	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(LIBSNDFA) $(LIBPORTAUDIO_FLAGS) \
 	       $(LIBPORTAUDIOA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_CLIENT) $(OBJS_HELP) -o $@
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
@@ -236,16 +236,10 @@ $(OBJS_CLIENT): | $(OBJD)
 install: server client
 
 clean:
-	@make -sC ./libjson clean
-	@make -sC ./libsndfile clean
-	@make -sC $(LBMXD) clean
 	@rm -rf $(OBJD)
 	@printf "$(OBJD)\t\t   \033[31;1mdeleted\033[0m\n"
 
 uninstall: clean
-	@make -sC ./libjson uninstall
-	@make -sC ./libsndfile uninstall
-	@make -sC $(LBMXD) uninstall
 	@rm -rf $(NAME_S) $(NAME_C)
 	@printf "$(NAME_S)\t   \033[31;1muninstalled\033[0m\n"
 	@printf "$(NAME_C)\t\t   \033[31;1muninstalled\033[0m\n"
