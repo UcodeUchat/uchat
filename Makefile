@@ -1,17 +1,6 @@
 NAME_S = uchat_server
 NAME_C = uchat
 
-#colors
-RESET			= \033[m
-RED         	= \033[1;31m
-GREEN       	= \033[01;38;05;46m
-YELLOW      	= \033[01;38;05;226m
-BLUE        	= \033[03;38;05;21m
-VIOLET      	= \033[01;38;05;201m
-CYAN        	= \033[1;36m
-WHITE       	= \033[01;38;05;15m
-
-
 SRCD = src
 INCD = inc
 OBJD = obj
@@ -34,6 +23,8 @@ LIBSNDFA := $(addprefix $(LIBSNDFD)/, $(LIBSNDFX))
 LIBPORTAUDIOD  = libportaudio
 LIBPORTAUDIOX  = lib/.libs/libportaudio.a
 LIBPORTAUDIOA := $(addprefix $(LIBPORTAUDIOD)/, $(LIBPORTAUDIOX))
+LIBPORTAUDIO_FLAGS = -framework CoreAudio -framework AudioToolbox -framework AudioUnit \
+                     -framework CoreServices -framework Carbon
 
 INCS = inc/uchat.h
 
@@ -136,10 +127,10 @@ SRC_CLIENT = main_client.c \
 	record_audio2.c \
 	play_audio.c \
 	play_audio2.c \
+	play_audio3.c \
 	send_empty_json.c \
 	mx_audio.c \
 
-# SRC_HELP = $(wildcard *.c)
 SRC_HELP = err_exit.c \
 	functions.c \
 	functions2.c \
@@ -174,8 +165,6 @@ LIBRESSL_H = \
 			-I ./libressl/ssl \
 			-I ./libressl/crypto
 
-#AUDIOFLAGS = -lportaudio
-#TLSFLAGS =  -lcrypto -lssl -ltls
 SQLFLAGS = -lsqlite3
 
 all: install
@@ -186,7 +175,8 @@ $(NAME_S): $(OBJS_SERVER) $(OBJS_HELP)
 	@clang -lsqlite3 -o create $(BD) && ./create server_db.bin
 	@rm -rf create
 	@make -sC $(LJSOND)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS)
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(LIBRESSL_H) $(LIBRESSL_A) \
+	       $(OBJS_SERVER) $(OBJS_HELP) -o $@  $(SQLFLAGS)
 	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
 
 $(OBJD)/%.o: src/server/%.c $(INCS)
@@ -222,25 +212,18 @@ $(LIBSNDFX): $(LIBSNDFA)
 	@make -sC $(LIBSNDFD)
 
 $(LIBPORTAUDIOA):
-	(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
+# 	(cd ./$(LIBPORTAUDIOD) &&./configure --disable-mac-universal)
 	@make -sC $(LIBPORTAUDIOD)
 
 $(LIBPORTAUDIOX): $(LIBPORTAUDIOA)
 	@make -sC $(LIBPORTAUDIOD)
 
 
-#$(LIBRESSLD_TLSA):
-	#(cd ./$(LIBRESSLD) && ./configure BUILD_SHARED_LIBS=ON)
-#	@make -sC $(LIBRESSLD)
-
-#$(LIBRESSL_TLSX): $(LIBRESSLD_TLSA)
-#	@make -sC $(LIBRESSLD)
-
-client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) #$(LIBMX)
-
+client: $(NAME_C) $(LIBSNDFX) $(LIBPORTAUDIOX) $(LIBMX)
 
 $(NAME_C): $(OBJS_CLIENT) $(OBJS_HELP)
-	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA)  $(LJSONA) $(LIBSNDFA) -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices -framework Carbon $(LIBPORTAUDIOA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_CLIENT) $(OBJS_HELP) -o $@
+	@clang $(CFLAGS) `pkg-config --cflags --libs gtk+-3.0` $(LMXA) $(LJSONA) $(LIBSNDFA) $(LIBPORTAUDIO_FLAGS) \
+	       $(LIBPORTAUDIOA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_CLIENT) $(OBJS_HELP) -o $@
 	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
 
 
@@ -258,15 +241,12 @@ $(OBJS_CLIENT): | $(OBJD)
 install: server client
 
 clean:
-# 	@make -sC ./libjson clean
-# 	@make -sC ./libsndfile clean
 # 	@make -sC $(LBMXD) clean
 	@rm -rf $(OBJD)
 	@printf "$(OBJD)\t\t   \033[31;1mdeleted\033[0m\n"
 
 uninstall: clean
-# 	@make -sC ./libjson uninstall
-# 	@make -sC ./libsndfile clean
+
 # 	@make -sC $(LBMXD) uninstall
 	@rm -rf $(NAME_S) $(NAME_C)
 	@printf "$(NAME_S)\t   \033[31;1muninstalled\033[0m\n"

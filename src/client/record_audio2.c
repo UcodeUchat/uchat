@@ -37,7 +37,7 @@ char *mx_record_audio(t_client_info *info) {
     err = mx_record(stream, data, sample_block, info);
     if (err != 0)
         printf("err =%d\n", err);
-    printf(" exit record\n");
+    printf("exit record\n");
     printf("record to file->%s\n", data->file_name);
     info->can_record = 1;
     return data->file_name;
@@ -62,7 +62,7 @@ int mx_exit_stream(t_audio *data, PaError err) {
         fprintf(stderr, "Error occured while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText( err ));
-        err = 1; // Always return 0 or 1, but no other return codes.
+        err = 1;
     }
     return err;
 }
@@ -76,7 +76,7 @@ long mx_save_audio(t_audio *data) {
     };
     char file_name[100];
 
-    snprintf(file_name, 100, "./Uchat_downloads/rec_massage%d.aif", rand());
+    snprintf(file_name, 100, "./Uchat_downloads/rec_%d.aif", rand());
     SNDFILE *outfile = sf_open(file_name, SFM_WRITE, &sfinfo);
     if (!outfile) {
         printf("error outfile =%d\n", sf_error(outfile));

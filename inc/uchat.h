@@ -655,5 +655,10 @@ int mx_record(PaStream *stream, t_audio *data, t_a_snippet *sample_block,
               t_client_info *info);
 int mx_process_stream(PaStream *stream, t_audio *data,
                       t_a_snippet *sample_block, int *i);
+int mx_play_loop(t_mes *mes, t_a_file *audio, SF_INFO s_info,
+                 PaStream* stream);
+int mx_play_loop_simple(t_a_file *audio, SF_INFO s_info,
+                       PaStream* stream);
+char *mx_get_file_name(t_mes *mes);
 
 #endif

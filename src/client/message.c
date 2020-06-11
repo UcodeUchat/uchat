@@ -36,8 +36,8 @@ t_message *mx_create_message (t_client_info *info, t_room *room,
 
 static void *sound_thread (void *data) {
     (void)data;
-    mx_play_sound_file(NULL, "0", "1");
-//    mx_play_sound_file("audio/moby.aif", "0", "3");
+
+    mx_play_audio_notific("./sounds/message_receive.aif", "0", "1");
     return 0;
 }
 

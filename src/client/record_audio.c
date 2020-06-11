@@ -46,9 +46,9 @@ static int set_input_parameters(PaStreamParameters *input_parameters,
 
     input_parameters->device = Pa_GetDefaultInputDevice();
     inp_info = Pa_GetDeviceInfo(input_parameters->device);
-    printf( "    Name: %s\n", inp_info->name );
-    printf( "      LL: %g s\n", inp_info->defaultLowInputLatency);
-    printf( "      HL: %g s\n", inp_info->defaultHighInputLatency);
+    printf( "   Name: %s\n", inp_info->name );
+    printf( "     LL: %g s\n", inp_info->defaultLowInputLatency);
+    printf( "     HL: %g s\n", inp_info->defaultHighInputLatency);
     if (input_parameters->device == paNoDevice)
         mx_err_return3("Error: No default input device.\n", NULL, -1);
     output_parameters->device = Pa_GetDefaultOutputDevice();
