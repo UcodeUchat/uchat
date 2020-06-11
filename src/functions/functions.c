@@ -4,22 +4,23 @@ int mx_detect_file_extention(char *filename) {
     char *dot = strrchr(filename, '.');
 
     if (!dot || dot == filename)
-		return -1;
+        return -1;
     else {
-		while (mx_get_char_index(dot + 1, '.') >= 0) {
+        while (mx_get_char_index(dot + 1, '.') >= 0) {
             char *tmp = strdup(dot + mx_get_char_index(dot, '.'));
             free(dot);
             dot = strdup(tmp);
             free(tmp); 
         }
-		dot++;
-		if (!strcmp(dot, "jpg") || !strcmp(dot, "jpeg") || !strcmp(dot, "png") || !strcmp(dot, "gif"))
-			return 1; // image
+        dot++;
+        if (!strcmp(dot, "jpg") || !strcmp(dot, "jpeg") ||\
+            !strcmp(dot, "png") || !strcmp(dot, "gif"))
+            return 1;
         else if (!strcmp(dot, "aif"))
-            return 2; //audio
-		else
-			return 0; // just file
-	}
+            return 2;
+        else
+            return 0;
+    }
 }
 
 int tls_send(struct tls *tls_socket, const char *content, int size) {
@@ -37,7 +38,6 @@ int tls_send(struct tls *tls_socket, const char *content, int size) {
 
 void mx_print_client_address(struct sockaddr_storage client_address,
                              socklen_t client_len) {
-    // print info about new accepted client
     char host[100];
     char serv[100];
 
