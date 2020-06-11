@@ -60,7 +60,5 @@ int mx_make_tls_connect_client(t_client_info *info) {
         mx_err_return2("tls_connect error: ", tls_error(info->tls_client));
     if (tls_handshake(info->tls_client) < 0)
         mx_err_return2("tls_handshake error: ", tls_error(info->tls_client));
-    printf("tls connect success \n");
-    mx_report_tls(info->tls_client, "client");
     return 0;
 }

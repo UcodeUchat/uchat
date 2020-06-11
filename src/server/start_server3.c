@@ -48,7 +48,5 @@ int mx_make_tls_connect(struct tls *tls, struct tls **tls_sock,
         printf("%s\n", tls_error(*tls_sock));
         return 1;
     }
-    mx_report_tls(*tls_sock, "new client ");
-    printf("\nClient connected successfully\n");
     return 0;
 }
