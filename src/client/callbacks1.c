@@ -62,7 +62,8 @@ void mx_search_callback (GtkWidget *widget, t_client_info *info) {
     mx_js_o_o_add(new_json, "type", mx_js_n_int(MX_SEARCH_ALL_TYPE));
     mx_js_o_o_add(new_json, "user_id", mx_js_n_int(info->id));
     mx_js_o_o_add(new_json, "query", mx_js_n_str 
-                            (gtk_entry_get_text(GTK_ENTRY(info->data->search_entry))));
+                            (gtk_entry_get_text(GTK_ENTRY
+                            (info->data->search_entry))));
     json_string = mx_js_o_to_js_str(new_json);
     tls_send(info->tls_client, json_string, strlen(json_string));
     gtk_entry_set_text(GTK_ENTRY(info->data->search_entry), "");
