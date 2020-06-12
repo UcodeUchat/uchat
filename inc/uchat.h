@@ -47,7 +47,7 @@
 #include "../libressl/include/openssl/aes.h"
 #include "../libressl/include/openssl/conf.h"
 
-#include "libmx/inc/libmx.h"
+#include "../libmx/inc/libmx.h"
 
 void mx_printerr(const char *s);
 int mx_set_demon(const char *log_file);

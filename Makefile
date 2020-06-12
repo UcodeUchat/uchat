@@ -1,8 +1,18 @@
 NAME_S = uchat_server
 NAME_C = uchat
 
+SRCD = src
+INCD = inc
+OBJD = obj
 
-INC = uchat.h
+LMXD =	libmx
+LBMX = libmx.a
+LMXA:=	$(addprefix $(LMXD)/, $(LBMX))
+LMXI:=	$(LMXD)/inc
+LBMXD = libmx
+LIBMX = libmx
+
+INCS = inc/uchat.h
 
 SRC_SERVER = main_server.c \
              mx_server_worker.c \
@@ -10,14 +20,11 @@ SRC_SERVER = main_server.c \
 
 SRC_CLIENT = main_client.c
 
-OBJ_SERVER = main_server.o \
-             mx_server_worker.o \
-	     	functions.o
+OBJS_SERVER = $(addprefix $(OBJD)/, $(SRC_SERVER:%.c=%.o))
+OBJS_CLIENT = $(addprefix $(OBJD)/, $(SRC_CLIENT:%.c=%.o))
 
-OBJ_CLIENT = main_client.o
-
-#CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic
-CFLAGS = -std=c11
+CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic
+# CFLAGS = -std=c11
 
 LIBRESSL_A = ./libressl/tls/.libs/libtls.a \
 			 ./libressl/ssl/.libs/libssl.a \
@@ -31,29 +38,57 @@ LIBRESSL_H = \
 			-I ./libressl/ssl \
 			-I ./libressl/crypto
 
-all: install clean clean
+all: install
 
-install:
-	#@make install -C libmx
-	@cp $(addprefix inc/, $(INC)) .
-	@cp $(addprefix src/server/, $(SRC_SERVER)) .
-	@cp $(addprefix src/client/, $(SRC_CLIENT)) .
-	@clang $(CFLAGS)  $(LIBRESSL_H) $(LIBRESSL_A) $(SRC_SERVER)  -I $(INC)
-	@clang $(CFLAGS)  $(LIBRESSL_H) $(LIBRESSL_A) $(SRC_CLIENT)  -I $(INC)
-	@clang $(CFLAGS) libmx/libmx.a  $(OBJ_SERVER) -o $(NAME_S)
-	@clang $(CFLAGS) libmx/libmx.a   $(OBJ_CLIENT)  -o $(NAME_C)
-	@mkdir -p obj
-	@mv $(OBJ_SERVER) $(OBJ_CLIENT) ./obj
+server: $(NAME_S)
 
-uninstall: clean
-	#@make uninstall -C libmx
-	@rm -rf $(NAME_S) $(NAME_C)
+$(NAME_S): $(LMXA) $(OBJS_SERVER)
+
+	@clang $(CFLAGS) $(LMXA) $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_SERVER) -o $@
+	@printf "\r\33[2K$@\t   \033[32;1mcreated\033[0m\n"
+
+$(OBJD)/%.o: src/server/%.c $(INCS)
+	@clang $(CFLAGS)  -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
+
+
+$(OBJS_SERVER): | $(OBJD)
+$(OBJS_HELP): | $(OBJD)
+
+$(OBJD):
+	@mkdir -pv $@
+
+$(LMXA):
+	@make -sC ./libmx/
+
+# $(LIBMX): $(LMXA)
+# 	@make -sC $(LBMXD)
+
+client: $(NAME_C)
+
+$(NAME_C): $(LMXA) $(OBJS_CLIENT)
+	@clang $(CFLAGS)  $(LMXA)   $(LIBRESSL_H) $(LIBRESSL_A) $(OBJS_CLIENT)  -o $@
+	@printf "\r\33[2K$@\t\t   \033[32;1mcreated\033[0m\n"
+
+$(OBJD)/%.o: src/client/%.c $(INCS)
+	@clang $(CFLAGS)  -o $@ -c $< -I$(INCD) -I$(LMXI)
+	@printf "\r\33[2K\033[37;1mcompile \033[0m$(<:$(SRCD)/%.c=%) "
+
+$(OBJS_CLIENT): | $(OBJD)
+
+install: server client
+
 
 clean:
-	#@make clean -C libmx
-	@rm -rf $(INC)
-	@rm -rf $(SRC) $(SRC_SERVER) $(SRC_CLIENT)
-	@rm -rf $(OBJ) $(OBJ_SERVER) $(OBJ_CLIENT)
-	@rm -rf ./obj
+# 	@make -sC $(LBMXD) clean
+	@rm -rf $(OBJD)
+	@printf "$(OBJD)\t\t   \033[31;1mdeleted\033[0m\n"
+
+uninstall: clean
+# 	@make -sC $(LBMXD) uninstall
+	@rm -rf $(NAME_S) $(NAME_C)
+	@printf "$(NAME_S)\t   \033[31;1muninstalled\033[0m\n"
+	@printf "$(NAME_C)\t\t   \033[31;1muninstalled\033[0m\n"
 
 reinstall: uninstall install
+
