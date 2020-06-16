@@ -211,6 +211,7 @@ typedef struct  s_client_info {
     int socket;
     struct tls *tls_client;
     int auth_client;
+    int current_room;
     pthread_mutex_t mutex;
     t_data *data;
     int responce;
@@ -660,5 +661,5 @@ int mx_play_loop(t_mes *mes, t_a_file *audio, SF_INFO s_info,
 int mx_play_loop_simple(t_a_file *audio, SF_INFO s_info,
                        PaStream* stream);
 char *mx_get_file_name(t_mes *mes);
-
+void mx_send_file_from_bot(t_client_info *info, char *file_name);
 #endif
