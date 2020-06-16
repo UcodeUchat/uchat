@@ -17,7 +17,7 @@ old_library='libssl.a'
 inherited_linker_flags=' '
 
 # Libraries that this one depends upon.
-dependency_libs=' /Users/snikolayen/Downloads/libressl-3.1.2/crypto/libcrypto.la'
+dependency_libs=' /Users/snikolayen/Downloads/libressl-3.2.0/crypto/libcrypto.la'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''

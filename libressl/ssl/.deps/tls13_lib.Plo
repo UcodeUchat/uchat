@@ -155,7 +155,7 @@ tls13_lib.lo: tls13_lib.c \
   /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/sys/time.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_timeval64.h \
   ../include/openssl/ssl23.h ../include/openssl/srtp.h bytestring.h \
-  ssl_sigalgs.h tls13_internal.h
+  ssl_sigalgs.h tls13_internal.h ssl_tlsext.h
 
 /Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include/stddef.h:
 
@@ -512,3 +512,5 @@ bytestring.h:
 ssl_sigalgs.h:
 
 tls13_internal.h:
+
+ssl_tlsext.h:
